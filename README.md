@@ -23,7 +23,7 @@ npm run demo
 npm run manifest
 ```
 
-`npm test` runs constitutional rule tests including Human Authority, confidence≠truth, and CrossTrade secondary-only routing.
+`npm test` runs constitutional rule tests including Human Authority, confidence≠truth, CrossTrade secondary-only routing, and v0.2 recognition / pricebook lock / mission board / location economics.
 
 `npm run demo` runs a synthetic shadow-day: Call-Fit, sealed counterfactual, human override, hash-chained receipts, trajectory rebase.
 
@@ -37,8 +37,11 @@ npm run manifest
 | Human Authority | `src/core/human-authority.ts` | live-pure |
 | TradesCoherence, EvidencePacket, DecisionGate, ReceiptLedger, Shadow, Trajectory | `src/inherited/` | live-pure |
 | Call-Fit, economics, CrossTrade, Chain D, workforce, Decision Fabric, analytics | `src/domain/` | live-pure |
-| Comms / recognition / mission board | `src/domain/comms.ts` | live-pure |
-| Pricebook / van stock / fulfillment | `src/domain/pricebook-stock.ts` | live-pure |
+| Communications (event-stream channels) | `src/domain/communications.ts` | live-pure |
+| Recognition (quality-gated) | `src/domain/recognition.ts` | live-pure |
+| Daily mission board | `src/domain/mission-board.ts` | live-pure |
+| Pricebook (ST shadow + LOCK) | `src/domain/pricebook.ts` | live-pure |
+| Truck stock / fulfillment | `src/domain/truck-stock.ts` | live-pure |
 | Weather / demand / lunar (experimental) | `src/domain/weather-demand.ts` | live-pure |
 | Maintenance routing (demand-first) | `src/domain/maintenance-routing.ts` | live-pure |
 | §18 freeze + v0.2 governing rules | `src/rules/constitution.ts` | live-pure |

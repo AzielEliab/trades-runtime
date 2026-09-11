@@ -3,8 +3,8 @@ import { mayTreatAsNotCovered, type WarrantyState } from "../core/warranty.js";
 import { overwriteForbidden, type ChainRecord } from "../core/chains.js";
 import { geographyIsSoleDecider, type CallFitFactors } from "../domain/call-fit.js";
 import { existingCommitmentProtected } from "../domain/workforce-capacity.js";
-import { mayRecognize, rewardRawRevenueAlone, type RecognitionCandidate } from "../domain/comms.js";
-import { refuseLockedAutoRecalibrate, type PricebookRecommendation } from "../domain/pricebook-stock.js";
+import { mayRecognize, rewardRawRevenueAlone, type RecognitionCandidate } from "../domain/recognition.js";
+import { refuseLockedAutoRecalibrate, type PricebookRecommendation } from "../domain/pricebook.js";
 import { lunarPlumbingFeature, lunarWeightWithoutEarnedLift } from "../domain/weather-demand.js";
 import { mayHoldForIdealSeller } from "../domain/maintenance-routing.js";
 

@@ -24,18 +24,28 @@ export { reconcilePipelines, paretoFrontier } from "./domain/decision-fabric.js"
 export { requireReportMetadata } from "./domain/analytics.js";
 export {
   archiveChannel,
+  attachEvent,
+  bindWarehouseDemand,
   createChannel,
-  mayRecognize,
-  missionBoard,
-  rewardRawRevenueAlone,
-  turnoverAttribution
-} from "./domain/comms.js";
+  createManagedChannel,
+  emitChannelEvent
+} from "./domain/communications.js";
+export { fireRecognition, mayRecognize, rewardRawRevenueAlone, turnoverAttribution } from "./domain/recognition.js";
+export { forScope, missionBoard } from "./domain/mission-board.js";
 export {
   applyManagerDecision,
   applyShadowBaseline,
-  recommendVanStock,
+  collectEvidenceWhileLocked,
+  recommendFromShadowBaseline,
   refuseLockedAutoRecalibrate
-} from "./domain/pricebook-stock.js";
+} from "./domain/pricebook.js";
+export {
+  applyLocationToEconomics,
+  economicsForLocation,
+  fulfillmentQueueFromDemand,
+  recommendVanProfile,
+  recommendVanStock
+} from "./domain/truck-stock.js";
 export {
   demandForecast,
   lunarPlumbingFeature,
