@@ -1,0 +1,269 @@
+{
+  "ok": true,
+  "product": "trades-runtime",
+  "name": "trades-runtime",
+  "title": "Trades Runtime",
+  "author": "Aziel Eliab",
+  "identity": "Aziel Eliab",
+  "version": "0.1.0",
+  "runtime_version": "0.1.0",
+  "role": "trades-runtime",
+  "layer": "static-catalog+docs",
+  "visibility": "private",
+  "license": "Apache-2.0",
+  "repository": "https://github.com/AzielEliab/trades-runtime",
+  "sibling_of": "aziel-runtime",
+  "not": [
+    "Not a public Softwares suite.",
+    "Not a FragGate engine catalog.",
+    "Not a clone of aziel-runtime.",
+    "Not a live Worker backend in v0."
+  ],
+  "authority": {
+    "runtime_json": "/v1/runtime.json",
+    "site": "/",
+    "cite": "/cite.json",
+    "llms": "/llms.txt",
+    "note": "v0 is a static documentation and ops catalog. Planned ops are named, not executed."
+  },
+  "planned_ops": [
+    {
+      "slug": "dispatch",
+      "name": "Dispatch",
+      "status": "planned",
+      "summary": "Assign a job to a crew or technician with trade, SLA window, and site notes."
+    },
+    {
+      "slug": "estimate",
+      "name": "Estimate",
+      "status": "planned",
+      "summary": "Capture scope, materials, labor, permits, and a written price before work starts."
+    },
+    {
+      "slug": "work-order",
+      "name": "Work order",
+      "status": "planned",
+      "summary": "The living job record: findings, parts, photos, customer authorization."
+    },
+    {
+      "slug": "inspection",
+      "name": "Inspection",
+      "status": "planned",
+      "summary": "Pre-work and post-work checks, code notes, and photo evidence."
+    },
+    {
+      "slug": "closeout",
+      "name": "Closeout",
+      "status": "planned",
+      "summary": "Complete the job: sign-off, invoices, warranty, and follow-up tasks."
+    }
+  ],
+  "modules": [
+    {
+      "slug": "hvac",
+      "name": "HVAC",
+      "kind": "trade",
+      "status": "catalog",
+      "version": "0.1.0",
+      "author": "Aziel Eliab",
+      "one_line": "Heating, ventilation, and air conditioning field work for service, install, and maintenance.",
+      "path": "trades/hvac/",
+      "job_types": [
+        "No-cool / no-heat diagnostic",
+        "Preventive maintenance tune-up",
+        "System replacement or change-out",
+        "Refrigerant leak search and repair",
+        "Thermostat and control issues",
+        "Duct, airflow, and IAQ work"
+      ],
+      "ops": {
+        "dispatch": { "status": "planned" },
+        "estimate": { "status": "planned" },
+        "work-order": { "status": "planned" },
+        "inspection": { "status": "planned" },
+        "closeout": { "status": "planned" }
+      },
+      "safety": {
+        "status": "placeholder",
+        "notes": [
+          "Electrical lockout on condensing units and air handlers.",
+          "Refrigerant handling and recovery credentials.",
+          "Combustion, CO, and flue integrity on gas equipment."
+        ]
+      },
+      "checklists": {
+        "status": "stub",
+        "items": [
+          "Confirm call type, equipment age, and refrigerant.",
+          "Photograph nameplate and existing conditions.",
+          "Record static pressure, temps, and customer authorization."
+        ]
+      }
+    },
+    {
+      "slug": "plumbing",
+      "name": "Plumbing",
+      "kind": "trade",
+      "status": "catalog",
+      "version": "0.1.0",
+      "author": "Aziel Eliab",
+      "one_line": "Supply, drain, fixture, and water-heater work inside the building envelope.",
+      "path": "trades/plumbing/",
+      "job_types": [
+        "Leak locate and repair",
+        "Drain clog and fixture stoppage",
+        "Water heater service or replacement",
+        "Fixture install or rebuild",
+        "Repipe or re-route",
+        "Backflow and isolation work"
+      ],
+      "ops": {
+        "dispatch": { "status": "planned" },
+        "estimate": { "status": "planned" },
+        "work-order": { "status": "planned" },
+        "inspection": { "status": "planned" },
+        "closeout": { "status": "planned" }
+      },
+      "safety": {
+        "status": "placeholder",
+        "notes": [
+          "Water shutoff and isolation before opening a line.",
+          "Scald and gas-connection checks on water heaters.",
+          "Wet-area electrical awareness around pumps and heaters."
+        ]
+      },
+      "checklists": {
+        "status": "stub",
+        "items": [
+          "Locate shutoffs and confirm water source.",
+          "Protect finished surfaces before opening walls or ceilings.",
+          "Pressure-test or visual-confirm the repair before closeout."
+        ]
+      }
+    },
+    {
+      "slug": "electrical",
+      "name": "Electrical",
+      "kind": "trade",
+      "status": "catalog",
+      "version": "0.1.0",
+      "author": "Aziel Eliab",
+      "one_line": "Service, branch-circuit, and equipment-power work for homes and light commercial sites.",
+      "path": "trades/electrical/",
+      "job_types": [
+        "Outlet, switch, and lighting repair",
+        "Panel and service troubleshooting",
+        "Circuit add or dedicated run",
+        "EV charger or generator interconnect",
+        "Device and fixture install",
+        "Service upgrade (planned scope only in v0)"
+      ],
+      "ops": {
+        "dispatch": { "status": "planned" },
+        "estimate": { "status": "planned" },
+        "work-order": { "status": "planned" },
+        "inspection": { "status": "planned" },
+        "closeout": { "status": "planned" }
+      },
+      "safety": {
+        "status": "placeholder",
+        "notes": [
+          "Verify de-energized with a known-live tester.",
+          "Lockout/tagout on panels and disconnects.",
+          "Arc-flash and PPE notes by task class."
+        ]
+      },
+      "checklists": {
+        "status": "stub",
+        "items": [
+          "Identify panel, circuit, and load before opening anything.",
+          "Photograph existing labeling and device condition.",
+          "Restore labeling and test the repaired circuit."
+        ]
+      }
+    },
+    {
+      "slug": "sewer",
+      "name": "Sewer",
+      "kind": "trade",
+      "status": "catalog",
+      "version": "0.1.0",
+      "author": "Aziel Eliab",
+      "one_line": "Building drain, sewer lateral, and main-line work beyond ordinary fixture clogs.",
+      "path": "trades/sewer/",
+      "job_types": [
+        "Main-line backup",
+        "Camera inspection",
+        "Hydro jet or cable clear",
+        "Cleanout locate and access",
+        "Root intrusion treatment",
+        "Spot repair or replacement estimate"
+      ],
+      "ops": {
+        "dispatch": { "status": "planned" },
+        "estimate": { "status": "planned" },
+        "work-order": { "status": "planned" },
+        "inspection": { "status": "planned" },
+        "closeout": { "status": "planned" }
+      },
+      "safety": {
+        "status": "placeholder",
+        "notes": [
+          "Sewage exposure and PPE.",
+          "Confined-space awareness at pits and vaults.",
+          "Traffic and excavation controls when the lateral is opened."
+        ]
+      },
+      "checklists": {
+        "status": "stub",
+        "items": [
+          "Confirm cleanout access and backup location.",
+          "Capture camera footage with distance marks.",
+          "Advise on repair vs. clear, then collect authorization."
+        ]
+      }
+    },
+    {
+      "slug": "cross-trades",
+      "name": "Cross-trades",
+      "kind": "trade",
+      "status": "catalog",
+      "version": "0.1.0",
+      "author": "Aziel Eliab",
+      "one_line": "Jobs that require more than one of HVAC, plumbing, electrical, or sewer on the same ticket.",
+      "path": "trades/cross-trades/",
+      "job_types": [
+        "Bathroom or kitchen remodel rough-in",
+        "HVAC change-out that needs new electrical",
+        "Water heater swap with vent, gas, or circuit work",
+        "Flood or backup restoration",
+        "New-construction multi-trade rough-in",
+        "Equipment pad, disconnect, and condensate together"
+      ],
+      "spans": ["hvac", "plumbing", "electrical", "sewer"],
+      "ops": {
+        "dispatch": { "status": "planned" },
+        "estimate": { "status": "planned" },
+        "work-order": { "status": "planned" },
+        "inspection": { "status": "planned" },
+        "closeout": { "status": "planned" }
+      },
+      "safety": {
+        "status": "placeholder",
+        "notes": [
+          "Sequence trades so one crew does not energize or pressurize another crew's work.",
+          "Shared lockout and water-gas-power isolation.",
+          "Single accountable lead on site when scopes overlap."
+        ]
+      },
+      "checklists": {
+        "status": "stub",
+        "items": [
+          "List every trade required before the first dispatch.",
+          "Hold one estimate that names each trade's scope and exclusions.",
+          "Close the ticket only when every trade has signed its portion."
+        ]
+      }
+    }
+  ]
+}

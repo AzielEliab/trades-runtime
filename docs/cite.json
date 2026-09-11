@@ -1,0 +1,18 @@
+{
+  "product": "trades-runtime",
+  "name": "trades-runtime",
+  "title": "Trades Runtime",
+  "version": "0.1.0",
+  "author": "Aziel Eliab",
+  "identity": "Aziel Eliab",
+  "role": "trades-runtime",
+  "visibility": "private",
+  "license": "Apache-2.0",
+  "repository": "https://github.com/AzielEliab/trades-runtime",
+  "description": "Private documentation and ops catalog for HVAC, plumbing, electrical, sewer, and cross-trades businesses.",
+  "not": [
+    "Not a public Softwares suite.",
+    "Not aziel-runtime.",
+    "No live Worker backends in v0."
+  ]
+}

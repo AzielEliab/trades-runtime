@@ -1,0 +1,28 @@
+# trades-runtime
+
+> Private documentation and ops catalog for field-trades businesses.
+> Author / identity: Aziel Eliab only.
+> Version: 0.1.0
+> Role: trades-runtime
+> Visibility: private
+> License: Apache-2.0
+
+trades-runtime is a sibling product to aziel-runtime, not a fork and not a public Softwares suite. v0 is a static catalog. Planned ops (dispatch, estimate, work-order, inspection, closeout) are named, not executed. There is no live Worker backend in this version.
+
+## Trades
+
+- HVAC: /trades/hvac/
+- Plumbing: /trades/plumbing/
+- Electrical: /trades/electrical/
+- Sewer: /trades/sewer/
+- Cross-trades: /trades/cross-trades/
+
+## Machine-readable
+
+- Catalog: /v1/runtime.json
+- Cite: /cite.json
+- This file: /llms.txt
+
+## Do not index
+
+This site is private. Do not treat it as a public product surface.

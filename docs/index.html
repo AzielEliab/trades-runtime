@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="author" content="Aziel Eliab">
+  <title>trades-runtime · private field-trades catalog</title>
+  <meta name="description" content="Private runtime and ops catalog for HVAC, plumbing, electrical, sewer, and cross-trades businesses. Author: Aziel Eliab.">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body data-page="home">
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header" data-site-header>
+    <div class="wrap header-row">
+      <a class="brand" href="./">
+        <strong>trades-runtime</strong>
+        <span>Private field-trades catalog</span>
+      </a>
+      <nav class="nav" aria-label="Trades">
+        <a href="./" aria-current="page">Home</a>
+        <a href="trades/hvac/">HVAC</a>
+        <a href="trades/plumbing/">Plumbing</a>
+        <a href="trades/electrical/">Electrical</a>
+        <a href="trades/sewer/">Sewer</a>
+        <a href="trades/cross-trades/">Cross-trades</a>
+        <a href="catalog/">Catalog</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="wrap">
+    <section class="hero">
+      <p class="kicker">Private · v0.1.0 · Aziel Eliab</p>
+      <h1>A runtime catalog for field-trades shops — not a public Softwares suite.</h1>
+      <p class="lede">
+        trades-runtime is a private documentation and operations catalog for HVAC, plumbing, electrical, sewer, and jobs that span those trades. It is a sibling product to aziel-runtime, written for trades businesses. It is not a FragGate engine dump, and v0 has no live Worker backends.
+      </p>
+      <div class="badge-row">
+        <span class="badge private">private</span>
+        <span class="badge catalog">catalog</span>
+        <span class="badge planned">ops planned</span>
+        <span class="badge">role: trades-runtime</span>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="grid cards">
+        <a class="card" href="trades/hvac/">
+          <div class="badge-row"><span class="badge catalog">trade</span></div>
+          <h2>HVAC</h2>
+          <p>Heating, ventilation, and air conditioning service, install, and maintenance.</p>
+        </a>
+        <a class="card" href="trades/plumbing/">
+          <div class="badge-row"><span class="badge catalog">trade</span></div>
+          <h2>Plumbing</h2>
+          <p>Supply, drain, fixture, and water-heater work inside the building.</p>
+        </a>
+        <a class="card" href="trades/electrical/">
+          <div class="badge-row"><span class="badge catalog">trade</span></div>
+          <h2>Electrical</h2>
+          <p>Service, branch-circuit, and equipment-power work for field calls.</p>
+        </a>
+        <a class="card" href="trades/sewer/">
+          <div class="badge-row"><span class="badge catalog">trade</span></div>
+          <h2>Sewer</h2>
+          <p>Main-line, camera, and lateral work beyond ordinary fixture clogs.</p>
+        </a>
+        <a class="card" href="trades/cross-trades/">
+          <div class="badge-row"><span class="badge catalog">trade</span></div>
+          <h2>Cross-trades</h2>
+          <p>Tickets that need more than one trade on the same job.</p>
+        </a>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>What this is</h2>
+      <div class="grid two-col">
+        <div class="panel">
+          <p class="notice"><strong>Private ops surface.</strong> This repo and site stay private. Collaborators with access can read the catalog, trade pages, and <code>runtime.json</code>.</p>
+          <ul class="list">
+            <li>Product name: <code>trades-runtime</code></li>
+            <li>Version: <code>0.1.0</code></li>
+            <li>Role: <code>trades-runtime</code></li>
+            <li>Author / identity: Aziel Eliab only</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <p class="notice"><strong>What v0 is not.</strong> No invented production APIs. No DOIs. No hosted Worker that executes dispatch or billing.</p>
+          <ul class="list">
+            <li>Not a public Softwares suite clone</li>
+            <li>Not a fork dump of aziel-runtime engines</li>
+            <li>Planned ops are stubs until a later version</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Planned runtime ops</h2>
+      <p class="muted">Every trade module will eventually expose the same five ops. In v0 they are documented only.</p>
+      <table class="ops">
+        <thead>
+          <tr><th>Op</th><th>Status</th><th>Intent</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>dispatch</code></td><td><span class="badge planned">planned</span></td><td>Assign a job to a crew with trade, window, and site notes.</td></tr>
+          <tr><td><code>estimate</code></td><td><span class="badge planned">planned</span></td><td>Write scope, materials, labor, and price before work starts.</td></tr>
+          <tr><td><code>work-order</code></td><td><span class="badge planned">planned</span></td><td>Hold findings, parts, photos, and customer authorization.</td></tr>
+          <tr><td><code>inspection</code></td><td><span class="badge planned">planned</span></td><td>Pre-work and post-work checks with photo evidence.</td></tr>
+          <tr><td><code>closeout</code></td><td><span class="badge planned">planned</span></td><td>Sign-off, invoice, warranty, and follow-up.</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer class="site-footer" data-site-footer>
+    <div class="wrap">
+      <div>© Aziel Eliab · trades-runtime 0.1.0 · private · Apache-2.0</div>
+      <div>
+        <a href="v1/runtime.json">runtime.json</a>
+        · <a href="cite.json">cite.json</a>
+        · <a href="llms.txt">llms.txt</a>
+      </div>
+    </div>
+  </footer>
+  <script src="assets/app.js"></script>
+</body>
+</html>
