@@ -1,72 +1,303 @@
 {
   "ok": true,
   "product": "trades-runtime",
-  "name": "trades-runtime",
-  "title": "Trades Runtime",
+  "name": "Trades-Runtime",
+  "title": "Trades-Runtime",
   "author": "Aziel Eliab",
   "identity": "Aziel Eliab",
   "version": "0.1.0",
   "runtime_version": "0.1.0",
+  "spec_pack": "architecture-v0.1 + addenda v0.7 / v0.8 / v0.9",
   "role": "trades-runtime",
-  "layer": "static-catalog+docs",
+  "kind": "shadow-first-operating-intelligence",
+  "layer": "static-architecture-portal",
   "visibility": "private",
   "license": "Apache-2.0",
   "repository": "https://github.com/AzielEliab/trades-runtime",
   "sibling_of": "aziel-runtime",
-  "not": [
-    "Not a public Softwares suite.",
-    "Not a FragGate engine catalog.",
-    "Not a clone of aziel-runtime.",
-    "Not a live Worker backend in v0."
+  "status": "design",
+  "live_backends": false,
+  "one_line": "Shadow-first AI operating system and company operating intelligence layer for large multi-branch HVAC, plumbing, electrical, sewer, and cross-trades field service.",
+  "honesty": "This JSON is a static design catalog for a private Pages portal. Engines, fabrics, pipelines, and ops are design/stub. No live Worker backends, DOIs, or production APIs are claimed.",
+  "design_target": {
+    "branches": "13-15",
+    "employees": "750+",
+    "region": "Midwest",
+    "trades": ["hvac", "plumbing", "electrical", "sewer", "cross-trades"],
+    "note": "Design target and operating context, not a live deployment claim."
+  },
+  "integration": {
+    "primary": ["ServiceTitan", "ProBooks"],
+    "posture": "Tether to ServiceTitan + ProBooks / authorized systems first. Read-only or recommendation until evidence supports greater autonomy.",
+    "status": "design"
+  },
+  "principles": [
+    {
+      "slug": "shadow-first",
+      "name": "Shadow-first",
+      "summary": "Observe, produce a sealed counterfactual, compare to actual outcomes. Do not start by replacing ServiceTitan or ProBooks."
+    },
+    {
+      "slug": "human-authority",
+      "name": "Human Authority Rule",
+      "summary": "Authorized human decisions always win operationally. Disagreements are preserved as evidence, never erased."
+    },
+    {
+      "slug": "canonical-state",
+      "name": "One canonical live state",
+      "summary": "Every role view is generated from the same company state. Reality is the next starting point after every event."
+    },
+    {
+      "slug": "receipts",
+      "name": "Reconstructable receipts",
+      "summary": "Material recommendations must be explainable after the fact from contemporaneous evidence."
+    }
+  ],
+  "is_not": [
+    "Not a simple dispatch optimizer.",
+    "Not a leaderboard that equates revenue with technician quality.",
+    "Not a fixed morning route planner.",
+    "Not an autonomous black box that can silently overrule humans.",
+    "Not an AI that treats a photo inference as proof of fault or misconduct.",
+    "Not a fuel-minimization system that sacrifices technical fit or customer outcome.",
+    "Not a system that assumes a 30-day return visit is automatically a technician callback.",
+    "Not a public Softwares suite or FragGate engine catalog.",
+    "Not a live Worker backend in this repository."
   ],
   "authority": {
     "runtime_json": "/v1/runtime.json",
     "site": "/",
+    "specs": "/specs/",
     "cite": "/cite.json",
     "llms": "/llms.txt",
-    "note": "v0 is a static documentation and ops catalog. Planned ops are named, not executed."
+    "canonical_spec": "/specs/architecture-v0.1.txt",
+    "note": "v0.1 is a static architecture portal. Planned ops and engines are named, not executed."
   },
-  "planned_ops": [
+  "deployment_ladder": [
     {
-      "slug": "dispatch",
-      "name": "Dispatch",
-      "status": "planned",
-      "summary": "Assign a job to a crew or technician with trade, SLA window, and site notes."
+      "slug": "observe",
+      "name": "Observe",
+      "status": "design",
+      "summary": "Ingest and normalize data without influencing decisions."
     },
     {
-      "slug": "estimate",
-      "name": "Estimate",
-      "status": "planned",
-      "summary": "Capture scope, materials, labor, permits, and a written price before work starts."
+      "slug": "shadow",
+      "name": "Shadow",
+      "status": "design",
+      "summary": "Produce sealed counterfactual recommendations while humans and existing software operate normally."
     },
     {
-      "slug": "work-order",
-      "name": "Work order",
-      "status": "planned",
-      "summary": "The living job record: findings, parts, photos, customer authorization."
+      "slug": "recommend",
+      "name": "Recommend",
+      "status": "design",
+      "summary": "Surface decisions to staff with no autonomous execution."
     },
     {
-      "slug": "inspection",
-      "name": "Inspection",
-      "status": "planned",
-      "summary": "Pre-work and post-work checks, code notes, and photo evidence."
+      "slug": "human-approves",
+      "name": "Human Approves",
+      "status": "design",
+      "summary": "One-click acceptance or override workflow."
     },
     {
-      "slug": "closeout",
-      "name": "Closeout",
-      "status": "planned",
-      "summary": "Complete the job: sign-off, invoices, warranty, and follow-up tasks."
+      "slug": "limited-autonomy",
+      "name": "Limited Autonomy",
+      "status": "design",
+      "summary": "Narrowly scoped actions with hard constraints and rollback."
+    },
+    {
+      "slug": "autonomous",
+      "name": "Autonomous Operations",
+      "status": "design",
+      "summary": "Only after sustained evidence, governance, and operational approval."
     }
+  ],
+  "modes": [
+    {
+      "slug": "watcher",
+      "name": "Watcher",
+      "status": "design",
+      "summary": "Analytics/operating mode for observe-only ingest. Corresponds to the Observe rung on the deployment ladder."
+    },
+    {
+      "slug": "shadow",
+      "name": "Shadow",
+      "status": "design",
+      "summary": "Sealed counterfactuals; no live execution."
+    },
+    {
+      "slug": "recommendation",
+      "name": "Recommendation",
+      "status": "design",
+      "summary": "Decisions are shown to authorized humans; nothing executes itself."
+    },
+    {
+      "slug": "human-approved",
+      "name": "Human-Approved",
+      "status": "design",
+      "summary": "Action proceeds only after an authorized human accepts."
+    },
+    {
+      "slug": "limited-autonomy",
+      "name": "Limited Autonomy",
+      "status": "design",
+      "summary": "Narrow, constrained, reversible actions."
+    },
+    {
+      "slug": "autonomous",
+      "name": "Autonomous",
+      "status": "design",
+      "summary": "Not claimed. Requires sustained proof and explicit governance."
+    }
+  ],
+  "chains": [
+    {
+      "id": "A",
+      "slug": "full-day-trajectory",
+      "name": "Full-Day Trajectory",
+      "status": "design",
+      "purpose": "Tracks the day as an evolving system.",
+      "preserves": "Morning plan, each real-world state change, each rebase, schedule displacement, route drift, end-of-day result."
+    },
+    {
+      "id": "B",
+      "slug": "call-to-call-ledger",
+      "name": "Call-to-Call Ledger",
+      "status": "design",
+      "purpose": "Tracks every individual service event.",
+      "preserves": "Assignment, travel, arrival, media, diagnosis, parts, quote, repair/turnover, runtime, customer outcome, next-state effect."
+    },
+    {
+      "id": "C",
+      "slug": "human-override-recalibration",
+      "name": "Human Override / Recalibration",
+      "also_called": "Decision/Override/Evidence receipts",
+      "status": "design",
+      "purpose": "Tracks intentional human changes.",
+      "preserves": "Original Trades recommendation, role/person who changed it, timestamp, stated reason, replacement decision, downstream effect, final outcome."
+    },
+    {
+      "id": "D",
+      "slug": "coordination-handoff",
+      "name": "Chain D coordination / handoff",
+      "status": "design",
+      "source": "addenda v0.7 / v0.8",
+      "purpose": "Reconstruct cross-function handoffs so a failed acknowledgment is not mislabeled as a dispatcher or technician fault."
+    }
+  ],
+  "history_rule": "Never overwrite history. Planned state, actual state, counterfactual state, and human override state remain separately queryable. A rebase changes the next decision; it does not erase the prior decision.",
+  "fabrics": [
+    {
+      "slug": "decision",
+      "name": "Decision Fabric",
+      "kind": "reconciler",
+      "status": "design",
+      "responsibility": "Reconciles candidate outputs: evidence weighting, cross-pipeline agreement/disagreement, hard-constraint validation, uncertainty, ranked action set. No single pipeline controls operations."
+    },
+    {
+      "slug": "real-time-operations",
+      "name": "Real-Time Operations Fabric",
+      "kind": "fabric",
+      "status": "design",
+      "responsibility": "Seconds/minutes: booking, dispatch, call-ins, emergencies, Van state, route rebase, employee windows."
+    },
+    {
+      "slug": "planning",
+      "name": "Planning Fabric",
+      "kind": "fabric",
+      "status": "design",
+      "responsibility": "Hours/days/weeks: staffing, PTO impact, maintenance capacity, protected reserve, branch borrowing."
+    },
+    {
+      "slug": "economic",
+      "name": "Economic Fabric",
+      "kind": "fabric",
+      "status": "design",
+      "responsibility": "Labor × cost × profit, contribution, margin, opportunity cost, pricing, procurement, warranty recovery."
+    },
+    {
+      "slug": "evidence",
+      "name": "Evidence Fabric",
+      "kind": "fabric",
+      "status": "design",
+      "responsibility": "Receipts, provenance, media, hashes, source conflict, point-in-time truth, reconstructability."
+    },
+    {
+      "slug": "learning",
+      "name": "Learning Fabric",
+      "kind": "fabric",
+      "status": "design",
+      "responsibility": "Model training, calibration, historical replay, skill learning, demand learning, drift detection."
+    },
+    {
+      "slug": "simulation",
+      "name": "Simulation Fabric",
+      "kind": "fabric",
+      "status": "design",
+      "responsibility": "Counterfactual schedules, branch scenarios, no-impact synthetic operating runs."
+    },
+    {
+      "slug": "analytics",
+      "name": "Analytics Fabric",
+      "kind": "fabric",
+      "status": "design",
+      "responsibility": "Arbitrary reports, graphs, models, scales, probabilities, and human-review queries."
+    }
+  ],
+  "pipelines": [
+    { "slug": "deterministic-rules", "name": "Deterministic Rules Pipeline", "status": "design", "role": "Hard constraints, safety, qualification, SLA, policy, non-negotiable rules." },
+    { "slug": "optimization", "name": "Optimization Pipeline", "status": "design", "role": "Dispatch, routing, capacity allocation, scheduling, contribution, schedule-survival." },
+    { "slug": "predictive-ml", "name": "Predictive ML Pipeline", "status": "design", "role": "Demand, duration, callback, inventory, conversion, urgency, capacity probabilities." },
+    { "slug": "simulation-digital-twin", "name": "Simulation / Digital-Twin Pipeline", "status": "design", "role": "Counterfactual schedules, scenario testing, alternative operational futures." },
+    { "slug": "llm-reasoning", "name": "LLM Reasoning Pipeline", "status": "design", "role": "Unstructured notes, context synthesis, explanation, root-cause hypotheses, solution generation." },
+    { "slug": "historical-analogue", "name": "Historical Analogue Pipeline", "status": "design", "role": "Comparable past calls/days/branches as empirical decision evidence." },
+    { "slug": "cross-branch-federated", "name": "Cross-Branch / Federated Pipeline", "status": "design", "role": "Company-wide balancing of Vans, labor, inventory, booking capacity, regional support." },
+    { "slug": "human-heuristic", "name": "Human-Heuristic Pipeline", "status": "design", "role": "Learn recurring dispatcher/manager override patterns without assuming the human is always correct." }
+  ],
+  "decisioning": {
+    "pareto_frontier": "For material decisions, expose plans where improving one objective necessarily worsens another. Recommend one; keep alternatives visible.",
+    "champion_challenger": "Challengers remain in Shadow until settlement against actual outcomes justifies promotion. Preserve rollback and version lineage.",
+    "status": "design"
+  },
+  "engines": [
+    { "slug": "booking-intake", "name": "Booking & Call Intake Engine", "status": "design", "summary": "Shared visibility into membership, equipment, warranty, and service history at booking." },
+    { "slug": "dispatch-call-fit", "name": "Dispatch / Call-Fit Engine", "status": "design", "summary": "Multi-objective Call-Fit. Geography is never the final factor." },
+    { "slug": "full-day-trajectory", "name": "Full-Day Trajectory Engine", "status": "design", "summary": "Morning plan, event, rebase from actual state, close." },
+    { "slug": "runtime-prediction", "name": "Runtime Prediction Engine", "status": "design", "summary": "Duration as a distribution, not a fixed block." },
+    { "slug": "skill-exploration", "name": "Technician Skill & Exploration Engine", "status": "design", "summary": "Competence-gated exploration so assignment history does not poison skill." },
+    { "slug": "visual-qa", "name": "Visual/Video QA Engine", "status": "design", "summary": "Media as calibration evidence. Inference alone is never proof of misconduct." },
+    { "slug": "warranty-callback", "name": "Warranty & Callback Classifier", "status": "design", "summary": "30-day returns are review triggers, not automatic penalties." },
+    { "slug": "manager-intervention", "name": "Manager Intervention Predictor", "status": "design", "summary": "Prioritized recommendation queue. Does not remove field/office judgment." },
+    { "slug": "field-advisor", "name": "Field Advisor", "status": "design", "summary": "Per-tech / per-call on/off diagnostic copilot." },
+    { "slug": "pricebook-quote-margin", "name": "Pricebook / Quote / Margin Engine", "status": "design", "summary": "ServiceTitan pricebook as shadow baseline. Humans ACCEPT, OVERRIDE, or LOCK." },
+    { "slug": "inventory-prediction", "name": "Inventory Prediction Engine", "status": "design", "summary": "Van-specific stock vs predicted need vs actual consumption." },
+    { "slug": "revenue-attribution", "name": "Revenue & Turnover Attribution Engine", "status": "design", "summary": "Keep the originating service call connected to downstream outcomes." },
+    { "slug": "counterfactual-outcome", "name": "Counterfactual Outcome Engine", "status": "design", "summary": "What Trades would have done from information available at that moment only." },
+    { "slug": "receipt-audit-override", "name": "Receipt / Audit / Override Engine", "status": "design", "summary": "Reconstructable evidence packets for material recommendations." },
+    { "slug": "workforce-capacity", "name": "Workforce Capacity & Availability Engine", "status": "design", "summary": "Schedule against the workforce that actually exists (addendum v0.8)." },
+    { "slug": "universal-analytics", "name": "Universal Analytics & Human Review", "status": "design", "summary": "If Trades has the authorized data, a human can interrogate it (addendum v0.7)." },
+    { "slug": "decision-fabric", "name": "Decision Fabric reconciler", "status": "design", "summary": "Cross-pipeline coherence, Pareto frontier, champion/challenger (addendum v0.9)." }
+  ],
+  "planned_ops": [
+    { "slug": "observe", "name": "Observe", "status": "planned", "summary": "Ingest and normalize authorized operational data." },
+    { "slug": "shadow", "name": "Shadow", "status": "planned", "summary": "Seal a counterfactual recommendation at a decision point." },
+    { "slug": "dispatch", "name": "Dispatch / Call-Fit", "status": "planned", "summary": "Score eligible Vans; recommend assignment without executing unless authorized." },
+    { "slug": "estimate", "name": "Estimate / quote-from-field", "status": "planned", "summary": "Combine notes, media, parts, difficulty, warranty, and pricebook into a proposed package." },
+    { "slug": "work-order", "name": "Work order / call ledger", "status": "planned", "summary": "Append Chain B events: arrival, media, diagnosis, parts, quote, repair." },
+    { "slug": "inspection", "name": "Inspection / visual QA", "status": "planned", "summary": "Before/during/after media scoring as review evidence, not accusation." },
+    { "slug": "closeout", "name": "Closeout / settlement", "status": "planned", "summary": "Settle predicted vs actual; write receipts; rebase the remaining day." },
+    { "slug": "override", "name": "Human override", "status": "planned", "summary": "Record Chain C: who, when, why, replacement, downstream effect." },
+    { "slug": "schedule", "name": "Demand-aware schedule", "status": "planned", "summary": "Booking blocks, first-call/midday protection, emergency insertion (v0.8)." },
+    { "slug": "report", "name": "Human-review report", "status": "planned", "summary": "Generate a reviewable analysis with mandatory report metadata (v0.7)." }
   ],
   "modules": [
     {
       "slug": "hvac",
       "name": "HVAC",
-      "kind": "trade",
-      "status": "catalog",
+      "kind": "domain-surface",
+      "status": "design",
       "version": "0.1.0",
       "author": "Aziel Eliab",
-      "one_line": "Heating, ventilation, and air conditioning field work for service, install, and maintenance.",
+      "one_line": "Heating, ventilation, and air conditioning as a first-class operating domain on the shared company state.",
       "path": "trades/hvac/",
       "job_types": [
         "No-cool / no-heat diagnostic",
@@ -75,36 +306,13 @@
         "Refrigerant leak search and repair",
         "Thermostat and control issues",
         "Duct, airflow, and IAQ work"
-      ],
-      "ops": {
-        "dispatch": { "status": "planned" },
-        "estimate": { "status": "planned" },
-        "work-order": { "status": "planned" },
-        "inspection": { "status": "planned" },
-        "closeout": { "status": "planned" }
-      },
-      "safety": {
-        "status": "placeholder",
-        "notes": [
-          "Electrical lockout on condensing units and air handlers.",
-          "Refrigerant handling and recovery credentials.",
-          "Combustion, CO, and flue integrity on gas equipment."
-        ]
-      },
-      "checklists": {
-        "status": "stub",
-        "items": [
-          "Confirm call type, equipment age, and refrigerant.",
-          "Photograph nameplate and existing conditions.",
-          "Record static pressure, temps, and customer authorization."
-        ]
-      }
+      ]
     },
     {
       "slug": "plumbing",
       "name": "Plumbing",
-      "kind": "trade",
-      "status": "catalog",
+      "kind": "domain-surface",
+      "status": "design",
       "version": "0.1.0",
       "author": "Aziel Eliab",
       "one_line": "Supply, drain, fixture, and water-heater work inside the building envelope.",
@@ -116,36 +324,13 @@
         "Fixture install or rebuild",
         "Repipe or re-route",
         "Backflow and isolation work"
-      ],
-      "ops": {
-        "dispatch": { "status": "planned" },
-        "estimate": { "status": "planned" },
-        "work-order": { "status": "planned" },
-        "inspection": { "status": "planned" },
-        "closeout": { "status": "planned" }
-      },
-      "safety": {
-        "status": "placeholder",
-        "notes": [
-          "Water shutoff and isolation before opening a line.",
-          "Scald and gas-connection checks on water heaters.",
-          "Wet-area electrical awareness around pumps and heaters."
-        ]
-      },
-      "checklists": {
-        "status": "stub",
-        "items": [
-          "Locate shutoffs and confirm water source.",
-          "Protect finished surfaces before opening walls or ceilings.",
-          "Pressure-test or visual-confirm the repair before closeout."
-        ]
-      }
+      ]
     },
     {
       "slug": "electrical",
       "name": "Electrical",
-      "kind": "trade",
-      "status": "catalog",
+      "kind": "domain-surface",
+      "status": "design",
       "version": "0.1.0",
       "author": "Aziel Eliab",
       "one_line": "Service, branch-circuit, and equipment-power work for homes and light commercial sites.",
@@ -156,37 +341,14 @@
         "Circuit add or dedicated run",
         "EV charger or generator interconnect",
         "Device and fixture install",
-        "Service upgrade (planned scope only in v0)"
-      ],
-      "ops": {
-        "dispatch": { "status": "planned" },
-        "estimate": { "status": "planned" },
-        "work-order": { "status": "planned" },
-        "inspection": { "status": "planned" },
-        "closeout": { "status": "planned" }
-      },
-      "safety": {
-        "status": "placeholder",
-        "notes": [
-          "Verify de-energized with a known-live tester.",
-          "Lockout/tagout on panels and disconnects.",
-          "Arc-flash and PPE notes by task class."
-        ]
-      },
-      "checklists": {
-        "status": "stub",
-        "items": [
-          "Identify panel, circuit, and load before opening anything.",
-          "Photograph existing labeling and device condition.",
-          "Restore labeling and test the repaired circuit."
-        ]
-      }
+        "Service upgrade (design scope only)"
+      ]
     },
     {
       "slug": "sewer",
       "name": "Sewer",
-      "kind": "trade",
-      "status": "catalog",
+      "kind": "domain-surface",
+      "status": "design",
       "version": "0.1.0",
       "author": "Aziel Eliab",
       "one_line": "Building drain, sewer lateral, and main-line work beyond ordinary fixture clogs.",
@@ -198,72 +360,26 @@
         "Cleanout locate and access",
         "Root intrusion treatment",
         "Spot repair or replacement estimate"
-      ],
-      "ops": {
-        "dispatch": { "status": "planned" },
-        "estimate": { "status": "planned" },
-        "work-order": { "status": "planned" },
-        "inspection": { "status": "planned" },
-        "closeout": { "status": "planned" }
-      },
-      "safety": {
-        "status": "placeholder",
-        "notes": [
-          "Sewage exposure and PPE.",
-          "Confined-space awareness at pits and vaults.",
-          "Traffic and excavation controls when the lateral is opened."
-        ]
-      },
-      "checklists": {
-        "status": "stub",
-        "items": [
-          "Confirm cleanout access and backup location.",
-          "Capture camera footage with distance marks.",
-          "Advise on repair vs. clear, then collect authorization."
-        ]
-      }
+      ]
     },
     {
       "slug": "cross-trades",
       "name": "Cross-trades",
-      "kind": "trade",
-      "status": "catalog",
+      "kind": "domain-surface",
+      "status": "design",
       "version": "0.1.0",
       "author": "Aziel Eliab",
-      "one_line": "Jobs that require more than one of HVAC, plumbing, electrical, or sewer on the same ticket.",
+      "one_line": "Jobs and turnovers that span HVAC, plumbing, electrical, or sewer on the same company state.",
       "path": "trades/cross-trades/",
+      "spans": ["hvac", "plumbing", "electrical", "sewer"],
       "job_types": [
         "Bathroom or kitchen remodel rough-in",
         "HVAC change-out that needs new electrical",
         "Water heater swap with vent, gas, or circuit work",
         "Flood or backup restoration",
-        "New-construction multi-trade rough-in",
-        "Equipment pad, disconnect, and condensate together"
-      ],
-      "spans": ["hvac", "plumbing", "electrical", "sewer"],
-      "ops": {
-        "dispatch": { "status": "planned" },
-        "estimate": { "status": "planned" },
-        "work-order": { "status": "planned" },
-        "inspection": { "status": "planned" },
-        "closeout": { "status": "planned" }
-      },
-      "safety": {
-        "status": "placeholder",
-        "notes": [
-          "Sequence trades so one crew does not energize or pressurize another crew's work.",
-          "Shared lockout and water-gas-power isolation.",
-          "Single accountable lead on site when scopes overlap."
-        ]
-      },
-      "checklists": {
-        "status": "stub",
-        "items": [
-          "List every trade required before the first dispatch.",
-          "Hold one estimate that names each trade's scope and exclusions.",
-          "Close the ticket only when every trade has signed its portion."
-        ]
-      }
+        "Plumbing → HVAC turnover",
+        "New-construction multi-trade rough-in"
+      ]
     }
   ]
 }

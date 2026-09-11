@@ -1,18 +1,21 @@
 {
   "product": "trades-runtime",
-  "name": "trades-runtime",
-  "title": "Trades Runtime",
+  "name": "Trades-Runtime",
+  "title": "Trades-Runtime",
   "version": "0.1.0",
   "author": "Aziel Eliab",
   "identity": "Aziel Eliab",
   "role": "trades-runtime",
+  "kind": "shadow-first-operating-intelligence",
   "visibility": "private",
   "license": "Apache-2.0",
   "repository": "https://github.com/AzielEliab/trades-runtime",
-  "description": "Private documentation and ops catalog for HVAC, plumbing, electrical, sewer, and cross-trades businesses.",
+  "spec_pack": "architecture-v0.1 + addenda v0.7 / v0.8 / v0.9",
+  "description": "Private architecture portal for a shadow-first AI operating system / company operating intelligence layer for large multi-branch HVAC, plumbing, electrical, sewer, and cross-trades field service.",
   "not": [
     "Not a public Softwares suite.",
     "Not aziel-runtime.",
-    "No live Worker backends in v0."
+    "Not a live Worker backend.",
+    "Not a production deployment claim."
   ]
 }

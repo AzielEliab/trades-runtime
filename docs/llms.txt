@@ -1,27 +1,59 @@
-# trades-runtime
+# Trades-Runtime
 
-> Private documentation and ops catalog for field-trades businesses.
+> Shadow-first AI operating system / company operating intelligence layer
+> for large multi-branch HVAC, plumbing, electrical, sewer, and cross-trades field service.
 > Author / identity: Aziel Eliab only.
 > Version: 0.1.0
 > Role: trades-runtime
 > Visibility: private
 > License: Apache-2.0
+> Status: design / not live
 
-trades-runtime is a sibling product to aziel-runtime, not a fork and not a public Softwares suite. v0 is a static catalog. Planned ops (dispatch, estimate, work-order, inspection, closeout) are named, not executed. There is no live Worker backend in this version.
+Trades-Runtime does not begin by replacing ServiceTitan or ProBooks. It shadows them: observe → sealed counterfactual → compare to actual outcomes. Authorized humans always win operationally. Disagreements are preserved as evidence.
 
-## Trades
+Design target (not a live claim): ~13–15 branches, 750+ employees, Midwest multi-trade.
 
-- HVAC: /trades/hvac/
-- Plumbing: /trades/plumbing/
-- Electrical: /trades/electrical/
-- Sewer: /trades/sewer/
-- Cross-trades: /trades/cross-trades/
+This site is a private static architecture portal. No live Worker backends, DOIs, or production APIs.
 
-## Machine-readable
+## Canonical specs
 
-- Catalog: /v1/runtime.json
-- Cite: /cite.json
-- This file: /llms.txt
+- Architecture v0.1 (canonical, includes v0.2 expansions): /specs/architecture-v0.1.txt
+- Earlier 14p snapshot (historical only): /specs/architecture-v0.1-14p.txt
+- Universal Analytics & Human Review v0.7: /specs/addendum-v0.7.txt
+- Workforce Capacity & Demand-Aware Scheduling v0.8: /specs/addendum-v0.8.txt
+- Multi-Fabric / Multi-Pipeline v0.9: /specs/addendum-v0.9.txt
+- PDF sources: /specs/source/
+
+## Architecture pages
+
+- Architecture: /architecture/
+- Operating model: /operating-model/
+- Chains A/B/C (+ D): /chains/
+- Shadow & deployment ladder: /shadow/
+- Decision rules freeze: /rules/
+- Dispatch / Call-Fit / Van: /dispatch/
+- Workforce & scheduling: /workforce/
+- Multi-fabric: /fabrics/
+- Analytics & human review: /analytics/
+- Specs library: /specs/
+- Trade domain surfaces: /trades/
+- Machine catalog: /v1/runtime.json
+
+## Three immutable chains
+
+- A. Full-Day Trajectory
+- B. Call-to-Call Ledger
+- C. Human Override / Recalibration (Decision/Override/Evidence receipts)
+
+## Modes
+
+Watcher / Shadow / Recommendation / Human-Approved / Limited Autonomy / Autonomous
+
+Ladder: Observe → Shadow → Recommend → Human Approves → Limited Autonomy → Autonomous Operations
+
+## What it is not (§1.2)
+
+Not a simple dispatch optimizer. Not a revenue-as-skill leaderboard. Not a fixed morning route planner. Not an autonomous black box that silently overrules humans. Not photo-as-proof of misconduct. Not fuel-first at the expense of fit/outcome. Not a system that treats a 30-day return as an automatic callback.
 
 ## Do not index
 

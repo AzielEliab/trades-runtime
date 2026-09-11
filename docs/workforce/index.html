@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="author" content="Aziel Eliab">
+  <title>Workforce &amp; scheduling · Trades-Runtime</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body data-page="workforce">
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header" data-site-header></header>
+  <main id="main" class="wrap">
+    <section class="page-head hero">
+      <p class="kicker">Addendum v0.8 · Workforce capacity, availability &amp; demand-aware scheduling</p>
+      <h1>Schedule against the workforce that actually exists.</h1>
+      <p>Headcount is not capacity. Usable capacity is labor × skill mix × Van availability × time windows × demand × runtime × geography × protected commitments × absence × weather × inventory.</p>
+    </section>
+
+    <section class="section">
+      <p class="formula">Demand Forecast + Workforce Availability + Employee Windows + Skill Capacity + Existing Commitments + Runtime/Travel Prediction → Live Capacity State → Booking/Dispatch Blocks → Continuous Recalibration → Actual Outcome → Calibration Learning.</p>
+    </section>
+
+    <section class="section">
+      <h2>Hard vs soft constraints</h2>
+      <table class="ops">
+        <thead><tr><th>Constraint</th><th>Treatment</th></tr></thead>
+        <tbody>
+          <tr><td>Hard availability</td><td>Approved PTO, call-in, leave, must-leave-by, cannot-start-before, training, licensing, unavailable Van.</td></tr>
+          <tr><td>Soft optimization</td><td>Preferences and operating choices: preferred return time, protected emergency capacity, maintenance reduction.</td></tr>
+        </tbody>
+      </table>
+      <p>A 3:30 PM leave / 4:00 PM shop-return is calculated backward from live location, predicted duration, uncertainty, and travel — not as a calendar label that simply greys out 4:00.</p>
+    </section>
+
+    <section class="section">
+      <h2>Demand-responsive booking blocks</h2>
+      <table class="ops">
+        <thead><tr><th>State</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td>OPEN</td><td>Available for normal booking.</td></tr>
+          <tr><td>HOLD</td><td>Temporarily reserved while demand/capacity is evaluated.</td></tr>
+          <tr><td>BLOCK NEW BOOKING</td><td>Do not add new routine work into the window.</td></tr>
+          <tr><td>PROTECTED</td><td>Reserved for emergencies or existing commitments.</td></tr>
+          <tr><td>RESCHEDULE CANDIDATE</td><td>Flexible commitment identified for human-reviewed displacement if required.</td></tr>
+          <tr><td>CLOSED</td><td>Unavailable because of a hard workforce/operational constraint.</td></tr>
+        </tbody>
+      </table>
+      <p>Blocking capacity does not silently cancel already booked customers. Displacement stays explicit, auditable, and human-authorized.</p>
+    </section>
+
+    <section class="section">
+      <div class="grid two-col">
+        <div class="panel">
+          <h2>First-call and midday protection</h2>
+          <p>First calls get strong schedule-reliability weighting because an early overrun cascades. Midday calls immediately before hard commitments get risk-weighted buffers — not static empty gaps everywhere. Scheduled window ≠ predicted completion time. Duration is a distribution.</p>
+        </div>
+        <div class="panel">
+          <h2>Urgency classes</h2>
+          <p>Emergency, Urgent, Priority service, Routine service, Maintenance / flexible. Policy is company-controlled. Trades must not invent safety conditions or falsely escalate urgency. An emergency does not automatically break multiple existing commitments.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Governing objective</h2>
+      <div class="panel">
+        <p class="notice">Serve the highest-urgency and highest-value legitimate demand while maximizing the probability that existing customer commitments and authorized employee availability windows are actually kept.</p>
+        <p>Optimize usable capacity, not theoretical utilization. Learn when leaving capacity open is valuable.</p>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer" data-site-footer></footer>
+  <script src="../assets/app.js"></script>
+</body>
+</html>

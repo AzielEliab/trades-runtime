@@ -1,26 +1,48 @@
 (function () {
   const STORAGE_KEY = "trades-runtime-theme";
 
+  const ONE = "../";
+  const TWO = "../../";
+
   const PAGES = {
-    home: { prefix: "", current: "home" },
-    catalog: { prefix: "../", current: "catalog" },
-    hvac: { prefix: "../../", current: "hvac" },
-    plumbing: { prefix: "../../", current: "plumbing" },
-    electrical: { prefix: "../../", current: "electrical" },
-    sewer: { prefix: "../../", current: "sewer" },
-    "cross-trades": { prefix: "../../", current: "cross-trades" },
-    notfound: { prefix: "/", current: "" }
+    home: "",
+    catalog: ONE,
+    architecture: ONE,
+    "operating-model": ONE,
+    chains: ONE,
+    shadow: ONE,
+    rules: ONE,
+    dispatch: ONE,
+    workforce: ONE,
+    fabrics: ONE,
+    analytics: ONE,
+    specs: ONE,
+    trades: ONE,
+    hvac: TWO,
+    plumbing: TWO,
+    electrical: TWO,
+    sewer: TWO,
+    "cross-trades": TWO,
+    notfound: "/"
   };
 
   const LINKS = [
     { id: "home", href: "", label: "Home" },
-    { id: "hvac", href: "trades/hvac/", label: "HVAC" },
-    { id: "plumbing", href: "trades/plumbing/", label: "Plumbing" },
-    { id: "electrical", href: "trades/electrical/", label: "Electrical" },
-    { id: "sewer", href: "trades/sewer/", label: "Sewer" },
-    { id: "cross-trades", href: "trades/cross-trades/", label: "Cross-trades" },
+    { id: "architecture", href: "architecture/", label: "Architecture" },
+    { id: "operating-model", href: "operating-model/", label: "Operating" },
+    { id: "chains", href: "chains/", label: "Chains" },
+    { id: "shadow", href: "shadow/", label: "Shadow" },
+    { id: "rules", href: "rules/", label: "Rules" },
+    { id: "dispatch", href: "dispatch/", label: "Dispatch" },
+    { id: "workforce", href: "workforce/", label: "Workforce" },
+    { id: "fabrics", href: "fabrics/", label: "Fabrics" },
+    { id: "analytics", href: "analytics/", label: "Analytics" },
+    { id: "specs", href: "specs/", label: "Specs" },
+    { id: "trades", href: "trades/", label: "Trades" },
     { id: "catalog", href: "catalog/", label: "Catalog" }
   ];
+
+  const TRADE_PAGES = ["trades", "hvac", "plumbing", "electrical", "sewer", "cross-trades"];
 
   function preferredTheme() {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -47,7 +69,13 @@
       }
       return "/";
     }
-    return (PAGES[page] && PAGES[page].prefix) || "";
+    return PAGES[page] != null ? PAGES[page] : "";
+  }
+
+  function isCurrent(linkId, page) {
+    if (linkId === page) return true;
+    if (linkId === "trades" && TRADE_PAGES.includes(page)) return true;
+    return false;
   }
 
   function mountChrome() {
@@ -59,20 +87,24 @@
 
     if (header) {
       header.innerHTML = `
-        <div class="wrap header-row">
+        <div class="confidential">Confidential design concept — implementation subject to integration, legal, security and operational validation. Not a live production deployment.</div>
+        <div class="wrap header-bar">
           <a class="brand" href="${prefix}">
-            <strong>trades-runtime</strong>
-            <span>Private field-trades catalog</span>
+            <strong>Trades-Runtime</strong>
+            <span>Shadow-first operating intelligence · private</span>
           </a>
-          <nav class="nav" aria-label="Trades">
+          <div class="header-tools">
+            <span class="badge private">private</span>
+            <button type="button" class="theme-toggle" data-theme-toggle aria-pressed="false">Light</button>
+          </div>
+        </div>
+        <div class="wrap">
+          <nav class="nav-bar" aria-label="Architecture">
             ${LINKS.map((link) => {
-              const current = link.id === page ? ' aria-current="page"' : "";
+              const current = isCurrent(link.id, page) ? ' aria-current="page"' : "";
               return `<a href="${prefix}${link.href}"${current}>${link.label}</a>`;
             }).join("")}
           </nav>
-          <div class="header-tools">
-            <button type="button" class="theme-toggle" data-theme-toggle aria-pressed="false">Light</button>
-          </div>
         </div>
       `;
     }
@@ -80,11 +112,12 @@
     if (footer) {
       footer.innerHTML = `
         <div class="wrap">
-          <div>© ${year} Aziel Eliab · trades-runtime 0.1.0 · private · Apache-2.0</div>
+          <div>© ${year} Aziel Eliab · Trades-Runtime 0.1.0 · private · Apache-2.0 · design / not live</div>
           <div>
             <a href="${prefix}v1/runtime.json">runtime.json</a>
             · <a href="${prefix}cite.json">cite.json</a>
             · <a href="${prefix}llms.txt">llms.txt</a>
+            · <a href="${prefix}specs/">specs</a>
           </div>
         </div>
       `;
@@ -100,32 +133,101 @@
     }
   }
 
+  function badge(status) {
+    const cls = status === "design" || status === "planned" || status === "stub" ? status === "design" ? "planned" : status : "catalog";
+    return `<span class="badge ${cls}">${status || "design"}</span>`;
+  }
+
   function renderCatalog(data) {
     const root = document.getElementById("catalog-root");
     if (!root) return;
 
-    const ops = (data.planned_ops || [])
-      .map((op) => `<tr><td><code>${op.slug}</code></td><td>${op.name}</td><td><span class="badge planned">${op.status}</span></td><td>${op.summary}</td></tr>`)
-      .join("");
+    const modes = (data.modes || []).map((m) => `
+      <div class="card">
+        <div class="badge-row">${badge(m.status)}<span class="badge">${m.slug}</span></div>
+        <h3>${m.name}</h3>
+        <p>${m.summary || ""}</p>
+      </div>`).join("");
 
-    const modules = (data.modules || [])
-      .map((mod) => {
-        const jobs = (mod.job_types || []).map((job) => `<li>${job}</li>`).join("");
-        return `
-          <a class="card" href="../${mod.path}">
-            <div class="badge-row"><span class="badge catalog">${mod.status}</span><span class="badge">${mod.kind}</span></div>
-            <h3>${mod.name}</h3>
-            <p>${mod.one_line}</p>
-            <ul class="list">${jobs}</ul>
-          </a>
-        `;
-      })
-      .join("");
+    const chains = (data.chains || []).map((c) => `
+      <div class="card">
+        <p class="chain-letter">${c.id}</p>
+        <h3>${c.name}</h3>
+        <p>${c.purpose || ""}</p>
+        ${badge(c.status)}
+      </div>`).join("");
+
+    const fabrics = (data.fabrics || []).map((f) => `
+      <div class="card">
+        <div class="badge-row">${badge(f.status)}<span class="badge">${f.kind || "fabric"}</span></div>
+        <h3>${f.name}</h3>
+        <p>${f.responsibility || f.one_line || ""}</p>
+      </div>`).join("");
+
+    const pipelines = (data.pipelines || []).map((p) => `
+      <tr><td>${p.name}</td><td>${p.role || ""}</td><td>${badge(p.status)}</td></tr>`).join("");
+
+    const engines = (data.engines || []).map((e) => `
+      <tr><td><code>${e.slug}</code></td><td>${e.name}</td><td>${badge(e.status)}</td><td>${e.summary || ""}</td></tr>`).join("");
+
+    const ops = (data.planned_ops || []).map((op) => `
+      <tr><td><code>${op.slug}</code></td><td>${op.name}</td><td>${badge(op.status)}</td><td>${op.summary || ""}</td></tr>`).join("");
+
+    const modules = (data.modules || []).map((mod) => {
+      const jobs = (mod.job_types || []).map((job) => `<li>${job}</li>`).join("");
+      return `
+        <a class="card" href="../${mod.path}">
+          <div class="badge-row">${badge(mod.status)}<span class="badge">${mod.kind}</span></div>
+          <h3>${mod.name}</h3>
+          <p>${mod.one_line}</p>
+          <ul class="list">${jobs}</ul>
+        </a>`;
+    }).join("");
+
+    const ladder = (data.deployment_ladder || []).map((step) => `
+      <li><div><strong>${step.name}</strong><p class="muted">${step.summary || ""}</p></div></li>`).join("");
+
+    const isNot = (data.is_not || data.not || []).map((item) => `<li>${item}</li>`).join("");
 
     root.innerHTML = `
       <div class="panel">
-        <p class="notice"><strong>${data.product}</strong> · v${data.version} · role <code>${data.role}</code> · author ${data.author}</p>
-        <p>${(data.not || []).join(" ")}</p>
+        <p class="notice"><strong>${data.title || data.product}</strong> · v${data.version} · role <code>${data.role}</code> · author ${data.author}</p>
+        <p>${data.one_line || ""}</p>
+        <p class="muted">${data.honesty || "Static design catalog. No live Worker backends."}</p>
+      </div>
+      <div class="section">
+        <h2>What it is not</h2>
+        <ul class="list is-not">${isNot}</ul>
+      </div>
+      <div class="section">
+        <h2>Deployment ladder</h2>
+        <ol class="ladder">${ladder}</ol>
+      </div>
+      <div class="section">
+        <h2>Operating modes</h2>
+        <div class="grid cards">${modes}</div>
+      </div>
+      <div class="section">
+        <h2>Immutable chains</h2>
+        <div class="grid chain-grid">${chains}</div>
+      </div>
+      <div class="section">
+        <h2>Fabrics</h2>
+        <div class="grid cards">${fabrics}</div>
+      </div>
+      <div class="section">
+        <h2>Pipelines</h2>
+        <table class="ops">
+          <thead><tr><th>Pipeline</th><th>Role</th><th>Status</th></tr></thead>
+          <tbody>${pipelines}</tbody>
+        </table>
+      </div>
+      <div class="section">
+        <h2>Decision engines</h2>
+        <table class="ops">
+          <thead><tr><th>Slug</th><th>Name</th><th>Status</th><th>Summary</th></tr></thead>
+          <tbody>${engines}</tbody>
+        </table>
       </div>
       <div class="section">
         <h2>Planned ops</h2>
@@ -135,7 +237,7 @@
         </table>
       </div>
       <div class="section">
-        <h2>Trade modules</h2>
+        <h2>Trade domain surfaces</h2>
         <div class="grid cards">${modules}</div>
       </div>
     `;

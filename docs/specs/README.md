@@ -12,3 +12,5 @@ Confidential design concepts. Implementation subject to integration, legal, secu
 | `source/*.pdf` | Original PDF sources |
 
 Author / product identity: Aziel Eliab / Trades-Runtime.
+
+Human-readable portal for this pack: [`index.html`](index.html) (served as `/specs/` on Pages).

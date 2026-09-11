@@ -5,108 +5,39 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow, noarchive">
   <meta name="author" content="Aziel Eliab">
-  <title>HVAC · trades-runtime</title>
-  <meta name="description" content="HVAC module for trades-runtime: overview, job types, safety placeholders, checklist stubs, and planned ops.">
+  <title>HVAC · Trades-Runtime</title>
   <link rel="stylesheet" href="../../assets/styles.css">
 </head>
 <body data-page="hvac">
   <a class="skip" href="#main">Skip to content</a>
-  <header class="site-header" data-site-header>
-    <div class="wrap header-row">
-      <a class="brand" href="../../">
-        <strong>trades-runtime</strong>
-        <span>Private field-trades catalog</span>
-      </a>
-      <nav class="nav" aria-label="Trades">
-        <a href="../../">Home</a>
-        <a href="./" aria-current="page">HVAC</a>
-        <a href="../plumbing/">Plumbing</a>
-        <a href="../electrical/">Electrical</a>
-        <a href="../sewer/">Sewer</a>
-        <a href="../cross-trades/">Cross-trades</a>
-        <a href="../../catalog/">Catalog</a>
-      </nav>
-    </div>
-  </header>
-
+  <header class="site-header" data-site-header></header>
   <main id="main" class="wrap">
     <section class="page-head hero">
-      <p class="kicker">Module · hvac</p>
+      <p class="kicker">Domain surface · hvac</p>
       <h1>HVAC</h1>
-      <p>Heating, ventilation, and air conditioning field work: diagnostics, maintenance, change-outs, and indoor-air jobs. This module is catalog-only in v0.</p>
-      <div class="badge-row">
-        <span class="badge catalog">catalog</span>
-        <span class="badge planned">ops planned</span>
-        <span class="badge">author: Aziel Eliab</span>
-      </div>
+      <p>Heating, ventilation, and air conditioning as a first-class dimension on the shared company state — not a standalone dispatch app. Weather windows, equipment age, membership, and Call-Fit all see the same call.</p>
+      <div class="badge-row"><span class="badge planned">design</span><span class="badge">author: Aziel Eliab</span></div>
     </section>
+    <p class="rail"><a href="../">All trades</a> · <a href="../plumbing/">Plumbing</a> · <a href="../electrical/">Electrical</a> · <a href="../sewer/">Sewer</a> · <a href="../cross-trades/">Cross-trades</a></p>
 
     <section class="section">
-      <h2>Overview</h2>
+      <h2>How this domain sits on the OS</h2>
       <div class="panel">
-        <p>HVAC tickets usually start as comfort calls (no-cool, no-heat, noise, odor) or planned work (tune-up, replacement). The runtime will keep equipment identity, refrigerant, and authorization on the same work order so a callback is not a new guess.</p>
-        <p class="muted">Electrical disconnects, condensate, and gas/vent work often spill into <a href="../cross-trades/">cross-trades</a>. Do not hide that on an HVAC-only ticket.</p>
+        <p>No-cool / no-heat volume is a weather-and-demand problem (v0.1 §25) before it is a route problem. Maintenance capacity is demand-first: sales opportunity weights Selling Techs on older systems, but a qualified available technician is dispatched rather than holding the customer for an ideal closer (§26). Electrical disconnects and condensate still belong on <a href="../cross-trades/">cross-trades</a> when another license can stop the job.</p>
       </div>
     </section>
 
     <section class="section">
-      <h2>Common job types</h2>
+      <h2>Common call types</h2>
       <div class="grid cards">
-        <div class="card"><h3>No-cool / no-heat</h3><p>Diagnostic first. Record indoor/outdoor temps, thermostat demand, and what the unit is doing before parts talk.</p></div>
-        <div class="card"><h3>Maintenance tune-up</h3><p>Filter, coils, drains, electrical draw, and a written exception list — not a silent “all good.”</p></div>
-        <div class="card"><h3>Change-out / install</h3><p>Load match, line-set, pad, flue, and startup readings. Permit notes stay on the estimate.</p></div>
-        <div class="card"><h3>Leak search</h3><p>Recovery, leak method, and whether the repair is worth the charge. No fake “top-off only” closeout.</p></div>
-        <div class="card"><h3>Controls / thermostat</h3><p>Wiring, communicating vs. conventional, and whether the complaint is the box or the plant.</p></div>
-        <div class="card"><h3>Airflow / IAQ</h3><p>Static pressure, returns, and filtration. Call electrical or carpentry when the duct is the job.</p></div>
-      </div>
-    </section>
-
-    <section class="section">
-      <h2>Planned ops</h2>
-      <table class="ops">
-        <thead><tr><th>Op</th><th>Status</th><th>HVAC note</th></tr></thead>
-        <tbody>
-          <tr><td><code>dispatch</code></td><td><span class="badge planned">planned</span></td><td>Send the right recovery gear and refrigerant, not just “AC tech.”</td></tr>
-          <tr><td><code>estimate</code></td><td><span class="badge planned">planned</span></td><td>Nameplate, options (repair vs. replace), and exclusions.</td></tr>
-          <tr><td><code>work-order</code></td><td><span class="badge planned">planned</span></td><td>Readings, leak method, and customer yes/no on the recommended path.</td></tr>
-          <tr><td><code>inspection</code></td><td><span class="badge planned">planned</span></td><td>Startup sheet, combustion/CO if gas, condensate path.</td></tr>
-          <tr><td><code>closeout</code></td><td><span class="badge planned">planned</span></td><td>Warranty, filter size, and what was left pending.</td></tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section class="section">
-      <div class="grid two-col">
-        <div class="panel">
-          <h2>Safety notes</h2>
-          <p><span class="badge placeholder">placeholder</span></p>
-          <ul class="list">
-            <li>Lock out the disconnect before opening an air handler or condenser.</li>
-            <li>Recover refrigerant; do not vent. Credentials belong on the work order later.</li>
-            <li>Treat gas heat as a combustion job: flue, CO, and heat-exchanger notes.</li>
-            <li>This list is a stub. It is not a substitute for shop policy or code.</li>
-          </ul>
-        </div>
-        <div class="panel">
-          <h2>Checklist stub</h2>
-          <p><span class="badge stub">stub</span></p>
-          <ul class="list">
-            <li>Confirm call type, access, and equipment location.</li>
-            <li>Photograph nameplate and existing damage.</li>
-            <li>Write temps, static, and amperage before recommending parts.</li>
-            <li>Get authorization before recovery, repair, or change-out.</li>
-          </ul>
-        </div>
+        <div class="card"><h3>No-cool / no-heat</h3><p>Diagnostic first. Indoor/outdoor temps and demand before parts talk.</p></div>
+        <div class="card"><h3>Maintenance</h3><p>Age-distributed through the maintenance/service ladder, not assigned blind.</p></div>
+        <div class="card"><h3>Change-out</h3><p>Often a multi-trade ticket: pad, disconnect, circuit, flue.</p></div>
+        <div class="card"><h3>Leak / IAQ / controls</h3><p>Call-Fit must include inventory, refrigerant credentials, and client-tech fit.</p></div>
       </div>
     </section>
   </main>
-
-  <footer class="site-footer" data-site-footer>
-    <div class="wrap">
-      <div>© Aziel Eliab · trades-runtime 0.1.0 · private · Apache-2.0</div>
-      <div><a href="../../v1/runtime.json">runtime.json</a></div>
-    </div>
-  </footer>
+  <footer class="site-footer" data-site-footer></footer>
   <script src="../../assets/app.js"></script>
 </body>
 </html>
