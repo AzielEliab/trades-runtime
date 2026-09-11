@@ -1,0 +1,701 @@
+                                                                                                  TRADES-RUNTIME | ARCHITECTURE DESIGN v0.1
+
+
+
+
+                               TRADES-RUNTIME
+                  Architecture & Operating Design Specification
+                 v0.1 - Shadow-First AI Operating System for HVAC, Plumbing & Electrical
+
+
+
+
+ Core Principle
+ Trades-Runtime does not begin by replacing the existing business stack. It first shadows it, records what actually
+ happened, records what Trades would have done, records every human override, then proves or disproves its
+ decisions against operational outcomes.
+
+
+Target operating scale: 13-15 branches | 750+ employees | Midwest region | multi-trade
+field service
+Primary integration posture: tether to ServiceTitan + ProBooks/other authorized systems first; operate as a read-only or
+recommendation layer until evidence supports greater autonomy.
+
+This document captures the architecture, ideas, rules, controls and operating logic established for Trades-Runtime.
+
+
+
+
+                   Confidential design concept - implementation subject to integration, legal, security and operational validation
+                                                                                                   TRADES-RUNTIME | ARCHITECTURE DESIGN v0.1
+
+1. Executive Summary
+Trades-Runtime is a company operating intelligence layer designed to coordinate booking, dispatch, technician
+selection, field execution, warranty logic, pricing, inventory, sales turnovers, service quality, management
+escalation and continuous operational learning across a large multi-branch trades business.
+
+Its first deployment mode is shadow operation. Existing systems and humans continue running the company.
+Trades-Runtime observes the same inputs, produces its own decisions, follows the day as reality changes, and
+compares its counterfactual choices with actual outcomes. The goal is not to claim that the AI would have
+performed better; the goal is to build call-level and day-level evidence showing when it did, when it did not, and
+why.
+
+    Human Authority Rule
+    Authorized human decisions always win operationally. Trades-Runtime may recommend against an override and
+    explain why, but it never supersedes authorized human recalibration. The disagreement remains preserved as
+    evidence.
+
+
+
+1.1 Primary objectives
+     Answer and book customer calls with shared visibility into membership, equipment, warranty and service
+      history.
+     Choose the correct technician/Van for the correct call using technical fit, quality, client fit, geography,
+      inventory, runtime, profit, margin and development opportunity.
+     Minimize unnecessary travel and fuel through geographic/ZIP consolidation without allowing proximity to
+      become the final deciding factor.
+     Continuously learn technician strengths, weaknesses, role suitability and uncertainty without poisoning the
+      model through self-reinforcing assignment bias.
+     Use before/during/after photos and video to normalize skill, difficulty, time, workmanship and legitimate
+      added cost.
+     Track repairs, turnovers, sales, warranties, callbacks, inventory and downstream revenue as connected
+      events.
+     Provide receipts for recommendations, disagreements, overrides, actual outcomes and counterfactual
+      outcomes.
+     Allow a field-side AI advisor to be turned on or off per technician/per call.
+     Create a canonical live operating state shared across IT, office, dispatch, managers, field technicians and
+      client booking interfaces.
+
+1.2 What Trades-Runtime is not
+     Not a simple dispatch optimizer.
+     Not a leaderboard that equates revenue with technician quality.
+     Not a fixed morning route planner.
+     Not an autonomous black box that can silently overrule humans.
+     Not an AI that treats a photo inference as proof of fault or misconduct.
+     Not a fuel-minimization system that sacrifices technical fit or customer outcome.
+     Not a system that assumes a 30-day return visit is automatically a technician callback.
+
+
+
+
+                    Confidential design concept - implementation subject to integration, legal, security and operational validation
+                                                                                                  TRADES-RUNTIME | ARCHITECTURE DESIGN v0.1
+
+2. System Operating Model
+2.1 Canonical live state
+Trades-Runtime maintains one canonical live company state. Each role receives a role-specific view of that same
+state. A completed field event can therefore update technician availability, route position, inventory, booking
+capacity, management forecasts, warranty context and dispatch recommendations without each department
+maintaining conflicting versions of reality.
+
+Canonical state inputs include customer, equipment, membership, service history, booking state, technician/Van
+state, location, inventory, active call state, media evidence, quote state, warranty state, route state, manager
+queue, pricebook state and integration health.
+
+2.2 Three immutable tracking chains
+ Chain                                            Purpose                                             What it preserves
+                                                                                                      Morning plan, each real-world state
+                                                                                                      change, each rebase, schedule
+ A. Full-Day Trajectory                           Tracks the day as an evolving system
+                                                                                                      displacement, route drift, end-of-day
+                                                                                                      result
+                                                                                                      Assignment, travel, arrival, media,
+                                                                                                      diagnosis, parts, quote, repair/turnover,
+ B. Call-to-Call Ledger                           Tracks every individual service event
+                                                                                                      runtime, customer outcome, next-state
+                                                                                                      effect
+                                                                                                      Original Trades recommendation,
+                                                                                                      role/person who changed it, timestamp,
+ C. Human Override / Recalibration                Tracks intentional human changes
+                                                                                                      stated reason, replacement decision,
+                                                                                                      downstream effect, final outcome
+ Never overwrite history
+ Planned state, actual state, counterfactual state and human override state remain separately queryable. A rebase
+ changes the next decision; it does not erase the prior decision.
+
+
+
+2.3 Shadow counterfactual
+For each decision point, the system asks: "Given only the information available at that moment, what would
+Trades-Runtime have done?" This prevents hindsight leakage. Once reality diverges from the recommendation,
+the shadow model rebases from the new actual state rather than pretending the original imaginary schedule still
+exists.
+
+The resulting evidence model is:
+ACTUAL: customer call -> existing booking/dispatch -> actual Van -> actual diagnosis/quote/repair/turnover -> actual
+revenue/margin/time/parts.
+
+TRADES: same known inputs -> Trades booking/dispatch -> predicted Van/route -> expected diagnosis/repair/turnover ->
+expected revenue/margin/time/parts.
+
+OVERRIDE: Trades recommendation -> authorized human change -> reason -> replacement action -> resulting state ->
+observed outcome.
+
+
+
+
+3. Booking & Schedule Precedence
+3.1 Booking precedence rule
+
+                   Confidential design concept - implementation subject to integration, legal, security and operational validation
+                                                                                                  TRADES-RUNTIME | ARCHITECTURE DESIGN v0.1
+Already-booked calls establish precedence. The default policy is to preserve customer commitments rather than
+optimize the schedule by repeatedly moving customers for marginal route gains.
+
+    Schedule rule
+    Preserve existing customer commitments unless the expected operational or customer consequence of preserving
+    them exceeds the cost of displacement.
+
+
+
+3.2 Demand-based displacement
+Demand service can justify rescheduling when the service need materially outweighs the protected
+appointment. Displacement is never silent. Trades-Runtime evaluates alternatives, documents why a move is
+recommended, estimates customer impact, and requires the appropriate operational workflow for customer
+contact/approval.
+
+     Urgency and safety impact.
+     Membership/service-level commitments.
+     Existing appointment precedence and promised window.
+     Available technician competence and inventory.
+     Travel and current route position.
+     Expected call runtime and downstream schedule damage.
+     Likelihood of successful rebooking or cancellation.
+     Revenue/contribution consequences, but never revenue alone.
+     Customer history, prior disruptions and management sensitivity.
+
+
+
+4. Dispatch Intelligence
+4.1 Call-Fit Score
+Every eligible Van receives a dynamic multi-objective Call-Fit Score. It is not a single sales metric and it is not
+distance-first.
+Call-Fit = quality + service competence + technical fit + client-tech fit + geolocation + truck inventory + estimated runtime +
+expected fixed-dollar contribution + expected margin + schedule impact + exploration opportunity.
+
+
+4.2 Geographic and ZIP intelligence
+The system learns geographic clusters, ZIP patterns, branch boundaries, traffic/travel behavior and common
+service corridors. Vans can be preferentially positioned or routed to consolidate travel and reduce fuel cost, but
+geographic efficiency is never the final deciding factor. A farther technician can win when expected technical
+resolution, inventory coverage, quality or contribution materially outweighs the route savings.
+
+4.3 Dynamic route drift
+An 8-12 hour field day will not remain on the route imagined at the start of the day. Trades-Runtime treats drift
+as normal operating evidence. After every meaningful event, the remaining schedule is recalculated from the
+actual present state.
+Morning plan -> event -> actual position/state -> rebase -> next event -> rebase -> close.
+
+Key day-level measures are morning forecast quality, adaptation quality and final-day operating outcome.
+
+
+
+
+                   Confidential design concept - implementation subject to integration, legal, security and operational validation
+                                                                                                     TRADES-RUNTIME | ARCHITECTURE DESIGN v0.1
+
+4.4 Runtime modeling
+Trades-Runtime learns standard call duration by issue, trade, equipment type, access/difficulty profile and
+technician. Generic time blocks are progressively replaced by distributions learned from actual work. Runtime
+influences not only the current assignment, but the expected feasibility of the next calls in the day.
+
+4.5 Exploration / curveball mechanism
+Pure exploitation creates a poisoned model: technicians who historically receive a job type gain more evidence
+and opportunity while others appear weak because they are never tested. Trades-Runtime therefore maintains
+an explicit exploration mechanism.
+
+      Exploration is controlled and competence-gated, not random assignment.
+      The system tracks observed capability separately from uncertainty/lack of opportunity.
+      Appropriate technicians can receive selected new opportunities when adjacent skills suggest they can safely
+       perform them.
+      Exploration results update the technician skill model and reduce uncertainty.
+      Long-term workforce development can justify a small short-term optimization tradeoff when risk remains
+       acceptable.
+
+
+
+5. Technician / Van Intelligence
+5.1 Identity and privacy model
+Operational analytics should primarily reference Van identifiers rather than technician names. Identity can
+remain available to authorized systems/roles, but optimization and reporting can be pseudonymized where
+practical.
+
+5.2 Editable internal role tags
+    Tag                                                                        Operational meaning
+    Service 1                                                                  Entry/basic service capability tier
+    Service 2                                                                  Intermediate service capability tier
+    Service 3                                                                  Advanced service capability tier
+    Warranty                                                                   Technician optimized/approved for warranty work
+    Selling Tech                                                               Equipment-sales capable field technician
+    Repair Tech                                                                Technician oriented toward complex repair execution
+    Comfort Advisor                                                            Dedicated sales/comfort consultant
+    Manager                                                                    Authorized management/escalation role
+Tags are fully modifiable by authorized humans. Trades-Runtime can recommend a change, recommend against
+a change, and explain its evidence, but cannot supersede authorized human recalibration. Every modification
+lands in the override/recalibration chain.
+
+5.3 Multi-horizon technician position
+Technician position must be shown across multiple time horizons to prevent a short spike or slump from
+becoming the employee narrative.
+    Window                                                                     Use
+    1 Week                                                                     Immediate operating trend and recent behavior
+    30 Days                                                                    Current performance profile
+    60 Days                                                                    Near-term stability/change
+    90 Days                                                                    Quarter-scale capability and consistency
+    6 Months                                                                   Structural trend and longer-term position
+
+
+
+                      Confidential design concept - implementation subject to integration, legal, security and operational validation
+                                                                                                    TRADES-RUNTIME | ARCHITECTURE DESIGN v0.1
+
+5.4 Output vs performance
+Output and performance are separate. Output reports what happened; performance estimates how well it
+happened after context normalization.
+    Output                                                                    Performance
+    Calls completed                                                           Quality/workmanship
+    Repair dollars                                                            Callback-adjusted competence
+    Turnovers created                                                         Diagnostic accuracy
+    Turnovers sold                                                            First-trip completion
+    IAQ/enhancement sales                                                     Runtime efficiency after difficulty adjustment
+    Memberships                                                               Client-tech fit
+    Equipment sales attribution                                               Margin quality
+    Gross contribution                                                        Manager intervention / escalation pattern
+
+
+
+
+6. Visual & Video QA Engine
+6.1 Media as field ground truth
+Before, during and after photos and video are primary calibration evidence. Media is combined with notes,
+equipment information, parts, elapsed time, diagnostic readings, quotes, callbacks and final system
+performance. Media inference alone is never treated as definitive proof of fault, misconduct or workmanship
+failure.
+
+6.2 What the engine estimates
+      Initial equipment condition and equipment age indicators.
+      Access difficulty, corrosion, crowding, contamination, wiring complexity, installation condition and other
+       effort drivers.
+      Likely repair difficulty and expected labor time.
+      Workmanship, completeness and visible quality after repair.
+      Expected parts/BOM and whether the installed/used parts are consistent with the scope.
+      Legitimate added-cost drivers tied to unusual access, condition, procurement or complexity.
+      Effort required versus effort demonstrated.
+      Potential concerns visible in media that are absent from technician notes, flagged as review items rather
+       than accusations.
+      Callback risk and documentation sufficiency.
+
+6.3 Skill normalization
+Visual/video evidence helps distinguish a slow technician from a difficult repair and distinguishes high revenue
+from high technical competence. A technician who completes a severe-access repair correctly in 150 minutes can
+outperform a technician who completes an easy repair in 60 minutes if the expected normalized time and
+quality support that conclusion.
+
+
+
+7. Customer, Equipment, Warranty & Callback Intelligence
+7.1 Required context
+      Equipment age and installation date when known.
+      Model/serial and registration status.
+      Parts warranty status.
+                     Confidential design concept - implementation subject to integration, legal, security and operational validation
+                                                                                                    TRADES-RUNTIME | ARCHITECTURE DESIGN v0.1
+      Labor warranty status.
+      Membership status and entitlements.
+      Last visit and prior service history.
+      Prior diagnoses, quotes and declined work.
+      Prior repairs and parts used.
+      Photos/video and documented equipment condition.
+
+7.2 Warranty lookup via MCP/connectors
+Authorized connectors/MCP tools can query manufacturer, distributor, internal or other warranty sources for
+parts and labor coverage. Coverage should be exposed during booking, dispatch, field diagnosis, quoting and
+repair reconciliation. Warranty states should include CONFIRMED, NOT COVERED, POSSIBLE, UNKNOWN and
+LOOKUP FAILED so an unavailable lookup never silently becomes "not covered."
+
+7.3 30-day callback classification
+A return visit inside 30 days is a trigger for review, not an automatic technician penalty. The classifier asks what
+failed, what was previously observed, what was quoted, what was accepted or declined, and what work the prior
+technician actually performed.
+    Classification                                                            Interpretation
+                                                                              Evidence reasonably ties the repeat problem to prior work or a
+    True callback / workmanship or diagnostic miss
+                                                                              material miss
+                                                                              Failed item was identified and customer declined the
+    Previously quoted / declined
+                                                                              recommended repair
+                                                                              New issue occurred inside the window but is not materially
+    New unrelated failure
+                                                                              connected
+    Warranty event                                                            Covered part/labor issue without technician fault
+    Indeterminate                                                             Evidence insufficient; route for review rather than auto-penalty
+
+
+
+
+8. Manager Intervention Queue
+Trades-Runtime continuously estimates where management involvement is likely to improve outcome before a
+field situation becomes an escalation.
+
+      Repeat visits or unresolved history.
+      Angry/escalating customer language.
+      Disputed warranty or membership status.
+      High-dollar or unusually complex repair decisions.
+      Prior declined work now implicated in a failure.
+      Technician uncertainty or repeated Field Advisor use.
+      Media/notes conflict or documentation gaps.
+      Unusually high quote variance.
+      Potential callback ambiguity.
+      Schedule displacement with material customer impact.
+The manager queue is a recommendation and prioritization surface. It does not remove field/office judgment.
+
+
+
+
+                     Confidential design concept - implementation subject to integration, legal, security and operational validation
+                                                                                               TRADES-RUNTIME | ARCHITECTURE DESIGN v0.1
+
+9. Field Advisor
+9.1 Per-tech/per-call on/off control
+The field AI advisor can be enabled or disabled by authorized policy or by the technician/call workflow. When
+disabled, Trades-Runtime can continue passive observation where permitted. When enabled, it becomes an
+active diagnostic and repair copilot.
+
+9.2 Field context available to the advisor
+   Customer and equipment history.
+   Prior repair/quote/decline history.
+   Parts/labor warranty and membership status.
+   Known model/serial information.
+   Current truck inventory.
+   Pricebook matches.
+   Photos/video/readings/notes supplied during the call.
+   Likely failure hierarchy and next diagnostic checks.
+   Predicted parts, runtime, difficulty and procurement needs.
+   Suggested repair/quote options and customer explanation.
+
+9.3 Learning from advice usage
+The system can measure whether AI guidance was requested, followed or rejected and what outcome followed.
+This is not a simplistic surveillance score. The purpose is to learn where assistance improves outcomes, where
+technicians outperform the model, and where the model needs recalibration.
+
+
+
+10. Pricebook & Profitability Engine
+10.1 ServiceTitan pricebook adaptation
+Trades-Runtime ingests the authorized pricebook and compares current pricing with observed repair volume,
+parts cost, labor burden, difficulty, access, procurement friction, callback risk, demand, market constraints and
+target gross contribution.
+
+Price recommendations should consider both fixed-dollar contribution and percentage margin. High-volume
+work can have different optimal economics than rare, high-complexity work.
+
+10.2 Quote-from-field function
+One action should be able to combine technician notes, photos/video, equipment context, predicted parts,
+difficulty, access, procurement, inventory, warranty and the pricebook into a proposed quote package with
+confidence and assumptions.
+
+   Probable repair/scope.
+   Expected parts/BOM.
+   Part availability and procurement path.
+   Expected labor/runtime.
+   Difficulty/access modifiers.
+   Warranty effect.
+   Pricebook item mapping.
+
+                Confidential design concept - implementation subject to integration, legal, security and operational validation
+                                                                                                TRADES-RUNTIME | ARCHITECTURE DESIGN v0.1
+   Expected revenue, fixed-dollar gross contribution and margin.
+   Confidence plus evidence receipts.
+
+
+
+11. Truck Inventory Intelligence
+Truck inventory is dynamic and technician-specific. Trades-Runtime compares what it predicted would be
+required with what ServiceTitan/other systems show was actually consumed, then adjusts recommended stock
+by technician skill profile, territory, seasonal call mix and likely future work.
+
+   Inventory fit affects dispatch because it changes first-trip completion probability.
+   Actual consumption reconciles the prediction model.
+   Frequent emergency procurement becomes evidence of a stocking gap.
+   Stock recommendations should consider carrying cost and vehicle capacity, not simply maximize inventory.
+   Parts prediction performance becomes a measurable model-quality metric.
+
+
+
+12. Revenue, Repair & Sales Attribution
+Trades-Runtime keeps the originating service call connected to all downstream outcomes rather than separating
+service and sales into unrelated systems.
+
+   Functional repair revenue.
+   IAQ revenue.
+   Enhancements/accessories.
+   Warranty repairs.
+   Memberships.
+   Equipment turnovers generated.
+   Turnovers sold by Comfort Advisors/sales staff.
+   Gross contribution and margin.
+   Callback or rework cost.
+   Attributable downstream revenue from the original service interaction.
+This supports fairer analysis of who identifies opportunities, who closes them, and what combination of
+technician/customer/call/manager/route conditions produces the strongest company outcome.
+
+
+
+13. Human Override & Recalibration Governance
+13.1 Universal override
+Any automated or recommended decision can be manually overridden by an authorized human within that
+role's permissions. Areas include booking, dispatch, route, technician assignment, schedule displacement,
+warranty classification, role tags, quote/price suggestions, parts, inventory and escalation.
+
+13.2 Override receipt
+Each override records:
+
+   Original Trades recommendation and confidence.
+   Who/which authorized role overrode it.
+   Timestamp.
+   Stated reason.
+                 Confidential design concept - implementation subject to integration, legal, security and operational validation
+                                                                                                    TRADES-RUNTIME | ARCHITECTURE DESIGN v0.1
+      Replacement decision.
+      Immediate state change.
+      Downstream schedule/route effects.
+      Observed final outcome.
+      Later assessment of whether the override improved, harmed or had neutral effect.
+    Learning rule
+    A human who repeatedly beats the model is not "noncompliant." The system should search for the unmodeled signal
+    that person is using and incorporate it when valid.
+
+
+
+
+14. Company Heartbeat & Role Interfaces
+Trades-Runtime acts as the shared nervous system between client booking, office staff, dispatch, field
+technicians, managers and IT. Every role sees only the information/actions appropriate to it, but all views are
+generated from the same canonical state.
+    Role                                                                      Primary view/actions
+                                                                              Customer identity, membership, equipment/history, available
+    Client Booking
+                                                                              windows, urgency, appointment precedence
+                                                                              Booking state, customer issues, warranty/membership context,
+    Office
+                                                                              schedule changes, contact actions
+                                                                              Live Van state, route, Call-Fit, runtime, inventory fit,
+    Dispatch
+                                                                              alternatives, override controls
+                                                                              Call context, Field Advisor, history, warranty, inventory,
+    Field Tech
+                                                                              quote/parts support, media capture
+                                                                              Escalation queue, override/recalibration, technician trends,
+    Manager
+                                                                              quality, revenue and risk
+                                                                              Integration health, MCP/API status, permissions, event integrity,
+    IT / System Admin
+                                                                              model health, audit logs
+Heartbeat updates should be event-driven where possible, with periodic health checks so a stale integration or
+missing field event is visible rather than silently corrupting the operating picture.
+
+
+
+15. Receipt Architecture
+Every important recommendation should be explainable after the fact. A receipt is the minimum evidence
+packet required to reconstruct why the system believed an action was appropriate at the time.
+
+      Input snapshot and timestamp.
+      Known customer/equipment/warranty/membership state.
+      Candidate Vans/alternatives considered.
+      Scoring factors and confidence.
+      Chosen recommendation.
+      Human/system actual decision.
+      Override information if applicable.
+      Predicted outcome and expected uncertainty.
+      Actual outcome.
+      Counterfactual assessment.
+      Which model parameters or technician profile elements changed afterward.
+
+
+
+
+                     Confidential design concept - implementation subject to integration, legal, security and operational validation
+                                                                                                      TRADES-RUNTIME | ARCHITECTURE DESIGN v0.1
+
+16. Shadow-Mode Proof Framework
+16.1 Deployment ladder
+1. Observe - ingest and normalize data without influencing decisions.
+2. Shadow - produce sealed counterfactual recommendations while humans/existing software operate normally.
+3. Recommend - surface decisions to staff with no autonomous execution.
+4. Human Approves - one-click acceptance/override workflow.
+5. Limited Autonomy - narrowly scoped actions with hard constraints and rollback.
+6. Autonomous Operations - only after sustained evidence, governance and operational approval.
+
+16.2 Proof metrics
+Trades-Runtime should not claim success using revenue alone. Shadow proof should include:
+
+      Gross contribution delta and margin delta.
+      First-trip completion.
+      Callback/rework rate.
+      Diagnostic accuracy.
+      Turnovers created and sold.
+      Travel/fuel/time efficiency.
+      Customer wait and displacement impact.
+      Runtime forecast error.
+      Inventory prediction accuracy.
+      Warranty/callback classification accuracy.
+      Quality/workmanship indicators.
+      Manager intervention prediction quality.
+      Human override win/loss/neutral rate.
+      Exploration results and newly discovered technician capability.
+
+
+
+17. Core Data Objects
+    Object                                                                      Minimum responsibility
+                                                                                Identity, address/service location, membership, preferences,
+    Customer
+                                                                                communication history
+                                                                                Trade, type, model/serial, age, install date, warranty, service
+    Equipment
+                                                                                history
+                                                                                Issue, urgency, booking, required skills, precedence, lifecycle
+    Call
+                                                                                state
+                                                                                Role tags, skills, quality, location, inventory, schedule,
+    Van/Technician
+                                                                                uncertainty/exploration state
+                                                                                Before/during/after photos/video, timestamps, call linkage,
+    Media Evidence
+                                                                                findings/confidence
+                                                                                Diagnosis, scope, parts, pricebook mapping, labor, difficulty,
+    Quote/Repair
+                                                                                margin, warranty
+                                                                                Predicted need, stock, consumption,
+    Inventory Event
+                                                                                replenishment/procurement
+    Turnover/Sale                                                               Originating call, tech, sales role, close, amount, contribution
+    Trajectory Event                                                            Planned state, actual event, rebase, new schedule/route state
+                                                                                Recommendation, authorized human change, reason,
+    Override Event
+                                                                                replacement, outcome
+                                                                                Reconstructable evidence for any material system
+    Receipt
+                                                                                recommendation
+
+                       Confidential design concept - implementation subject to integration, legal, security and operational validation
+                                                                                                 TRADES-RUNTIME | ARCHITECTURE DESIGN v0.1
+
+18. Decision Rules to Freeze in v0.1
+1. Human-authorized recalibration always controls the live operation.
+2. No recommendation may erase the recommendation or state that preceded it.
+3. Route drift is expected and causes rebasing, not automatic failure scoring.
+4. Existing bookings have precedence; displacement must be justified and auditable.
+5. Geography/fuel matters but is never the final factor.
+6. Technician revenue is not equivalent to technician skill.
+7. Skill must be normalized for call difficulty, access, runtime, opportunity mix and customer context.
+8. Inside-30-day return visits are reviewed, not automatically charged as callbacks.
+9. Previously quoted and declined work must be separated from technician fault.
+10. Media can support a concern but cannot alone prove misconduct or diagnostic failure.
+11. Unknown warranty status is never silently converted to not-covered.
+12. Exploration opportunities are necessary to prevent historical dispatch patterns from poisoning capability
+estimates.
+13. Output and performance remain separate metrics.
+14. Trades-Runtime must be able to explain material decisions with receipts.
+15. Actual real-world state always becomes the starting point for the next decision.
+
+
+
+19. Recommended Logical Architecture
+A practical high-level architecture is:
+ServiceTitan / ProBooks / warranty sources / telephony / maps-location / pricebook / inventory / media -> Integration & MCP
+Layer -> Canonical Event Bus -> Operational State Store -> Decision Engines -> Shadow/Counterfactual Engine -> Receipts &
+Audit -> Role Interfaces -> Controlled Action Layer.
+
+
+19.1 Decision engines
+   Booking & Call Intake Engine.
+   Dispatch / Call-Fit Engine.
+   Full-Day Trajectory Engine.
+   Runtime Prediction Engine.
+   Technician Skill & Exploration Engine.
+   Visual/Video QA Engine.
+   Warranty & Callback Classifier.
+   Manager Intervention Predictor.
+   Field Advisor.
+   Pricebook / Quote / Margin Engine.
+   Inventory Prediction Engine.
+   Revenue & Turnover Attribution Engine.
+   Counterfactual Outcome Engine.
+   Receipt / Audit / Override Engine.
+
+19.2 Data/storage separation
+   Immutable event ledger for audit and historical reconstruction.
+   Operational state store for the current live company state.
+                  Confidential design concept - implementation subject to integration, legal, security and operational validation
+                                                                                               TRADES-RUNTIME | ARCHITECTURE DESIGN v0.1
+   Analytical warehouse/lakehouse for long-horizon training and reporting.
+   Media/object store for photos/video with strict call/equipment linkage.
+   Feature/skill store for technician and job-type models.
+   Receipt store for decision evidence and override history.
+
+
+
+20. Safety, Fairness & Governance Requirements
+   Role-based permissions for sensitive employee/customer data and overrides.
+   Pseudonymized Van-first analytics where practical.
+   No automatic disciplinary action from a model score, media inference or one time window.
+   Performance views must show context and uncertainty, not only rank.
+   Photo/video analysis should be used for work quality and job context within authorized policy, with
+    retention/access controls.
+   Customer/employee recording and media workflows must comply with applicable consent, privacy and
+    employment requirements.
+   Every autonomous capability must have a manual fallback and clear integration-health state.
+   External API/MCP integrations must be validated against actual permissions, rate limits, data rights and
+    available endpoints before implementation.
+
+
+
+21. v0.1 Build Boundary
+The first build should favor proof over autonomy. The most valuable v0.1 is a reliable shadow operating system
+that can reconstruct calls, technicians/Vans, routes, booking decisions, warranty/membership context, outcomes
+and overrides with defensible receipts.
+
+21.1 Minimum viable shadow system
+1. Ingest ServiceTitan + ProBooks/authorized operational data.
+2. Normalize customers, equipment, calls, Vans/technicians, bookings, jobs, quotes, parts, turnovers and sales.
+3. Create canonical event timestamps and call IDs across integrations.
+4. Map technician identities to Van identifiers for primary analytics.
+5. Implement Full-Day Trajectory, Call-to-Call Ledger and Override/Recalibration Chain.
+6. Implement baseline Call-Fit scoring and route rebasing.
+7. Implement technician role tags and multi-window dashboards (1 week / 30 / 60 / 90 days / 6 months).
+8. Implement 30-day callback/warranty decision support.
+9. Implement warranty lookup adapters where authorized.
+10. Implement media ingestion and initial before/after visual QA scoring.
+11. Implement receipts that make every shadow recommendation reconstructable.
+12. Compare actual versus shadow outcomes without allowing future information into the original
+recommendation.
+
+21.2 Subsequent capabilities
+Once the shadow data is trustworthy, add live Field Advisor, video reasoning, manager queue, quote generation,
+pricebook optimization, truck inventory prediction, customer-facing AI call handling and progressively
+controlled execution.
+
+
+                Confidential design concept - implementation subject to integration, legal, security and operational validation
+                                                                                                  TRADES-RUNTIME | ARCHITECTURE DESIGN v0.1
+
+22. Success Condition
+Trades-Runtime succeeds when management can open any day, any call or any meaningful system
+disagreement and see: what the company knew at that moment, what existing operations did, what Trades-
+Runtime recommended, whether a human changed it, why, how the remaining day adapted, what physically
+occurred in the field, what the customer received, and what measurable result followed.
+
+ North Star
+ The system earns authority by being auditable, adaptable and repeatedly correct under real operating conditions -
+ not by being more confident than the humans running the business.
+
+
+End of architecture specification - Trades-Runtime v0.1
+
+
+
+
+                   Confidential design concept - implementation subject to integration, legal, security and operational validation
+
