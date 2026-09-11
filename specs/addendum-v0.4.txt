@@ -1,0 +1,260 @@
+                                              Trades-Runtime
+  Deployment, Watcher Mode, Continuous Learning, Recalibration, KPI & Receipt Architecture - Addendum v0.4
+
+Scope. This document captures the Trades-Runtime requirements added after the prior architecture PDFs: progressive
+branch deployment, tethered and standalone operation, cross-platform access, pre-implementation Watcher Mode,
+continuous learning, Van/technician recalibration, technician profit/KPI matrices, scalable value measurement, and the
+complete receipt database.
+
+
+1. Progressive Branch Deployment
+Trades-Runtime must be deployable one branch at a time rather than requiring a company-wide cutover. A branch can enter
+Watcher, Shadow, Recommendation, Human-Approved, Limited-Autonomy or Autonomous modes independently of every
+other branch.
+
+   Recommended rollout: Branch 1 pilot -> prove data quality, stability, economics and employee workflow ->
+   Branch 2 -> Branch 3 -> regional federation -> company-wide availability.
+
+Each branch retains its own operational partition: technician/Van profiles, schedules, inventory, pricebook differences,
+customer/equipment base, weather sensitivity, staffing, autonomy permissions, KPI baselines and local exceptions.
+Company leadership receives a federated view across branches. A failure or bad model state at one branch must be
+containable without destabilizing the others.
+
+
+2. Tethered and Standalone Modes
+Tethered Mode: Trades integrates with ServiceTitan, ProBooks and other authorized systems through available
+APIs/connectors/MCP. Early stages primarily observe, normalize and shadow their records. Write-back privileges are
+enabled only by domain and authorization.
+
+Standalone Mode: Trades must also be architected so it can ultimately operate without ServiceTitan or ProBooks as a
+dependency. Native capabilities can include customer/property/equipment records, booking, dispatch, field workflows,
+pricebook, inventory, warehouse, warranty, communications, reporting, analytics, receipts and operational intelligence.
+
+   The migration path should therefore support: tethered observation -> hybrid operation -> selected
+   Trades-native modules -> branch-level standalone -> optional company-wide standalone.
+
+3. Cross-Platform Application Requirement
+Trades-Runtime should expose one shared backend/canonical company state through role-specific interfaces usable on
+iPad, iPhone, macOS, Windows and Linux. A responsive web/PWA surface provides a universal baseline; native
+wrappers/apps may be used where device integration or field reliability benefits.
+
+Field use requires poor-connectivity/offline tolerance: locally queue authorized notes, media metadata, job-state changes
+and other supported events, clearly mark unsynchronized state, and reconcile safely when connectivity returns. Duplicate
+synchronization must be idempotent.
+
+
+4. Watcher Mode - Mandatory Pre-Implementation Learning
+Before Trades recommends or controls a branch, it should be capable of a passive WATCHER MODE. Watcher observes
+the real operation without changing it. Its purpose is to learn how that branch actually functions rather than forcing a generic
+company model onto it.
+
+   Watcher learns               Examples
+
+   Demand                       Call volume, booking patterns, seasonality, urgency, no-show/cancellation behavior.
+    Watcher learns               Examples
+
+    Dispatch                     Actual assignments, route drift, rebasing, geography, human exceptions.
+
+    Technicians/Vans             Call mix, capability, runtime, quality, sales/repair output, opportunity exposure.
+
+    Economics                    Labor hours/cost, ticket values, parts burden, contribution, margin, rework.
+
+    Inventory                    Van usage, branch stock, transfers, procurement delays, stockouts.
+
+    Customers/equipment          Installed base, age, brands, warranties, memberships, repeat history.
+
+    Management                   Override patterns, escalation, branch-specific policies and unmodeled knowledge.
+
+    Environment                  Weather response, surge behavior and branch-specific demand lag.
+
+
+Watcher Mode should produce a branch readiness report: data completeness, identity conflicts, model uncertainty,
+operational patterns learned, predicted-vs-observed calibration, integration failures and areas where insufficient evidence
+prevents promotion to Shadow/Recommendation mode.
+
+
+5. Branch Maturity Ladder
+   WATCH -> LEARN -> SHADOW -> COMPARE -> RECOMMEND -> HUMAN-APPROVED ACTION ->
+   LIMITED AUTONOMY -> AUTONOMOUS DOMAIN
+
+Promotion occurs by branch and by subsystem. One branch might allow autonomous inventory replenishment while keeping
+dispatch in recommendation mode. Another may remain entirely in Watcher Mode. Recalibration/reset can occur at any
+stage.
+
+
+6. Continuous Learning as the Company Changes
+Trades must learn continuously as branches grow, service territories change, new branches or acquisitions are added,
+employees enter/leave, Vans change hands, equipment brands change, pricing changes, new call types emerge and
+weather/customer behavior shifts.
+
+The system must distinguish environment change from performance degradation. Novel conditions increase uncertainty
+and trigger learning/recalibration rather than immediately punishing a technician or treating the old model as permanent
+truth.
+
+
+7. Van / Technician Recalibration and Reset
+Van numbers remain the primary operational analytics identifier, but Van history cannot permanently contaminate the next
+technician. Authorized management needs explicit lifecycle actions.
+
+    Action                       Purpose
+
+    RECALIBRATE                  Retain history but re-estimate active expectations after meaningful role/environment change.
+
+    RESET VAN                    Start a new active Van baseline while preserving the prior Van-era history in the archive.
+
+    TRANSFER PROFILE             Move appropriate technician-specific learned evidence when a technician changes Vans.
+
+    NEW TECH BASELINE            Initialize a new employee from role/company priors rather than the prior Van operator.
+
+    ROLE CHANGE                  Rebase expectations when Maintenance, Service, Selling, Warranty, Repair or other role changes.
+
+    EMPLOYMENT END               Close the active technician era; preserve history and prevent future attribution.
+
+
+Every recalibration/reset is itself a receipt: initiator, reason, old state, new state, transferred evidence, excluded history,
+timestamp and policy/model version. Historical records are never deleted merely to create a fresh operational baseline.
+8. Technician Profit Matrix and KPI Windows
+Trades should provide a technician/Van performance matrix that keeps output, economics and technical performance
+distinct but comparable. Revenue alone is not skill, and profit alone is not quality.
+
+   Category                    Representative metrics
+
+   Output                      Calls completed, repair revenue, IAQ, memberships, turnovers, equipment-sale attribution.
+
+   Economics                   Realized contribution, margin %, loaded labor cost, parts/procurement burden, contribution per labor hour.
+
+   Quality                     Callback-adjusted competence, diagnostic accuracy, first-trip completion, workmanship/Visual QA.
+
+   Runtime                     Actual vs difficulty-adjusted expected duration, productive labor utilization.
+
+   Customer/fit                Client-tech fit, escalation/manager intervention, customer outcome where measurable.
+
+   Opportunity                 Call-type exposure, exploration opportunities, uncertainty/lack-of-opportunity.
+
+   Profit quality              Contribution after labor, parts, procurement, warranty recovery, callbacks/rework and concessions.
+
+
+  Frozen KPI durations: 1 week, 1 month, 3 months, 6 months, 9 months and 12 months. Optional
+  role-tenure/lifetime views may supplement these.
+
+Each KPI can expose actual value, target, target-attainment %, trend %, branch/company percentile where appropriate,
+sample size, confidence, difficulty/context adjustment and prior-period delta. Small samples must be visibly marked rather
+than presented as stable rankings.
+
+
+9. Scalable Results / Value Lookup
+Trades should maintain a searchable value ledger showing what the system is estimated to have identified, what it
+recommended, and what was actually realized. Results must be filterable by company, region, branch, trade, subsystem,
+date range and operating mode.
+
+   Value class                      Treatment
+
+   Observed opportunity             Watcher-detected opportunity only; not claimed as savings.
+
+   Shadow estimated savings         Counterfactual estimate; clearly labeled estimated.
+
+   Recommendation-mode realized savings
+                                  Measured after a human adopted a Trades recommendation.
+
+   Autonomous-mode realized savingsMeasured from authorized autonomous actions.
+
+   Revenue uplift                   Incremental attributable revenue with methodology.
+
+   Labor savings                    Loaded labor cost/time reduction, quality adjusted.
+
+   Travel/fuel savings              Reduced miles/time/fuel from routing and positioning.
+
+   Procurement savings              Avoided trips, freight, rush orders, transfers or better sourcing.
+
+   Callback/rework savings          Avoided attributable labor, parts, travel and concessions.
+
+   Inventory savings                Reduced carrying cost/stockouts/obsolete stock where measurable.
+
+   Warranty recovery                Additional verified reimbursement or avoided customer/company cost.
+
+
+Non-negotiable: estimated money saved and realized money saved are separate fields. Every value claim carries its
+calculation method, baseline/counterfactual, evidence, confidence, mode, relevant receipts and whether the value is
+estimated, attributed or reconciled.
+
+
+10. Full Receipt Database - Operational Black Box
+Trades requires a durable, searchable receipt database covering the complete lifecycle of consequential data and decisions.
+The receipt store is not merely an error log; it is the company's reconstructable operational history.
+
+   Receipt family             Examples
+
+   Evidence/input             Source packet, source system, hash, observed/received time, freshness, trust metadata.
+
+   AI decision                Recommendation, alternate calculation, confidence, coherence verdict, evidence references.
+
+   Dispatch/booking           Candidate Vans, scores, actual assignment, displacement, route rebase, human change.
+
+   Human override             Who/role, reason, prior recommendation, replacement decision, downstream result.
+
+   Lifecycle                  Van reset, profile transfer, role change, employment end, branch-mode promotion/demotion.
+
+   Economics                  Predicted vs realized labor, cost, contribution, margin, savings/value attribution.
+
+   Price/inventory            Pricebook recommendation/change/lock, stock recommendation, warehouse/procurement action.
+
+   Warranty/callback          Lookup evidence, status, classification, challenge/review and final disposition.
+
+   Model/policy               Model version, policy/ruleset, configuration, deployment version and rollback.
+
+   Outcome                    Final job/customer outcome, callback/rework, payment/recovery and model-learning result.
+
+
+  The receipt database should answer questions such as: Why was Van 214 sent? What information existed
+  at that exact time? Which model and policy version made the recommendation? Did a human override it?
+  Why? Which path performed better? What was the labor/cost/profit difference? Was the result estimated or
+  reconciled? What did the model learn afterward?
+
+11. Receipt Search, Retention and Integrity
+Receipts should be searchable by branch, Van, technician era, customer/property/equipment, job, part, event type,
+date/time, model version, override actor/role, operating mode, confidence, economic result and exception status. Material
+receipts should be hash-verifiable and corrections should append new records rather than silently rewriting historical
+evidence.
+
+Retention, privacy, role access, export and legal/compliance requirements should be governed explicitly. The operational
+database may use hot/warm/archive tiers as volume grows, but the logical receipt lineage must remain reconstructable.
+
+
+12. Integrated Lifecycle
+  Connect -> Watch -> Learn -> Calibrate -> Shadow -> Compare -> Recommend -> Human Approve ->
+  Limited Autonomy -> Autonomous Domain -> Measure -> Reconcile -> Learn -> Recalibrate when
+  reality changes.
+
+This lifecycle operates independently by branch and subsystem while contributing to a federated company model. A new
+branch can begin in Watcher Mode while mature branches continue operating at higher autonomy levels.
+
+
+13. Architecture Freeze - Newly Added Requirements
+   Requirement                Frozen decision
+
+   Deployment                 One branch at a time; branch-specific maturity and containment.
+
+   Integration                ServiceTitan/ProBooks tetherable but not permanent dependencies.
+
+   Standalone                 Trades can mature into the primary operating software.
+
+   Platforms                  iPad, iPhone, Mac, Windows, Linux via shared cross-platform architecture.
+   Requirement             Frozen decision
+
+   Pre-implementation      Watcher Mode learns before recommendation/control.
+
+   Learning                Continuous, change-aware learning with uncertainty during novelty.
+
+   Recalibration           Reset/rebase/transfer technician-Van state without deleting history.
+
+   KPI windows             1 week, 1 month, 3, 6, 9 and 12 months.
+
+   Profit matrix           Labor x loaded cost x realized profit integrated with quality/context.
+
+   Value reporting         Estimated vs realized money saved kept explicitly separate.
+
+   Receipts                Durable full operational black-box database with searchable lineage.
+
+
+End of Trades-Runtime Addendum v0.4
+
