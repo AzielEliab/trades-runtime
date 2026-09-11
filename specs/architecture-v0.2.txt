@@ -1,0 +1,192 @@
+Trades-Runtime
+Architecture Expansion v0.2 - Communications, Recognition, Live Goals & Dynamic Pricebook/Stock
+
+Provenance. Extracted from the longer Architecture Design PDF (header still labeled v0.1).
+The PDF footer marks "End of architecture specification - Trades-Runtime v0.2".
+There is no separate Addendum v0.2 PDF in the chat attachments — this IS the v0.2 content.
+
+23. Communications, Recognition and Live Goals
+Trades-Runtime includes an internal Teams-style communications layer built on the same canonical event
+stream as booking, dispatch, field operations, warehouse, management and I.T. Managers can create, manage,
+archive and moderate company, branch, department, trade, dispatch, sales, field, warehouse, project and
+temporary incident chats or channels according to permissions.
+
+23.1 Automated recognition
+Trades-Runtime may automatically celebrate operational achievements after quality gates are satisfied.
+Recognition is context-aware and must not reward raw revenue alone.
+
+   High repair/service tickets completed successfully.
+   Replacement turnovers generated and equipment replacements closed, preserving attribution to both the
+    originating Van and the closing Comfort Advisor.
+   Difficult jobs completed correctly, especially when difficulty-normalized duration and quality are
+    exceptional.
+   High-value repairs with successful completion and acceptable callback/quality outcomes.
+   Exceptional duration-adjusted performance, first-trip completion, diagnostic quality and sustained
+    improvement.
+
+23.2 Daily mission board
+Role-appropriate dashboards display configurable daily goals for company, region, branch, team and role. Core
+measures include repair/service sales, equipment sales, calls completed, turnovers generated, turnovers closed,
+first-trip completion and other approved KPIs. Each goal displays target, actual, expected pace at the current
+time, remaining gap and projected end-of-day finish.
+
+
+
+24. Dynamic Pricebook, Truck Stock and Supply Intelligence
+The ServiceTitan pricebook is the initial shadow baseline. Trades-Runtime observes actual economics before
+recommending changes. Pricebook, truck-stock and procurement recommendations remain subordinate to
+authorized human control.
+
+24.1 Pricebook recommendation inputs
+   Repair frequency and current/predicted demand.
+   Whether acquisition is required or the item already exists on the assigned Van.
+   Current, last and average part cost.
+   Expected contribution and approved premium profit-margin targets.
+   Availability and lead time.
+   Shipping/freight cost and delay when required.
+   Warehouse or distributor procurement burden.
+   Labor, job difficulty, access difficulty and expected runtime.
+   Exact OEM part number, approved substitute, vendor/SKU and compatibility evidence.
+   Historical returns/failures, first-trip completion effect and actual realized margin.
+
+Inventory location is operationally material. Trades-Runtime distinguishes ON VAN, NEARBY VAN, BRANCH
+STOCK, CENTRAL WAREHOUSE, LOCAL DISTRIBUTOR, SHIPPED and BACKORDERED states when estimating job
+economics and completion probability.
+
+                   Confidential design concept - implementation subject to integration, legal, security and operational validation
+                                                                                                TRADES-RUNTIME | ARCHITECTURE DESIGN v0.1
+
+24.2 Manager override and lock
+Authorized managers can ACCEPT, OVERRIDE or LOCK any pricebook, part-selection or stock recommendation.
+A lock prevents automatic recalibration until an authorized human changes or releases it. Trades-Runtime may
+continue collecting evidence and recommend reconsideration, but it may not supersede the lock. Every action is
+preserved in Chain 3 with who, when, why, prior recommendation and subsequent outcome.
+
+24.3 Van-specific stock optimization
+Trades-Runtime learns an optimal inventory profile for each Van using its territory, call mix, technician skill
+profile, actual consumption, first-trip completion, predicted demand, procurement lead time, carrying cost and
+exploration needs. It recommends additions, increases, reductions and items that should be eliminated or held at
+minimal quantities.
+
+24.4 Warehouse chat and fulfillment queue
+Warehouse receives a dedicated operational chat/queue generated from live job demand and truck-stock
+consumption. Requests identify call/job, Van, required part and exact part number, quantity, stock locations,
+urgency, source/availability, shipping or procurement requirement, and whether replenishment is required
+after fulfillment.
+
+Suggested workflow: REQUESTED -> CLAIMED -> PICKING -> READY -> TRANSFER -> DELIVERED -> INSTALLED
+-> RECONCILED. Purchasing authority remains human unless explicitly delegated later.
+
+
+
+25. Weather and Demand Intelligence
+Each branch/service territory maintains three synchronized weather windows: the past 7 days, the current
+week/current conditions, and the forward 7-day forecast. Trades-Runtime learns branch-specific relationships
+between environmental conditions and HVAC, plumbing and electrical demand rather than relying on a single
+generic weather rule.
+
+25.1 Environmental features
+   Temperature, heat intensity/duration and heat index.
+   Cold intensity/duration, snow/ice and freeze-thaw behavior.
+   Humidity and dew point for HVAC demand and latent-load/comfort effects.
+   Precipitation, heavy rainfall, flash-flood conditions and storm activity.
+   Wind and severe-weather disruption.
+   Rapid temperature transitions and multi-day weather lag.
+   Extreme or black-swan operating states such as blizzards, dangerous heat events, flash floods and
+    exceptional rainfall.
+
+25.2 Demand outputs
+Weather features are correlated with branch history including bookings, call types, equipment ages,
+memberships, callbacks, runtimes, sales, turnovers, parts consumption and staffing. Outputs include predicted
+call volume by trade/call type, uncertainty range, peak windows, staffing/capacity risk, Van-positioning
+implications, truck-stock recommendations, warehouse procurement signals, manager-coverage needs and goal
+adjustments.
+
+Extreme-event mode increases uncertainty bands and predicts event-specific call mix instead of merely
+multiplying normal demand.
+
+                 Confidential design concept - implementation subject to integration, legal, security and operational validation
+                                                                                               TRADES-RUNTIME | ARCHITECTURE DESIGN v0.1
+
+25.3 Lunar/Earth-tide plumbing hypothesis
+Lunar-cycle and Earth-tide variables may be retained as experimental plumbing-demand features because
+lunar/solar gravitational forcing can produce measurable groundwater and aquifer-pressure changes in some
+environments. Trades-Runtime must not assume that lunar phase itself causes residential plumbing leaks. The
+feature must earn predictive weight from branch-specific historical data after controlling for weather,
+precipitation, soil/groundwater conditions, seasonality and other confounders. If it provides no incremental
+predictive lift, its model weight should approach zero.
+
+25.4 Forecast calibration
+Every branch forecast is reconciled against actual demand. Forecast error, missed call mix and operational
+consequences are preserved so each territory's weather-response model improves over multiple seasons.
+
+
+
+26. Maintenance Scheduling and Equipment-Age Opportunity
+Routing
+Trades-Runtime uses company installation records, equipment age, warranty, membership, maintenance
+history, prior repairs/quotes and current demand to schedule and route maintenance. The objective is to put a
+qualified available technician on the correct job without delaying legitimate demand merely to preserve a sales
+opportunity.
+
+26.1 Technician operational tags
+   Maintenance Tech Level 1, Level 2 and Level 3.
+   Service Tech Level 1, Level 2 and Level 3.
+   Selling Tech.
+   Repair Tech.
+   Warranty.
+   Comfort Advisor.
+   Manager.
+
+Tags are internally editable. Authorized human recalibration always wins; Trades-Runtime may recommend
+against a change and explain why, but cannot supersede it. All changes remain in Chain 3.
+
+26.2 Equipment-age scheduling
+Maintenance capacity should intentionally account for the age distribution of company-installed equipment.
+Newer systems, middle-aged systems and older systems are distributed through the appropriate
+maintenance/service ladder rather than being assigned without context.
+
+Systems around 10 years old and older receive progressively greater weighting toward qualified Selling Techs
+because replacement probability is generally more relevant as systems age. The older/problematic the system,
+the stronger the weighting toward technicians proven capable of both correct technical service and appropriate
+replacement-opportunity handling.
+
+26.3 Demand-first dispatch rule
+Sales opportunity is a technician-matching factor, not permission to delay qualified service. If an appropriate
+qualified technician is available, Trades-Runtime should dispatch rather than hold the customer waiting for an
+
+
+
+                Confidential design concept - implementation subject to integration, legal, security and operational validation
+                                                                                               TRADES-RUNTIME | ARCHITECTURE DESIGN v0.1
+ideal Selling Tech, unless an authorized human explicitly overrides. A qualified non-selling technician can create
+a turnover for the appropriate Comfort Advisor when replacement is warranted.
+
+
+
+27. Updated Governing Rules
+   Reality always becomes the next starting state; route drift across an 8-12 hour day is expected evidence, not
+    an automatic failure.
+   Preserve Planned State, Actual State and Counterfactual State, plus the human Override/Recalibration Chain.
+   Already-booked customers have precedence; avoid rescheduling unless demand/urgency justifies
+    displacement and the decision is auditable.
+   Humans retain authority everywhere. Trades-Runtime can warn, recommend and explain, but authorized
+    human override or lock controls the live operation.
+   Optimize quality, competence, correct technician fit, client fit, geography, inventory, runtime, expected fixed
+    profit and expected margin together; fuel/geography never become the sole deciding factor.
+   Use controlled exploration so historical assignment patterns do not poison technician skill models.
+   Use photos and video with notes, parts, timing and outcomes to normalize skill, difficulty, effort and
+    legitimate added cost; media inference alone is not proof of misconduct.
+   Use one canonical live operating state with heartbeat/event synchronization across I.T., office, dispatch,
+    managers, field technicians, warehouse and client booking.
+   Standard technician performance windows are 1 week, 30 days, 60 days, 90 days and 6 months.
+   Weather, demand, inventory, pricebook and maintenance scheduling continuously feed one another, while
+    all shadow recommendations remain reconstructable from contemporaneous evidence.
+
+End of architecture specification - Trades-Runtime v0.2
+
+
+
+
+                Confidential design concept - implementation subject to integration, legal, security and operational validation
+
