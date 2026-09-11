@@ -1,0 +1,251 @@
+                                               Trades-Runtime
+                       Workforce Capacity, Availability & Demand-Aware Scheduling - Addendum v0.8
+
+Scope. This addendum contains all architecture added since Universal Analytics & Human Review Layer v0.7. It defines
+real-world employee availability constraints, demand-responsive booking blocks, scheduled-off-day calibration, probabilistic
+call duration, emergency/urgency handling, first-call and midday schedule protection, reschedule minimization and
+continuous capacity recalibration.
+
+
+1. Workforce Availability & Capacity Constraint Engine
+Trades-Runtime must schedule against the workforce that actually exists, not an imaginary fully staffed board. Employee
+availability, scheduled time off, call-ins, early-departure requirements, delayed starts, training, vehicle availability and
+authorized scheduling constraints become part of the canonical live company state.
+
+   Demand Forecast + Workforce Availability + Employee Windows + Skill Capacity + Existing
+   Commitments + Runtime/Travel Prediction -> Live Capacity State -> Booking/Dispatch Blocks ->
+   Continuous Recalibration -> Actual Outcome -> Calibration Learning.
+
+2. Hard vs Soft Constraints
+   Constraint                    Treatment
+
+   Hard availability             Approved PTO/day off, call-in, leave, must-leave-by, cannot-start-before, training, licensing restriction, unavailable Van o
+
+   Soft optimization             Preferences and operating choices such as preferred return time, protected emergency capacity, maintenance reduction
+
+
+
+3. Employee Availability Windows
+A time restriction is not merely a calendar label. Trades calculates backward from the employee's required end/return time
+using live location, predicted job duration, uncertainty, expected travel and destination.
+
+   Availability window -> predicted job duration -> uncertainty buffer -> travel/return time -> latest safe
+   dispatch time.
+
+Example: if a technician must leave by 3:30 PM and be back at the shop by 4:00 PM, Trades determines the latest feasible
+new assignment dynamically rather than simply marking 4:00 PM unavailable.
+
+
+4. Demand-Responsive Booking Blocks
+Trades can recommend, and where explicitly authorized can implement, booking-capacity blocks based on live and forecast
+demand. This includes reducing maintenance availability during severe service demand, employee call-ins, constrained skill
+mix or emergency surges.
+
+   Booking state                   Meaning
+
+   OPEN                            Available for normal booking.
+
+   HOLD                            Temporarily reserved while demand/capacity is evaluated.
+
+   BLOCK NEW BOOKING               Do not add new routine work into the window.
+
+   PROTECTED                       Reserved for defined capacity purpose such as emergencies or existing commitments.
+
+   RESCHEDULE CANDIDATE            Existing flexible commitment identified for human-reviewed displacement if required.
+
+   CLOSED                          Unavailable because of hard workforce/operational constraint.
+5. Existing Customer Commitments Remain Protected
+Blocking capacity does not silently cancel already booked customers. Existing bookings retain precedence under the Trades
+customer-commitment rule. Displacement must be explicit, auditable, customer-impact aware and evaluated against
+alternatives. Human authority remains available for all material schedule changes.
+
+
+6. Live Absence / Return Recalculation
+When an employee calls in, Trades immediately removes the relevant labor/skill capacity, recalculates booked capacity and
+Van trajectories, identifies calls at risk, evaluates maintenance blocks, cross-branch borrowing and other recovery options,
+then presents ranked recovery plans. If the employee later becomes available, Trades restores capacity and recomputes
+from the actual current state.
+
+  Call-in -> capacity loss -> at-risk commitments -> recovery alternatives -> management decision ->
+  live rebase -> settlement.
+
+7. Real Usable Operating Capacity
+Headcount alone is not capacity. Trades should calculate usable capacity from available labor, skill mix, Van availability,
+employee windows, call demand, expected runtime, geography, protected commitments, weather, inventory and absence
+state.
+
+  Available labor x skill mix x Van availability x time windows x call demand x expected runtime x
+  geography x protected commitments x absence state x weather x inventory = real usable operating
+  capacity.
+
+8. Workforce Calibration
+Historical availability events should be aggregated against demand and operational outcomes. Trades learns how specific
+combinations of absences, skill loss, weather, weekday, booked load and branch conditions affect customer wait, overtime,
+first-trip completion, displacement, maintenance blocking, cross-branch support and realized economics.
+9. Demand-Aware Booking & Schedule Reliability Engine
+Trades must optimize for service demand, urgency, employee availability and schedule reliability rather than simply filling
+every visible opening. It should specifically minimize avoidable first-call and midday reschedules while preserving capacity
+for real service demand.
+
+
+10. Scheduled Days Off Feed Future Capacity
+Known days off, vacations, training and approved reduced schedules must affect future booking capacity before the
+operating day begins. If a branch will have materially less qualified service capacity on a future day, Trades should reduce
+safely bookable capacity or recommend protective blocks in advance rather than discovering the shortage after the board is
+full.
+
+
+11. Probabilistic Call Duration
+A typical service-call booking window may be approximately two hours, with many calls extending toward four hours and
+lengthy repairs sometimes exceeding that. Trades should therefore model call duration as a probability distribution, not a
+fixed block.
+
+The distribution should continuously recalibrate by call type, trade, equipment, age/condition, prior history, Van/technician
+era, access/difficulty, branch, geography, repair probability and actual completed outcomes.
+
+   Scheduled window != predicted completion time. The board should understand both.
+
+12. First-Morning Call Protection
+First calls should receive strong schedule-reliability weighting because an early overrun can cascade through the entire day.
+Trades should consider the probability that the first call completes with enough time to meet the next committed appointment
+and any employee availability boundary.
+
+Where two otherwise appropriate assignments exist, the one producing materially higher probability of preserving the next
+commitment should receive scheduling preference unless urgency, qualification, safety or another governing factor
+dominates.
+
+
+13. Midday Commitment Protection
+The same principle applies to midday calls. Trades should identify calls immediately preceding hard customer commitments
+or employee windows and dynamically create only the buffer justified by the predicted overrun risk. Static empty gaps
+everywhere are unnecessary; risk-weighted buffers are preferred.
+
+
+14. Reschedule-Risk Score
+   Field                           Meaning
+
+   On-Time Probability             Probability the customer commitment can be met within the defined service window.
+
+   Reschedule Probability          Estimated probability the appointment must be materially moved/displaced.
+
+   Expected Start Range            Probability-informed arrival/start interval.
+
+   Expected Completion Range       Probability-informed completion interval.
+
+   Emergency Displacement Risk     Likelihood surge demand will consume the planned capacity.
+
+   Technician Overrun Risk         Likelihood prior work extends into this commitment.
+
+   Customer Flexibility            Policy/recorded flexibility, never invented.
+
+   Downstream Schedule Impact      Expected effect of delay on subsequent commitments and employee windows.
+15. Protected Demand Reserve
+Trades should not necessarily book every minute of every qualified Van. Branch/time-block emergency reserve should vary
+according to predicted urgent-call arrival rate, weather, season, day/time, staffing, skill mix and existing workload.
+
+  Total qualified capacity - protected commitments - employee restrictions - predicted overruns -
+  emergency reserve = safely bookable capacity.
+
+16. Demand Urgency Model
+   Class                       Operational concept
+
+   Emergency                   Immediate safety/property threat or other company-defined condition requiring the fastest appropriate response.
+
+   Urgent                      Material service failure where delay has elevated customer/property/operational consequence.
+
+   Priority service            Important system failure requiring timely service but below emergency/urgent classification.
+
+   Routine service             Normal repair/service demand.
+
+   Maintenance / flexible      Planned work that can absorb more scheduling flexibility under authorized policy.
+
+
+Urgency policy remains company-controlled. Trades learns the operational consequence of delay for each class but must
+not invent safety conditions or falsely escalate urgency.
+
+
+17. Emergency Insertion Without Destroying the Board
+An emergency does not automatically justify breaking multiple existing commitments. Trades evaluates whether the call can
+be absorbed through protected reserve, another qualified Van, nearby/cross-branch capacity, management resources,
+flexible maintenance movement or other authorized recovery options.
+
+The engine should rank alternatives by response time, qualification, customer displacement, downstream schedule survival,
+labor/travel cost, overtime, contribution and operational risk, then preserve the chosen plan and outcome in receipts.
+
+
+18. Morning Board Optimization
+The morning board is a probabilistic best plan rather than a rigid schedule. It should: (1) protect high-confidence first
+commitments, (2) preserve enough flexibility for expected urgent demand, and (3) avoid creating a downstream cascade
+when early calls run long.
+
+Chain A then continuously rebases the plan from actual real-world state as calls finish early, run long, employees become
+unavailable, emergencies arrive or capacity changes.
+
+
+19. Demand x Day-Off x Booking Calibration
+Trades should learn interactions rather than treating each variable independently. Examples include scheduled days off x
+temperature x weekday x skill mix x morning bookings; call-ins x emergency arrivals x maintenance load; and
+early-departure windows x expected repair duration x geography.
+
+This allows future planning to answer not merely how many employees are scheduled, but whether the available skill/time
+distribution is sufficient for the expected demand curve while preserving existing customer commitments.
+
+
+20. End-of-Day Settlement & Learning
+   Predicted / planned                    Settled against
+
+   Call duration                          Actual duration and reason for material variance.
+
+   Demand volume/mix                      Actual calls by urgency, trade and call type.
+    Predicted / planned                   Settled against
+
+    Emergency arrival probability         Actual emergency/urgent arrivals by time block.
+
+    Reschedule probability                Actual on-time, delayed, displaced or rescheduled result.
+
+    Protected reserve                     Used capacity vs unused reserve and avoided displacement.
+
+    Staffing assumptions                  Actual attendance, availability windows and skill capacity.
+
+    Morning trajectory                    Actual route/day trajectory and rebase performance.
+
+    Recovery plan                         Actual customer, labor, travel, overtime and economic consequence.
+
+
+
+21. Chain D Integration
+Availability and scheduling failures must be reconstructable through Chain D. If management approved a 4:00 PM return but
+the availability state never reached Dispatch, Chain D should identify the failed handoff rather than incorrectly labeling the
+dispatcher as the root cause.
+
+
+22. Universal Analytics Integration
+All workforce and scheduling variables become available to the v0.7 Universal Analytics layer. Human reviewers can
+generate reports, graphs, scales, probability analyses and models across days off, call-ins, demand, weather, urgency,
+booking blocks, first-call reliability, midday reliability, overtime, reschedules, cross-branch borrowing, labor/cost/profit and
+any other authorized metric.
+
+
+23. Receipt Requirements
+Material availability and capacity changes should record who entered/changed the constraint, constraint type, hard/soft
+state, when it became known, effective window, affected Van/role/branch, Trades recommendation, management action,
+booking/dispatch changes, customers affected, model/policy version, expected impact and final outcome.
+
+
+24. Governing Objective
+   Serve the highest-urgency and highest-value legitimate demand while maximizing the probability that
+   existing customer commitments and authorized employee availability windows are actually kept.
+
+Trades should optimize usable capacity, not theoretical utilization. It should learn when leaving capacity open is valuable,
+when maintenance should remain bookable, when it should be blocked, and how much staffing/skill reserve a branch needs
+under different demand conditions.
+
+
+25. Architecture Result
+   Future roster + scheduled days off + employee windows + historical demand + weather + current
+   bookings + urgency mix + call-duration distributions + emergency-arrival probability -> Safe
+   Bookable Capacity -> Morning Board -> Protected Capacity -> Live Rebase -> Emergency Insertion ->
+   Reschedule Minimization -> End-of-Day Settlement -> Calibration.
+
+End of Trades-Runtime Workforce Capacity, Availability & Demand-Aware Scheduling Addendum v0.8
+
