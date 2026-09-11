@@ -16,7 +16,7 @@
     workforce: ONE,
     fabrics: ONE,
     analytics: ONE,
-    specs: ONE,
+    modules: ONE,
     trades: ONE,
     hvac: TWO,
     plumbing: TWO,
@@ -37,7 +37,7 @@
     { id: "workforce", href: "workforce/", label: "Workforce" },
     { id: "fabrics", href: "fabrics/", label: "Fabrics" },
     { id: "analytics", href: "analytics/", label: "Analytics" },
-    { id: "specs", href: "specs/", label: "Specs" },
+    { id: "modules", href: "modules/", label: "Modules" },
     { id: "trades", href: "trades/", label: "Trades" },
     { id: "catalog", href: "catalog/", label: "Catalog" }
   ];
@@ -117,7 +117,7 @@
             <a href="${prefix}v1/runtime.json">runtime.json</a>
             · <a href="${prefix}cite.json">cite.json</a>
             · <a href="${prefix}llms.txt">llms.txt</a>
-            · <a href="${prefix}specs/">specs</a>
+            · <a href="${prefix}modules/">modules</a>
           </div>
         </div>
       `;
@@ -134,7 +134,7 @@
   }
 
   function badge(status) {
-    const cls = status === "design" || status === "planned" || status === "stub" ? status === "design" ? "planned" : status : "catalog";
+    const cls = status === "live-pure" || status === "ok" ? "catalog" : status === "design" || status === "planned" || status === "stub" ? status === "stub" ? "stub" : "planned" : "private";
     return `<span class="badge ${cls}">${status || "design"}</span>`;
   }
 
@@ -166,6 +166,9 @@
 
     const pipelines = (data.pipelines || []).map((p) => `
       <tr><td>${p.name}</td><td>${p.role || ""}</td><td>${badge(p.status)}</td></tr>`).join("");
+
+    const software = (data.software_modules || []).map((m) => `
+      <tr><td><code>${m.slug}</code></td><td><code>${m.path || ""}</code></td><td>${badge(m.status)}</td><td>${m.summary || ""}</td></tr>`).join("");
 
     const engines = (data.engines || []).map((e) => `
       <tr><td><code>${e.slug}</code></td><td>${e.name}</td><td>${badge(e.status)}</td><td>${e.summary || ""}</td></tr>`).join("");
@@ -220,6 +223,13 @@
         <table class="ops">
           <thead><tr><th>Pipeline</th><th>Role</th><th>Status</th></tr></thead>
           <tbody>${pipelines}</tbody>
+        </table>
+      </div>
+      <div class="section">
+        <h2>Software modules</h2>
+        <table class="ops">
+          <thead><tr><th>Slug</th><th>Path</th><th>Status</th><th>Summary</th></tr></thead>
+          <tbody>${software || "<tr><td colspan=4>No software_modules in runtime.json</td></tr>"}</tbody>
         </table>
       </div>
       <div class="section">

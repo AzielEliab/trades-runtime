@@ -10,12 +10,11 @@
   "visibility": "private",
   "license": "Apache-2.0",
   "repository": "https://github.com/AzielEliab/trades-runtime",
-  "spec_pack": "architecture-v0.1 + addenda v0.7 / v0.8 / v0.9",
-  "description": "Private architecture portal for a shadow-first AI operating system / company operating intelligence layer for large multi-branch HVAC, plumbing, electrical, sewer, and cross-trades field service.",
+  "description": "Private TypeScript runtime for shadow-first field-trades operating intelligence. Pages is a thin UI. Specs are not published as PDFs.",
   "not": [
+    "Not a PDF portal.",
     "Not a public Softwares suite.",
-    "Not aziel-runtime.",
-    "Not a live Worker backend.",
-    "Not a production deployment claim."
+    "Not aziel-runtime wholesale.",
+    "Not a live Worker backend."
   ]
 }

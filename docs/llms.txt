@@ -1,60 +1,26 @@
 # Trades-Runtime
 
-> Shadow-first AI operating system / company operating intelligence layer
-> for large multi-branch HVAC, plumbing, electrical, sewer, and cross-trades field service.
+> Private TypeScript operating system for field-trades companies.
 > Author / identity: Aziel Eliab only.
 > Version: 0.1.0
-> Role: trades-runtime
-> Visibility: private
-> License: Apache-2.0
-> Status: design / not live
+> Status: live-pure core + stubs. No live backends. No PDFs on Pages.
 
-Trades-Runtime does not begin by replacing ServiceTitan or ProBooks. It shadows them: observe → sealed counterfactual → compare to actual outcomes. Authorized humans always win operationally. Disagreements are preserved as evidence.
+Product is src/. Pages is a thin UI. Implementer specs are at repo-root specs/ (not published).
 
-Design target (not a live claim): ~13–15 branches, 750+ employees, Midwest multi-trade.
+## Software
 
-This site is a private static architecture portal. No live Worker backends, DOIs, or production APIs.
-
-## Canonical specs
-
-- Architecture v0.1 (canonical, includes v0.2 expansions): /specs/architecture-v0.1.txt
-- Earlier 14p snapshot (historical only): /specs/architecture-v0.1-14p.txt
-- Universal Analytics & Human Review v0.7: /specs/addendum-v0.7.txt
-- Workforce Capacity & Demand-Aware Scheduling v0.8: /specs/addendum-v0.8.txt
-- Multi-Fabric / Multi-Pipeline v0.9: /specs/addendum-v0.9.txt
-- PDF sources: /specs/source/
-
-## Architecture pages
-
-- Architecture: /architecture/
-- Operating model: /operating-model/
-- Chains A/B/C (+ D): /chains/
-- Shadow & deployment ladder: /shadow/
-- Decision rules freeze: /rules/
-- Dispatch / Call-Fit / Van: /dispatch/
-- Workforce & scheduling: /workforce/
-- Multi-fabric: /fabrics/
-- Analytics & human review: /analytics/
-- Specs library: /specs/
-- Trade domain surfaces: /trades/
-- Machine catalog: /v1/runtime.json
-
-## Three immutable chains
-
-- A. Full-Day Trajectory
-- B. Call-to-Call Ledger
-- C. Human Override / Recalibration (Decision/Override/Evidence receipts)
+- npm test — constitutional rules, CrossTrade secondary-only, Human Authority, confidence≠truth
+- npm run demo — synthetic shadow-day + receipts
+- Manifest: /v1/runtime.json and /modules/
 
 ## Modes
 
-Watcher / Shadow / Recommendation / Human-Approved / Limited Autonomy / Autonomous
+Watcher | Shadow | Recommendation | HumanApproved | LimitedAutonomy | Autonomous
 
-Ladder: Observe → Shadow → Recommend → Human Approves → Limited Autonomy → Autonomous Operations
+## Chains
 
-## What it is not (§1.2)
-
-Not a simple dispatch optimizer. Not a revenue-as-skill leaderboard. Not a fixed morning route planner. Not an autonomous black box that silently overrules humans. Not photo-as-proof of misconduct. Not fuel-first at the expense of fit/outcome. Not a system that treats a 30-day return as an automatic callback.
+A Full-Day Trajectory · B Call-to-Call Ledger · C Human Override / Recalibration · D Coordination
 
 ## Do not index
 
-This site is private. Do not treat it as a public product surface.
+Private. Do not treat as a public product surface.

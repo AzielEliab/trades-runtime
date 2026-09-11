@@ -1,0 +1,33 @@
+export const RUNTIME_MANIFEST = {
+  product: "trades-runtime",
+  version: "0.1.0",
+  author: "Aziel Eliab",
+  identity: "Aziel Eliab",
+  role: "trades-runtime",
+  kind: "shadow-first-operating-intelligence",
+  live_backends: false,
+  honesty: "Pure/stub TypeScript runtime. No ServiceTitan write-back. No production claim.",
+  modules: [
+    { slug: "ids", path: "src/core/ids.ts", status: "live-pure", summary: "Canonical entity IDs." },
+    { slug: "events", path: "src/core/events.ts", status: "live-pure", summary: "Event contracts and idempotency helpers." },
+    { slug: "modes", path: "src/core/modes.ts", status: "live-pure", summary: "Per-branch operating modes." },
+    { slug: "confidence", path: "src/core/confidence.ts", status: "live-pure", summary: "Confidence ≠ truth." },
+    { slug: "chains", path: "src/core/chains.ts", status: "live-pure", summary: "Append-only chains A/B/C/D." },
+    { slug: "human-authority", path: "src/core/human-authority.ts", status: "live-pure", summary: "Human overrides win; disagreement preserved." },
+    { slug: "trades-coherence", path: "src/inherited/trades-coherence.ts", status: "live-pure", summary: "Primary vs alternate path." },
+    { slug: "evidence-packet", path: "src/inherited/evidence-packet.ts", status: "live-pure", summary: "Provenance wrapper; trust ≠ truth." },
+    { slug: "decision-gate", path: "src/inherited/decision-gate.ts", status: "live-pure", summary: "High-consequence PASS|REVISE|BLOCK." },
+    { slug: "receipt-ledger", path: "src/inherited/receipt-ledger.ts", status: "live-pure", summary: "Hash-chained receipts." },
+    { slug: "shadow-engine", path: "src/inherited/shadow-engine.ts", status: "live-pure", summary: "Sealed counterfactual settlement." },
+    { slug: "trajectory-engine", path: "src/inherited/trajectory-engine.ts", status: "live-pure", summary: "Morning plan → drift → rebase." },
+    { slug: "call-fit", path: "src/domain/call-fit.ts", status: "live-pure", summary: "Dispatch ranking; geography never sole factor." },
+    { slug: "job-economics", path: "src/domain/job-economics.ts", status: "live-pure", summary: "Labor × cost × realized contribution." },
+    { slug: "cross-trade-matrix", path: "src/domain/cross-trade-matrix.ts", status: "live-pure", summary: "Secondary routing signal only." },
+    { slug: "chain-d", path: "src/domain/chain-d.ts", status: "live-pure", summary: "Coordination failure reconstruction." },
+    { slug: "workforce-capacity", path: "src/domain/workforce-capacity.ts", status: "live-pure", summary: "Booking blocks and reschedule risk." },
+    { slug: "decision-fabric", path: "src/domain/decision-fabric.ts", status: "live-pure", summary: "Multi-pipeline reconcile + Pareto." },
+    { slug: "analytics", path: "src/domain/analytics.ts", status: "live-pure", summary: "Mandatory report metadata." },
+    { slug: "constitution", path: "src/rules/constitution.ts", status: "live-pure", summary: "Architecture §18 freeze rules." },
+    { slug: "servicetitan-connector", path: "n/a", status: "stub", summary: "Tether later. No live writes in v0." }
+  ]
+} as const;
