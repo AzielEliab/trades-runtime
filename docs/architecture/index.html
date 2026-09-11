@@ -13,7 +13,7 @@
   <header class="site-header" data-site-header></header>
   <main id="main" class="wrap">
     <section class="page-head hero">
-      <p class="kicker">Architecture &amp; Operating Design · v0.1</p>
+      <p class="kicker">Architecture &amp; Operating Design · v0.2</p>
       <h1>Company operating intelligence, proven in shadow before it is allowed to act.</h1>
       <p>Implemented in the private <code>src/</code> TypeScript package (see <a href="../modules/">software modules</a>). Implementer specs live at repo-root <code>specs/</code> — they are not published on Pages.</p>
     </section>
@@ -64,13 +64,28 @@
           <tr><td>Warranty &amp; Callback Classifier</td><td><span class="badge planned">design</span></td></tr>
           <tr><td>Manager Intervention Predictor</td><td><span class="badge planned">design</span></td></tr>
           <tr><td>Field Advisor</td><td><span class="badge planned">design</span></td></tr>
-          <tr><td>Pricebook / Quote / Margin</td><td><span class="badge planned">design</span></td></tr>
-          <tr><td>Inventory Prediction</td><td><span class="badge planned">design</span></td></tr>
+          <tr><td>Pricebook / Quote / Margin</td><td><span class="badge">live-pure</span></td></tr>
+          <tr><td>Inventory / van stock / fulfillment</td><td><span class="badge">live-pure</span></td></tr>
+          <tr><td>Communications / recognition / mission board</td><td><span class="badge">live-pure</span></td></tr>
+          <tr><td>Weather / demand</td><td><span class="badge">live-pure</span></td></tr>
+          <tr><td>Maintenance / equipment-age routing</td><td><span class="badge">live-pure</span></td></tr>
           <tr><td>Revenue &amp; Turnover Attribution</td><td><span class="badge planned">design</span></td></tr>
           <tr><td>Counterfactual Outcome</td><td><span class="badge planned">design</span></td></tr>
           <tr><td>Receipt / Audit / Override</td><td><span class="badge planned">design</span></td></tr>
         </tbody>
       </table>
+    </section>
+
+    <section class="section">
+      <h2>v0.2 software (coded, not a spec dump)</h2>
+      <ul class="list">
+        <li>Internal channels: company, branch, department, trade, dispatch, sales, field, warehouse, project, incident — archive by moderator.</li>
+        <li>Recognition after quality gates. Raw revenue alone is never a celebration.</li>
+        <li>Mission board: target, actual, expected pace, remaining gap, projected end-of-day.</li>
+        <li>ServiceTitan pricebook is a shadow baseline. ACCEPT / OVERRIDE / LOCK write Chain C. A lock cannot auto-recalibrate.</li>
+        <li>Weather windows stay synchronized. Extreme events widen uncertainty; they do not just multiply demand. Lunar weight is zero unless lift is earned.</li>
+        <li>Maintenance is demand-first: do not hold a qualified available technician for an ideal Selling Tech unless a human overrides.</li>
+      </ul>
     </section>
 
     <section class="section">

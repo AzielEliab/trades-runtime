@@ -3,7 +3,7 @@
 Private **TypeScript runtime** for a shadow-first AI operating system / company operating intelligence layer. Field trades: HVAC, plumbing, electrical, sewer, and cross-trades.
 
 **Author / identity:** Aziel Eliab only  
-**Version:** 0.1.0  
+**Version:** 0.2.0  
 **Role:** `trades-runtime`  
 **License:** Apache-2.0  
 **Visibility:** this repository stays **private**  
@@ -37,7 +37,11 @@ npm run manifest
 | Human Authority | `src/core/human-authority.ts` | live-pure |
 | TradesCoherence, EvidencePacket, DecisionGate, ReceiptLedger, Shadow, Trajectory | `src/inherited/` | live-pure |
 | Call-Fit, economics, CrossTrade, Chain D, workforce, Decision Fabric, analytics | `src/domain/` | live-pure |
-| §18 freeze rules | `src/rules/constitution.ts` | live-pure |
+| Comms / recognition / mission board | `src/domain/comms.ts` | live-pure |
+| Pricebook / van stock / fulfillment | `src/domain/pricebook-stock.ts` | live-pure |
+| Weather / demand / lunar (experimental) | `src/domain/weather-demand.ts` | live-pure |
+| Maintenance routing (demand-first) | `src/domain/maintenance-routing.ts` | live-pure |
+| §18 freeze + v0.2 governing rules | `src/rules/constitution.ts` | live-pure |
 | ServiceTitan / ProBooks connectors | — | stub |
 
 Inherited names come only from [`specs/aziel-runtime-inheritance.txt`](specs/aziel-runtime-inheritance.txt). This is not a wholesale copy of aziel-runtime Softwares.

@@ -22,5 +22,31 @@ export { reconstructHandoff, systemBeforeBlame } from "./domain/chain-d.js";
 export { recommendBlock, scoreRescheduleRisk } from "./domain/workforce-capacity.js";
 export { reconcilePipelines, paretoFrontier } from "./domain/decision-fabric.js";
 export { requireReportMetadata } from "./domain/analytics.js";
+export {
+  archiveChannel,
+  createChannel,
+  mayRecognize,
+  missionBoard,
+  rewardRawRevenueAlone,
+  turnoverAttribution
+} from "./domain/comms.js";
+export {
+  applyManagerDecision,
+  applyShadowBaseline,
+  recommendVanStock,
+  refuseLockedAutoRecalibrate
+} from "./domain/pricebook-stock.js";
+export {
+  demandForecast,
+  lunarPlumbingFeature,
+  lunarWeightWithoutEarnedLift,
+  synchronizedWindows
+} from "./domain/weather-demand.js";
+export {
+  applyTagChange,
+  mayHoldForIdealSeller,
+  pickMaintenanceVan,
+  sellingWeightForAge
+} from "./domain/maintenance-routing.js";
 export * from "./rules/constitution.js";
 export { runShadowDayDemo } from "./demo/shadow-day.js";

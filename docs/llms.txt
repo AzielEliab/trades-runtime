@@ -2,14 +2,14 @@
 
 > Private TypeScript operating system for field-trades companies.
 > Author / identity: Aziel Eliab only.
-> Version: 0.1.0
+> Version: 0.2.0
 > Status: live-pure core + stubs. No live backends. No PDFs on Pages.
 
 Product is src/. Pages is a thin UI. Implementer specs are at repo-root specs/ (not published).
 
 ## Software
 
-- npm test — constitutional rules, CrossTrade secondary-only, Human Authority, confidence≠truth
+- npm test — constitutional rules, CrossTrade secondary-only, Human Authority, confidence≠truth, v0.2 pricebook lock / recognition / weather / maintenance
 - npm run demo — synthetic shadow-day + receipts
 - Manifest: /v1/runtime.json and /modules/
 

@@ -5,8 +5,8 @@
   "title": "Trades-Runtime",
   "author": "Aziel Eliab",
   "identity": "Aziel Eliab",
-  "version": "0.1.0",
-  "runtime_version": "0.1.0",
+  "version": "0.2.0",
+  "runtime_version": "0.2.0",
   "spec_pack": "repo-root specs/ (not published on Pages)",
   "role": "trades-runtime",
   "kind": "shadow-first-operating-intelligence",
@@ -278,7 +278,11 @@
     { "slug": "workforce-capacity", "path": "src/domain/workforce-capacity.ts", "status": "live-pure", "summary": "Booking blocks and reschedule risk." },
     { "slug": "decision-fabric", "path": "src/domain/decision-fabric.ts", "status": "live-pure", "summary": "Multi-pipeline reconcile + Pareto." },
     { "slug": "analytics", "path": "src/domain/analytics.ts", "status": "live-pure", "summary": "Mandatory report metadata." },
-    { "slug": "constitution", "path": "src/rules/constitution.ts", "status": "live-pure", "summary": "Architecture §18 freeze rules." },
+    { "slug": "comms", "path": "src/domain/comms.ts", "status": "live-pure", "summary": "Channels, quality-gated recognition, mission board." },
+    { "slug": "pricebook-stock", "path": "src/domain/pricebook-stock.ts", "status": "live-pure", "summary": "Shadow pricebook; human lock cannot auto-recalibrate." },
+    { "slug": "weather-demand", "path": "src/domain/weather-demand.ts", "status": "live-pure", "summary": "Three weather windows; lunar weight 0 without lift." },
+    { "slug": "maintenance-routing", "path": "src/domain/maintenance-routing.ts", "status": "live-pure", "summary": "Demand-first maintenance; tags on Chain C." },
+    { "slug": "constitution", "path": "src/rules/constitution.ts", "status": "live-pure", "summary": "Architecture §18 freeze + v0.2 governing rules." },
     { "slug": "servicetitan-connector", "path": "n/a", "status": "stub", "summary": "No live ServiceTitan writes in v0." }
   ],
   "engines": [
@@ -291,8 +295,11 @@
     { "slug": "warranty-callback", "name": "Warranty & Callback Classifier", "status": "live-pure", "summary": "Unknown ≠ not-covered; 30-day review." },
     { "slug": "manager-intervention", "name": "Manager Intervention Predictor", "status": "stub", "summary": "Queue model not live." },
     { "slug": "field-advisor", "name": "Field Advisor", "status": "stub", "summary": "Per-call copilot not live." },
-    { "slug": "pricebook-quote-margin", "name": "Pricebook / Quote / Margin Engine", "status": "stub", "summary": "No ServiceTitan pricebook writes." },
-    { "slug": "inventory-prediction", "name": "Inventory Prediction Engine", "status": "stub", "summary": "Needs stock connectors." },
+    { "slug": "pricebook-quote-margin", "name": "Pricebook / Quote / Margin Engine", "status": "live-pure", "summary": "src/domain/pricebook-stock.ts — ST is shadow baseline; lock cannot auto-recalibrate." },
+    { "slug": "inventory-prediction", "name": "Inventory Prediction Engine", "status": "live-pure", "summary": "Van-stock recommend + fulfillment queue coded. Live stock connectors remain stub." },
+    { "slug": "comms-recognition", "name": "Communications / Recognition / Mission Board", "status": "live-pure", "summary": "src/domain/comms.ts — quality gates; not raw revenue." },
+    { "slug": "weather-demand", "name": "Weather and Demand Intelligence", "status": "live-pure", "summary": "src/domain/weather-demand.ts — extreme events widen uncertainty; lunar weight 0 without lift." },
+    { "slug": "maintenance-routing", "name": "Maintenance Scheduling / Equipment-Age Routing", "status": "live-pure", "summary": "src/domain/maintenance-routing.ts — demand-first dispatch." },
     { "slug": "revenue-attribution", "name": "Revenue & Turnover Attribution Engine", "status": "live-pure", "summary": "Job economics reconciliation is coded." },
     { "slug": "counterfactual-outcome", "name": "Counterfactual Outcome Engine", "status": "live-pure", "summary": "src/inherited/shadow-engine.ts" },
     { "slug": "receipt-audit-override", "name": "Receipt / Audit / Override Engine", "status": "live-pure", "summary": "Hash-chained ledger + Chain C." },
@@ -310,7 +317,11 @@
     { "slug": "closeout", "name": "Closeout / settlement", "status": "planned", "summary": "Settle predicted vs actual; write receipts; rebase the remaining day." },
     { "slug": "override", "name": "Human override", "status": "planned", "summary": "Record Chain C: who, when, why, replacement, downstream effect." },
     { "slug": "schedule", "name": "Demand-aware schedule", "status": "planned", "summary": "Booking blocks, first-call/midday protection, emergency insertion (v0.8)." },
-    { "slug": "report", "name": "Human-review report", "status": "planned", "summary": "Generate a reviewable analysis with mandatory report metadata (v0.7)." }
+    { "slug": "report", "name": "Human-review report", "status": "planned", "summary": "Generate a reviewable analysis with mandatory report metadata (v0.7)." },
+    { "slug": "recognize", "name": "Quality-gated recognition", "status": "planned", "summary": "Celebrate achievements after quality gates; never raw revenue alone." },
+    { "slug": "mission-board", "name": "Daily mission board", "status": "planned", "summary": "Target, actual, expected pace, remaining gap, projected end-of-day." },
+    { "slug": "lock-pricebook", "name": "Pricebook lock / override", "status": "planned", "summary": "ACCEPT / OVERRIDE / LOCK with Chain C. Lock cannot auto-recalibrate." },
+    { "slug": "warehouse-fulfill", "name": "Warehouse fulfillment queue", "status": "planned", "summary": "REQUESTED → RECONCILED. Purchasing stays human unless delegated." }
   ],
   "modules": [
     {

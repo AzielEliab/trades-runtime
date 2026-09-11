@@ -1,6 +1,6 @@
 export const RUNTIME_MANIFEST = {
   product: "trades-runtime",
-  version: "0.1.0",
+  version: "0.2.0",
   author: "Aziel Eliab",
   identity: "Aziel Eliab",
   role: "trades-runtime",
@@ -27,7 +27,11 @@ export const RUNTIME_MANIFEST = {
     { slug: "workforce-capacity", path: "src/domain/workforce-capacity.ts", status: "live-pure", summary: "Booking blocks and reschedule risk." },
     { slug: "decision-fabric", path: "src/domain/decision-fabric.ts", status: "live-pure", summary: "Multi-pipeline reconcile + Pareto." },
     { slug: "analytics", path: "src/domain/analytics.ts", status: "live-pure", summary: "Mandatory report metadata." },
-    { slug: "constitution", path: "src/rules/constitution.ts", status: "live-pure", summary: "Architecture §18 freeze rules." },
+    { slug: "comms", path: "src/domain/comms.ts", status: "live-pure", summary: "Channels, quality-gated recognition, mission board." },
+    { slug: "pricebook-stock", path: "src/domain/pricebook-stock.ts", status: "live-pure", summary: "Shadow pricebook; human lock cannot auto-recalibrate." },
+    { slug: "weather-demand", path: "src/domain/weather-demand.ts", status: "live-pure", summary: "Three weather windows; lunar weight 0 without lift." },
+    { slug: "maintenance-routing", path: "src/domain/maintenance-routing.ts", status: "live-pure", summary: "Demand-first maintenance; tags on Chain C." },
+    { slug: "constitution", path: "src/rules/constitution.ts", status: "live-pure", summary: "Architecture §18 freeze + v0.2 governing rules." },
     { slug: "servicetitan-connector", path: "n/a", status: "stub", summary: "Tether later. No live writes in v0." }
   ]
 } as const;
