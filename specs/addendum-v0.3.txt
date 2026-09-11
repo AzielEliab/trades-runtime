@@ -1,0 +1,256 @@
+                                               Trades-Runtime
+     Critical Architecture Addendum v0.3 - Failure Containment, Economics, Digital Twin & Operating Controls
+
+Scope. This addendum freezes the critical operating-system concerns that sit around the previously defined dispatch,
+maintenance, weather, inventory, pricebook, field-advisor, coherence, evidence and human-override architecture.
+
+
+Economic rule added
+   Labor x cost x realized profit must be first-class metrics. Trades-Runtime must not optimize ticket
+   revenue, margin percentage, or technician speed in isolation. Every job should ultimately reconcile the labor
+   consumed and its fully loaded cost against parts, acquisition/procurement cost, warranty recovery,
+   callback/rework cost and collected revenue.
+
+
+1. Job Economics & Labor Profitability Engine
+Each completed call should produce a predicted and realized economic record. Technician quality remains separate from
+economics, but economics must be visible to dispatch, pricebook, staffing, training and company simulation.
+
+   Metric                        Definition / use
+
+   Labor hours                   Actual technician time attributable to the job, with travel/onsite/return labor separated where useful.
+
+   Loaded labor cost             Hourly wage or approved labor-cost basis plus employer burden/overhead allocation according to company policy.
+
+   Parts cost                    Actual consumed parts at real acquisition cost, not only pricebook retail value.
+
+   Procurement cost              Freight, supply-house trip, transfer, rush shipping and other acquisition burden.
+
+   Revenue                       Invoiced and, where available, collected revenue attributable to the job.
+
+   Warranty recovery             Expected and actual manufacturer/distributor/labor reimbursement.
+
+   Callback/rework cost          Labor, parts, travel and customer concessions created by a return or workmanship issue.
+
+   Gross contribution            Revenue and recoveries less direct labor, parts, procurement and directly attributable rework costs.
+
+   Contribution per labor hour   Gross contribution divided by productive labor hours; never used alone as a skill score.
+
+   Margin %                      Gross contribution relative to revenue, alongside fixed-dollar contribution.
+
+   Opportunity cost              Effect of consuming scarce technician time that could have served higher-priority demand.
+
+
+Core reconciliation: Collected/recognized revenue + warranty recovery - parts - procurement - loaded labor -
+callback/rework - directly attributable concessions = realized contribution. Predicted economics should be scored against
+realized economics so pricing and dispatch learn from actual profitability.
+
+Do not turn this into a technician leaderboard that rewards rushing, overselling, cherry-picking or avoiding difficult work.
+Difficulty, access, warranty, opportunity, customer mix, job type and quality must remain normalization variables.
+
+
+2. Failure Containment & Degraded Modes
+Trades-Runtime must assume dependencies fail. Define behavior for ServiceTitan outage, manufacturer API failure, stale
+GPS, missing weather, warehouse-count conflict, event-bus delay, AI-model outage and connector timeout. Every subsystem
+needs a known degraded mode: continue, freeze, fall back, queue, or require human action. Trades must never become a
+single point of company failure.
+
+
+3. Master Data & Source-of-Truth Rules
+Freeze the authoritative owner for customer, property, equipment, serial/model, membership, appointment, Van/technician,
+pricebook, inventory, warranty, invoice, payment and accounting records. Trades may maintain the canonical live operating
+state without silently replacing the legal/system-of-record owner. Conflicts must enter a reconciliation queue rather than being
+guessed away.
+
+
+4. Identity Resolution Graph
+Maintain persistent Customer -> Property -> System -> Component -> Job -> Part relationships. Resolve duplicate customers,
+moved equipment, previous homeowners, installation records, serial/model variants, warranty registrations and historical calls
+so intelligence accumulates around the same real-world asset instead of fragmenting across records.
+
+
+5. Event Idempotency & Reconciliation
+Every heartbeat/event requires a unique event ID, source, sequence/timestamp and processing state. Duplicate events must
+not create duplicate bookings, revenue, inventory depletion or recognition. Periodic reconciliation against source systems
+must detect missing, delayed, duplicated and conflicting events.
+
+
+6. Model, Policy & Configuration Versioning
+Every recommendation must preserve the model version, ruleset, pricebook version, inventory snapshot, technician/Van
+profile, weather/demand forecast, evidence state and policy configuration that produced it. A later audit must be able to
+reconstruct the decision exactly without hindsight leakage.
+
+
+7. Rollback & Domain Kill Switches
+Provide company-, region-, branch- and subsystem-level rollback to a known-good version. Separate controls should exist for
+AI Booking, Dispatch, Pricebook, Inventory, Warehouse, Warranty, Field Advisor, Communications and other autonomous
+domains. A broken warranty connector must not require disabling dispatch.
+
+
+8. Data Freshness & Expiration
+Attach freshness to operational facts. Inventory observed weeks ago, stale GPS, old warranty responses and outdated
+customer/equipment records should lose decision weight. Critical decisions should FLAG/HOLD when required evidence is
+too stale. Freshness thresholds can vary by data type.
+
+
+9. Exception Queues & Ownership
+Warnings must become owned work. Create queues for unresolved warranty, inventory conflicts, duplicate identity, possible
+callback, price anomaly, manager intervention, media conflict, stale evidence, failed connector, reconciliation mismatch and
+other exceptions. Each item needs owner, severity, age, escalation path and resolution receipt.
+
+
+10. Customer Communication Orchestration
+Coordinate confirmations, ETA, technician-en-route notices, delays, displacement/rescheduling, parts arrival, maintenance
+reminders, quote follow-up and turnover scheduling. AI communication must not invent arrival times, warranties, pricing,
+inventory, approvals or commitments. Material customer promises require authoritative data or human approval according to
+policy.
+
+
+11. No-Show, Cancellation & Confirmation Modeling
+Appointment reliability affects the trajectory. Model confirmation state and cancellation/no-show probability as scheduling
+inputs, while avoiding unfair or opaque customer treatment. The model should improve capacity planning rather than deny
+service based on speculative behavior.
+12. Protected Capacity & Demand Reservation
+Weather intelligence should be able to reserve capacity before demand arrives. Filling every future slot with low-urgency
+maintenance may be locally efficient but harmful when a heat wave, freeze, flood or other surge is forecast. Trades should
+recommend protected service capacity with an explicit cost of holding it.
+
+
+13. Cross-Branch Resource Borrowing
+Treat the branch network as one constrained system. Trades can recommend lending Vans, qualified technicians, parts,
+warehouse stock, Comfort Advisors, managers or booking capacity between branches while calculating the donor-branch cost
+and receiving-branch benefit.
+
+
+14. Skill Decay, Certification & Recency
+Capability is not permanent. Track licenses/certifications, manufacturer training, equipment families, time since last
+demonstrated repair, recent outcomes and opportunity exposure. Separate lack of recent opportunity from evidence of
+declining competence.
+
+
+15. Training & Workforce Development Engine
+Convert repeated diagnostic gaps, runtime variance, callback patterns and Field Advisor dependence into training
+recommendations. Training should create a measurable before/after loop so Trades learns whether the intervention actually
+improved performance.
+
+
+16. Parts Supersession & Compatibility Graph
+Build Equipment <-> Component <-> OEM Part <-> Supersession <-> Approved Substitute relationships. Record harnesses,
+adapters, compatibility constraints, vendor SKUs, return/failure history and evidence source. This prevents text-search
+similarity from becoming false compatibility.
+
+
+17. Accounting & Realized-Profit Reconciliation
+Close the loop from quote and invoice to payment, parts cost, labor cost, warranty reimbursement, customer concession,
+callback/rework and final realized contribution. The pricebook and dispatch engines should learn from realized economics, not
+only booked or invoiced revenue.
+
+
+18. Causal Evaluation
+Trades must distinguish correlation from improvement caused by its decisions. Use shadow comparisons, controlled rollouts,
+matched cohorts and other defensible evaluation methods where feasible. A good outcome after a Trades recommendation
+does not by itself prove the recommendation caused the outcome.
+
+
+19. Metric-Gaming / Goodhart Protection
+Assume behavior will adapt to measured KPIs. Balance revenue, contribution, quality, callbacks, diagnostic accuracy,
+customer impact, runtime, first-trip completion and difficulty. Monitor for systematic gaming such as unnecessary turnovers,
+rushed closes, cherry-picking, inflated tickets or avoidance of difficult calls.
+
+
+20. Employee Challenge & Correction Mechanism
+Technicians and authorized staff should be able to challenge a callback classification, skill inference, media interpretation or
+other material assessment and attach evidence. The original assessment is preserved; the challenge, reviewer decision and
+downstream model correction become receipts.
+21. Privacy, Consent & Retention Boundaries
+Define what photos, video, call recordings, customer data, equipment data, technician-performance data and AI inferences
+may be collected, analyzed, retained and shown by role. Retention/deletion rules and access boundaries should be explicit
+before broad deployment.
+
+
+22. Disaster Recovery & Business Continuity
+Define backup, restore testing, recovery objectives, credential recovery, secondary storage and an operating procedure for a
+full Trades outage. The company must be able to run manually or through existing systems while Trades is unavailable.
+23. Trades Operational Constitution
+These are non-optimizable rules. Learning systems may adjust weights and recommendations, but may not rewrite these
+principles without authorized governance.
+
+• Authorized human control supersedes AI within the person's granted authority.
+
+• Safety and legal/compliance constraints beat revenue optimization.
+
+• Customer demand and timely qualified service beat preservation of a sales opportunity.
+
+• Verified evidence beats model confidence.
+
+• Unknown does not equal false, not-covered, unavailable, or failed.
+
+• Never invent inventory, warranty, price, customer, equipment, schedule or technician facts.
+
+• Never silently displace an existing customer.
+
+• Never materially penalize a technician from unverified inference alone.
+
+• Every consequential autonomous action must be reconstructable from point-in-time evidence.
+
+• Every autonomous subsystem requires a human-accessible fallback or degraded mode.
+
+• Learning may change model weights; it may not silently change constitutional rules.
+
+• Revenue, margin, labor efficiency and profit must remain quality- and context-adjusted rather than becoming standalone
+employee-worth scores.
+
+
+24. Company Digital Twin / Simulation Layer
+Once shadow trajectories, staffing, weather, equipment age, demand, inventory, pricebook, labor economics and branch
+resources share one canonical state, Trades-Runtime can become a digital twin of the operating company. Management can
+simulate changes before deploying them.
+
+Example simulations: add two Service Level 2 Vans to a branch; raise or lower a repair price; reserve maintenance capacity
+during a forecast heat wave; move stock between branches; change technician role mix; alter maintenance-age routing; add a
+warehouse transfer route; or test a new staffing schedule.
+
+   Simulation objective: predict not only revenue but calls served, customer delay, labor hours, loaded labor
+   cost, parts/procurement burden, first-trip completion, quality/callback risk, fixed-dollar contribution, margin,
+   capacity utilization and downstream sales/turnover effects.
+
+
+25. Integrated Economic Objective
+Trades-Runtime should optimize a balanced operating objective rather than a single KPI. One conceptual form is:
+
+   Operational Value = Customer Demand Served + Quality + First-Trip Completion + Realized
+   Contribution + Workforce Development - Customer Delay - Rework/Callbacks - Travel/Procurement
+   Waste - Capacity Risk - Evidence/Uncertainty Penalties
+
+Within Realized Contribution, labor is explicit: revenue/recoveries - parts - procurement - loaded labor -
+rework/concessions. This ensures that a $1,500 repair requiring extraordinary labor and multiple return trips is not treated as
+economically identical to a $1,500 repair completed correctly on the first trip with stocked parts.
+
+
+26. Recommended Next Build Order
+   Priority   Workstream                                        Why now
+
+   1          Operational Constitution + source-of-truth map    Defines what the system may do and which facts it may trust.
+
+   2          Event IDs, provenance, receipts, versioning       Makes every later decision reconstructable.
+
+   3          Failure/degraded modes + kill switches + rollbackPrevents Trades from becoming operationally dangerous.
+
+   4          Identity graph + reconciliation queues            Creates reliable customer/equipment/part state.
+
+   5          Labor/cost/profit reconciliation                  Gives pricebook, dispatch and simulation a real economic target.
+
+   6          Exception ownership + challenge workflow          Turns uncertainty and disagreement into manageable operations.
+
+   7          Protected capacity + cross-branch optimization    Unlocks weather/demand forecasting operationally.
+
+   8          Parts compatibility/supersession + warehouse integration
+                                                              Raises first-trip completion and quote reliability.
+
+   9          Causal evaluation + anti-gaming controls          Determines whether Trades is truly improving operations.
+
+   10         Digital twin / company simulation                 Uses the mature state model to test policy before deployment.
+
+
+End of Trades-Runtime Critical Architecture Addendum v0.3
+
