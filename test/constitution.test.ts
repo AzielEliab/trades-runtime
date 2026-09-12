@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   RULES_V01,
   RULES_V02,
+  RULES_PROPERTY,
   bookingPrecedence,
   classifyThirtyDayReturn,
   driftIsNotAutomaticFailure,
@@ -50,6 +51,7 @@ describe("§18 freeze rules", () => {
   it("lists all fifteen constitutional rules", () => {
     expect(RULES_V01).toHaveLength(15);
     expect(RULES_V02).toHaveLength(5);
+    expect(RULES_PROPERTY).toHaveLength(6);
   });
 
   it("human override always wins live operation", () => {

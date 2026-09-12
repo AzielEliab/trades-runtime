@@ -8,6 +8,7 @@
   "version": "0.2.0",
   "runtime_version": "0.2.0",
   "spec_pack": "repo-root specs/ (not published on Pages)",
+  "property_intelligence": "1.0",
   "role": "trades-runtime",
   "kind": "shadow-first-operating-intelligence",
   "layer": "typescript-runtime + thin-pages-ui",
@@ -285,7 +286,14 @@
     { "slug": "truck-stock", "path": "src/domain/truck-stock.ts", "status": "live-pure", "summary": "Location states, van profile, warehouse fulfillment queue." },
     { "slug": "weather-demand", "path": "src/domain/weather-demand.ts", "status": "live-pure", "summary": "Three weather windows; lunar weight 0 without lift." },
     { "slug": "maintenance-routing", "path": "src/domain/maintenance-routing.ts", "status": "live-pure", "summary": "Demand-first maintenance; tags on Chain C." },
-    { "slug": "constitution", "path": "src/rules/constitution.ts", "status": "live-pure", "summary": "Architecture §18 freeze + v0.2 governing rules." },
+    { "slug": "property-record", "path": "src/domain/property-record.ts", "status": "live-pure", "summary": "Living property lifecycle; approved sources only; market data is prior." },
+    { "slug": "property-improvement-ledger", "path": "src/domain/property-improvement-ledger.ts", "status": "live-pure", "summary": "Improvement ledger; repair cost ≠ resale uplift." },
+    { "slug": "property-value-engine", "path": "src/domain/property-value-engine.ts", "status": "live-pure", "summary": "Value RANGE + nominal/real; mortgage is demand pressure, not a haircut." },
+    { "slug": "neighborhood-momentum", "path": "src/domain/neighborhood-momentum.ts", "status": "live-pure", "summary": "Visible-methodology momentum score and condition delta." },
+    { "slug": "neighborhood-failure-patterns", "path": "src/domain/neighborhood-failure-patterns.ts", "status": "live-pure", "summary": "Pattern is diagnostic prior, not proof of subject defect." },
+    { "slug": "regional-recalibration", "path": "src/domain/regional-recalibration.ts", "status": "live-pure", "summary": "Geo hierarchy + promotion ladder; weaken thin/stale/conflicted samples." },
+    { "slug": "property-intelligence-hooks", "path": "src/domain/property-intelligence-hooks.ts", "status": "live-pure", "summary": "Typed integration points; not live backends." },
+    { "slug": "constitution", "path": "src/rules/constitution.ts", "status": "live-pure", "summary": "Architecture §18 freeze + v0.2 + Property Intelligence v1.0 rules." },
     { "slug": "servicetitan-connector", "path": "n/a", "status": "stub", "summary": "No live ServiceTitan writes in v0." }
   ],
   "engines": [
@@ -308,7 +316,8 @@
     { "slug": "receipt-audit-override", "name": "Receipt / Audit / Override Engine", "status": "live-pure", "summary": "Hash-chained ledger + Chain C." },
     { "slug": "workforce-capacity", "name": "Workforce Capacity & Availability Engine", "status": "live-pure", "summary": "src/domain/workforce-capacity.ts" },
     { "slug": "universal-analytics", "name": "Universal Analytics & Human Review", "status": "live-pure", "summary": "Mandatory report metadata enforced." },
-    { "slug": "decision-fabric", "name": "Decision Fabric reconciler", "status": "live-pure", "summary": "src/domain/decision-fabric.ts" }
+    { "slug": "decision-fabric", "name": "Decision Fabric reconciler", "status": "live-pure", "summary": "src/domain/decision-fabric.ts" },
+    { "slug": "property-intelligence", "name": "Property / Neighborhood / Regional Intelligence", "status": "live-pure", "summary": "Addendum v1.0 — living property record, value ranges, neighborhood priors, regional ladder." }
   ],
   "planned_ops": [
     { "slug": "observe", "name": "Observe", "status": "planned", "summary": "Ingest and normalize authorized operational data." },
@@ -324,7 +333,8 @@
     { "slug": "recognize", "name": "Quality-gated recognition", "status": "planned", "summary": "Celebrate achievements after quality gates; never raw revenue alone." },
     { "slug": "mission-board", "name": "Daily mission board", "status": "planned", "summary": "Target, actual, expected pace, remaining gap, projected end-of-day." },
     { "slug": "lock-pricebook", "name": "Pricebook lock / override", "status": "planned", "summary": "ACCEPT / OVERRIDE / LOCK with Chain C. Lock cannot auto-recalibrate." },
-    { "slug": "warehouse-fulfill", "name": "Warehouse fulfillment queue", "status": "planned", "summary": "REQUESTED → RECONCILED. Purchasing stays human unless delegated." }
+    { "slug": "warehouse-fulfill", "name": "Warehouse fulfillment queue", "status": "planned", "summary": "REQUESTED → RECONCILED. Purchasing stays human unless delegated." },
+    { "slug": "property-packet", "name": "Property intelligence packet", "status": "planned", "summary": "Authorized property/neighborhood/regional priors. Not verified fact until corroborated." }
   ],
   "modules": [
     {

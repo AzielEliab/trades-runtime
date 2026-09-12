@@ -34,7 +34,14 @@ export const RUNTIME_MANIFEST = {
     { slug: "truck-stock", path: "src/domain/truck-stock.ts", status: "live-pure", summary: "Location states, van profile, warehouse fulfillment queue." },
     { slug: "weather-demand", path: "src/domain/weather-demand.ts", status: "live-pure", summary: "Three weather windows; lunar weight 0 without lift." },
     { slug: "maintenance-routing", path: "src/domain/maintenance-routing.ts", status: "live-pure", summary: "Demand-first maintenance; tags on Chain C." },
-    { slug: "constitution", path: "src/rules/constitution.ts", status: "live-pure", summary: "Architecture §18 freeze + v0.2 governing rules." },
+    { slug: "property-record", path: "src/domain/property-record.ts", status: "live-pure", summary: "Living property lifecycle; approved sources only; market data is prior." },
+    { slug: "property-improvement-ledger", path: "src/domain/property-improvement-ledger.ts", status: "live-pure", summary: "Improvement ledger; repair cost ≠ resale uplift." },
+    { slug: "property-value-engine", path: "src/domain/property-value-engine.ts", status: "live-pure", summary: "Value RANGE + nominal/real; mortgage is demand pressure, not a haircut." },
+    { slug: "neighborhood-momentum", path: "src/domain/neighborhood-momentum.ts", status: "live-pure", summary: "Visible-methodology momentum score and condition delta." },
+    { slug: "neighborhood-failure-patterns", path: "src/domain/neighborhood-failure-patterns.ts", status: "live-pure", summary: "Pattern is diagnostic prior, not proof of subject defect." },
+    { slug: "regional-recalibration", path: "src/domain/regional-recalibration.ts", status: "live-pure", summary: "Geo hierarchy + promotion ladder; weaken thin/stale/conflicted samples." },
+    { slug: "property-intelligence-hooks", path: "src/domain/property-intelligence-hooks.ts", status: "live-pure", summary: "Typed integration points; not live backends." },
+    { slug: "constitution", path: "src/rules/constitution.ts", status: "live-pure", summary: "Architecture §18 freeze + v0.2 + Property Intelligence v1.0 rules." },
     { slug: "servicetitan-connector", path: "n/a", status: "stub", summary: "Tether later. No live writes in v0." }
   ]
 } as const;

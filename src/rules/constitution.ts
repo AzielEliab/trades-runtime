@@ -7,6 +7,10 @@ import { mayRecognize, rewardRawRevenueAlone, type RecognitionCandidate } from "
 import { refuseLockedAutoRecalibrate, type PricebookRecommendation } from "../domain/pricebook.js";
 import { lunarPlumbingFeature, lunarWeightWithoutEarnedLift } from "../domain/weather-demand.js";
 import { mayHoldForIdealSeller } from "../domain/maintenance-routing.js";
+import { marketDataIsAutomaticTruth } from "../domain/property-record.js";
+import { repairCostEqualsResaleUplift } from "../domain/property-improvement-ledger.js";
+import { propertyValueIsGuarantee } from "../domain/property-value-engine.js";
+import { neighborhoodPatternProvesSubjectDefect } from "../domain/neighborhood-failure-patterns.js";
 
 export const RULES_V01 = [
   "human-authorized-recalibration-controls-live",
@@ -144,4 +148,31 @@ export function lunarWeightIsZeroWithoutLift(): boolean {
 
 export function demandFirstUnlessHuman(humanOverride: boolean): boolean {
   return mayHoldForIdealSeller(humanOverride) === humanOverride;
+}
+
+export const RULES_PROPERTY = [
+  "neighborhood-pattern-is-not-verified-defect",
+  "public-market-data-is-prior-not-truth",
+  "property-value-is-estimate-range",
+  "repair-cost-is-not-resale-uplift",
+  "confidence-is-not-truth",
+  "no-unauthorized-scraping"
+] as const;
+
+export type RuleIdProperty = (typeof RULES_PROPERTY)[number];
+
+export function patternIsNotDefect(): boolean {
+  return neighborhoodPatternProvesSubjectDefect() === false;
+}
+
+export function publicDataIsNotAutomaticTruth(): boolean {
+  return marketDataIsAutomaticTruth() === false;
+}
+
+export function valueEffectsAreEstimates(): boolean {
+  return propertyValueIsGuarantee() === false;
+}
+
+export function costIsNotUplift(): boolean {
+  return repairCostEqualsResaleUplift() === false;
 }

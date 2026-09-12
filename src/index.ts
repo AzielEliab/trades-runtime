@@ -58,5 +58,41 @@ export {
   pickMaintenanceVan,
   sellingWeightForAge
 } from "./domain/maintenance-routing.js";
+export {
+  advanceLifecycle,
+  asPriorNotTruth,
+  attachFact,
+  createPropertyRecord,
+  ingestSourceKind,
+  marketDataIsAutomaticTruth,
+  mayTreatAsVerifiedPropertyFact
+} from "./domain/property-record.js";
+export {
+  estimatedEffectFromWork,
+  recordImprovement,
+  repairCostEqualsResaleUplift
+} from "./domain/property-improvement-ledger.js";
+export {
+  dualValue,
+  mortgageDemandPressure,
+  projectTrajectory,
+  propertyValueIsGuarantee,
+  refuseMortgageHaircut,
+  settleAgainstSale,
+  valueRange
+} from "./domain/property-value-engine.js";
+export { neighborhoodMomentum, propertyConditionDelta } from "./domain/neighborhood-momentum.js";
+export {
+  asDiagnosticPrior,
+  mayCallVerifiedSubjectDefect,
+  neighborhoodPatternProvesSubjectDefect
+} from "./domain/neighborhood-failure-patterns.js";
+export { evidenceWeight, moreSpecificOutweighsBroader, promotePattern } from "./domain/regional-recalibration.js";
+export {
+  hookCallFit,
+  hookFieldAdvisor,
+  hookTruckStock,
+  hookWarehouse
+} from "./domain/property-intelligence-hooks.js";
 export * from "./rules/constitution.js";
 export { runShadowDayDemo } from "./demo/shadow-day.js";

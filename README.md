@@ -44,6 +44,7 @@ npm run manifest
 | Truck stock / fulfillment | `src/domain/truck-stock.ts` | live-pure |
 | Weather / demand / lunar (experimental) | `src/domain/weather-demand.ts` | live-pure |
 | Maintenance routing (demand-first) | `src/domain/maintenance-routing.ts` | live-pure |
+| Property Intelligence v1.0 | `src/domain/property-*.ts`, `neighborhood-*.ts`, `regional-recalibration.ts` | live-pure |
 | §18 freeze + v0.2 governing rules | `src/rules/constitution.ts` | live-pure |
 | ServiceTitan / ProBooks connectors | — | stub |
 
