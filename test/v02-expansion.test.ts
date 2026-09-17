@@ -42,7 +42,8 @@ import type { HumanOverride } from "../src/core/human-authority.js";
 const manager: HumanOverride = {
   actorId: "mgr-1",
   role: "manager",
-  authorized: true,
+  branchId: "branch:midwest-3",
+  lockHolderId: "mgr-1",
   reason: "lock the OEM condenser price",
   replacementAction: "pricebook:lock",
   replacementPayload: { proposedPrice: 420 },

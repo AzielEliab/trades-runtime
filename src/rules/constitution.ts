@@ -1,4 +1,5 @@
 import { applyHumanOverride, type HumanOverride, type Recommendation } from "../core/human-authority.js";
+import { exampleActorRegistry, type ActorRegistry } from "../core/actor-registry.js";
 import { mayTreatAsNotCovered, type WarrantyState } from "../core/warranty.js";
 import { overwriteForbidden, type ChainRecord } from "../core/chains.js";
 import { geographyIsSoleDecider, type CallFitFactors } from "../domain/call-fit.js";
@@ -36,8 +37,12 @@ export interface CallbackClassification {
   kind: "true-callback" | "previously-quoted-declined" | "new-unrelated" | "warranty" | "indeterminate";
 }
 
-export function humanWins(recommendation: Recommendation, override: HumanOverride) {
-  return applyHumanOverride(recommendation, override).winner === "human";
+export function humanWins(
+  recommendation: Recommendation,
+  override: HumanOverride,
+  registry: ActorRegistry = exampleActorRegistry()
+) {
+  return applyHumanOverride(recommendation, override, registry).winner === "human";
 }
 
 export function assertHistoryImmutable(previous: ChainRecord, attempted: ChainRecord): void {

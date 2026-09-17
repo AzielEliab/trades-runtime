@@ -26,9 +26,14 @@ export { lockEvidence, runAction, type ActionRequest, type ActionResult } from "
 export {
   SERVICE_TITAN_SHADOW_ENTITIES,
   SERVICE_TITAN_WRITES_ENABLED,
+  ingestServiceTitanCustomer,
+  ingestServiceTitanEquipment,
+  ingestServiceTitanJob,
+  ingestServiceTitanPricebook,
   ingestServiceTitanShadow,
   mayWriteServiceTitan,
   refuseServiceTitanWrite,
+  refuseServiceTitanWriteMethod,
   type ServiceTitanShadowEntity,
   type ServiceTitanShadowIngest,
   type ServiceTitanShadowRecord

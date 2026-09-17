@@ -1,8 +1,10 @@
 import { entityId } from "../core/ids.js";
+import { exampleActorRegistry } from "../core/actor-registry.js";
 import { applyHumanOverride } from "../core/human-authority.js";
+import { describeShadowMode, type ShadowMode } from "../core/shadow-modes.js";
 import { wrapEvidence } from "../inherited/evidence-packet.js";
 import { comparePaths } from "../inherited/trades-coherence.js";
-import { appendReceipt, createLedger, verifyLedger } from "../inherited/receipt-ledger.js";
+import { appendReceipt, createLedger, verifyLedger, tipHash } from "../inherited/receipt-ledger.js";
 import { sealCounterfactual, settleShadow } from "../inherited/shadow-engine.js";
 import { closeDay, openMorningPlan, rebaseFromActual } from "../inherited/trajectory-engine.js";
 import { rankVans } from "../domain/call-fit.js";
@@ -22,20 +24,78 @@ const even: CallFitFactors = {
   exploration: 0.2
 };
 
-export function runShadowDayDemo() {
+export type ShadowDayKind = "hvac" | "plumbing-overflow";
+
+export interface ShadowDayRecording {
+  kind: ShadowDayKind;
+  mode: ShadowMode;
+  branch: string;
+  scoresTechnicians: false;
+  planned: Record<string, unknown>;
+  actual: Record<string, unknown>;
+  counterfactual: Record<string, unknown>;
+  reconstructable: {
+    planned: Record<string, unknown>;
+    actual: Record<string, unknown>;
+    counterfactual: Record<string, unknown>;
+  };
+  settlement: {
+    plannedAction: string;
+    contemporaneousEvidenceHash: string;
+    prediction_confidence: number;
+    evidence_strength: string;
+    source_quality: string;
+    cross_source_agreement: string;
+    verification_status: string;
+    timeToSettleMs: number;
+    sealedRecommendationHash: string;
+    hindsightLeak: false;
+  };
+  liveWinner: "human" | "trades";
+  disagreementPreserved: boolean;
+  ledgerValid: boolean;
+  ledgerTip: string;
+  receiptCount: number;
+  trajectoryRecords: number;
+  viewers: string;
+}
+
+function daySpec(kind: ShadowDayKind) {
+  if (kind === "plumbing-overflow") {
+    return {
+      day: "2026-07-15",
+      callLocal: "backup-2201",
+      issue: "main-line-backup",
+      mode: "SHADOW-VISIBLE" as const,
+      vanPreferred: "088"
+    };
+  }
+  return {
+    day: "2026-07-14",
+    callLocal: "no-cool-1042",
+    issue: "no-cool",
+    mode: "SHADOW-SEALED" as const,
+    vanPreferred: "214"
+  };
+}
+
+export function runShadowDayDemo(kind: ShadowDayKind = "hvac"): ShadowDayRecording {
+  const spec = daySpec(kind);
+  const registry = exampleActorRegistry();
   const branch = entityId("branch", "midwest-3");
-  const call = entityId("call", "no-cool-1042");
+  const call = entityId("call", spec.callLocal);
   const vanA = entityId("van", "214");
   const vanB = entityId("van", "088");
+  const modeState = describeShadowMode(spec.mode, branch);
 
   const evidence = wrapEvidence({
-    sourceId: "st:job:1042",
+    sourceId: `st:job:${spec.callLocal}`,
     sourceType: "servicetitan",
-    receivedAt: "2026-07-14T12:00:00Z",
+    receivedAt: `${spec.day}T12:00:00Z`,
     trust: "HIGH",
-    tags: ["booking"],
-    claims: ["no-cool"],
-    body: { call, issue: "no-cool" }
+    tags: ["booking", spec.issue],
+    claims: [spec.issue],
+    body: { call, issue: spec.issue, kind }
   });
 
   const ranked = rankVans([
@@ -43,10 +103,11 @@ export function runShadowDayDemo() {
     { vanId: vanB, qualifiedForPrimary: true, factors: { ...even, geolocation: 0.9, technicalFit: 0.7 } }
   ]);
 
+  const plannedVan = ranked[0]?.vanId ?? vanA;
   const recommendation = {
-    recommendationId: "rec-1042",
+    recommendationId: `rec:${spec.callLocal}`,
     action: "dispatch",
-    payload: { vanId: ranked[0]?.vanId, call },
+    payload: { vanId: plannedVan, call },
     confidence: {
       predictionConfidence: 0.72,
       evidenceStrength: "MEDIUM" as const,
@@ -54,20 +115,20 @@ export function runShadowDayDemo() {
       agreement: "MEDIUM" as const,
       verificationStatus: "PARTIAL" as const
     },
-    issuedAt: "2026-07-14T12:05:00Z"
+    issuedAt: `${spec.day}T12:05:00Z`
   };
 
   const coherence = comparePaths(
     {
       id: "primary",
-      claim: "dispatch-van-214",
+      claim: `dispatch-${plannedVan}`,
       action: "dispatch",
       confidence: recommendation.confidence,
       evidenceIds: [evidence.sourceId]
     },
     {
       id: "alternate",
-      claim: "dispatch-van-214",
+      claim: `dispatch-${plannedVan}`,
       action: "dispatch",
       confidence: recommendation.confidence,
       evidenceIds: [evidence.sourceId]
@@ -76,60 +137,118 @@ export function runShadowDayDemo() {
   );
 
   const sealed = sealCounterfactual({
-    knownInputs: { call, ranked: ranked.map((v) => v.vanId) },
+    knownInputs: { call, issue: spec.issue, evidenceHash: evidence.contentHash },
     action: recommendation.action,
-    expected: { vanId: ranked[0]?.vanId, firstTrip: true },
+    expected: { vanId: plannedVan, firstTrip: true },
     confidence: recommendation.confidence,
     sealedAt: recommendation.issuedAt
   });
 
-  const live = applyHumanOverride(recommendation, {
-    actorId: "dispatcher-lee",
-    role: "dispatch",
-    authorized: true,
-    reason: "customer requested prior tech",
-    replacementAction: "dispatch",
-    replacementPayload: { vanId: vanB, call },
-    at: "2026-07-14T12:08:00Z"
-  });
+  const live = applyHumanOverride(
+    recommendation,
+    {
+      actorId: "dispatcher-lee",
+      role: "dispatcher",
+      branchId: branch,
+      lockHolderId: "dispatcher-lee",
+      reason: kind === "plumbing-overflow" ? "overflow board: keep 088 on laterals" : "customer requested prior tech",
+      replacementAction: "dispatch",
+      replacementPayload: { vanId: vanB, call },
+      at: `${spec.day}T12:08:00Z`
+    },
+    registry
+  );
 
   let ledger = createLedger();
   ledger = appendReceipt(ledger, {
-    receiptId: "r1",
+    receiptId: `${kind}:r1`,
     kind: "recommendation",
     at: recommendation.issuedAt,
     body: { recommendation, coherence },
     confidence: recommendation.confidence
   });
   ledger = appendReceipt(ledger, {
-    receiptId: "r2",
+    receiptId: `${kind}:r2`,
     kind: "override",
     at: live.override?.at ?? "",
-    body: { live }
+    body: { live, lockHolderId: "dispatcher-lee", branchId: branch }
   });
 
-  let traj = openMorningPlan("2026-07-14", { vans: [vanA, vanB], branch }, "2026-07-14T07:00:00Z");
-  traj = rebaseFromActual(traj, { vans: [vanA, vanB], lastEvent: "override" }, "2026-07-14T12:08:00Z");
-  traj = closeDay(traj, "2026-07-14T18:00:00Z");
+  let traj = openMorningPlan(spec.day, { vans: [vanA, vanB], branch }, `${spec.day}T07:00:00Z`);
+  traj = rebaseFromActual(traj, { vans: [vanA, vanB], lastEvent: "override" }, `${spec.day}T12:08:00Z`);
+  traj = closeDay(traj, `${spec.day}T18:00:00Z`);
 
-  const settlement = settleShadow(sealed, { vanId: vanB, firstTrip: false });
+  const actual = { vanId: vanB, firstTrip: false };
+  const settlement = settleShadow(sealed, actual, undefined, {
+    settledAt: `${spec.day}T18:05:00Z`,
+    mode: spec.mode,
+    override: live.override ?? null
+  });
 
   ledger = appendReceipt(ledger, {
-    receiptId: "r3",
-    kind: "counterfactual",
-    at: "2026-07-14T18:05:00Z",
-    body: { settlement }
+    receiptId: `${kind}:r3`,
+    kind: "outcome",
+    at: `${spec.day}T18:05:00Z`,
+    body: {
+      plannedAction: settlement.plannedAction,
+      contemporaneousEvidenceHash: settlement.contemporaneousEvidenceHash,
+      prediction_confidence: settlement.prediction_confidence,
+      evidence_strength: settlement.evidence_strength,
+      source_quality: settlement.source_quality,
+      cross_source_agreement: settlement.cross_source_agreement,
+      verification_status: settlement.verification_status,
+      actualOutcome: settlement.actualOutcome,
+      timeToSettleMs: settlement.timeToSettleMs,
+      sealedRecommendationHash: settlement.sealedRecommendationHash,
+      hindsightLeak: settlement.hindsightLeak
+    }
   });
 
+  const planned = {
+    action: recommendation.action,
+    payload: recommendation.payload,
+    morning: { vans: [vanA, vanB], branch }
+  };
+  const counterfactual = {
+    action: sealed.action,
+    expected: sealed.expected,
+    evidenceLockHash: sealed.evidenceLockHash
+  };
+
   return {
+    kind,
+    mode: spec.mode,
     branch,
-    ranked: ranked.map((v) => ({ vanId: v.vanId, finalScore: Number(v.finalScore.toFixed(3)) })),
-    coherence: coherence.verdict,
+    scoresTechnicians: false,
+    planned,
+    actual,
+    counterfactual,
+    reconstructable: { planned, actual, counterfactual },
+    settlement: {
+      plannedAction: settlement.plannedAction,
+      contemporaneousEvidenceHash: settlement.contemporaneousEvidenceHash,
+      prediction_confidence: settlement.prediction_confidence,
+      evidence_strength: settlement.evidence_strength,
+      source_quality: settlement.source_quality,
+      cross_source_agreement: settlement.cross_source_agreement,
+      verification_status: settlement.verification_status,
+      timeToSettleMs: settlement.timeToSettleMs,
+      sealedRecommendationHash: settlement.sealedRecommendationHash,
+      hindsightLeak: false
+    },
     liveWinner: live.winner,
     disagreementPreserved: live.disagreementPreserved,
     ledgerValid: verifyLedger(ledger),
+    ledgerTip: tipHash(ledger),
     receiptCount: ledger.receipts.length,
     trajectoryRecords: traj.chain.records.length,
-    settlementDeltas: settlement.deltas
+    viewers: modeState.viewers
+  };
+}
+
+export function runRecordedShadowDays(): { hvac: ShadowDayRecording; plumbingOverflow: ShadowDayRecording } {
+  return {
+    hvac: runShadowDayDemo("hvac"),
+    plumbingOverflow: runShadowDayDemo("plumbing-overflow")
   };
 }

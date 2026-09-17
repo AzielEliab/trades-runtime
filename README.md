@@ -50,7 +50,12 @@ CI (`.github/workflows/ci.yml`) runs `npm ci`, `npm run typecheck`, and `npm tes
 | FragGate inbound | `src/spine/fraggate-inbound.ts` | live-pure |
 | Durable receipts | `src/spine/durable-receipts.ts` | live-pure |
 | `runAction()` spine | `src/spine/run-action.ts` | live-pure |
+| Actor / authority registry | `src/core/actor-registry.ts` | live-pure |
+| Shadow modes | `src/core/shadow-modes.ts` | live-pure |
 | ServiceTitan shadow (read-only) | `src/spine/servicetitan-shadow.ts` | live-pure |
+| Fulfillment state machine | `src/domain/fulfillment-machine.ts` | live-pure |
+| Mission board clock | `src/domain/mission-board.ts` | live-pure |
+| PI wired to jobs | `src/domain/property-jobs.ts` | live-pure |
 | §18 freeze + v0.2 governing rules | `src/rules/constitution.ts` | live-pure |
 | ServiceTitan / ProBooks live writes | — | refused |
 

@@ -8,6 +8,12 @@ export {
   mayAutonomousHighConsequence
 } from "./core/confidence.js";
 export { applyHumanOverride, liveWithoutOverride } from "./core/human-authority.js";
+export {
+  createActorRegistry,
+  exampleActorRegistry,
+  grantAuthority
+} from "./core/actor-registry.js";
+export { parseShadowMode, describeShadowMode } from "./core/shadow-modes.js";
 export { appendRecord, emptyChain } from "./core/chains.js";
 export { wrapEvidence } from "./inherited/evidence-packet.js";
 export { comparePaths, refuseFabricatedEvidence } from "./inherited/trades-coherence.js";
@@ -31,7 +37,14 @@ export {
   emitChannelEvent
 } from "./domain/communications.js";
 export { fireRecognition, mayRecognize, rewardRawRevenueAlone, turnoverAttribution } from "./domain/recognition.js";
-export { forScope, missionBoard } from "./domain/mission-board.js";
+export {
+  applyCompletion,
+  forScope,
+  lockMissionGoal,
+  missionBoard,
+  openMissionDay,
+  retargetGoal
+} from "./domain/mission-board.js";
 export {
   applyManagerDecision,
   applyShadowBaseline,
@@ -46,6 +59,12 @@ export {
   recommendVanProfile,
   recommendVanStock
 } from "./domain/truck-stock.js";
+export { runFulfillmentTo, transitionFulfillment } from "./domain/fulfillment-machine.js";
+export {
+  appendImprovementFromCompletedJob,
+  attachJobToAddress,
+  jobPatternIsNotDefect
+} from "./domain/property-jobs.js";
 export {
   demandForecast,
   lunarPlumbingFeature,
@@ -103,8 +122,13 @@ export {
 export { DurableReceiptStore, openDurableReceipts } from "./spine/durable-receipts.js";
 export { lockEvidence, runAction } from "./spine/run-action.js";
 export {
+  ingestServiceTitanCustomer,
+  ingestServiceTitanEquipment,
+  ingestServiceTitanJob,
+  ingestServiceTitanPricebook,
   ingestServiceTitanShadow,
   mayWriteServiceTitan,
-  refuseServiceTitanWrite
+  refuseServiceTitanWrite,
+  refuseServiceTitanWriteMethod
 } from "./spine/servicetitan-shadow.js";
-export { runShadowDayDemo } from "./demo/shadow-day.js";
+export { runRecordedShadowDays, runShadowDayDemo } from "./demo/shadow-day.js";

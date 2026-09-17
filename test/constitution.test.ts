@@ -59,7 +59,8 @@ describe("§18 freeze rules", () => {
       humanWins(rec, {
         actorId: "mgr-1",
         role: "manager",
-        authorized: true,
+        branchId: "branch:midwest-3",
+        lockHolderId: "mgr-1",
         reason: "customer request",
         replacementAction: "dispatch-088",
         replacementPayload: { vanId: "088" },

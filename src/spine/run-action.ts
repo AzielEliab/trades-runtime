@@ -1,4 +1,6 @@
 import { sha256 } from "../core/hash.js";
+import { exampleActorRegistry, type ActorRegistry } from "../core/actor-registry.js";
+import { type ShadowMode } from "../core/shadow-modes.js";
 import {
   applyHumanOverride,
   liveWithoutOverride,
@@ -42,6 +44,9 @@ export interface ActionRequest {
   override?: HumanOverride;
   actual?: Record<string, unknown>;
   at: string;
+  settledAt?: string;
+  shadowMode?: ShadowMode;
+  registry?: ActorRegistry;
   persist?: DurableReceiptStore;
 }
 
@@ -159,7 +164,11 @@ export function runAction(request: ActionRequest): ActionResult {
   const blocked = request.highConsequence && gate.outcome === "BLOCK" && !request.override;
   let live: LiveDecision;
   if (request.override) {
-    live = applyHumanOverride(recommendation, request.override);
+    live = applyHumanOverride(
+      recommendation,
+      request.override,
+      request.registry ?? exampleActorRegistry()
+    );
     const ov = persist(ledger, request.persist, {
       receiptId: `${request.actionId}:override`,
       kind: "override",
@@ -167,6 +176,8 @@ export function runAction(request: ActionRequest): ActionResult {
       body: {
         actorId: request.override.actorId,
         role: request.override.role,
+        branchId: request.override.branchId,
+        lockHolderId: request.override.lockHolderId,
         reason: request.override.reason,
         originalAction: recommendation.action,
         replacementAction: request.override.replacementAction,
@@ -191,14 +202,27 @@ export function runAction(request: ActionRequest): ActionResult {
 
   let settlement: ShadowSettlement | null = null;
   if (request.actual) {
-    settlement = settleShadow(sealed, request.actual);
+    settlement = settleShadow(sealed, request.actual, undefined, {
+      settledAt: request.settledAt ?? request.at,
+      mode: request.shadowMode ?? "SHADOW-SEALED",
+      override: request.override ?? null
+    });
     const out = persist(ledger, request.persist, {
       receiptId: `${request.actionId}:outcome`,
       kind: "outcome",
-      at: request.at,
+      at: request.settledAt ?? request.at,
       body: {
-        expected: request.expected,
-        actual: request.actual,
+        plannedAction: settlement.plannedAction,
+        contemporaneousEvidenceHash: settlement.contemporaneousEvidenceHash,
+        prediction_confidence: settlement.prediction_confidence,
+        evidence_strength: settlement.evidence_strength,
+        source_quality: settlement.source_quality,
+        cross_source_agreement: settlement.cross_source_agreement,
+        verification_status: settlement.verification_status,
+        humanOverride: settlement.humanOverride,
+        actualOutcome: settlement.actualOutcome,
+        timeToSettleMs: settlement.timeToSettleMs,
+        sealedRecommendationHash: settlement.sealedRecommendationHash,
         deltas: settlement.deltas,
         hindsightLeak: settlement.hindsightLeak,
         evidenceLockHash

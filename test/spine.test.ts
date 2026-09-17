@@ -134,7 +134,8 @@ describe("4b durable receipts", () => {
           override: {
             actorId: "mgr-1",
             role: "manager",
-            authorized: true,
+            branchId: "branch:midwest-3",
+            lockHolderId: "mgr-1",
             reason: "customer request",
             replacementAction: "dispatch-088",
             replacementPayload: { vanId: "088" },
@@ -188,7 +189,8 @@ describe("4c runAction pipeline", () => {
       override: {
         actorId: "mgr-1",
         role: "manager",
-        authorized: true,
+        branchId: "branch:midwest-3",
+        lockHolderId: "mgr-1",
         reason: "customer requested 088",
         replacementAction: "dispatch",
         replacementPayload: { vanId: "088" },
@@ -281,7 +283,8 @@ describe("4c runAction pipeline", () => {
         override: {
           actorId: "mgr-1",
           role: "manager",
-          authorized: true,
+          branchId: "branch:midwest-3",
+          lockHolderId: "mgr-1",
           reason: "known covered under OEM",
           replacementAction: "warranty-confirm",
           replacementPayload: { covered: true },
