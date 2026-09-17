@@ -26,12 +26,25 @@ const mid: ConfidenceSeparation = {
   verificationStatus: "PARTIAL"
 };
 
-function pathFor(id: string, packetId: string, action = "dispatch"): ReasoningPath {
+const verified: ConfidenceSeparation = {
+  predictionConfidence: 0.82,
+  evidenceStrength: "HIGH",
+  sourceQuality: "HIGH",
+  agreement: "HIGH",
+  verificationStatus: "VERIFIED"
+};
+
+function pathFor(
+  id: string,
+  packetId: string,
+  action = "dispatch",
+  confidence: ConfidenceSeparation = mid
+): ReasoningPath {
   return {
     id,
     claim: "dispatch-van-214",
     action,
-    confidence: mid,
+    confidence,
     evidenceIds: [packetId]
   };
 }
@@ -162,9 +175,9 @@ describe("4c runAction pipeline", () => {
       action: "dispatch",
       payload: { vanId: "214" },
       packets: [admitted.packet],
-      primary: pathFor("primary", admitted.packet.sourceId),
-      alternate: pathFor("alternate", admitted.packet.sourceId),
-      confidence: mid,
+      primary: pathFor("primary", admitted.packet.sourceId, "dispatch", verified),
+      alternate: pathFor("alternate", admitted.packet.sourceId, "dispatch", verified),
+      confidence: verified,
       highConsequence: true,
       defined: true,
       impactAssessed: true,
