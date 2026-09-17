@@ -1,25 +1,23 @@
 import { describe, expect, it } from "vitest";
+import { DEPRECATED_COMMS_BARREL } from "../src/domain/comms.js";
+import { DEPRECATED_PRICEBOOK_STOCK_BARREL } from "../src/domain/pricebook-stock.js";
+import { archiveChannel, CHANNEL_KINDS, createChannel } from "../src/domain/communications.js";
+import { mayRecognize, rewardRawRevenueAlone, turnoverAttribution } from "../src/domain/recognition.js";
+import { missionBoard } from "../src/domain/mission-board.js";
 import {
-  archiveChannel,
-  CHANNEL_KINDS,
-  createChannel,
-  mayRecognize,
-  missionBoard,
-  rewardRawRevenueAlone,
-  turnoverAttribution
-} from "../src/domain/comms.js";
-import {
-  advanceFulfillment,
   applyManagerDecision,
   applyShadowBaseline,
+  refuseLockedAutoRecalibrate,
+  type PricebookRecommendation
+} from "../src/domain/pricebook.js";
+import {
+  advanceFulfillment,
   FULFILLMENT_STEPS,
   firstTripProbability,
   purchasingRequiresHuman,
   recommendVanStock,
-  refuseLockedAutoRecalibrate,
-  STOCK_LOCATIONS,
-  type PricebookRecommendation
-} from "../src/domain/pricebook-stock.js";
+  STOCK_LOCATIONS
+} from "../src/domain/truck-stock.js";
 import {
   demandForecast,
   lunarPlumbingFeature,
@@ -44,7 +42,8 @@ import type { HumanOverride } from "../src/core/human-authority.js";
 const manager: HumanOverride = {
   actorId: "mgr-1",
   role: "manager",
-  authorized: true,
+  branchId: "branch:midwest-3",
+  lockHolderId: "mgr-1",
   reason: "lock the OEM condenser price",
   replacementAction: "pricebook:lock",
   replacementPayload: { proposedPrice: 420 },
@@ -300,5 +299,12 @@ describe("v0.2 maintenance routing", () => {
 describe("v0.2 constitution additions", () => {
   it("lists the five v0.2 governing invariants", () => {
     expect(RULES_V02).toHaveLength(5);
+  });
+});
+
+describe("F10 leftover barrels are deprecated", () => {
+  it("points comms and pricebook-stock at one canonical path each", () => {
+    expect(DEPRECATED_COMMS_BARREL).toMatch(/communications\.ts/);
+    expect(DEPRECATED_PRICEBOOK_STOCK_BARREL).toMatch(/pricebook\.ts/);
   });
 });

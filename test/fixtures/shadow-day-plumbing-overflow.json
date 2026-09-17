@@ -1,0 +1,79 @@
+{
+  "kind": "plumbing-overflow",
+  "mode": "SHADOW-VISIBLE",
+  "branch": "tr:branch:midwest-3",
+  "scoresTechnicians": false,
+  "planned": {
+    "action": "dispatch",
+    "payload": {
+      "vanId": "tr:van:214",
+      "call": "tr:call:backup-2201"
+    },
+    "morning": {
+      "vans": [
+        "tr:van:214",
+        "tr:van:088"
+      ],
+      "branch": "tr:branch:midwest-3"
+    }
+  },
+  "actual": {
+    "vanId": "tr:van:088",
+    "firstTrip": false
+  },
+  "counterfactual": {
+    "action": "dispatch",
+    "expected": {
+      "vanId": "tr:van:214",
+      "firstTrip": true
+    },
+    "evidenceLockHash": "eb040bf30791722a0699ab86062bec5ff73ec9e0c9843427ffe0787207287b01"
+  },
+  "reconstructable": {
+    "planned": {
+      "action": "dispatch",
+      "payload": {
+        "vanId": "tr:van:214",
+        "call": "tr:call:backup-2201"
+      },
+      "morning": {
+        "vans": [
+          "tr:van:214",
+          "tr:van:088"
+        ],
+        "branch": "tr:branch:midwest-3"
+      }
+    },
+    "actual": {
+      "vanId": "tr:van:088",
+      "firstTrip": false
+    },
+    "counterfactual": {
+      "action": "dispatch",
+      "expected": {
+        "vanId": "tr:van:214",
+        "firstTrip": true
+      },
+      "evidenceLockHash": "eb040bf30791722a0699ab86062bec5ff73ec9e0c9843427ffe0787207287b01"
+    }
+  },
+  "settlement": {
+    "plannedAction": "dispatch",
+    "contemporaneousEvidenceHash": "eb040bf30791722a0699ab86062bec5ff73ec9e0c9843427ffe0787207287b01",
+    "prediction_confidence": 0.72,
+    "evidence_strength": "MEDIUM",
+    "source_quality": "HIGH",
+    "cross_source_agreement": "MEDIUM",
+    "verification_status": "PARTIAL",
+    "timeToSettleMs": 21600000,
+    "sealedRecommendationHash": "0025eda818357f679ab357fcc16fb6c74d6a4035440e81ec959903d4d8d97e27",
+    "hindsightLeak": false
+  },
+  "liveWinner": "human",
+  "disagreementPreserved": true,
+  "ledgerValid": true,
+  "ledgerTip": "57a844cbd81e53fe55cf6467df7d504cd498d2ab254d54ec6c159bf310dd48a8",
+  "receiptCount": 3,
+  "trajectoryRecords": 3,
+  "viewers": "dispatch / warehouse / selected techs (display only)"
+}

@@ -1,3 +1,12 @@
+/**
+ * @deprecated TR-AUDIT-2026-09-17 F10.
+ * Canonical path: `src/domain/communications.ts`.
+ * Recognition: `src/domain/recognition.ts`. Mission board: `src/domain/mission-board.ts`.
+ * Do not add new imports here.
+ */
+export const DEPRECATED_COMMS_BARREL =
+  "use src/domain/communications.ts (recognition.ts / mission-board.ts)" as const;
+
 export {
   CHANNEL_KINDS,
   archiveChannel,
@@ -13,23 +22,3 @@ export {
   type ChannelKind,
   type ChannelState
 } from "./communications.js";
-export {
-  fireRecognition,
-  mayRecognize,
-  rewardRawRevenueAlone,
-  turnoverAttribution,
-  type RecognitionCandidate,
-  type RecognitionEvent,
-  type RecognitionKind,
-  type TurnoverAttribution
-} from "./recognition.js";
-export {
-  CORE_MEASURES,
-  GOAL_SCOPES,
-  forScope,
-  missionBoard,
-  type CoreMeasure,
-  type GoalScope,
-  type MissionBoardRow,
-  type MissionGoal
-} from "./mission-board.js";

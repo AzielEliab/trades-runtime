@@ -1,6 +1,6 @@
 export const RUNTIME_MANIFEST = {
   product: "trades-runtime",
-  version: "0.2.0",
+  version: "0.3.0",
   author: "Aziel Eliab",
   identity: "Aziel Eliab",
   role: "trades-runtime",
@@ -14,6 +14,8 @@ export const RUNTIME_MANIFEST = {
     { slug: "confidence", path: "src/core/confidence.ts", status: "live-pure", summary: "Confidence ≠ truth." },
     { slug: "chains", path: "src/core/chains.ts", status: "live-pure", summary: "Append-only chains A/B/C/D." },
     { slug: "human-authority", path: "src/core/human-authority.ts", status: "live-pure", summary: "Human overrides win; disagreement preserved." },
+    { slug: "actor-registry", path: "src/core/actor-registry.ts", status: "live-pure", summary: "Named roles, branch scope, lock-holder id. Override is not a bare boolean." },
+    { slug: "shadow-modes", path: "src/core/shadow-modes.ts", status: "live-pure", summary: "SHADOW-SEALED / SHADOW-VISIBLE / ADVISE-LOCKED." },
     { slug: "trades-coherence", path: "src/inherited/trades-coherence.ts", status: "live-pure", summary: "Primary vs alternate path." },
     { slug: "evidence-packet", path: "src/inherited/evidence-packet.ts", status: "live-pure", summary: "Provenance wrapper; trust ≠ truth." },
     { slug: "decision-gate", path: "src/inherited/decision-gate.ts", status: "live-pure", summary: "High-consequence PASS|REVISE|BLOCK." },
@@ -29,7 +31,9 @@ export const RUNTIME_MANIFEST = {
     { slug: "analytics", path: "src/domain/analytics.ts", status: "live-pure", summary: "Mandatory report metadata." },
     { slug: "communications", path: "src/domain/communications.ts", status: "live-pure", summary: "Teams-style channels on the canonical event stream." },
     { slug: "recognition", path: "src/domain/recognition.ts", status: "live-pure", summary: "Quality-gated recognition; never raw revenue alone." },
-    { slug: "mission-board", path: "src/domain/mission-board.ts", status: "live-pure", summary: "Daily goals: target, actual, pace, gap, projected EOD." },
+    { slug: "mission-board", path: "src/domain/mission-board.ts", status: "live-pure", summary: "One branch, one day; KPIs from completions; human can lock a goal." },
+    { slug: "fulfillment-machine", path: "src/domain/fulfillment-machine.ts", status: "live-pure", summary: "REQUESTED→RECONCILED on the canonical event stream." },
+    { slug: "property-jobs", path: "src/domain/property-jobs.ts", status: "live-pure", summary: "Job attaches to address; completed work appends the improvement ledger." },
     { slug: "pricebook", path: "src/domain/pricebook.ts", status: "live-pure", summary: "ST shadow baseline; ACCEPT/OVERRIDE/LOCK with Chain C receipt." },
     { slug: "truck-stock", path: "src/domain/truck-stock.ts", status: "live-pure", summary: "Location states, van profile, warehouse fulfillment queue." },
     { slug: "weather-demand", path: "src/domain/weather-demand.ts", status: "live-pure", summary: "Three weather windows; lunar weight 0 without lift." },
@@ -42,6 +46,10 @@ export const RUNTIME_MANIFEST = {
     { slug: "regional-recalibration", path: "src/domain/regional-recalibration.ts", status: "live-pure", summary: "Geo hierarchy + promotion ladder; weaken thin/stale/conflicted samples." },
     { slug: "property-intelligence-hooks", path: "src/domain/property-intelligence-hooks.ts", status: "live-pure", summary: "Typed integration points; not live backends." },
     { slug: "constitution", path: "src/rules/constitution.ts", status: "live-pure", summary: "Architecture §18 freeze + v0.2 + Property Intelligence v1.0 rules." },
-    { slug: "servicetitan-connector", path: "n/a", status: "stub", summary: "Tether later. No live writes in v0." }
+    { slug: "fraggate-inbound", path: "src/spine/fraggate-inbound.ts", status: "live-pure", summary: "FragGate inbound wall. Wrapper is not verification. Scrape refused." },
+    { slug: "durable-receipts", path: "src/spine/durable-receipts.ts", status: "live-pure", summary: "Append-only JSONL receipts. Process exit does not erase Chain C." },
+    { slug: "run-action", path: "src/spine/run-action.ts", status: "live-pure", summary: "packet → lock → primary → alternate → coherence → gate → receipt → override → shadow settle." },
+    { slug: "servicetitan-shadow", path: "src/spine/servicetitan-shadow.ts", status: "live-pure", summary: "Read-only ST-shaped ingest + hash. Writes refused." },
+    { slug: "servicetitan-connector", path: "src/spine/servicetitan-shadow.ts", status: "stub", summary: "Live ServiceTitan writes stay refused." }
   ]
 } as const;

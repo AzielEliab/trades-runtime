@@ -2,7 +2,7 @@
 
 > Private TypeScript operating system for field-trades companies.
 > Author / identity: Aziel Eliab only.
-> Version: 0.2.0
+> Version: 0.3.0
 > Status: live-pure core + stubs. No live backends. No PDFs on Pages.
 
 Product is src/. Pages is a thin UI. Implementer specs are at repo-root specs/ (not published).

@@ -1,4 +1,5 @@
 import { applyHumanOverride, type HumanOverride, type Recommendation } from "../core/human-authority.js";
+import { exampleActorRegistry, type ActorRegistry, type AuthorityAction } from "../core/actor-registry.js";
 import { appendRecord, emptyChain, type OverrideRecord } from "../core/chains.js";
 import { appendReceipt, createLedger, type ReceiptLedger } from "../inherited/receipt-ledger.js";
 
@@ -97,16 +98,23 @@ export function collectEvidenceWhileLocked(
 export function applyManagerDecision(
   rec: PricebookRecommendation,
   decision: ManagerDecision,
-  override: HumanOverride
+  override: HumanOverride,
+  registry: ActorRegistry = exampleActorRegistry()
 ): {
   live: PricebookRecommendation;
   chain: ReturnType<typeof emptyChain<OverrideRecord>>;
   ledger: ReceiptLedger;
 } {
+  if (!override.lockHolderId?.trim()) {
+    throw new Error("ACCEPT / OVERRIDE / LOCK requires a lock-holder id");
+  }
+  if (!override.branchId?.trim()) {
+    throw new Error("authority grant requires branch scope");
+  }
   if (rec.locked && decision === "ACCEPT") {
     throw new Error("locked pricebook recommendation cannot be auto-recalibrated");
   }
-  if (rec.locked && decision === "RELEASE" && override.actorId !== rec.lockHolder && !override.authorized) {
+  if (rec.locked && decision === "RELEASE" && override.actorId !== rec.lockHolder) {
     throw new Error("only an authorized human can release a lock");
   }
   const liveDecision = applyHumanOverride(
@@ -123,12 +131,16 @@ export function applyManagerDecision(
       },
       issuedAt: override.at
     } satisfies Recommendation,
-    override
+    override,
+    registry,
+    decision as AuthorityAction
   );
+  const lockHolderId =
+    decision === "LOCK" ? override.actorId : decision === "RELEASE" ? undefined : override.lockHolderId || rec.lockHolder;
   const next: PricebookRecommendation = {
     ...rec,
     locked: decision === "LOCK" || (rec.locked && decision !== "RELEASE"),
-    lockHolder: decision === "LOCK" ? override.actorId : decision === "RELEASE" ? undefined : rec.lockHolder,
+    lockHolder: lockHolderId,
     proposedPrice:
       decision === "OVERRIDE" ? Number(override.replacementPayload.proposedPrice ?? rec.proposedPrice) : rec.proposedPrice
   };
@@ -150,6 +162,8 @@ export function applyManagerDecision(
     body: {
       decision,
       actorId: override.actorId,
+      lockHolderId: next.lockHolder ?? override.lockHolderId,
+      branchId: override.branchId,
       priorPrice: rec.proposedPrice,
       livePrice: next.proposedPrice,
       locked: next.locked

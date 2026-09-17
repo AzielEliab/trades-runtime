@@ -5,6 +5,7 @@ import {
   mayAutonomousHighConsequence
 } from "../src/core/confidence.js";
 import { applyHumanOverride, liveWithoutOverride } from "../src/core/human-authority.js";
+import { exampleActorRegistry } from "../src/core/actor-registry.js";
 
 const unsupported = {
   predictionConfidence: 0.97,
@@ -46,13 +47,14 @@ describe("human authority", () => {
   it("preserves the original recommendation when a human wins", () => {
     const live = applyHumanOverride(rec, {
       actorId: "lee",
-      role: "dispatch",
-      authorized: true,
+      role: "dispatcher",
+      branchId: "branch:midwest-3",
+      lockHolderId: "lee",
       reason: "window",
       replacementAction: "dispatch-088",
       replacementPayload: { vanId: "088" },
       at: "2026-01-01T00:01:00Z"
-    });
+    }, exampleActorRegistry());
     expect(live.winner).toBe("human");
     expect(live.disagreementPreserved).toBe(true);
     expect(live.originalRecommendation.action).toBe("hold");
@@ -63,13 +65,14 @@ describe("human authority", () => {
     expect(() =>
       applyHumanOverride(rec, {
         actorId: "intern",
-        role: "observer",
-        authorized: false,
+        role: "technician",
+        branchId: "branch:midwest-3",
+        lockHolderId: "intern",
         reason: "guess",
         replacementAction: "dispatch",
         replacementPayload: {},
         at: "2026-01-01T00:01:00Z"
-      })
+      }, exampleActorRegistry())
     ).toThrow(/unauthorized/);
   });
 

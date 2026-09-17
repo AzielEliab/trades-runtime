@@ -1,0 +1,79 @@
+{
+  "kind": "hvac",
+  "mode": "SHADOW-SEALED",
+  "branch": "tr:branch:midwest-3",
+  "scoresTechnicians": false,
+  "planned": {
+    "action": "dispatch",
+    "payload": {
+      "vanId": "tr:van:214",
+      "call": "tr:call:no-cool-1042"
+    },
+    "morning": {
+      "vans": [
+        "tr:van:214",
+        "tr:van:088"
+      ],
+      "branch": "tr:branch:midwest-3"
+    }
+  },
+  "actual": {
+    "vanId": "tr:van:088",
+    "firstTrip": false
+  },
+  "counterfactual": {
+    "action": "dispatch",
+    "expected": {
+      "vanId": "tr:van:214",
+      "firstTrip": true
+    },
+    "evidenceLockHash": "150ae9094eadb367cd2ee894ac32aa68643269271fce128023a8aeb143129c47"
+  },
+  "reconstructable": {
+    "planned": {
+      "action": "dispatch",
+      "payload": {
+        "vanId": "tr:van:214",
+        "call": "tr:call:no-cool-1042"
+      },
+      "morning": {
+        "vans": [
+          "tr:van:214",
+          "tr:van:088"
+        ],
+        "branch": "tr:branch:midwest-3"
+      }
+    },
+    "actual": {
+      "vanId": "tr:van:088",
+      "firstTrip": false
+    },
+    "counterfactual": {
+      "action": "dispatch",
+      "expected": {
+        "vanId": "tr:van:214",
+        "firstTrip": true
+      },
+      "evidenceLockHash": "150ae9094eadb367cd2ee894ac32aa68643269271fce128023a8aeb143129c47"
+    }
+  },
+  "settlement": {
+    "plannedAction": "dispatch",
+    "contemporaneousEvidenceHash": "150ae9094eadb367cd2ee894ac32aa68643269271fce128023a8aeb143129c47",
+    "prediction_confidence": 0.72,
+    "evidence_strength": "MEDIUM",
+    "source_quality": "HIGH",
+    "cross_source_agreement": "MEDIUM",
+    "verification_status": "PARTIAL",
+    "timeToSettleMs": 21600000,
+    "sealedRecommendationHash": "982ac1e9f9cc6256152ea36795049724f7715f17377095317e3b3a447fa2fb16",
+    "hindsightLeak": false
+  },
+  "liveWinner": "human",
+  "disagreementPreserved": true,
+  "ledgerValid": true,
+  "ledgerTip": "32446d732775ffd83d2145163b2a1e146ba1d832be107016b92e9b58587d6833",
+  "receiptCount": 3,
+  "trajectoryRecords": 3,
+  "viewers": "operator + designated managers"
+}
