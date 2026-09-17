@@ -1,0 +1,208 @@
+TRADES-RUNTIME · CUT SHEET                                                                                                               TR-CUT-2026-09-17
+
+
+
+
+Missing Features, Test, Shadow, Slow Integration, Launch
+Receipt ID TR-CUT-2026-09-17 · 2026-09-17 18:50 EDT
+AzielEliab/trades-runtime · private · working tip ab18a105 · main 26f0eb21
+Not a production claim. Not a scrape plan. Not a public Pages enable.
+
+
+This cut sheet names the ten missing features that unblock field use, then the test battery, the shadow operating mode, a slow
+integration ladder, and launch options that stay inside the constitution (human wins, confidence ≠ truth, no live ST writes until
+a later explicit cut). Companion audit: TR-AUDIT-2026-09-17.
+
+1. Top 10 missing features
+    #       Feature                       Why it is next                                            Done when
+
+    1       main is the product           Default clone is a stub. Six days of software sit on a    PR #1 merged. git clone of main runs npm test.
+                                          Cursor branch + PR #1.
+
+    2       CI constitution               69 tests are a commit message until they run on every GitHub Action: npm test + typecheck on pull_request
+                                          PR.                                                   and main. Red blocks merge.
+
+    3       FragGate inbound              Inheritance spec requires it. Untrusted ST / tech /       Admit function stamps source, trust metadata, hash.
+            boundary                      customer / AI can become “evidence” by wrapping.          Refuse silent promotion to truth.
+
+    4       Durable receipt store         Chains and ForgeReceipts-shaped ledger die with the       Append-only file or sqlite. Replay Chain C after
+                                          process.                                                  restart. Hash verify.
+
+    5       runAction() pipeline          Modules exist as files. No single walk for a              One function: packet → lock → primary → alternate
+                                          consequential act.                                        → coherence → gate → receipt → override →
+                                                                                                    shadow settle.
+
+    6       Actor / authority registry    Override is authorized: boolean. Locks have no            Named roles, branch scope, lock-holder id on every
+                                          holder.                                                   ACCEPT / OVERRIDE / LOCK.
+
+    7       ST shadow read-only           Every domain module is fed synthetic objects. Writes Nightly or on-demand ingest of jobs / pricebook /
+                                          stay refused.                                        equipment / customer. Content-hash. No write path
+                                                                                               compiled.
+
+    8       Fulfillment state machine     Location states exist. Warehouse queue does not run.      REQUESTED → CLAIMED → PICKING →
+                                                                                                    READY → TRANSFER → DELIVERED →
+                                                                                                    INSTALLED → RECONCILED on the event stream.
+
+    9       Mission board clock           Target / actual / pace / gap / EOD are structs with no    One branch, one day, KPIs update from completions.
+                                          clock.                                                    Human can lock a goal.
+
+    10      PI wired to jobs              Property Intelligence v1.0 is isolated functions.         A job attaches to an address. Improvement ledger
+                                                                                                    appends from completed work. Pattern ≠ defect still
+                                                                                                    holds.
+Off this list on purpose: scrape layer, public Pages, live ST writes, photo-as-misconduct, lunar plumbing as a shipped feature,
+another architecture PDF.
+
+2. Test
+Keep three layers. Do not collapse them. Constitutional tests already exist under test/ (confidence-authority, constitution,
+cross-trade, domain, inherited, v0.2 modules, property-intelligence). What is missing is CI, a shadow harness, and a
+slow-integration suite that never talks to a live write API.
+
+    Layer                      Runs                                  Must prove                                      Must not do
+
+    L0 Unit / constitution     vitest on every PR. Current 7 files   Human wins. Confidence ≠ truth.                 Network. Fixtures that impersonate
+                               + PI. Target: keep green, add one     Geography not sole. Recognition not raw         ST writes.
+                               file per new module.                  revenue. LOCK not auto-recalibrated.
+                                                                     Pattern ≠ defect. Repair cost ≠ uplift. Lunar
+                                                                     weight 0 without lift.
+
+
+
+
+PRIVATE · Aziel Eliab only · not a public export                                                                                                          p. 1
+TRADES-RUNTIME · CUT SHEET                                                                                                             TR-CUT-2026-09-17
+
+
+
+
+    Layer                   Runs                                Must prove                                      Must not do
+
+    L1 Pipeline             vitest on runAction() once it       Same input → same receipt hash. Override        Clock-dependent flakes. Hidden I/O.
+                            exists. Golden fixtures on disk.    preserves original recommendation. Gate
+                                                                BLOCK on unverified high-consequence.
+
+    L2 Shadow day           npm run demo plus a recorded        Planned / actual / counterfactual all           Claim accuracy against a live
+                            fixture pack (one HVAC day, one     reconstructable. Drift rebases. Bookings not    branch. Score technicians from the
+                            plumbing overflow day).             silently displaced.                             demo.
+
+    L3 Shadow-live (read)   Optional nightly. Read-only ST      Ingest completeness. Packet provenance.         POST/PUT/PATCH to ST.
+                            dump hashed into evidence           Replay equals first pass.                       Auto-dispatch. Auto pricebook
+                            packets. Offline replay.                                                            change.
+CI minimum after merge: Node 20, npm ci, npm run typecheck, npm test. Fail the PR if constitution tests fail. Do not gate on
+coverage theater. Gate on the rule list in src/rules/constitution.ts.
+
+3. Shadow
+Shadow is the operating mode, not a UI tab. The company keeps running ServiceTitan as today. Trades-Runtime recommends,
+freezes, and later compares. It does not take the wheel. src/inherited/shadow-engine.ts already names sealed counterfactual
+settlement. Wire it; do not replace ST.
+
+    Mode                      Who sees it                         Live effect                                  Exit rule
+
+    SHADOW-SEALED             Operator + designated managers      None. Recommendations hashed.                Never auto-exits. Promotion is an
+                              only.                               Humans do what they already do.              explicit human act (see launch
+                                                                                                               options).
+
+    SHADOW-VISIBLE            Dispatch / warehouse / selected     None on bookings. Display only.              If it distracts or is treated as an order,
+                              techs as a side panel.              Override still required to change live       drop back to SEALED.
+                                                                  work.
+
+    ADVISE-LOCKED             Same as visible, plus LOCK /        Only after a named authorized human          Any unauthorized write attempt is a
+                              ACCEPT on pricebook and stock       accepts. Runtime cannot supersede a          defect, not a feature.
+                              recs.                               lock.
+Shadow settlement fields that must be stored with the receipt: planned action, contemporaneous evidence hash,
+prediction_confidence / evidence_strength / source_quality / cross_source_agreement / verification_status, human override (if
+any), actual outcome, time-to-settle. Hindsight from the outcome must not rewrite the sealed recommendation.
+
+4. Slow integration
+One-way, read-first, human-gated. Each rung earns the next with receipts, not calendar pressure. Skip a rung and the
+constitution is theater.
+
+    Rung      Integration                                       Duration (min)      Pass condition
+
+    R0        Merge + CI. Local demo only.                      1 session           main installs. Tests green on Action.
+
+    R1        FragGate + durable ledger on disk. No ST.         days                Restart preserves receipts. Untrusted wrap refused.
+
+    R2        ST export / API read into a quarantine bucket.    1–2 weeks           Packet hashes stable. No credentials in repo. Writes not in the
+              Manual operator pull.                                                 binary.
+
+    R3        Scheduled read (nightly). Shadow-sealed scoring 2–4 weeks             Replay matches. Forecast error logged. No one treats output as
+              vs that day’s actuals.                                                a ticket.
+
+    R4        One branch, SHADOW-VISIBLE side panel.            2–4 weeks           Dispatchers ignore it without harm. Complaints = drop to
+              Mission board clock on that branch only.                              SEALED.
+
+    R5        ADVISE-LOCKED on pricebook / van stock for        after R4 holds      Every accept/lock has actor id + Chain C receipt. Zero silent ST
+              that branch. Fulfillment queue visible to                             writes.
+              warehouse.
+
+    R6        Property record attach on completed jobs          after R3 data       Pattern never marks a subject defective. Uplift not set equal to
+              (approved sources only).                          exists              invoice.
+
+
+
+
+PRIVATE · Aziel Eliab only · not a public export                                                                                                            p. 2
+TRADES-RUNTIME · CUT SHEET                                                                                                             TR-CUT-2026-09-17
+
+
+
+
+    Rung      Integration                                         Duration (min)       Pass condition
+
+    R7        Second branch. Then stop and write the score.       after R5–R6          Promotion to any write path is a new paper, not a quiet flag.
+              Do not add writes.
+Credentials: operator env or a sealed local vault. Never commit ST tokens. Never put branch addresses or customer PII on
+Pages. Pages stays off or private-local preview of docs/ only.
+
+5. Launch options
+Four options. Pick one. Do not run them in parallel. All keep the repo private.
+
+    Option                     What ships                          Who it is for                Risk                          Recommend
+
+    A — Merge-only             PR #1 onto main. CI. Version        Operator + future            Low. Default tree finally     Do this first.
+                               0.3.0. No Pages. No ST.             implementers.                matches README.               Non-negotiable.
+
+    B — Local spine            A + FragGate + disk ledger +        Operator evaluating the      Low. Still no network.        Do this next. One PR.
+                               runAction() + recorded              OS before any company
+                               shadow-day demo.                    sees it.
+
+    C — One-branch             B + read-only ST pull +             One GM / dispatch lead       Medium. People will treat     Only after B receipts
+    shadow                     SHADOW-SEALED then                  who already knows it is      a panel as an order if you    exist. Written rules of
+                               SEALED→VISIBLE on a single          advisory.                    let them.                     engagement first.
+                               branch.
+
+    D — Advise-lock            C + human ACCEPT/LOCK on            One branch that already      High if writes sneak in.      Last. Explicit operator
+    pilot                      pricebook and van stock.            has a warehouse person       Keep ST write code            go. New receipt paper
+                               Warehouse queue visible.            who will use a queue.        uncompiled.                   before any write API.
+
+
+Launch options refused
+Public GitHub Pages as a “launch.” Worker/MCP public surface. Multi-branch big-bang. ServiceTitan write-back in v0.3.
+App-store / customer-facing booking cutover. Scoring techs from shadow numbers in a review. Selling PI as an AVM.
+Scraping listings.
+
+6. Suggested sequence (this week / this month)
+    When                            Act                                                                  Exit
+
+    This session / this week        Option A. Merge PR #1. Add CI workflow. Bump 0.3.0. Keep             main npm test green.
+                                    Pages off.
+
+    Next PR                         Option B. FragGate admit + sqlite/jsonl ledger + runAction() + L1    Restart replay + pipeline hash stable.
+                                    tests.
+
+    After B is boring               Option C on one branch, SHADOW-SEALED for two weeks                  Settlement receipts for N days with no live
+                                    before VISIBLE.                                                      writes.
+
+    Only if C is calm               Option D. Named lock-holders. Warehouse queue. Still no ST           New paper required to even discuss writes.
+                                    writes in the binary.
+
+
+7. Disposition
+Paper only. No merge, no Pages, no connector from this file. Operator picks A/B/C/D. Default recommendation: A now, B as
+the next code cut, C only with a named branch and a written “this is not an order” rule, D last.
+
+
+
+
+PRIVATE · Aziel Eliab only · not a public export                                                                                                        p. 3
+
