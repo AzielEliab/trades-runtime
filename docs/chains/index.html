@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="author" content="Aziel Eliab">
+  <title>Tracking chains · Trades-Runtime</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body data-page="chains">
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header" data-site-header></header>
+  <main id="main" class="wrap">
+    <section class="page-head hero">
+      <p class="kicker">Three immutable tracking chains · §2.2</p>
+      <h1>Planned, actual, counterfactual, and override stay separately queryable.</h1>
+      <p>Never overwrite history. A rebase changes the next decision; it does not erase the prior decision.</p>
+    </section>
+
+    <section class="section">
+      <div class="grid chain-grid">
+        <div class="card">
+          <p class="chain-letter">A</p>
+          <h3>Full-Day Trajectory</h3>
+          <p><strong>Purpose.</strong> Tracks the day as an evolving system.</p>
+          <p>Preserves the morning plan, each real-world state change, each rebase, schedule displacement, route drift, and end-of-day result.</p>
+        </div>
+        <div class="card">
+          <p class="chain-letter">B</p>
+          <h3>Call-to-Call Ledger</h3>
+          <p><strong>Purpose.</strong> Tracks every individual service event.</p>
+          <p>Preserves assignment, travel, arrival, media, diagnosis, parts, quote, repair/turnover, runtime, customer outcome, and next-state effect.</p>
+        </div>
+        <div class="card">
+          <p class="chain-letter">C</p>
+          <h3>Human Override / Recalibration</h3>
+          <p><strong>Purpose.</strong> Tracks intentional human changes. Also called Decision/Override/Evidence receipts.</p>
+          <p>Preserves the original Trades recommendation, the role/person who changed it, timestamp, stated reason, replacement decision, downstream effect, and final outcome.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Evidence model</h2>
+      <div class="panel">
+        <p><strong>ACTUAL:</strong> customer call → existing booking/dispatch → actual Van → actual diagnosis/quote/repair/turnover → actual revenue/margin/time/parts.</p>
+        <p><strong>TRADES:</strong> same known inputs → Trades booking/dispatch → predicted Van/route → expected diagnosis/repair/turnover → expected revenue/margin/time/parts.</p>
+        <p><strong>OVERRIDE:</strong> Trades recommendation → authorized human change → reason → replacement action → resulting state → observed outcome.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Shadow counterfactual</h2>
+      <p>For each decision point: “Given only the information available at that moment, what would Trades-Runtime have done?” That prevents hindsight leakage. Once reality diverges, the shadow model rebases from the new actual state rather than pretending the original imaginary schedule still exists.</p>
+    </section>
+
+    <section class="section">
+      <h2>Chain D — coordination / handoff</h2>
+      <div class="panel">
+        <p>Addenda v0.7 and v0.8 add Chain D so a failed handoff can be reconstructed. If management approved a 4:00 PM return but the availability state never reached Dispatch, Chain D identifies the failed acknowledgment rather than labeling the dispatcher as the root cause. Cross-department analytics can compare HVAC ↔ plumbing ↔ electrical turnovers without mixing them with Office/Dispatch/Field/Warehouse coordination health.</p>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer" data-site-footer></footer>
+  <script src="../assets/app.js"></script>
+</body>
+</html>

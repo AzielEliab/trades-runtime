@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="author" content="Aziel Eliab">
+  <title>Architecture · Trades-Runtime</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body data-page="architecture">
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header" data-site-header></header>
+  <main id="main" class="wrap">
+    <section class="page-head hero">
+      <p class="kicker">Architecture &amp; Operating Design · v0.2</p>
+      <h1>Company operating intelligence, proven in shadow before it is allowed to act.</h1>
+      <p>Implemented in the private <code>src/</code> TypeScript package (see <a href="../modules/">software modules</a>). Implementer specs live at repo-root <code>specs/</code> — they are not published on Pages.</p>
+    </section>
+
+    <nav class="rail" aria-label="Architecture sections">
+      <a href="../operating-model/">Operating model</a>
+      <a href="../chains/">Chains</a>
+      <a href="../shadow/">Shadow</a>
+      <a href="../rules/">Rules</a>
+      <a href="../dispatch/">Dispatch</a>
+      <a href="../workforce/">Workforce</a>
+      <a href="../fabrics/">Fabrics</a>
+      <a href="../analytics/">Analytics</a>
+    </nav>
+
+    <section class="section">
+      <h2>Primary objectives</h2>
+      <ul class="list">
+        <li>Answer and book calls with shared membership, equipment, warranty, and history.</li>
+        <li>Choose the correct technician/Van using technical fit, quality, client fit, geography, inventory, runtime, profit, margin, and development — not distance alone.</li>
+        <li>Minimize unnecessary travel without letting proximity become the final factor.</li>
+        <li>Learn strengths, weaknesses, and uncertainty without poisoning the model through self-reinforcing assignment.</li>
+        <li>Use before/during/after media to normalize skill, difficulty, time, workmanship, and legitimate added cost.</li>
+        <li>Keep repairs, turnovers, sales, warranties, callbacks, inventory, and downstream revenue as connected events.</li>
+        <li>Issue receipts for recommendations, disagreements, overrides, actuals, and counterfactuals.</li>
+        <li>Allow a field-side advisor on or off per technician / per call.</li>
+        <li>Share one canonical live operating state across IT, office, dispatch, managers, field, warehouse, and booking.</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>Recommended logical architecture</h2>
+      <p class="formula">ServiceTitan / ProBooks / warranty / telephony / maps / pricebook / inventory / media → Integration &amp; MCP Layer → Canonical Event Bus → Operational State Store → Decision Engines → Shadow/Counterfactual Engine → Receipts &amp; Audit → Role Interfaces → Controlled Action Layer.</p>
+      <p class="muted">This portal documents that design. It does not host the event bus or execute engines.</p>
+    </section>
+
+    <section class="section">
+      <h2>Decision engines (design / stub)</h2>
+      <table class="ops">
+        <thead><tr><th>Engine</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Booking &amp; Call Intake</td><td><span class="badge planned">design</span></td></tr>
+          <tr><td>Dispatch / Call-Fit</td><td><span class="badge planned">design</span></td></tr>
+          <tr><td>Full-Day Trajectory</td><td><span class="badge planned">design</span></td></tr>
+          <tr><td>Runtime Prediction</td><td><span class="badge planned">design</span></td></tr>
+          <tr><td>Technician Skill &amp; Exploration</td><td><span class="badge planned">design</span></td></tr>
+          <tr><td>Visual/Video QA</td><td><span class="badge planned">design</span></td></tr>
+          <tr><td>Warranty &amp; Callback Classifier</td><td><span class="badge planned">design</span></td></tr>
+          <tr><td>Manager Intervention Predictor</td><td><span class="badge planned">design</span></td></tr>
+          <tr><td>Field Advisor</td><td><span class="badge planned">design</span></td></tr>
+          <tr><td>Pricebook / Quote / Margin</td><td><span class="badge">live-pure</span></td></tr>
+          <tr><td>Inventory / van stock / fulfillment</td><td><span class="badge">live-pure</span></td></tr>
+          <tr><td>Communications / recognition / mission board</td><td><span class="badge">live-pure</span></td></tr>
+          <tr><td>Weather / demand</td><td><span class="badge">live-pure</span></td></tr>
+          <tr><td>Maintenance / equipment-age routing</td><td><span class="badge">live-pure</span></td></tr>
+          <tr><td>Revenue &amp; Turnover Attribution</td><td><span class="badge planned">design</span></td></tr>
+          <tr><td>Counterfactual Outcome</td><td><span class="badge planned">design</span></td></tr>
+          <tr><td>Receipt / Audit / Override</td><td><span class="badge planned">design</span></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section">
+      <h2>v0.2 software (coded, not a spec dump)</h2>
+      <ul class="list">
+        <li>Internal channels: company, branch, department, trade, dispatch, sales, field, warehouse, project, incident — archive by moderator.</li>
+        <li>Recognition after quality gates. Raw revenue alone is never a celebration.</li>
+        <li>Mission board: target, actual, expected pace, remaining gap, projected end-of-day.</li>
+        <li>ServiceTitan pricebook is a shadow baseline. ACCEPT / OVERRIDE / LOCK write Chain C. A lock cannot auto-recalibrate.</li>
+        <li>Weather windows stay synchronized. Extreme events widen uncertainty; they do not just multiply demand. Lunar weight is zero unless lift is earned.</li>
+        <li>Maintenance is demand-first: do not hold a qualified available technician for an ideal Selling Tech unless a human overrides.</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>Property Intelligence v1.0 (coded, not a spec dump)</h2>
+      <ul class="list">
+        <li>A property is a living lifecycle object, not a static address.</li>
+        <li>Neighborhood patterns are diagnostic priors — not proof of a defect on the subject property.</li>
+        <li>Public/market data is evidence, not automatic truth, until corroborated.</li>
+        <li>Value is a range (nominal and inflation-adjusted), never a guarantee. Repair cost is not resale uplift.</li>
+        <li>Mortgage rates change purchasing-power / demand pressure. They are not a fixed percentage haircut.</li>
+        <li>Approved/licensed/public-authorized sources only. No unauthorized scraping architecture.</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <div class="grid two-col">
+        <div class="panel">
+          <h2>Storage separation</h2>
+          <ul class="list">
+            <li>Immutable event ledger</li>
+            <li>Operational state store</li>
+            <li>Analytical warehouse / lakehouse</li>
+            <li>Media / object store</li>
+            <li>Feature / skill store</li>
+            <li>Receipt store</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <h2>North star</h2>
+          <p>The system earns authority by being auditable, adaptable, and repeatedly correct under real operating conditions — not by being more confident than the humans running the business.</p>
+          <p class="muted">Success: any day, call, or disagreement can show what was known, what operations did, what Trades recommended, whether a human changed it, how the day adapted, what happened in the field, and what result followed.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer" data-site-footer></footer>
+  <script src="../assets/app.js"></script>
+</body>
+</html>

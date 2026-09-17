@@ -1,0 +1,184 @@
+                                                Trades-Runtime
+                               Property, Neighborhood & Regional Intelligence Addendum v1.0
+
+Scope: New Trades-Runtime property intelligence requirements added after the canonical tools/pipelines registry. This
+document defines the living property record, valuation trajectory, neighborhood repair intelligence and regional repair-pattern
+recalibration loop.
+
+
+1. Property Intelligence Layer
+Every client property becomes a modeled operational object rather than a static address. Trades may ingest authorized/public
+property information from approved or licensed real-estate/property-data sources, county/assessor and permit records,
+customer-provided documents, and the company's own service history and field evidence.
+
+    Property data                Examples
+
+    Structure                    Year built, square footage, lot size, property type, stories, basement/crawlspace/slab, garage and additions.
+
+    Market history               Prior sales, listing history, market exposure, assessed value and comparable-property information.
+
+    Documents & media            Listing/property photos, permits, disclosures or inspection material when legitimately available, and company before/during
+
+    Trade context                HVAC, plumbing and electrical equipment/system age, known materials, prior diagnoses, repairs, warranties and company
+
+
+2. Living Property Lifecycle Record
+The property record updates as the customer relationship progresses. Repairs and replacements are not merely closed jobs;
+they change the canonical technical state of the property.
+
+  Property baseline -> current condition -> proposed work -> approved work -> work in progress -> completed
+  work -> verified equipment/property state -> estimated property-value effect -> future maintenance/value
+  trajectory
+
+Each significant job can update removed/replaced assets, make/model/serial, capacity/efficiency, installation date, warranties,
+permits, financing where applicable, before/after evidence, repair history, remaining useful life, operating-cost expectations and
+subsequent risk.
+
+
+3. Property Improvement Ledger
+  Date -> Trade -> Work Performed -> Cost -> Asset Replaced/Modified -> Remaining Life Changed -> Warranty ->
+  Permit -> Evidence -> Estimated Value Effect -> Confidence -> Later Realized Evidence
+
+The ledger distinguishes Value Added, Value Preserved, Risk Removed, Operating Cost Reduction, Marketability
+Improvement, and Safety/Code Improvement. Repair cost must never be assumed to equal resale-value increase.
+
+
+4. Property Lifecycle & Value Intelligence Engine
+Trades maintains a value range rather than a falsely precise number. Inputs can include external market estimates, assessed
+value, recent comparable sales, last sale, internal condition adjustment, local market direction, property improvements and
+source freshness.
+
+  Pre-work property value -> repair/improvement cost -> avoided deterioration/risk -> estimated value
+  preservation -> estimated value uplift -> marketability effect -> confidence range
+
+When a property later lists or sells, Trades can settle prior estimates against realized market evidence and recalibrate its
+improvement-value models.
+
+
+5. Market & Neighborhood Value Model
+    Layer                           Inputs
+
+    Property-specific state         Age, sqft, lot, condition, systems, repairs, upgrades, warranties, permits, additions, deferred maintenance and company h
+
+    Neighborhood state              Comparable sales, price/sqft trends, inventory, days on market, sale/list relationships, construction/permit activity and othe
+
+    Local/regional market           ZIP/county/metro appreciation or decline, transaction volume, housing supply, rents where useful, construction and labor
+
+    Macro state                     Inflation, mortgage rates, credit conditions, employment/income indicators and broader housing-market direction.
+
+
+6. Property Value Trajectory
+  Previous value estimate -> market movement -> neighborhood movement -> property-condition movement ->
+  completed-work effect -> depreciation/aging -> macroeconomic adjustment -> current value range -> direction ->
+  confidence
+
+Trades should track whether value is rising or falling and explain the modeled contributors. Attribution remains estimated unless
+supported by realized sale evidence. It should maintain both Nominal Home Value and Inflation-Adjusted / Real Value.
+
+Mortgage rates should influence modeled buyer purchasing power and local demand pressure rather than being converted into a
+simplistic fixed percentage deduction from property value.
+
+7. Neighborhood Momentum & Property Condition
+A Neighborhood Momentum Score can summarize recurring local market direction using comparable-sale trends, price/sqft,
+transaction velocity, inventory, days on market, sale/list behavior, construction/permit activity and distress signals. Its
+methodology and components remain visible.
+
+A separate Property Condition Delta compares the subject property with appropriate nearby comparables while accounting for
+verified or evidence-supported HVAC, plumbing, electrical and other material condition differences.
+
+
+8. Neighborhood Failure Pattern Engine
+Trades learns recurring repair/failure patterns among nearby homes with similar construction era, materials, utility infrastructure,
+subdivision/builder history, soil/environment and property type.
+
+    Trade                     Illustrative pattern classes
+
+    Plumbing                  Clay sewer tile cracking/splitting, root intrusion, Orangeburg collapse, cast-iron deterioration, galvanized restrictions, polybutylen
+
+    Electrical                Recurring panel/service/wiring issues, capacity limitations and construction-era electrical patterns.
+
+    HVAC                      Recurring duct, sizing, insulation, condensate, equipment-location and equipment-family failure patterns.
+
+The model separates Observed Neighborhood Pattern, Inferred Risk, and Verified Property Condition. A neighborhood
+pattern is a diagnostic prior, not proof that the individual property has the defect.
+
+
+9. Neighborhood Repair Risk Profile & Density Mapping
+Each property can receive a Neighborhood Repair Risk Profile showing issue class, risk level, evidence basis, comparable case
+count, geographic/era similarity and property-specific verification status. Repair-density maps can visualize patterns such as
+sewer replacements, panel upgrades, water-service failures or other confirmed work by neighborhood/subdivision/build decade.
+
+
+10. Regional Repair Pattern Recalibration Engine
+Company findings continuously recalibrate local priors. Verified repairs from every participating branch become shared learning
+evidence rather than remaining isolated service tickets.
+
+  Completed jobs -> verified diagnosis -> repair type -> property age/materials -> geography -> branch/Van ->
+  outcome -> aggregate regional pattern -> confidence threshold -> neighborhood/property prior update -> future
+  field verification -> settlement -> recalibration
+Evidence can be weighted by sample size, geographic concentration, construction similarity, material similarity, repeated
+technician confirmation, outcome confirmation, recency and cross-branch agreement. Patterns are weakened when samples are
+small, diagnoses conflict, cohorts are dissimilar, evidence becomes stale or the pattern stops recurring.
+
+
+11. Geographic Learning Hierarchy
+  Company-wide pattern -> Region -> Branch territory -> ZIP -> Neighborhood/Subdivision -> Comparable
+  property cohort -> Individual property
+
+More specific evidence can outweigh broader priors when it is sufficiently strong. A client file should expose the distinction
+between regional support, neighborhood support and property-specific verification.
+
+
+12. Pattern Promotion Ladder
+  OBSERVED -> CANDIDATE PATTERN -> REGIONALLY SUPPORTED -> VERIFIED PATTERN -> ACTIVE PRIOR ->
+  MONITORED FOR DRIFT -> RETIRED / DOWN-WEIGHTED
+
+This prevents isolated technician observations from becoming company truth while allowing genuine field discoveries to
+propagate across the organization.
+
+13. Downstream Trades-Runtime Integration
+    Subsystem                          Use of property/neighborhood/regional intelligence
+
+    Field Advisor                      Surfaces locally elevated failure modes as inspection/diagnostic hypotheses.
+
+    Call-Fit / Dispatch                Weights proven competence with emerging/local issue classes while preserving governing dispatch constraints.
+
+    Truck Stock Intelligence           Adjusts Van stock toward recurring local repair patterns.
+
+    Warehouse / Procurement            Forecasts and pre-positions parts associated with emerging regional failures.
+
+    Training & Workforce Development Identifies emerging failure classes requiring technician education.
+
+    Pricebook / Profitability          Recalibrates runtime, labor and cost assumptions for recurring regional work.
+
+    Weather Demand Intelligence        Tests whether repair clusters respond to freeze, heat, flooding, groundwater or other environmental events.
+
+    Property Value Intelligence        Models legitimate infrastructure/condition burdens and the value-preservation effect of completed work.
+
+    Universal Analytics                Allows heat maps, trend analysis, cohort comparison, probability reports and regional repair-pattern reporting.
+
+
+14. Recurring Refresh & Settlement
+Event-driven: company work, inspection, permit, listing/sale or ownership change. Weekly: neighborhood
+market/listing/comparable movement where practical. Monthly: property valuation and neighborhood momentum. Quarterly:
+broader model calibration and nominal-vs-real analysis. On demand: fresh property packet for authorized operational workflows.
+
+Actual future listings, sales, completed repairs and verified field findings become settlement evidence for both valuation and
+failure-pattern models.
+
+
+15. Evidence & Governance Rules
+External real-estate/listing/property data is evidence, not automatic truth. Every material property fact should retain source,
+observed/retrieved time, freshness, confidence, verification status and conflicts. Approved/licensed APIs and legitimate
+public/authorized sources should be preferred over making the architecture dependent on unauthorized scraping.
+
+  Public-property, market, neighborhood and regional-pattern data may inform priors, preparation, routing,
+  valuation and diagnostic hypotheses, but must not be represented as verified property fact until corroborated
+  by authoritative evidence or field observation. Property-value effects are estimates, not guarantees.
+
+16. Governing Property Intelligence Principle
+Trades models the home as an evolving physical and financial asset whose technical condition, repair history,
+neighborhood context, regional failure patterns and market exposure change over time. Every verified repair
+improves the individual property record and, when appropriately aggregated, improves the company's regional
+operating intelligence.
+

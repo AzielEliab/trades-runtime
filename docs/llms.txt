@@ -1,0 +1,26 @@
+# Trades-Runtime
+
+> Private TypeScript operating system for field-trades companies.
+> Author / identity: Aziel Eliab only.
+> Version: 0.2.0
+> Status: live-pure core + stubs. No live backends. No PDFs on Pages.
+
+Product is src/. Pages is a thin UI. Implementer specs are at repo-root specs/ (not published).
+
+## Software
+
+- npm test — constitutional rules, CrossTrade secondary-only, Human Authority, confidence≠truth, v0.2 pricebook lock / recognition / weather / maintenance
+- npm run demo — synthetic shadow-day + receipts
+- Manifest: /v1/runtime.json and /modules/
+
+## Modes
+
+Watcher | Shadow | Recommendation | HumanApproved | LimitedAutonomy | Autonomous
+
+## Chains
+
+A Full-Day Trajectory · B Call-to-Call Ledger · C Human Override / Recalibration · D Coordination
+
+## Do not index
+
+Private. Do not treat as a public product surface.

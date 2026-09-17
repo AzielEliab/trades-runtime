@@ -1,0 +1,146 @@
+                                          Trades-Runtime
+            Aziel-Runtime Inheritance: Anti-Hallucination, Coherence & Evidence Integrity Architecture
+
+
+Purpose. Identify the highest-value components in Aziel-Runtime that should be inherited by Trades-Runtime, with
+special emphasis on anti-hallucination controls, coherence checking, provenance, state locking, auditability, and human
+override.
+
+Core Design Principle
+   Confidence is not truth. Trades-Runtime must keep prediction confidence separate from
+   evidence strength, source quality, cross-source agreement, and verification status. High model
+   confidence must never automatically convert an unsupported claim into a verified fact.
+
+1. AZCoherence -> TradesCoherence
+AZCoherence is the strongest direct anti-hallucination inheritance. Its current architecture performs a second-pass
+comparison between primary and alternate reasoning paths and can return PASS, FLAG, NEUTRALIZE, or REFUSE. It
+explicitly rejects evidence fabrication, detects confidence without evidence, identifies unsupported claim tokens, and
+distinguishes confidence from truth.
+
+Trades adaptation: every consequential AI recommendation can be subjected to an independent alternate calculation.
+The two paths are compared against the available evidence before the system is permitted to act. Recommended
+operational states: PASS / FLAG / HOLD / HUMAN REVIEW.
+
+Example: before stating that a compressor is under warranty, TradesCoherence should compare the manufacturer
+record, serial/model data, customer record, coverage type, and alternate interpretation. A high-confidence answer with
+weak evidence remains unverified.
+
+2. Provenance -> Trades Evidence Packets
+Aziel-Runtime's provenance layer normalizes inputs with source ID, source type, observed/received timestamps, content
+hashes, trust levels, tags, and claims. Critically, source trust is metadata rather than truth.
+
+Trades Evidence Packets should wrap ServiceTitan records, technician notes, customer statements, manufacturer
+warranty responses, equipment photos, warehouse counts, pricebook entries, manager inputs, sensor data, and other
+operational evidence before reasoning occurs.
+
+3. DecisionGATE -> High-Consequence Action Gate
+DecisionGATE uses sequential Definition, Evidence, Impact, Integrity, and Responsibility checks with PASS / REVISE /
+BLOCK outcomes. Trades-Runtime should use this pattern selectively for actions with meaningful financial, customer,
+safety, personnel, or operational consequences.
+
+Strong-gate examples include warranty determinations, callback attribution, technician penalties, pricebook changes,
+expensive replacement recommendations, inventory purchase orders, schedule displacement, and autonomous dispatch
+changes.
+
+4. ForgeReceipts -> Trades Receipt Ledger
+ForgeReceipts canonicalizes evidence and confidence, hashes the resulting receipt, and supports later integrity
+verification. Trades-Runtime should use the same concept to preserve what the system recommended, what evidence
+existed, what confidence was assigned, what a human changed, and what ultimately happened.
+5. ChainLock / TemporalLock / ChronoLock
+These concepts are especially important for shadow evaluation. Trades must preserve point-in-time state so that a later
+outcome cannot leak backward into the original recommendation. The system should be able to reconstruct exactly what
+information was available when a dispatch, diagnosis, quote, or inventory decision was made.
+
+6. ShadowLock -> Trades Shadow Engine
+ShadowLock maps naturally to the planned actual-versus-Trades operating comparison. The AI recommendation
+remains frozen while the real organization proceeds normally. Outcomes can then be compared without rewriting the
+original prediction.
+
+7. TrajectoryLock -> Full-Day Rebase Engine
+TrajectoryLock is conceptually useful for the morning-plan -> live operational drift -> rebase cycle. Trades can maintain
+the planned day, detect meaningful deviation, calculate a revised trajectory, and retain both the original and rebased
+paths for later evaluation.
+
+8. FragGate -> Controlled Connector Boundary
+FragGate-style boundaries can separate external connectors and untrusted inputs from canonical internal state. No
+incoming source should silently become operational truth merely because an API, technician, customer, or AI supplied it.
+Recommended Trades Integrity Pipeline
+    Stage                       Function
+
+    1. Source Provenance        Identify origin, timestamp, trust metadata and content hash.
+
+    2. Evidence Lock            Freeze the evidence available at decision time.
+
+    3. Primary Reasoning        Generate the proposed diagnosis, dispatch, quote or action.
+
+    4. Alternate Calculation    Independently calculate a competing interpretation/path.
+
+    5. TradesCoherence          Compare paths, evidence support, contradictions and confidence.
+
+    6. Decision Gate            PASS, FLAG, HOLD or require human review based on consequence.
+
+    7. Receipt                  Hash the decision, evidence state, confidence and rationale.
+
+    8. Human Override           Allow intervention while preserving the original recommendation.
+
+    9. Outcome Reconciliation   Compare predicted versus actual result without hindsight leakage.
+
+
+
+
+Required Confidence Separation
+Trades-Runtime should expose distinct fields rather than one misleading confidence score:
+
+    Field                             Meaning
+
+    prediction_confidence             How strongly the model favors its prediction.
+
+    evidence_strength                 How much direct evidence supports the claim.
+
+    source_quality                    Reliability/authority characteristics of the supporting sources.
+
+    cross_source_agreement            Whether independent sources materially agree.
+
+    verification_status               UNVERIFIED / PARTIAL / VERIFIED / CONFLICTED.
+
+
+
+   A valid state can therefore read: 97% prediction confidence / LOW evidence / UNVERIFIED.
+   That result should remain blocked from autonomous high-consequence action.
+
+Frozen Aziel -> Trades Inheritance
+    Aziel-Runtime                                   Trades-Runtime
+
+    AZCoherence                                     TradesCoherence
+
+    Provenance                                      Trades Evidence Packets
+
+    ChainLock                                       Trades State / Evidence Lock
+
+    TemporalLock / ChronoLock                       Point-in-Time Truth
+
+    ShadowLock                                      Trades Shadow Engine
+
+    TrajectoryLock                                  Full-Day Rebase Engine
+
+    DecisionGATE                                    High-Consequence Action Gate
+    Aziel-Runtime                                   Trades-Runtime
+
+    ForgeReceipts                                   Trades Receipt Ledger
+
+    FragGate                                        Connector / Input Boundary
+
+    Hash infrastructure                             Evidence and decision integrity
+
+
+
+
+Scope Discipline
+Trades-Runtime should not inherit Aziel-Runtime wholesale. Components that do not materially improve trades
+operations, evidence integrity, anti-hallucination behavior, decision quality, shadow testing, or auditability should remain
+outside the runtime. Every inherited module must justify its complexity against the operating mission.
+
+   Recommended architectural spine: Source Provenance -> Evidence Lock -> Alternate
+   Calculation -> Coherence Check -> Decision Gate -> Receipt -> Human Override -> Outcome
+   Reconciliation.
+

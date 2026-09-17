@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="author" content="Aziel Eliab">
+  <title>Universal analytics · Trades-Runtime</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body data-page="analytics">
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header" data-site-header></header>
+  <main id="main" class="wrap">
+    <section class="page-head hero">
+      <p class="kicker">Addendum v0.7 · Universal Analytics &amp; Human Review Layer</p>
+      <h1>If Trades has the authorized data, a human can interrogate it.</h1>
+      <p>Compare it, model it, visualize it, and generate a reviewable report — without engineering work for every new question. Analytics informs humans. It does not convert probability into fact or automatically authorize high-consequence action.</p>
+    </section>
+
+    <section class="section">
+      <h2>Four analytical levels</h2>
+      <table class="ops">
+        <thead><tr><th>Level</th><th>Question answered</th></tr></thead>
+        <tbody>
+          <tr><td>Descriptive</td><td>What happened?</td></tr>
+          <tr><td>Diagnostic</td><td>Why did it happen?</td></tr>
+          <tr><td>Predictive</td><td>What is likely to happen next, with what probability / uncertainty?</td></tr>
+          <tr><td>Prescriptive</td><td>What actions should humans consider, what are the tradeoffs, and what is predicted under each?</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section">
+      <h2>Human-review outputs</h2>
+      <p>Reports, graphs, heat maps / matrices, scales, scorecards, probability reports, forecasts, models, performance reports, and solution reports. Probability must never be presented as certainty. Distinguish prediction confidence, evidence strength, source quality, agreement, verification, sample size, and calibration history.</p>
+    </section>
+
+    <section class="section">
+      <h2>Mandatory report metadata</h2>
+      <table class="ops">
+        <thead><tr><th>Field</th><th>Required disclosure</th></tr></thead>
+        <tbody>
+          <tr><td>Scope / filters</td><td>Exactly what records, branches, roles, modes, and dates were included or excluded.</td></tr>
+          <tr><td>Data sources</td><td>ServiceTitan / ProBooks / Trades-native / connector / manual or other authorized sources.</td></tr>
+          <tr><td>Sample size</td><td>Jobs / events / observations supporting the result.</td></tr>
+          <tr><td>Formula / methodology</td><td>How the metric, scale, savings estimate, or probability was calculated.</td></tr>
+          <tr><td>Assumptions</td><td>Operational / model assumptions that materially affect interpretation.</td></tr>
+          <tr><td>Confidence / uncertainty</td><td>Model confidence, evidence strength, and interval / range.</td></tr>
+          <tr><td>Status</td><td>Observed, estimated, attributed, reconciled/realized, simulated, or unresolved.</td></tr>
+          <tr><td>Version lineage</td><td>Model, ruleset, policy, pricebook, and report-definition version.</td></tr>
+          <tr><td>Receipt references</td><td>Traceable lineage to underlying decision / evidence records.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section">
+      <div class="grid two-col">
+        <div class="panel">
+          <h2>Drill-down</h2>
+          <p class="formula">Aggregate → cohort → event/job → decision receipt → evidence packet → source/version.</p>
+          <p>A visualization is not an opaque truth source.</p>
+        </div>
+        <div class="panel">
+          <h2>Anti-misleading rules</h2>
+          <p>Flag tiny samples, missing data, stale sources, selection bias, incomparable cohorts, estimated values, wide uncertainty, and model drift. Estimated savings must never display as realized. Correlation is not causation without evaluation. Rankings show sample size and context.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Frozen requirement</h2>
+      <div class="panel">
+        <p class="notice">Any authorized metric must be capable of human-readable reporting, visualization, comparison, modeling, and evidence-backed review at the appropriate scope. No important model output should exist only as an internal machine value that management cannot inspect and challenge.</p>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer" data-site-footer></footer>
+  <script src="../assets/app.js"></script>
+</body>
+</html>

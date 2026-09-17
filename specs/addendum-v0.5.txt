@@ -1,0 +1,175 @@
+                                            Trades-Runtime
+                          Cross-Department Relationship & Turnover Matrix - Addendum v0.5
+
+Purpose. Create a measurable HVAC-Plumbing-Electrical relationship engine that recognizes legitimate cross-trade
+opportunities discovered during primary service calls, tracks their complete outcomes and economics, and learns which
+Vans/technicians create value across departments without allowing secondary sales opportunity to become the primary
+reason for dispatch.
+
+
+1. Constitutional Routing Rule
+  Cross-department opportunity is a secondary routing signal only. It may never manufacture the
+  candidate pool or become the primary reason a technician is sent.
+
+Trades first identifies technicians who are qualified and appropriate for the customer's actual requested service. Normal
+demand, safety, technical capability, availability, quality, client fit, geography, inventory, runtime and other governing
+dispatch factors establish the valid candidate pool. Only then may a legitimate secondary cross-trade opportunity contribute
+a bounded tie-breaking or ranking weight.
+
+Example: a customer has a 1-year-old furnace and a 15-year-old water heater. Trades must not send an HVAC Selling Tech
+primarily because the old water heater might create a Plumbing opportunity. The correct HVAC technician is chosen for the
+HVAC call. Cross-trade context becomes relevant only among otherwise appropriate candidates.
+
+
+2. Cross-Department Relationship Matrix
+   Origin        Receiving          Representative legitimate observations
+
+   HVAC          Plumbing           Leaking/aging water heater, visible piping leak, drain/condensate crossover, gas-piping concern.
+
+   HVAC          Electrical         Panel/service concern, unsafe wiring, circuit capacity, disconnect/feed issue, generator/service opportunity.
+
+   Plumbing      HVAC               Aging HVAC equipment, comfort issue, visible condensate/HVAC condition, obvious equipment concern.
+
+   Plumbing      Electrical         Panel condition, water exposure near electrical equipment, water-heater circuit/service concern.
+
+   Electrical    HVAC               HVAC electrical failure pattern, aging equipment, service-capacity implications for replacement.
+
+   Electrical    Plumbing           Visible water-heater/leak/sump/plumbing condition encountered during legitimate electrical work.
+
+
+
+3. Cross-Trade Event Chain
+  PRIMARY CALL -> LEGITIMATE OBSERVATION -> EVIDENCE/CONTEXT -> CUSTOMER
+  DISCUSSION/CONSENT -> CROSS-DEPARTMENT TURNOVER -> BOOKED/NOT BOOKED ->
+  RECEIVING TRADE DISPATCH -> COMPLETED/NOT COMPLETED -> SOLD/NOT SOLD ->
+  LABOR/PARTS/COST -> REALIZED CONTRIBUTION -> CALLBACK/QUALITY -> MODEL UPDATE
+
+The originating call, originating Van, receiving department, receiving Van, equipment/condition observed, customer response
+and final financial/quality outcome remain linked through receipts.
+
+
+4. Equipment & Property Opportunity Context
+Secondary opportunity scoring should use actual property/equipment evidence rather than crude age-only rules. Examples
+include water-heater age, visible leakage/corrosion, prior service history, warranty, panel age/type/capacity/condition, HVAC
+age/repair history, known electrical or plumbing observations, and supporting technician media/notes.
+Equipment age can increase the probability that a legitimate need exists, but age alone does not establish failure, justify a
+turnover, or override the customer's primary service need.
+
+
+5. Originating Van x Receiving Trade Matrix
+    Metric                           Example interpretation
+
+    Legitimate opportunities observed Evidence-supported cross-trade conditions recognized.
+
+    Turnovers offered                Opportunities actually discussed/offered under company policy.
+
+    Bookings accepted                Customers who accepted receiving-department booking.
+
+    Receiving calls completed        Booked turnovers actually run by the other trade.
+
+    Jobs sold                        Receiving-trade work sold after evaluation.
+
+    Booking conversion %             Accepted bookings / qualified turnovers offered.
+
+    Completion %                     Receiving calls completed / accepted bookings.
+
+    Sales conversion %               Sold work / completed receiving calls.
+
+    Revenue attributed               Receiving-department revenue traceable to originating event.
+
+    Realized contribution            Revenue/recovery less labor, parts, procurement, rework/concessions.
+
+    False/unsubstantiated rate       Turnovers later found unsupported or materially overstated.
+
+    Customer impact                  Complaints, cancellations, positive outcomes and avoidable disruption.
+
+
+
+6. Secondary Dispatch Weight
+Cross-trade capability may help break a close call-fit decision between technicians who are already appropriate for the
+primary call. It must not elevate a materially worse primary-call candidate merely because that person historically creates
+more cross-department sales.
+
+   Rule: Primary Call Fit -> Qualified Candidate Pool -> Governing Dispatch Score -> bounded
+   Cross-Department Relationship Weight -> Final Recommendation.
+
+The system should preserve the base score and the secondary adjustment so managers can see whether cross-trade
+opportunity changed the recommendation and by how much.
+
+
+7. Cross-Department Relationship Strength
+Trades should learn relationship strength for HVAC <-> Plumbing, Plumbing <-> Electrical and HVAC <-> Electrical at
+company, branch, team and individual Van/technician-era levels. Relationship strength should consider opportunity quality,
+booking conversion, receiving-trade validation, sold work, realized contribution, customer impact and false-opportunity rate.
+
+A technician who reliably notices genuine adjacent-trade problems can receive positive cross-department recognition. A
+technician who generates many low-quality leads should not receive the same score simply because turnover count is high.
+
+
+8. Missed Opportunity Calibration
+Trades may also detect a possible missed cross-trade opportunity when later evidence indicates that a visible,
+long-standing condition was likely present during an earlier call. This is a calibration observation, not automatic employee
+fault. Media availability, visibility, scope of the original call, technician role, customer interaction and evidence strength must
+be considered before any performance implication.
+
+
+9. Cross-Department Attribution Economics
+  Economic attribution must follow the full chain: Originating Van -> turnover -> receiving department ->
+  receiving Van -> sold work -> labor -> parts -> procurement -> warranty/recovery -> rework -> realized
+  contribution.
+
+Management should be able to see both departmental and originating contribution without double-counting company
+revenue. The originating technician may receive turnover attribution while the receiving technician/Comfort Advisor receives
+execution/sales attribution. Company financial reporting counts the underlying dollars once.
+
+
+10. Time-Window Matrix
+Cross-department KPIs should use the same frozen analysis windows as the technician profit matrix: 1 week, 1 month, 3
+months, 6 months, 9 months and 12 months, with sample-size/confidence indicators. This allows management to
+distinguish a short hot streak from durable cross-trade capability.
+
+
+11. Receipt Requirements
+Every material cross-trade event belongs in the full Trades receipt database. Required lineage includes primary call, origin
+department/Van, evidence, equipment context, opportunity score, whether the cross-trade signal affected dispatch, customer
+consent/response, turnover creation, receiving booking, receiving Van, final diagnosis, sold/not sold, revenue, labor, parts,
+realized contribution, callback/quality outcome, model version and any human override.
+
+
+12. Company-Level Cross-Trade Dashboard
+The company dashboard should answer questions such as: How much Plumbing opportunity originated from HVAC? What
+percentage booked? What percentage was validated by plumbers? What sold? What became realized contribution? Which
+branches have the strongest HVAC-Plumbing relationship? Which Vans generate high-quality adjacent-trade opportunities?
+Where are opportunities being lost between turnover and booking? Where are high turnover counts producing poor
+validation or customer outcomes?
+
+
+13. Frozen Safeguards
+   Safeguard                   Requirement
+
+   Primary-service integrity   Never route primarily to manufacture an adjacent-trade opportunity.
+
+   Qualification first         Cross-trade weighting only applies after the valid primary candidate pool exists.
+
+   Demand first                Do not delay qualified service to wait for a better cross-selling technician.
+
+   Evidence                    Age/opportunity indicators do not equal verified failure.
+
+   Customer integrity          No invented urgency, defect, warranty, safety issue or sales claim.
+
+   No raw lead gaming          Reward validated quality and realized outcomes, not turnover volume alone.
+
+   No automatic punishment     Possible missed opportunity is a review/calibration signal, not automatic fault.
+
+   No double counting          Origin attribution and receiving attribution may coexist; company dollars count once.
+
+   Human authority             Authorized managers may override; the original recommendation and outcome remain receipted.
+
+
+  Architecture result: HVAC, Plumbing and Electrical become an interconnected service graph while
+  preserving the integrity of the customer's primary reason for service. Trades learns who opens legitimate
+  doors for other departments, how reliably those opportunities convert, and what they actually contribute after
+  labor and cost.
+
+End of Trades-Runtime Cross-Department Relationship & Turnover Matrix v0.5
+

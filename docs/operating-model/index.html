@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="author" content="Aziel Eliab">
+  <title>Operating model · Trades-Runtime</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body data-page="operating-model">
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header" data-site-header></header>
+  <main id="main" class="wrap">
+    <section class="page-head hero">
+      <p class="kicker">System operating model · §2 / §14 / §23–24</p>
+      <h1>One canonical live company state. Role views, not competing realities.</h1>
+      <p>A completed field event can update technician availability, route position, inventory, booking capacity, forecasts, warranty context, and dispatch recommendations without each department keeping its own version of the day.</p>
+    </section>
+
+    <section class="section">
+      <h2>Canonical state inputs</h2>
+      <div class="panel">
+        <p>Customer, equipment, membership, service history, booking state, technician/Van state, location, inventory, active call state, media evidence, quote state, warranty state, route state, manager queue, pricebook state, and integration health.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Company heartbeat — role interfaces</h2>
+      <table class="ops">
+        <thead><tr><th>Role</th><th>Primary view / actions</th></tr></thead>
+        <tbody>
+          <tr><td>Client Booking</td><td>Identity, membership, equipment/history, windows, urgency, appointment precedence.</td></tr>
+          <tr><td>Office</td><td>Booking state, issues, warranty/membership, schedule changes, contact actions.</td></tr>
+          <tr><td>Dispatch</td><td>Live Van state, route, Call-Fit, runtime, inventory fit, alternatives, override controls.</td></tr>
+          <tr><td>Field Tech</td><td>Call context, Field Advisor, history, warranty, inventory, quote/parts, media capture.</td></tr>
+          <tr><td>Manager</td><td>Escalation queue, override/recalibration, technician trends, quality, revenue, risk.</td></tr>
+          <tr><td>IT / System Admin</td><td>Integration health, MCP/API status, permissions, event integrity, model health, audit logs.</td></tr>
+        </tbody>
+      </table>
+      <p class="muted">Heartbeat updates are event-driven where possible, with periodic health checks so a stale integration is visible instead of silently corrupting the picture.</p>
+    </section>
+
+    <section class="section">
+      <div class="grid two-col">
+        <div class="panel">
+          <h2>Communications layer</h2>
+          <p>An internal Teams-style layer on the same canonical event stream. Managers can create and moderate company, branch, department, trade, dispatch, sales, field, warehouse, project, and incident channels by permission. Recognition is context-aware and must not reward raw revenue alone. Daily mission boards show target, actual, pace, gap, and projected finish.</p>
+        </div>
+        <div class="panel">
+          <h2>Pricebook, stock, weather</h2>
+          <p>ServiceTitan pricebook is the initial shadow baseline. Managers can ACCEPT, OVERRIDE, or LOCK recommendations; a lock cannot be superseded. Van stock, warehouse fulfillment (REQUESTED → RECONCILED), and branch weather windows (past 7 / current / forward 7) feed the same state. Lunar/Earth-tide plumbing features are experimental and must earn weight or go to zero.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer" data-site-footer></footer>
+  <script src="../assets/app.js"></script>
+</body>
+</html>

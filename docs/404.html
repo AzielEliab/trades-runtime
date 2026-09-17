@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="author" content="Aziel Eliab">
+  <title>Not found · Trades-Runtime</title>
+  <script>
+    (function () {
+      var parts = location.pathname.split("/").filter(Boolean);
+      var i = parts.indexOf("trades-runtime");
+      var base = i !== -1 ? "/" + parts.slice(0, i + 1).join("/") + "/" : "/";
+      var link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = base + "assets/styles.css";
+      document.head.appendChild(link);
+      window.TR_BASE = base;
+    })();
+  </script>
+</head>
+<body data-page="notfound">
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header" data-site-header></header>
+  <main id="main" class="wrap">
+    <section class="hero">
+      <p class="kicker">404</p>
+      <h1>That path is not in this architecture portal.</h1>
+      <p class="lede">This is a private Trades-Runtime site. Open Home, Architecture, or Specs from the navigation.</p>
+    </section>
+  </main>
+  <footer class="site-footer" data-site-footer></footer>
+  <script>
+    (function () {
+      var s = document.createElement("script");
+      s.src = (window.TR_BASE || "/") + "assets/app.js";
+      document.body.appendChild(s);
+    })();
+  </script>
+</body>
+</html>
