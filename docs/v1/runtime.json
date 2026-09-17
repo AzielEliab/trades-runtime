@@ -5,8 +5,8 @@
   "title": "Trades-Runtime",
   "author": "Aziel Eliab",
   "identity": "Aziel Eliab",
-  "version": "0.2.0",
-  "runtime_version": "0.2.0",
+  "version": "0.3.0",
+  "runtime_version": "0.3.0",
   "spec_pack": "repo-root specs/ (not published on Pages)",
   "property_intelligence": "1.0",
   "role": "trades-runtime",
@@ -294,7 +294,11 @@
     { "slug": "regional-recalibration", "path": "src/domain/regional-recalibration.ts", "status": "live-pure", "summary": "Geo hierarchy + promotion ladder; weaken thin/stale/conflicted samples." },
     { "slug": "property-intelligence-hooks", "path": "src/domain/property-intelligence-hooks.ts", "status": "live-pure", "summary": "Typed integration points; not live backends." },
     { "slug": "constitution", "path": "src/rules/constitution.ts", "status": "live-pure", "summary": "Architecture §18 freeze + v0.2 + Property Intelligence v1.0 rules." },
-    { "slug": "servicetitan-connector", "path": "n/a", "status": "stub", "summary": "No live ServiceTitan writes in v0." }
+    { "slug": "fraggate-inbound", "path": "src/spine/fraggate-inbound.ts", "status": "live-pure", "summary": "FragGate inbound wall. Wrapper is not verification. Scrape refused." },
+    { "slug": "durable-receipts", "path": "src/spine/durable-receipts.ts", "status": "live-pure", "summary": "Append-only JSONL receipts. Process exit does not erase Chain C." },
+    { "slug": "run-action", "path": "src/spine/run-action.ts", "status": "live-pure", "summary": "packet → lock → primary → alternate → coherence → gate → receipt → override → shadow settle." },
+    { "slug": "servicetitan-shadow", "path": "src/spine/servicetitan-shadow.ts", "status": "live-pure", "summary": "Read-only ST-shaped ingest + hash. Writes refused." },
+    { "slug": "servicetitan-connector", "path": "src/spine/servicetitan-shadow.ts", "status": "stub", "summary": "Live ServiceTitan writes stay refused." }
   ],
   "engines": [
     { "slug": "booking-intake", "name": "Booking & Call Intake Engine", "status": "stub", "summary": "Needs authorized connectors." },
@@ -317,7 +321,8 @@
     { "slug": "workforce-capacity", "name": "Workforce Capacity & Availability Engine", "status": "live-pure", "summary": "src/domain/workforce-capacity.ts" },
     { "slug": "universal-analytics", "name": "Universal Analytics & Human Review", "status": "live-pure", "summary": "Mandatory report metadata enforced." },
     { "slug": "decision-fabric", "name": "Decision Fabric reconciler", "status": "live-pure", "summary": "src/domain/decision-fabric.ts" },
-    { "slug": "property-intelligence", "name": "Property / Neighborhood / Regional Intelligence", "status": "live-pure", "summary": "Addendum v1.0 — living property record, value ranges, neighborhood priors, regional ladder." }
+    { "slug": "property-intelligence", "name": "Property / Neighborhood / Regional Intelligence", "status": "live-pure", "summary": "Addendum v1.0 — living property record, value ranges, neighborhood priors, regional ladder." },
+    { "slug": "execution-spine", "name": "Execution spine (FragGate inbound / durable receipts / runAction)", "status": "live-pure", "summary": "TR-AUDIT-2026-09-17 cuts 4a–4c. Untrusted wrap ≠ evidence. Chain C survives restart." }
   ],
   "planned_ops": [
     { "slug": "observe", "name": "Observe", "status": "planned", "summary": "Ingest and normalize authorized operational data." },
@@ -334,7 +339,8 @@
     { "slug": "mission-board", "name": "Daily mission board", "status": "planned", "summary": "Target, actual, expected pace, remaining gap, projected end-of-day." },
     { "slug": "lock-pricebook", "name": "Pricebook lock / override", "status": "planned", "summary": "ACCEPT / OVERRIDE / LOCK with Chain C. Lock cannot auto-recalibrate." },
     { "slug": "warehouse-fulfill", "name": "Warehouse fulfillment queue", "status": "planned", "summary": "REQUESTED → RECONCILED. Purchasing stays human unless delegated." },
-    { "slug": "property-packet", "name": "Property intelligence packet", "status": "planned", "summary": "Authorized property/neighborhood/regional priors. Not verified fact until corroborated." }
+    { "slug": "property-packet", "name": "Property intelligence packet", "status": "planned", "summary": "Authorized property/neighborhood/regional priors. Not verified fact until corroborated." },
+    { "slug": "run-action", "name": "runAction spine", "status": "live-pure", "summary": "packet → lock → primary → alternate → coherence → gate → receipt → human override → shadow settle." }
   ],
   "modules": [
     {

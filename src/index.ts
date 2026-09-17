@@ -95,4 +95,16 @@ export {
   hookWarehouse
 } from "./domain/property-intelligence-hooks.js";
 export * from "./rules/constitution.js";
+export {
+  admitInbound,
+  admitInboundOrThrow,
+  wrapperIsVerification
+} from "./spine/fraggate-inbound.js";
+export { DurableReceiptStore, openDurableReceipts } from "./spine/durable-receipts.js";
+export { lockEvidence, runAction } from "./spine/run-action.js";
+export {
+  ingestServiceTitanShadow,
+  mayWriteServiceTitan,
+  refuseServiceTitanWrite
+} from "./spine/servicetitan-shadow.js";
 export { runShadowDayDemo } from "./demo/shadow-day.js";

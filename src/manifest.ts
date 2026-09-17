@@ -1,6 +1,6 @@
 export const RUNTIME_MANIFEST = {
   product: "trades-runtime",
-  version: "0.2.0",
+  version: "0.3.0",
   author: "Aziel Eliab",
   identity: "Aziel Eliab",
   role: "trades-runtime",
@@ -42,6 +42,10 @@ export const RUNTIME_MANIFEST = {
     { slug: "regional-recalibration", path: "src/domain/regional-recalibration.ts", status: "live-pure", summary: "Geo hierarchy + promotion ladder; weaken thin/stale/conflicted samples." },
     { slug: "property-intelligence-hooks", path: "src/domain/property-intelligence-hooks.ts", status: "live-pure", summary: "Typed integration points; not live backends." },
     { slug: "constitution", path: "src/rules/constitution.ts", status: "live-pure", summary: "Architecture §18 freeze + v0.2 + Property Intelligence v1.0 rules." },
-    { slug: "servicetitan-connector", path: "n/a", status: "stub", summary: "Tether later. No live writes in v0." }
+    { slug: "fraggate-inbound", path: "src/spine/fraggate-inbound.ts", status: "live-pure", summary: "FragGate inbound wall. Wrapper is not verification. Scrape refused." },
+    { slug: "durable-receipts", path: "src/spine/durable-receipts.ts", status: "live-pure", summary: "Append-only JSONL receipts. Process exit does not erase Chain C." },
+    { slug: "run-action", path: "src/spine/run-action.ts", status: "live-pure", summary: "packet → lock → primary → alternate → coherence → gate → receipt → override → shadow settle." },
+    { slug: "servicetitan-shadow", path: "src/spine/servicetitan-shadow.ts", status: "live-pure", summary: "Read-only ST-shaped ingest + hash. Writes refused." },
+    { slug: "servicetitan-connector", path: "src/spine/servicetitan-shadow.ts", status: "stub", summary: "Live ServiceTitan writes stay refused." }
   ]
 } as const;

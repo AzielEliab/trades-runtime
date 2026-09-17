@@ -3,11 +3,11 @@
 Private **TypeScript runtime** for a shadow-first AI operating system / company operating intelligence layer. Field trades: HVAC, plumbing, electrical, sewer, and cross-trades.
 
 **Author / identity:** Aziel Eliab only  
-**Version:** 0.2.0  
+**Version:** 0.3.0  
 **Role:** `trades-runtime`  
 **License:** Apache-2.0  
 **Visibility:** this repository stays **private**  
-**Status:** live-pure core + honest stubs — **no** live ServiceTitan writes, Worker backends, DOIs, or production deployment
+**Status:** 0.3.0 lockstep with Property Intelligence v1.0 in-tree — live-pure core + honest stubs — **no** live ServiceTitan writes, Worker backends, DOIs, or production deployment
 
 The product is the software in `src/`. GitHub Pages is a thin private UI over that runtime. **PDFs are never published on Pages.** Implementer specs live at repo-root [`specs/`](specs/) (not under `docs/`).
 
@@ -23,7 +23,9 @@ npm run demo
 npm run manifest
 ```
 
-`npm test` runs constitutional rule tests including Human Authority, confidence≠truth, CrossTrade secondary-only routing, and v0.2 recognition / pricebook lock / mission board / location economics.
+`npm test` runs constitutional rule tests including Human Authority, confidence≠truth, CrossTrade secondary-only routing, v0.2 recognition / pricebook lock / mission board / location economics, and the 0.3.0 execution spine (FragGate inbound, durable receipts, `runAction`).
+
+CI (`.github/workflows/ci.yml`) runs `npm ci`, `npm run typecheck`, and `npm test` on pull requests and pushes to `main`. Do not treat Pages deploy as the test gate.
 
 `npm run demo` runs a synthetic shadow-day: Call-Fit, sealed counterfactual, human override, hash-chained receipts, trajectory rebase.
 
@@ -45,18 +47,22 @@ npm run manifest
 | Weather / demand / lunar (experimental) | `src/domain/weather-demand.ts` | live-pure |
 | Maintenance routing (demand-first) | `src/domain/maintenance-routing.ts` | live-pure |
 | Property Intelligence v1.0 | `src/domain/property-*.ts`, `neighborhood-*.ts`, `regional-recalibration.ts` | live-pure |
+| FragGate inbound | `src/spine/fraggate-inbound.ts` | live-pure |
+| Durable receipts | `src/spine/durable-receipts.ts` | live-pure |
+| `runAction()` spine | `src/spine/run-action.ts` | live-pure |
+| ServiceTitan shadow (read-only) | `src/spine/servicetitan-shadow.ts` | live-pure |
 | §18 freeze + v0.2 governing rules | `src/rules/constitution.ts` | live-pure |
-| ServiceTitan / ProBooks connectors | — | stub |
+| ServiceTitan / ProBooks live writes | — | refused |
 
 Inherited names come only from [`specs/aziel-runtime-inheritance.txt`](specs/aziel-runtime-inheritance.txt). This is not a wholesale copy of aziel-runtime Softwares.
 
 ## Private Pages (thin UI)
 
-Intended URL after Pages is enabled and `main` has deployed:
+Intended URL if Pages is later enabled (it stays **off** — TR-AUDIT-2026-09-17):
 
 **https://azieleliab.github.io/trades-runtime/**
 
-Keep the repository private. Do not change visibility to public. Do not add PDFs under `docs/`.
+Keep the repository private. Do not change visibility to public. Do not enable GitHub Pages. Do not add PDFs under `docs/`.
 
 ### First-time Pages enable (repo owner)
 

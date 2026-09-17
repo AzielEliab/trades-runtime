@@ -2,3 +2,5 @@ node_modules/
 dist/
 .vitest/
 *.log
+data/*
+!data/.gitkeep

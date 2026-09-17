@@ -12,7 +12,9 @@ export type EvidenceSourceType =
   | "pricebook"
   | "manager"
   | "sensor"
-  | "synthetic";
+  | "synthetic"
+  | "operator"
+  | "authorized-property";
 
 export interface EvidencePacket {
   sourceId: string;
