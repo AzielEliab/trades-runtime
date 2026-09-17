@@ -1,0 +1,163 @@
+TRADES-RUNTIME · OPERATOR AUDIT                                                                                                   TR-AUDIT-2026-09-17
+
+
+
+
+ Trades-Runtime Operator Audit
+ Receipt ID TR-AUDIT-2026-09-17 · snapshot 2026-09-17 18:45 EDT
+ Repo AzielEliab/trades-runtime · visibility private · not a production claim
+
+
+
+ Scope
+ Audit of the private TypeScript runtime for a shadow-first operating-intelligence layer covering HVAC, plumbing,
+ electrical, sewer, and cross-trades. Compared main against working branch cursor/trades-runtime-pages-cd86
+ at ab18a105. Prior session baseline was 2026-09-11 (1defd177, 57 tests claimed). This receipt records delta, gaps, and
+ next cuts. No merge, Pages enable, or visibility change was performed.
+
+ Snapshot
+    Owner / repo                           AzielEliab / trades-runtime
+
+    Visibility                             private · has_pages false · last push 2026-09-12T03:50:09Z
+
+    main                                   26f0eb21 — initial README stub only (107 bytes)
+
+    Working branch                         cursor/trades-runtime-pages-cd86 @ ab18a105
+
+    Open PR                                #1 Property Intelligence v1.0 + Trades-Runtime software (unmerged)
+
+    Declared version                       0.2.0 in README and src/manifest.ts
+
+    PI label                               Property Intelligence v1.0 (in-tree; version identity split)
+
+    Tests claimed                          69 (was 57 on 2026-09-11)
+
+    Live backends                          false — no ServiceTitan write, Worker, DOI, or production deploy
+
+
+ Delta since 2026-09-11
+ Two commits after the prior audit tip. Operator added specs/ extract for Property / Neighborhood / Regional Intelligence
+ v1.0. Cursor Agent implemented the live-pure TypeScript (+1,157 / −4) with co-author Aziel Eliab. Then five days of no
+ pushes. main did not move.
+
+    Path                                                                  Role
+
+    src/domain/property-record.ts                                         Living property lifecycle; market data is prior
+
+    src/domain/property-improvement-ledger.ts                             Improvement ledger; repair cost ≠ resale uplift
+
+    src/domain/property-value-engine.ts                                   Value RANGE + nominal/real; mortgage ≠ haircut
+
+    src/domain/neighborhood-momentum.ts                                   Visible-methodology momentum / condition delta
+
+    src/domain/neighborhood-failure-patterns.ts                           Pattern is diagnostic prior, not subject defect
+
+    src/domain/regional-recalibration.ts                                  Geo hierarchy + promotion ladder; weaken thin samples
+
+    src/domain/property-intelligence-hooks.ts                             Typed integration points; not live backends
+
+    test/property-intelligence.test.ts                                    +306 lines; constitution rules extended
+
+
+ What holds
+ Constitutional spine is intact: authorized human wins and disagreement is preserved; confidence is not truth; geography/fuel
+ is never the sole decider; recognition cannot fire on raw revenue; a LOCKED pricebook may collect evidence but cannot
+ auto-recalibrate; unknown warranty is not “not covered.” Property Intelligence hard rules match the addendum: pattern ≠
+ defect, market data ≠ truth, repair cost ≠ resale uplift, no scrape architecture. ServiceTitan / ProBooks remain stub. Public
+ identity on the sampled files is Aziel Eliab only. PDFs stay out of docs/.
+
+
+
+PRIVATE · Aziel Eliab only · not a public export                                                                                                  p. 1
+TRADES-RUNTIME · OPERATOR AUDIT                                                                                                    TR-AUDIT-2026-09-17
+
+
+
+
+ Findings
+    ID         Severity        Finding
+
+    F1         P0              main is not the software. Default clone is the 11 Sep stub. Six days after the runtime existed, it still is not on main.
+
+    F2         P1              Spec surface grew (v0.2 modules + PI v1.0) faster than an execution spine. Still no FragGate inbound wall,
+                               durable ledger, or single action runner.
+
+    F3         P1              Version identity split: product 0.2.0 vs Property Intelligence v1.0 in the same tree. README / manifest /
+                               runtime.json must lockstep on merge.
+
+    F4         P1              Canonical history is a Cursor agent branch. Fine as a spike. Not fine as long-term source of truth for a private ops
+                               system.
+
+    F5         P1              Pages workflow deploys docs/ on push to main. README advertises azieleliab.github.io/trades-runtime/. Repo
+                               private, Pages off. Do not enable public Pages.
+
+    F6         P2              No real connector. Domain modules eat synthetic objects. Read-only ST shadow does not exist; writes correctly
+                               refused.
+
+    F7         P2              No persistence. Receipt ledger and chains are in-process types. Process exit erases Chain C.
+
+    F8         P2              Human override is authorized: boolean. No role roster, signed actor, or branch-scoped lock holder.
+
+    F9         P2              Inherited modules exist as separate files. No runAction() that walks packet → lock → primary → alternate →
+                               coherence → gate → receipt → override → shadow settle.
+
+    F10        P3              No CI test job. Pages Action without npm test / typecheck. Duplicate leftovers: comms.ts vs communications.ts;
+                               pricebook-stock.ts vs split modules.
+
+
+ Intentionally off (not defects)
+ Live ServiceTitan writes. Autonomous dispatch that silently overrules humans. Photo-as-misconduct proof. Fuel-only
+ routing. Automatic 30-day callback penalty. Public Pages. Wholesale copy of aziel-runtime Softwares. Listing scrape. Lunar
+ plumbing as a product feature (weight stays 0 until branch-specific lift is earned). These are correctly refused or stubbed.
+
+ Advice
+ Do not write the next addendum. Cut a spine. Property Intelligence v1.0 is a valid module and not a reason to delay merge. A
+ living property ledger with no job-history ingest and no frozen evidence store cannot be used in the field.
+
+    #       Cut                                 Rule
+
+    1       Merge PR #1 to main                 Squash or merge-commit with an operator message. Keep the repository private. Do not enable
+                                                Pages in the same motion.
+
+    2       CI on main / PR                     npm test and npm run typecheck. Pages-without-tests is how a brochure ships and the
+                                                constitution does not.
+
+    3       Version lockstep                    Bump to 0.3.0 if PI is in-tree (or 0.2.0+pi.1). README, manifest, docs/v1/runtime.json agree.
+
+    4a      FragGate inbound                    Untrusted input cannot become evidence by wrapping. Connector boundary first.
+
+    4b      Durable receipts                    Append-only file or sqlite. Process exit must not erase Chain C. Point-in-time freeze.
+
+    4c      runAction() pipeline                packet → lock → primary → alternate → coherence → gate → receipt → human override →
+                                                shadow settle.
+
+    4d      ST shadow read-only                 Ingest + hash. Writes stay refused. No live dispatch.
+
+
+ Do not build next
+ Scrape layer. Public GitHub Pages. Live dispatch writes. Photo-misconduct scoring. Lunar plumbing as a shipped demand
+ feature. Another architecture PDF until 4a–4c exist.
+
+
+
+PRIVATE · Aziel Eliab only · not a public export                                                                                                          p. 2
+TRADES-RUNTIME · OPERATOR AUDIT                                                                             TR-AUDIT-2026-09-17
+
+
+
+
+ Method and limits
+ Method: GitHub connector as AzielEliab; tree, commits, PR #1, README, manifest, constitution, decision-gate, inheritance
+ extract, architecture-v0.2 extract, PI commit stats. Limits: tests were not executed in this environment (no local clone / npm
+ test). Claimed 69 green is taken from the 12 Sep commit message, not re-run. Code search on the private repo via GitHub
+ code search returned empty (index lag typical for private). This paper names structure and next cuts. It is not a toolkit,
+ Worker, or product surface.
+
+ Disposition
+ Connected. Audited. Not merged. Not published. Operator owns the next cut.
+
+
+
+
+PRIVATE · Aziel Eliab only · not a public export                                                                             p. 3
+
