@@ -53,12 +53,29 @@ function writeLine(filePath: string, value: StoreLine): void {
  */
 export class DurableReceiptStore {
   readonly filePath: string;
+  private closed = false;
 
   constructor(filePath = DEFAULT_RECEIPT_PATH) {
     this.filePath = filePath;
   }
 
+  /** Drop this process handle. A new store must reopen the same path to continue. */
+  close(): void {
+    this.closed = true;
+  }
+
+  get isClosed(): boolean {
+    return this.closed;
+  }
+
+  private assertOpen(): void {
+    if (this.closed) {
+      throw new Error("durable receipt store: closed (process exit simulated)");
+    }
+  }
+
   load(): ReceiptLedger {
+    this.assertOpen();
     if (!existsSync(this.filePath)) {
       const ledger = createLedger();
       writeLine(this.filePath, { type: "genesis", genesis: ledger.genesis });
