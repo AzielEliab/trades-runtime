@@ -2,7 +2,7 @@
   "product": "trades-runtime",
   "name": "Trades-Runtime",
   "title": "Trades-Runtime",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "author": "Aziel Eliab",
   "identity": "Aziel Eliab",
   "role": "trades-runtime",
@@ -10,11 +10,13 @@
   "visibility": "private",
   "license": "Apache-2.0",
   "repository": "https://github.com/AzielEliab/trades-runtime",
-  "description": "Private TypeScript runtime for shadow-first field-trades operating intelligence. BYO local ServiceTitan + ProBooks inbound. Pages off. Specs are not published as PDFs.",
+  "public_surface": "https://trades-runtime.vibelock.workers.dev",
+  "description": "Local-first TypeScript runtime for shadow-first field-trades operating intelligence. BYO local ServiceTitan + ProBooks inbound. Pages off. Public get is the giveaway Worker (UI + counted tarball), not a hosted company OS. Specs are not published as PDFs.",
   "not": [
     "Not a PDF portal.",
     "Not a public Softwares suite.",
     "Not aziel-runtime wholesale.",
-    "Not a live Worker backend."
+    "Not a hosted multi-tenant company OS.",
+    "Not a ServiceTitan or ProBooks write API."
   ]
 }

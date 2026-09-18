@@ -1,0 +1,34 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  // Author / identity: Aziel Eliab only. Public giveaway Worker, not a hosted company OS.
+  "name": "trades-runtime",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-18",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": false,
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+  "vars": {
+    "PRODUCT_VERSION": "0.3.3",
+    "RELEASE_FILENAME": "trades-runtime-0.3.3.tgz"
+  },
+  // COUNTS is the honest view/download namespace.
+  // First deploy on the vibelock account:
+  //   npx wrangler kv namespace create COUNTS
+  // then paste the id below. Local `wrangler dev` uses Miniflare simulated KV
+  // and does not need the production id.
+  "kv_namespaces": [
+    {
+      "binding": "COUNTS",
+      "id": "00000000000000000000000000000000"
+    }
+  ],
+  "assets": {
+    "directory": "./release",
+    "binding": "ASSETS",
+    "run_worker_first": true
+  }
+}

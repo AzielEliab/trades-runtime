@@ -2,7 +2,7 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { RUNTIME_MANIFEST } from "../src/manifest.js";
 
-const PRODUCT = "0.3.2";
+const PRODUCT = "0.3.3";
 const IDENTITY = "Aziel Eliab";
 const PRODUCT_SURFACES = [
   "README.md",
@@ -13,11 +13,13 @@ const PRODUCT_SURFACES = [
   "docs/cite.json",
   "docs/v1/runtime.json",
   "docs/llms.txt",
-  "docs/index.html"
+  "docs/index.html",
+  "workers/giveaway/src/identity.ts",
+  "workers/giveaway/wrangler.jsonc"
 ];
 
 describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", () => {
-  it("keeps package, manifest, and catalog on 0.3.2", () => {
+  it("keeps package, manifest, and catalog on 0.3.3", () => {
     const pkg = JSON.parse(readFileSync("package.json", "utf8")) as { version: string; author: string };
     const runtime = JSON.parse(readFileSync("docs/v1/runtime.json", "utf8")) as {
       version: string;
@@ -62,10 +64,12 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
     expect(runtime.launch_options?.D?.status).toBe("not-started");
     expect(RUNTIME_MANIFEST.launch_options.C.status).toBe("code-ready-pilot-not-started");
     expect(RUNTIME_MANIFEST.launch_options.D.status).toBe("not-started");
-    expect(readFileSync("README.md", "utf8")).toMatch(/\*\*Version:\*\* 0\.3\.2/);
+    expect(readFileSync("README.md", "utf8")).toMatch(/\*\*Version:\*\* 0\.3\.3/);
     expect(readFileSync("README.md", "utf8")).toMatch(/TR-BOT-2026-09-17/);
     expect(readFileSync("README.md", "utf8")).toMatch(/TR-BYO-2026-09-17/);
+    expect(readFileSync("README.md", "utf8")).toMatch(/TR-AUDIT-2026-09-18C/);
     expect(readFileSync("README.md", "utf8")).toMatch(/TR-AUDIT-2026-09-18B/);
+    expect(readFileSync("README.md", "utf8")).toMatch(/trades-runtime\.vibelock\.workers\.dev/);
     expect(readFileSync("README.md", "utf8")).toMatch(/data\/inbound\/servicetitan/);
     expect(readFileSync("README.md", "utf8")).toMatch(/data\/inbound\/probooks/);
     expect(readFileSync("README.md", "utf8")).toMatch(/Option C code-ready \/ pilot not started/);
@@ -76,6 +80,17 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
     expect(RUNTIME_MANIFEST.modules.some((module) => module.slug === "shadow-branch")).toBe(true);
     expect(RUNTIME_MANIFEST.modules.some((module) => module.slug === "settlement-harness")).toBe(true);
     expect(RUNTIME_MANIFEST.modules.some((module) => module.slug === "shadow-sealed-demo")).toBe(true);
+    const workerPkg = JSON.parse(readFileSync("workers/giveaway/package.json", "utf8")) as {
+      version: string;
+      author: string;
+    };
+    const workerWrangler = readFileSync("workers/giveaway/wrangler.jsonc", "utf8");
+    expect(workerPkg.version).toBe(PRODUCT);
+    expect(workerPkg.author).toBe(IDENTITY);
+    expect(workerWrangler).toMatch(/"name": "trades-runtime"/);
+    expect(workerWrangler).toMatch(/"binding": "COUNTS"/);
+    expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/export const VERSION = "0\.3\.3"/);
+    expect(readFileSync("README.md", "utf8")).toMatch(/Public giveaway Worker/);
     expect(pkg.author).toBe(IDENTITY);
     expect(RUNTIME_MANIFEST.author).toBe(IDENTITY);
     expect(RUNTIME_MANIFEST.identity).toBe(IDENTITY);

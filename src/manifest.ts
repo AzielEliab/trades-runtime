@@ -1,12 +1,12 @@
 export const RUNTIME_MANIFEST = {
   product: "trades-runtime",
-  version: "0.3.2",
+  version: "0.3.3",
   author: "Aziel Eliab",
   identity: "Aziel Eliab",
   role: "trades-runtime",
   kind: "shadow-first-operating-intelligence",
   live_backends: false,
-  honesty: "Pure/stub TypeScript runtime. BYO local ServiceTitan + ProBooks inbound. Authoring node is not a data custodian. No central dump. No hosted uploader. No phone-home. No ServiceTitan or ProBooks write-back. live_backends false. Pages off (workflow deleted). Credentials local only. No production claim. Option C code-ready / pilot not started. Option D not started. Not a live company pilot.",
+  honesty: "Pure/stub TypeScript runtime. BYO local ServiceTitan + ProBooks inbound. Authoring node is not a data custodian. No central dump. No hosted uploader. No phone-home. No ServiceTitan or ProBooks write-back. live_backends false. Pages off (workflow deleted). Credentials local only. No production claim. Public giveaway Worker is UI + counted tarball only — not a hosted company OS and not a tenant host. Option C code-ready / pilot not started. Option D not started. Not a live company pilot.",
   launch_options: {
     A: { name: "Merge-only", status: "done" },
     B: { name: "Local spine", status: "done-in-software" },
