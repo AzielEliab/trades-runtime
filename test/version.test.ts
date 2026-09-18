@@ -13,6 +13,7 @@ describe("TR-AUDIT-2026-09-17 cut 3 version lockstep", () => {
       property_intelligence: string;
       live_backends: boolean;
       pages?: string;
+      honesty?: string;
     };
     const cite = JSON.parse(readFileSync("docs/cite.json", "utf8")) as { version: string };
 
@@ -24,8 +25,16 @@ describe("TR-AUDIT-2026-09-17 cut 3 version lockstep", () => {
     expect(cite.version).toBe(PRODUCT);
     expect(runtime.live_backends).toBe(false);
     expect(runtime.pages).toBe("off");
+    expect(RUNTIME_MANIFEST.live_backends).toBe(false);
+    expect(RUNTIME_MANIFEST.honesty).toMatch(/BYO local ServiceTitan \+ ProBooks/);
+    expect(RUNTIME_MANIFEST.honesty).toMatch(/Credentials local only/);
+    expect(runtime.honesty).toMatch(/BYO local ServiceTitan \+ ProBooks/);
     expect(readFileSync("README.md", "utf8")).toMatch(/\*\*Version:\*\* 0\.3\.0/);
     expect(readFileSync("README.md", "utf8")).toMatch(/TR-BOT-2026-09-17/);
+    expect(readFileSync("README.md", "utf8")).toMatch(/TR-BYO-2026-09-17/);
+    expect(readFileSync("README.md", "utf8")).toMatch(/data\/inbound\/servicetitan/);
+    expect(readFileSync("README.md", "utf8")).toMatch(/data\/inbound\/probooks/);
+    expect(RUNTIME_MANIFEST.modules.some((module) => module.slug === "probooks-shadow")).toBe(true);
   });
 
   it("keeps Pages deploy workflow_dispatch only", () => {

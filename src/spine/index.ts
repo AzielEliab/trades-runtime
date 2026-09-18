@@ -1,14 +1,20 @@
 export {
   AUTHORIZED_INBOUND_KINDS,
+  FIRST_CLASS_SOURCE_KINDS,
   REFUSED_INBOUND_KINDS,
+  admitHumanCorrection,
   admitInbound,
   admitInboundOrThrow,
   inboundPropertyKind,
   isAuthorizedInboundKind,
+  isFirstClassSourceKind,
   isRefusedInboundKind,
+  refuseSilentVerifiedPromotion,
   wrapperIsVerification,
   type AdmittedInbound,
   type AuthorizedInboundKind,
+  type FirstClassSourceKind,
+  type HumanChainCCorrection,
   type InboundRefuseCode,
   type InboundResult,
   type InboundSourceKind,
@@ -38,3 +44,49 @@ export {
   type ServiceTitanShadowIngest,
   type ServiceTitanShadowRecord
 } from "./servicetitan-shadow.js";
+export {
+  PROBOOKS_SHADOW_ENTITIES,
+  PROBOOKS_WRITES_ENABLED,
+  ingestProBooksBook,
+  ingestProBooksCost,
+  ingestProBooksItem,
+  ingestProBooksShadow,
+  ingestProBooksVendor,
+  mayWriteProBooks,
+  openProBooksShadowClient,
+  refuseProBooksWrite,
+  refuseProBooksWriteMethod,
+  type NoCompiledPbWrite,
+  type ProBooksShadowEntity,
+  type ProBooksShadowIngest,
+  type ProBooksShadowRecord
+} from "./probooks-shadow.js";
+export {
+  BYO_INBOUND_ROOT,
+  HOSTED_TENANT_LAYOUT,
+  PROBOOKS_INBOUND_DIR,
+  RUNTIME_ISOLATE_ROOT,
+  SERVICE_TITAN_INBOUND_DIR,
+  TR_BYO_LAWS,
+  assertLocalInboundPath,
+  inboundDir,
+  inboundPath,
+  isHostedTenantLayout,
+  refuseHostedTenantLayout
+} from "./inbound-layout.js";
+export {
+  defaultLocalInboundConfig,
+  parseLocalInboundConfig,
+  type LocalInboundConfig
+} from "./local-inbound-config.js";
+export {
+  assertIsolatePath,
+  assertIsolatesDoNotMix,
+  describeRuntimeIsolate,
+  isolateLedgerPath,
+  isolateReceiptPath,
+  isolatesDoNotMix,
+  openIsolatedReceipts,
+  refuseSharedHostedCorpus,
+  sanitizeInstanceId
+} from "./runtime-isolate.js";

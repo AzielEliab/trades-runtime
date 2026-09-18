@@ -7,13 +7,13 @@ Private **TypeScript runtime** for a shadow-first AI operating system / company 
 **Role:** `trades-runtime`  
 **License:** Apache-2.0  
 **Visibility:** this repository stays **private**  
-**Status:** 0.3.0 lockstep with Property Intelligence v1.0 in-tree — live-pure core + honest stubs — **no** live ServiceTitan writes, Worker backends, DOIs, or production deployment
+**Status:** 0.3.0 lockstep with Property Intelligence v1.0 in-tree — live-pure core + honest stubs — **BYO** local ServiceTitan + ProBooks inbound — **no** live writes, Worker backends, DOIs, hosted uploader, or production deployment
 
 The product is the software in `src/`. `docs/` is a thin local catalog/UI. GitHub Pages stays **off** (`live_backends: false`). **PDFs are never published.** Implementer specs live at repo-root [`specs/`](specs/) (not under `docs/`).
 
 Standing rule: every PDF Aziel sends is a spec to implement as coded software.
 
-Paper trail: [`TR-AUDIT-2026-09-17`](specs/TR-AUDIT-2026-09-17.txt) · [`TR-CUT-2026-09-17`](specs/TR-CUT-2026-09-17.txt) · [`TR-BOT-2026-09-17`](specs/TR-BOT-2026-09-17.txt) (standing brief).
+Paper trail: [`TR-AUDIT-2026-09-17`](specs/TR-AUDIT-2026-09-17.txt) · [`TR-CUT-2026-09-17`](specs/TR-CUT-2026-09-17.txt) · [`TR-BOT-2026-09-17`](specs/TR-BOT-2026-09-17.txt) (standing brief) · [`TR-BYO-2026-09-17`](specs/TR-BYO-2026-09-17.txt) (amends TR-BOT §9 and TR-CUT R2–R3).
 
 ## Install, test, demo
 
@@ -55,11 +55,29 @@ CI (`.github/workflows/ci.yml`) runs `npm ci`, `npm run typecheck`, and `npm tes
 | Actor / authority registry | `src/core/actor-registry.ts` | live-pure |
 | Shadow modes | `src/core/shadow-modes.ts` | live-pure |
 | ServiceTitan shadow (read-only) | `src/spine/servicetitan-shadow.ts` | live-pure |
+| ProBooks shadow (read-only, peer inbound) | `src/spine/probooks-shadow.ts` | live-pure |
+| Local BYO inbound layout | `src/spine/inbound-layout.ts` | live-pure |
+| Local inbound config (no cloud account) | `src/spine/local-inbound-config.ts` | live-pure |
+| Runtime isolate (per-instance receipts) | `src/spine/runtime-isolate.ts` | live-pure |
 | Fulfillment state machine | `src/domain/fulfillment-machine.ts` | live-pure |
 | Mission board clock | `src/domain/mission-board.ts` | live-pure |
 | PI wired to jobs | `src/domain/property-jobs.ts` | live-pure |
 | §18 freeze + v0.2 governing rules | `src/rules/constitution.ts` | live-pure |
 | ServiceTitan / ProBooks live writes | — | refused |
+
+## BYO inbound (TR-BYO-2026-09-17)
+
+Each user incorporates **their own** ServiceTitan and **their own** ProBooks into **their** local runtime. The authoring node / GitHub is **not** a data custodian. No central dump. No hosted uploader. No phone-home.
+
+Local inbound on that machine (contents gitignored):
+
+- `data/inbound/servicetitan/` — ST export or read-only pull the user places
+- `data/inbound/probooks/` — ProBooks books / items / costs / vendor files the user places
+- `data/runtime/<instanceId>/receipts.jsonl` and `ledger.jsonl` — isolate per runtime instance
+
+Not `data/tenants/` (that word implies a hosted multi-tenant service). Optional local config lists paths or read endpoints only — **no cloud account**. Tokens stay on the user’s machine or their sealed vault.
+
+FragGate first-class `sourceKind` values: `servicetitan` (MEDIUM, hashed, `live:false` `write:false`), `probooks` (same), `operator-file` (LOW until origin tagged; still not truth), `human` (manager correction on Chain C with actor id). Wrapper ≠ verified. Scrape and silent promotion to VERIFIED are refused.
 
 Inherited names come only from [`specs/aziel-runtime-inheritance.txt`](specs/aziel-runtime-inheritance.txt). This is not a wholesale copy of aziel-runtime Softwares.
 

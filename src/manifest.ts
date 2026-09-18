@@ -6,7 +6,7 @@ export const RUNTIME_MANIFEST = {
   role: "trades-runtime",
   kind: "shadow-first-operating-intelligence",
   live_backends: false,
-  honesty: "Pure/stub TypeScript runtime. No ServiceTitan write-back. No production claim.",
+  honesty: "Pure/stub TypeScript runtime. BYO local ServiceTitan + ProBooks inbound. Authoring node is not a data custodian. No central dump. No hosted uploader. No phone-home. No ServiceTitan or ProBooks write-back. live_backends false. Pages off. Credentials local only. No production claim.",
   modules: [
     { slug: "ids", path: "src/core/ids.ts", status: "live-pure", summary: "Canonical entity IDs." },
     { slug: "events", path: "src/core/events.ts", status: "live-pure", summary: "Event contracts and idempotency helpers." },
@@ -46,10 +46,15 @@ export const RUNTIME_MANIFEST = {
     { slug: "regional-recalibration", path: "src/domain/regional-recalibration.ts", status: "live-pure", summary: "Geo hierarchy + promotion ladder; weaken thin/stale/conflicted samples." },
     { slug: "property-intelligence-hooks", path: "src/domain/property-intelligence-hooks.ts", status: "live-pure", summary: "Typed integration points; not live backends." },
     { slug: "constitution", path: "src/rules/constitution.ts", status: "live-pure", summary: "Architecture §18 freeze + v0.2 + Property Intelligence v1.0 rules." },
-    { slug: "fraggate-inbound", path: "src/spine/fraggate-inbound.ts", status: "live-pure", summary: "FragGate inbound wall. Wrapper is not verification. Scrape refused." },
-    { slug: "durable-receipts", path: "src/spine/durable-receipts.ts", status: "live-pure", summary: "Append-only JSONL receipts. Process exit does not erase Chain C." },
+    { slug: "fraggate-inbound", path: "src/spine/fraggate-inbound.ts", status: "live-pure", summary: "FragGate inbound wall. First-class servicetitan / probooks / operator-file / human. Wrapper is not verification. Scrape refused. Silent VERIFIED promotion refused." },
+    { slug: "durable-receipts", path: "src/spine/durable-receipts.ts", status: "live-pure", summary: "Append-only JSONL receipts. Process exit does not erase Chain C. Isolate per runtime instance." },
     { slug: "run-action", path: "src/spine/run-action.ts", status: "live-pure", summary: "packet → lock → primary → alternate → coherence → gate → receipt → override → shadow settle." },
     { slug: "servicetitan-shadow", path: "src/spine/servicetitan-shadow.ts", status: "live-pure", summary: "Read-only ST-shaped ingest + hash. Writes refused." },
-    { slug: "servicetitan-connector", path: "src/spine/servicetitan-shadow.ts", status: "stub", summary: "Live ServiceTitan writes stay refused." }
+    { slug: "probooks-shadow", path: "src/spine/probooks-shadow.ts", status: "live-pure", summary: "Read-only ProBooks books/items/costs/vendor ingest + hash. First-class peer inbound. Writes refused." },
+    { slug: "inbound-layout", path: "src/spine/inbound-layout.ts", status: "live-pure", summary: "Local BYO paths data/inbound/servicetitan and data/inbound/probooks. Not data/tenants." },
+    { slug: "local-inbound-config", path: "src/spine/local-inbound-config.ts", status: "live-pure", summary: "Optional local paths / read endpoints. No cloud account. Credentials stay on the user's machine." },
+    { slug: "runtime-isolate", path: "src/spine/runtime-isolate.ts", status: "live-pure", summary: "Separate receipt/ledger files per runtime instance. No shared hosted corpus." },
+    { slug: "servicetitan-connector", path: "src/spine/servicetitan-shadow.ts", status: "stub", summary: "Live ServiceTitan writes stay refused." },
+    { slug: "probooks-connector", path: "src/spine/probooks-shadow.ts", status: "stub", summary: "Live ProBooks writes stay refused." }
   ]
 } as const;

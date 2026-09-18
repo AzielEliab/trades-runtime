@@ -10,7 +10,7 @@
   "visibility": "private",
   "license": "Apache-2.0",
   "repository": "https://github.com/AzielEliab/trades-runtime",
-  "description": "Private TypeScript runtime for shadow-first field-trades operating intelligence. Pages is a thin UI. Specs are not published as PDFs.",
+  "description": "Private TypeScript runtime for shadow-first field-trades operating intelligence. BYO local ServiceTitan + ProBooks inbound. Pages off. Specs are not published as PDFs.",
   "not": [
     "Not a PDF portal.",
     "Not a public Softwares suite.",

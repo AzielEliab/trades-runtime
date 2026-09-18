@@ -20,7 +20,7 @@
   "status": "live-pure",
   "live_backends": false,
   "one_line": "Shadow-first TypeScript operating system for multi-branch HVAC, plumbing, electrical, sewer, and cross-trades field service.",
-  "honesty": "Software modules in src/ are live-pure (executable, tested) or stub (no ServiceTitan writes). No live Worker backends, DOIs, or production APIs.",
+  "honesty": "Software modules in src/ are live-pure (executable, tested) or stub. BYO local ServiceTitan + ProBooks inbound (peer sources). Authoring node is not a data custodian. No central dump. No hosted uploader. No phone-home. No ServiceTitan or ProBooks write-back. live_backends false. Pages off. Credentials local only. No live Worker backends, DOIs, or production APIs.",
   "design_target": {
     "branches": "13-15",
     "employees": "750+",
@@ -30,8 +30,17 @@
   },
   "integration": {
     "primary": ["ServiceTitan", "ProBooks"],
-    "posture": "Tether to ServiceTitan + ProBooks / authorized systems first. Read-only or recommendation until evidence supports greater autonomy.",
-    "status": "design"
+    "posture": "BYO: each user incorporates their own ServiceTitan and ProBooks into their local runtime. Peer inbound. Read-only until a later paper. Authoring node / GitHub is not a data custodian.",
+    "status": "byo-local",
+    "live_backends": false,
+    "hosted_uploader": false,
+    "phone_home": false,
+    "credentials": "local-only",
+    "inbound": {
+      "servicetitan": "data/inbound/servicetitan",
+      "probooks": "data/inbound/probooks",
+      "not": "data/tenants"
+    }
   },
   "principles": [
     {
@@ -299,11 +308,16 @@
     { "slug": "regional-recalibration", "path": "src/domain/regional-recalibration.ts", "status": "live-pure", "summary": "Geo hierarchy + promotion ladder; weaken thin/stale/conflicted samples." },
     { "slug": "property-intelligence-hooks", "path": "src/domain/property-intelligence-hooks.ts", "status": "live-pure", "summary": "Typed integration points; not live backends." },
     { "slug": "constitution", "path": "src/rules/constitution.ts", "status": "live-pure", "summary": "Architecture §18 freeze + v0.2 + Property Intelligence v1.0 rules." },
-    { "slug": "fraggate-inbound", "path": "src/spine/fraggate-inbound.ts", "status": "live-pure", "summary": "FragGate inbound wall. Wrapper is not verification. Scrape refused." },
-    { "slug": "durable-receipts", "path": "src/spine/durable-receipts.ts", "status": "live-pure", "summary": "Append-only JSONL receipts. Process exit does not erase Chain C." },
+    { "slug": "fraggate-inbound", "path": "src/spine/fraggate-inbound.ts", "status": "live-pure", "summary": "FragGate inbound wall. First-class servicetitan / probooks / operator-file / human. Wrapper is not verification. Scrape refused." },
+    { "slug": "durable-receipts", "path": "src/spine/durable-receipts.ts", "status": "live-pure", "summary": "Append-only JSONL receipts. Process exit does not erase Chain C. Isolate per runtime instance." },
     { "slug": "run-action", "path": "src/spine/run-action.ts", "status": "live-pure", "summary": "packet → lock → primary → alternate → coherence → gate → receipt → override → shadow settle." },
     { "slug": "servicetitan-shadow", "path": "src/spine/servicetitan-shadow.ts", "status": "live-pure", "summary": "Read-only ST-shaped ingest + hash. Writes refused." },
-    { "slug": "servicetitan-connector", "path": "src/spine/servicetitan-shadow.ts", "status": "stub", "summary": "Live ServiceTitan writes stay refused." }
+    { "slug": "probooks-shadow", "path": "src/spine/probooks-shadow.ts", "status": "live-pure", "summary": "Read-only ProBooks books/items/costs/vendor ingest + hash. First-class peer inbound. Writes refused." },
+    { "slug": "inbound-layout", "path": "src/spine/inbound-layout.ts", "status": "live-pure", "summary": "Local BYO paths data/inbound/servicetitan and data/inbound/probooks. Not data/tenants." },
+    { "slug": "local-inbound-config", "path": "src/spine/local-inbound-config.ts", "status": "live-pure", "summary": "Optional local paths / read endpoints. No cloud account. Credentials stay on the user's machine." },
+    { "slug": "runtime-isolate", "path": "src/spine/runtime-isolate.ts", "status": "live-pure", "summary": "Separate receipt/ledger files per runtime instance. No shared hosted corpus." },
+    { "slug": "servicetitan-connector", "path": "src/spine/servicetitan-shadow.ts", "status": "stub", "summary": "Live ServiceTitan writes stay refused." },
+    { "slug": "probooks-connector", "path": "src/spine/probooks-shadow.ts", "status": "stub", "summary": "Live ProBooks writes stay refused." }
   ],
   "engines": [
     { "slug": "booking-intake", "name": "Booking & Call Intake Engine", "status": "stub", "summary": "Needs authorized connectors." },
@@ -327,7 +341,8 @@
     { "slug": "universal-analytics", "name": "Universal Analytics & Human Review", "status": "live-pure", "summary": "Mandatory report metadata enforced." },
     { "slug": "decision-fabric", "name": "Decision Fabric reconciler", "status": "live-pure", "summary": "src/domain/decision-fabric.ts" },
     { "slug": "property-intelligence", "name": "Property / Neighborhood / Regional Intelligence", "status": "live-pure", "summary": "Addendum v1.0 — living property record, value ranges, neighborhood priors, regional ladder." },
-    { "slug": "execution-spine", "name": "Execution spine (FragGate inbound / durable receipts / runAction)", "status": "live-pure", "summary": "TR-AUDIT-2026-09-17 cuts 4a–4c. Untrusted wrap ≠ evidence. Chain C survives restart." }
+    { "slug": "execution-spine", "name": "Execution spine (FragGate inbound / durable receipts / runAction)", "status": "live-pure", "summary": "TR-AUDIT-2026-09-17 cuts 4a–4c + TR-BYO-2026-09-17. Untrusted wrap ≠ evidence. ST + ProBooks peer inbound. Chain C survives restart. Isolate per instance." },
+    { "slug": "byo-inbound", "name": "BYO ServiceTitan + ProBooks inbound", "status": "live-pure", "summary": "Each user brings their ST and ProBooks into their local runtime. No central dump. No hosted uploader. Writes refused." }
   ],
   "planned_ops": [
     { "slug": "observe", "name": "Observe", "status": "planned", "summary": "Ingest and normalize authorized operational data." },
