@@ -1,0 +1,51 @@
+TRADES-RUNTIME · OPERATOR RE-AUDIT                                                                                              TR-AUDIT-2026-09-18C
+
+Trades-Runtime Operator Re-Audit (post 0.3.2 Option C scaffolding)
+Receipt ID TR-AUDIT-2026-09-18C · after TR-AUDIT-2026-09-18B
+Not a production claim. Identity: Aziel Eliab only.
+
+Snapshot
+  main                         652a4be7bde8 — Merge Option C scaffolding + identity + 0.3.2
+  Version                      0.3.2 lockstep
+  Visibility                   private · has_pages false · pages.yml absent
+  Branches                     [main]
+  Open PRs                     none
+  CI @ tip                     success · 17 files · 116 passed
+  Orphans                      none
+  IDENTITY.md                  present · Aziel Eliab only
+
+Prior open items disposition
+  H1 Option C/D                PARTIAL — Option C is CODE-READY / pilot not started (engagement rules,
+                               one-branch shadow config, settlement harness, shadow:sealed-demo).
+                               Option D still NO. Not a live GM pilot. Field launch still ~25%.
+  H2 identity hygiene          CLOSED for product strings + IDENTITY.md + commit author on this line.
+
+What holds
+  All prior closed findings (G1–G3 software, G5, BYO, spine, constitution).
+  Fresh-checkout proofs: npm test, byo:admit-demo, shadow:sealed-demo (pilotStarted=false).
+
+Ladder
+  R0–R2 software DONE (BYO admit demo synthetic)
+  Option C software scaffold DONE; human pilot NOT STARTED
+  R3–R7 / Option D NOT STARTED
+
+Launch readiness
+  A 10/10 · B ~9.5/10 · C code-ready ~4/10 (was 2; still not a company launch) · D 1/10 · public/writes 0/10
+
+Open findings (honest remainder — not software-closeable here)
+  ID    Sev   Finding
+  J1    P2    Option C human pilot: named GM + real BYO ST/ProBooks on operator box + sealed days vs their actuals
+  J2    P2    Option D advise-lock pilot: still requires C calm + named lock-holders; writes remain uncompiled
+  J3    P3    Real customer inbound still never touches the authoring node (TR-BYO) — correct
+
+Advice — next physical act
+  Operator box only: clone 0.3.2 → npm test → npm run byo:admit-demo → npm run shadow:sealed-demo →
+  point data/inbound at THEIR read-only sources if/when a one-branch shadow is authorized in writing.
+  Do not tell a GM the company OS is live. No new architecture PDF. No Pages. No write client.
+
+Disposition
+  All software-closeable audit items from 18 / 18B are done. Working copy is 0.3.2 Option B + Option C scaffold.
+  Remaining blockers are human/operator pilots, not missing TypeScript modules.
+
+Method
+  GitHub connector: tip, tree, CI logs (116 passed), branches, Pages 404. No customer credentials.
