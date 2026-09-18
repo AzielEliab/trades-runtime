@@ -1,0 +1,34 @@
+{
+  "synthetic": true,
+  "note": "Synthetic ProBooks-shaped export for BYO admit demo. Not customer data. Authoring node is not a custodian.",
+  "exportedAt": "2026-09-18T00:00:00Z",
+  "source": "trades-runtime-fixture",
+  "books": [
+    {
+      "id": "SYN-PB-BOOK-PARTS",
+      "name": "parts-ledger"
+    }
+  ],
+  "items": [
+    {
+      "id": "SYN-PB-ITEM-SKU-1",
+      "sku": "SKU-SYN-1",
+      "cost": 72.5,
+      "bookId": "SYN-PB-BOOK-PARTS"
+    }
+  ],
+  "costs": [
+    {
+      "id": "SYN-PB-COST-1",
+      "itemId": "SYN-PB-ITEM-SKU-1",
+      "amount": 72.5,
+      "kind": "acquisition"
+    }
+  ],
+  "vendors": [
+    {
+      "id": "SYN-PB-VEND-1",
+      "nameHash": "synthetic-vendor"
+    }
+  ]
+}

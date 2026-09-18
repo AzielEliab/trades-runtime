@@ -5,8 +5,8 @@
   "title": "Trades-Runtime",
   "author": "Aziel Eliab",
   "identity": "Aziel Eliab",
-  "version": "0.3.0",
-  "runtime_version": "0.3.0",
+  "version": "0.3.1",
+  "runtime_version": "0.3.1",
   "spec_pack": "repo-root specs/ (not published on Pages)",
   "property_intelligence": "1.0",
   "role": "trades-runtime",
@@ -20,7 +20,14 @@
   "status": "live-pure",
   "live_backends": false,
   "one_line": "Shadow-first TypeScript operating system for multi-branch HVAC, plumbing, electrical, sewer, and cross-trades field service.",
-  "honesty": "Software modules in src/ are live-pure (executable, tested) or stub. BYO local ServiceTitan + ProBooks inbound (peer sources). Authoring node is not a data custodian. No central dump. No hosted uploader. No phone-home. No ServiceTitan or ProBooks write-back. live_backends false. Pages off. Credentials local only. No live Worker backends, DOIs, or production APIs.",
+  "honesty": "Software modules in src/ are live-pure (executable, tested) or stub. BYO local ServiceTitan + ProBooks inbound (peer sources). Authoring node is not a data custodian. No central dump. No hosted uploader. No phone-home. No ServiceTitan or ProBooks write-back. live_backends false. Pages off (workflow deleted). Credentials local only. No live Worker backends, DOIs, or production APIs. Option C/D not started.",
+  "launch_options": {
+    "A": { "name": "Merge-only", "status": "done" },
+    "B": { "name": "Local spine", "status": "done-in-software" },
+    "C": { "name": "One-branch shadow", "status": "not-started" },
+    "D": { "name": "Advise-lock pilot", "status": "not-started" },
+    "note": "Do not fake Option C/D. Field launch is not live."
+  },
   "design_target": {
     "branches": "13-15",
     "employees": "750+",
@@ -316,6 +323,7 @@
     { "slug": "inbound-layout", "path": "src/spine/inbound-layout.ts", "status": "live-pure", "summary": "Local BYO paths data/inbound/servicetitan and data/inbound/probooks. Not data/tenants." },
     { "slug": "local-inbound-config", "path": "src/spine/local-inbound-config.ts", "status": "live-pure", "summary": "Optional local paths / read endpoints. No cloud account. Credentials stay on the user's machine." },
     { "slug": "runtime-isolate", "path": "src/spine/runtime-isolate.ts", "status": "live-pure", "summary": "Separate receipt/ledger files per runtime instance. No shared hosted corpus." },
+    { "slug": "byo-admit-demo", "path": "src/demo/byo-admit.ts", "status": "live-pure", "summary": "Synthetic fixture admit proof. Wrapper ≠ VERIFIED. Writes throw. Not a customer dump." },
     { "slug": "servicetitan-connector", "path": "src/spine/servicetitan-shadow.ts", "status": "stub", "summary": "Live ServiceTitan writes stay refused." },
     { "slug": "probooks-connector", "path": "src/spine/probooks-shadow.ts", "status": "stub", "summary": "Live ProBooks writes stay refused." }
   ],

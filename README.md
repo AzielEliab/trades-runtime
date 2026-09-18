@@ -3,17 +3,17 @@
 Private **TypeScript runtime** for a shadow-first AI operating system / company operating intelligence layer. Field trades: HVAC, plumbing, electrical, sewer, and cross-trades.
 
 **Author / identity:** Aziel Eliab only  
-**Version:** 0.3.0  
+**Version:** 0.3.1  
 **Role:** `trades-runtime`  
 **License:** Apache-2.0  
 **Visibility:** this repository stays **private**  
-**Status:** 0.3.0 lockstep with Property Intelligence v1.0 in-tree — live-pure core + honest stubs — **BYO** local ServiceTitan + ProBooks inbound — **no** live writes, Worker backends, DOIs, hosted uploader, or production deployment
+**Status:** 0.3.1 lockstep with Property Intelligence v1.0 in-tree — live-pure core + honest stubs — **BYO** local ServiceTitan + ProBooks inbound — **no** live writes, Worker backends, DOIs, hosted uploader, or production deployment — **Option C/D not started**
 
-The product is the software in `src/`. `docs/` is a thin local catalog/UI. GitHub Pages stays **off** (`live_backends: false`). **PDFs are never published.** Implementer specs live at repo-root [`specs/`](specs/) (not under `docs/`).
+The product is the software in `src/`. `docs/` is a thin local catalog/UI. GitHub Pages is **intentionally disabled** (`live_backends: false`). There is no Pages workflow. **PDFs are never published.** Implementer specs live at repo-root [`specs/`](specs/) (not under `docs/`).
 
 Standing rule: every PDF Aziel sends is a spec to implement as coded software.
 
-Paper trail: [`TR-AUDIT-2026-09-17`](specs/TR-AUDIT-2026-09-17.txt) · [`TR-CUT-2026-09-17`](specs/TR-CUT-2026-09-17.txt) · [`TR-BOT-2026-09-17`](specs/TR-BOT-2026-09-17.txt) (standing brief) · [`TR-BYO-2026-09-17`](specs/TR-BYO-2026-09-17.txt) (amends TR-BOT §9 and TR-CUT R2–R3).
+Paper trail: [`TR-AUDIT-2026-09-18`](specs/TR-AUDIT-2026-09-18.txt) · [`TR-AUDIT-2026-09-17`](specs/TR-AUDIT-2026-09-17.txt) · [`TR-CUT-2026-09-17`](specs/TR-CUT-2026-09-17.txt) · [`TR-BOT-2026-09-17`](specs/TR-BOT-2026-09-17.txt) (standing brief) · [`TR-BYO-2026-09-17`](specs/TR-BYO-2026-09-17.txt) (amends TR-BOT §9 and TR-CUT R2–R3).
 
 ## Install, test, demo
 
@@ -22,12 +22,13 @@ npm install
 npm test
 npm run typecheck
 npm run demo
+npm run byo:admit-demo
 npm run manifest
 ```
 
-`npm test` runs constitutional rule tests including Human Authority, confidence≠truth, CrossTrade secondary-only routing, v0.2 recognition / pricebook lock / mission board / location economics, the 0.3.0 execution spine (FragGate inbound, durable receipts, `runAction`), and restart-replay of append-only JSONL receipts (`data/receipts.jsonl` or `{tmpdir}/tr-replay-*/receipts.jsonl`).
+`npm test` runs constitutional rule tests including Human Authority, confidence≠truth, CrossTrade secondary-only routing, v0.2 recognition / pricebook lock / mission board / location economics, the 0.3.1 execution spine (FragGate inbound, durable receipts, `runAction`), restart-replay of append-only JSONL receipts (`data/receipts.jsonl` or `{tmpdir}/tr-replay-*/receipts.jsonl`), and the synthetic BYO admit demo.
 
-CI (`.github/workflows/ci.yml`) runs `npm ci`, `npm run typecheck`, and `npm test` on pull requests and pushes to `main`. Do not treat Pages deploy as the test gate.
+CI (`.github/workflows/ci.yml`) runs `npm ci`, `npm run typecheck`, and `npm test` on pull requests and pushes to `main`. GitHub Pages is intentionally disabled — do not treat a github.io URL as a test gate.
 
 `npm run demo` runs a synthetic shadow-day: Call-Fit, sealed counterfactual, human override, hash-chained receipts, trajectory rebase.
 
@@ -59,6 +60,7 @@ CI (`.github/workflows/ci.yml`) runs `npm ci`, `npm run typecheck`, and `npm tes
 | Local BYO inbound layout | `src/spine/inbound-layout.ts` | live-pure |
 | Local inbound config (no cloud account) | `src/spine/local-inbound-config.ts` | live-pure |
 | Runtime isolate (per-instance receipts) | `src/spine/runtime-isolate.ts` | live-pure |
+| Synthetic BYO admit demo | `src/demo/byo-admit.ts` | live-pure |
 | Fulfillment state machine | `src/domain/fulfillment-machine.ts` | live-pure |
 | Mission board clock | `src/domain/mission-board.ts` | live-pure |
 | PI wired to jobs | `src/domain/property-jobs.ts` | live-pure |
@@ -79,15 +81,26 @@ Not `data/tenants/` (that word implies a hosted multi-tenant service). Optional 
 
 FragGate first-class `sourceKind` values: `servicetitan` (MEDIUM, hashed, `live:false` `write:false`), `probooks` (same), `operator-file` (LOW until origin tagged; still not truth), `human` (manager correction on Chain C with actor id). Wrapper ≠ verified. Scrape and silent promotion to VERIFIED are refused.
 
+`npm run byo:admit-demo` is **operator-software proof** with synthetic fixtures under `test/fixtures/byo/`. It copies those fixtures into a temp inbound dir, admits via FragGate as `servicetitan` + `probooks`, hashes packets, writes isolate receipts under a temp `data/runtime/<id>/`, prints hashes, and proves wrapper ≠ VERIFIED while ST/ProBooks writes still throw. It is not a customer dump. The authoring node is not a data custodian.
+
+Real user exports belong only on that user's machine under `data/inbound/{servicetitan,probooks}/` (gitignored except `.gitkeep`).
+
 Inherited names come only from [`specs/aziel-runtime-inheritance.txt`](specs/aziel-runtime-inheritance.txt). This is not a wholesale copy of aziel-runtime Softwares.
 
-## Pages (off)
+## Ladder (honest)
 
-GitHub Pages stays **off**. `.github/workflows/pages.yml` is `workflow_dispatch` only so merges do not attempt deploy. Do not enable Pages. Do not treat a github.io URL as a live product surface.
+| Option | Meaning | State |
+| --- | --- | --- |
+| A | Merge-only | done |
+| B | Local spine | done in software |
+| C | One-branch shadow | **not started** |
+| D | Advise-lock pilot | **not started** |
 
-Intended URL if Pages is later enabled (it is **not** enabled — TR-BOT-2026-09-17 / TR-AUDIT-2026-09-17):
+Do not tell a GM the company OS is live. Do not fake Option C/D.
 
-**https://azieleliab.github.io/trades-runtime/**
+## Pages (intentionally disabled)
+
+GitHub Pages is **intentionally disabled**. There is no `.github/workflows/pages.yml`. Do not add a Pages deploy workflow. Do not enable Pages on the repository. Do not treat a github.io URL as a live product surface.
 
 Keep the repository private. Do not change visibility to public. Do not enable GitHub Pages. Do not add PDFs under `docs/`.
 
