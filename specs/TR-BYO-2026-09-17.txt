@@ -1,0 +1,94 @@
+TRADES-RUNTIME · BYO DATA AMENDMENT                                                                                                          TR-BYO-2026-09-17
+
+
+
+
+ Per-user ServiceTitan and ProBooks incorporation
+ Receipt ID TR-BYO-2026-09-17 · 2026-09-17 20:54 EDT
+ Operator correction to TR-BOT-2026-09-17 §9 and TR-CUT rungs R2–R3.
+ Identity: Aziel Eliab only. Repo stays private. Writes stay refused.
+
+
+ Correction
+ Wrong next-act in TR-BOT §9: “we” pull a read-only ServiceTitan dump and feed the runtime. That makes the authoring node
+ a data custodian. That is not the product.
+ Right model: every user (company / branch operator running trades-runtime locally) incorporates their own ServiceTitan data
+ and their own ProBooks data into their runtime. The software provides the admit path, the packet shape, the hash, the
+ quarantine, and the refuse-write. It does not phone home a tenant dump. It does not hold a central ST or ProBooks corpus.
+
+ Law
+    Law                                      Meaning
+
+    BYO, not central dump                    Authoring node / mesh / AzielEliab GitHub is not the ST or ProBooks custodian.
+
+    Per-runtime isolate                      Tenant A packets never mix with tenant B. Separate receipt files, separate ledgers.
+
+    Both sources first-class                 ServiceTitan and ProBooks are peer inbound classes. Neither is “the” source of truth by brand.
+
+    FragGate still admits                    ST export, ST API read, ProBooks export, ProBooks API read — all untrusted until admitted + hashed.
+
+    Wrapper ≠ verified                       A user dropping a CSV/JSON into the folder does not make claims VERIFIED.
+
+    Writes refused                           No compiled ST or ProBooks POST/PUT/PATCH in v0.3. New paper to even discuss write-back.
+
+    Credentials local                        Tokens and exports live on the user’s machine or their sealed vault. Never in the public or shared repo.
+
+    Pages / mesh                             No tenant data on GitHub Pages, Workers, or a shared demo.
+
+
+ Inbound classes the runtime must name
+    sourceKind                    What the user brings                                       Admit as
+
+    servicetitan                  Their ST export or read-only API pull (jobs, pricebook,    MEDIUM trust default. Hash payload. live:false write:false.
+                                  equipment, customer, appointments).
+
+    probooks                      Their ProBooks books / items / costs / vendor files or     MEDIUM trust default. Hash payload. live:false write:false.
+                                  read-only pull.
+
+    operator-file                 Hand-placed CSV/JSON they assert is from ST or             LOW until they tag origin. Still hashed. Still not truth.
+                                  ProBooks.
+
+    human                         Manager correction of a price or part.                     Trust is metadata. Goes on Chain C with actor id.
+
+
+ Rungs rewritten
+    Rung             Old (void)                                               Now
+
+    R2               We pull one ST dump into quarantine.                     User points their runtime at their ST read source and/or their ProBooks read
+                                                                              source. Software admits + hashes locally.
+
+    R3               Our nightly read vs actuals.                             Their scheduled local read, on their box, sealed against their actuals.
+                                                                              Optional. Off by default.
+
+    R4–R7            One named branch in “our” pilot.                         One named branch inside that user’s company. Still SHADOW-SEALED
+                                                                              first. Still not an order.
+
+
+ What the software still owes (not done as a product surface)
+ 0.3.0 has ServiceTitan-shaped ingest and a write-refuse. ProBooks is still a stub name in the manifest. Finish: sourceKind
+ "probooks" on FragGate; a ProBooks shadow ingest sibling (read-only, same packet law); a local config that lists
+ user-supplied paths or read endpoints — no cloud account; isolate directory per runtime instance (data/tenants is the wrong
+
+
+PRIVATE · Aziel Eliab only · amends TR-BOT-2026-09-17 §9                                                                                                     p. 1
+TRADES-RUNTIME · BYO DATA AMENDMENT                                                                           TR-BYO-2026-09-17
+
+
+
+ word if it implies a hosted multi-tenant service — use data/inbound/servicetitan and data/inbound/probooks on that machine).
+ Do not add a hosted uploader.
+
+ Grok / AZbot standing change
+ Do not tell the operator to “do a read-only ST dump” as if the authoring node will ingest a customer’s books. Tell them: each
+ user brings their ST and their ProBooks into their copy. Help them wire admit + hash + isolate. Refuse to design a central
+ collection point.
+
+ Disposition
+ TR-BOT-2026-09-17 §9 next-act is amended by this paper. Option C is still not a company launch. The missing feature is
+ BYO dual-source ingest (ST + ProBooks) on the user’s runtime, not a dump we run.
+
+
+
+
+PRIVATE · Aziel Eliab only · amends TR-BOT-2026-09-17 §9                                                                    p. 2
+
