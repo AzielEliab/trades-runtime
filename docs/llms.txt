@@ -2,8 +2,8 @@
 
 > Private TypeScript operating system for field-trades companies.
 > Author / identity: Aziel Eliab only.
-> Version: 0.3.1,
-> Status: live-pure core + stubs. BYO local ServiceTitan + ProBooks. No live backends. Pages off. No PDFs on Pages.
+> Version: 0.3.2,
+> Status: live-pure core + stubs. BYO local ServiceTitan + ProBooks. Option C code-ready / pilot not started. Option D not started. No live backends. Pages off. No PDFs on Pages.
 
 Product is src/. Pages is a thin UI. Implementer specs are at repo-root specs/ (not published).
 
@@ -12,6 +12,7 @@ Product is src/. Pages is a thin UI. Implementer specs are at repo-root specs/ (
 - npm test — constitutional rules, CrossTrade secondary-only, Human Authority, confidence≠truth, v0.2 pricebook lock / recognition / weather / maintenance
 - npm run demo — synthetic shadow-day + receipts
 - npm run byo:admit-demo — synthetic ST+ProBooks admit proof (not customer data)
+- npm run shadow:sealed-demo — synthetic N-day sealed settlement (pilot not started)
 - Manifest: /v1/runtime.json and /modules/
 
 ## Modes

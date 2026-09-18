@@ -14,6 +14,17 @@ export {
   grantAuthority
 } from "./core/actor-registry.js";
 export { parseShadowMode, describeShadowMode } from "./core/shadow-modes.js";
+export {
+  applyEngagement,
+  engagementNotice,
+  isEngagementViolation
+} from "./core/engagement-rules.js";
+export { createOneBranchShadowConfig, requestShadowModeChange } from "./core/shadow-branch.js";
+export {
+  assertSealedRecommendationUnchanged,
+  requireSettlementFields,
+  settleRequired
+} from "./core/settlement-harness.js";
 export { appendRecord, emptyChain } from "./core/chains.js";
 export { wrapEvidence } from "./inherited/evidence-packet.js";
 export { comparePaths, refuseFabricatedEvidence } from "./inherited/trades-coherence.js";
@@ -151,3 +162,4 @@ export { defaultLocalInboundConfig, parseLocalInboundConfig } from "./spine/loca
 export { isolateReceiptPath, openIsolatedReceipts } from "./spine/runtime-isolate.js";
 export { runRecordedShadowDays, runShadowDayDemo } from "./demo/shadow-day.js";
 export { runByoAdmitDemo, printByoAdmitDemo } from "./demo/byo-admit.js";
+export { runSealedShadowDemo, printSealedShadowDemo } from "./demo/shadow-sealed.js";

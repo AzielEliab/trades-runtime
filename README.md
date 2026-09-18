@@ -2,18 +2,18 @@
 
 Private **TypeScript runtime** for a shadow-first AI operating system / company operating intelligence layer. Field trades: HVAC, plumbing, electrical, sewer, and cross-trades.
 
-**Author / identity:** Aziel Eliab only  
-**Version:** 0.3.1  
+**Author / identity:** Aziel Eliab only. See [`IDENTITY.md`](IDENTITY.md). No legal name, home, or county on exports.  
+**Version:** 0.3.2  
 **Role:** `trades-runtime`  
 **License:** Apache-2.0  
 **Visibility:** this repository stays **private**  
-**Status:** 0.3.1 lockstep with Property Intelligence v1.0 in-tree — live-pure core + honest stubs — **BYO** local ServiceTitan + ProBooks inbound — **no** live writes, Worker backends, DOIs, hosted uploader, or production deployment — **Option C/D not started**
+**Status:** 0.3.2 lockstep with Property Intelligence v1.0 in-tree — live-pure core + honest stubs — **BYO** local ServiceTitan + ProBooks inbound — **no** live writes, Worker backends, DOIs, hosted uploader, or production deployment — **Option C code-ready / pilot not started** — **Option D not started**
 
 The product is the software in `src/`. `docs/` is a thin local catalog/UI. GitHub Pages is **intentionally disabled** (`live_backends: false`). There is no Pages workflow. **PDFs are never published.** Implementer specs live at repo-root [`specs/`](specs/) (not under `docs/`).
 
 Standing rule: every PDF Aziel sends is a spec to implement as coded software.
 
-Paper trail: [`TR-AUDIT-2026-09-18`](specs/TR-AUDIT-2026-09-18.txt) · [`TR-AUDIT-2026-09-17`](specs/TR-AUDIT-2026-09-17.txt) · [`TR-CUT-2026-09-17`](specs/TR-CUT-2026-09-17.txt) · [`TR-BOT-2026-09-17`](specs/TR-BOT-2026-09-17.txt) (standing brief) · [`TR-BYO-2026-09-17`](specs/TR-BYO-2026-09-17.txt) (amends TR-BOT §9 and TR-CUT R2–R3).
+Paper trail: [`TR-AUDIT-2026-09-18B`](specs/TR-AUDIT-2026-09-18B.txt) · [`TR-AUDIT-2026-09-18`](specs/TR-AUDIT-2026-09-18.txt) · [`TR-AUDIT-2026-09-17`](specs/TR-AUDIT-2026-09-17.txt) · [`TR-CUT-2026-09-17`](specs/TR-CUT-2026-09-17.txt) · [`TR-BOT-2026-09-17`](specs/TR-BOT-2026-09-17.txt) (standing brief) · [`TR-BYO-2026-09-17`](specs/TR-BYO-2026-09-17.txt) (amends TR-BOT §9 and TR-CUT R2–R3).
 
 ## Install, test, demo
 
@@ -23,10 +23,11 @@ npm test
 npm run typecheck
 npm run demo
 npm run byo:admit-demo
+npm run shadow:sealed-demo
 npm run manifest
 ```
 
-`npm test` runs constitutional rule tests including Human Authority, confidence≠truth, CrossTrade secondary-only routing, v0.2 recognition / pricebook lock / mission board / location economics, the 0.3.1 execution spine (FragGate inbound, durable receipts, `runAction`), restart-replay of append-only JSONL receipts (`data/receipts.jsonl` or `{tmpdir}/tr-replay-*/receipts.jsonl`), and the synthetic BYO admit demo.
+`npm test` runs constitutional rule tests including Human Authority, confidence≠truth, CrossTrade secondary-only routing, v0.2 recognition / pricebook lock / mission board / location economics, the 0.3.2 execution spine (FragGate inbound, durable receipts, `runAction`), restart-replay of append-only JSONL receipts (`data/receipts.jsonl` or `{tmpdir}/tr-replay-*/receipts.jsonl`), the synthetic BYO admit demo, and Option C sealed-shadow scaffolding (no auto-promote, engagement drop-back, required settlement fields).
 
 CI (`.github/workflows/ci.yml`) runs `npm ci`, `npm run typecheck`, and `npm test` on pull requests and pushes to `main`. GitHub Pages is intentionally disabled — do not treat a github.io URL as a test gate.
 
@@ -55,12 +56,16 @@ CI (`.github/workflows/ci.yml`) runs `npm ci`, `npm run typecheck`, and `npm tes
 | `runAction()` spine | `src/spine/run-action.ts` | live-pure |
 | Actor / authority registry | `src/core/actor-registry.ts` | live-pure |
 | Shadow modes | `src/core/shadow-modes.ts` | live-pure |
+| Engagement rules (not an order) | `src/core/engagement-rules.ts` | live-pure |
+| One-branch shadow config | `src/core/shadow-branch.ts` | live-pure |
+| Settlement harness | `src/core/settlement-harness.ts` | live-pure |
 | ServiceTitan shadow (read-only) | `src/spine/servicetitan-shadow.ts` | live-pure |
 | ProBooks shadow (read-only, peer inbound) | `src/spine/probooks-shadow.ts` | live-pure |
 | Local BYO inbound layout | `src/spine/inbound-layout.ts` | live-pure |
 | Local inbound config (no cloud account) | `src/spine/local-inbound-config.ts` | live-pure |
 | Runtime isolate (per-instance receipts) | `src/spine/runtime-isolate.ts` | live-pure |
 | Synthetic BYO admit demo | `src/demo/byo-admit.ts` | live-pure |
+| Synthetic sealed-shadow demo | `src/demo/shadow-sealed.ts` | live-pure |
 | Fulfillment state machine | `src/domain/fulfillment-machine.ts` | live-pure |
 | Mission board clock | `src/domain/mission-board.ts` | live-pure |
 | PI wired to jobs | `src/domain/property-jobs.ts` | live-pure |
@@ -93,10 +98,12 @@ Inherited names come only from [`specs/aziel-runtime-inheritance.txt`](specs/azi
 | --- | --- | --- |
 | A | Merge-only | done |
 | B | Local spine | done in software |
-| C | One-branch shadow | **not started** |
+| C | One-branch shadow | **code-ready / pilot not started** |
 | D | Advise-lock pilot | **not started** |
 
-Do not tell a GM the company OS is live. Do not fake Option C/D.
+Software for Option C exists (named branch, engagement rules, sealed settlement harness, synthetic demo). That is **not** a company or field pilot. Do not tell a GM the company OS is live. Do not fake Option C as a live company pilot. Option D is still NO.
+
+Still human/operator-only: a real ServiceTitan path on their box, a named GM, and sealed days against their actuals. The authoring node does not hold that dump.
 
 ## Pages (intentionally disabled)
 

@@ -1,12 +1,23 @@
 export const RUNTIME_MANIFEST = {
   product: "trades-runtime",
-  version: "0.3.1",
+  version: "0.3.2",
   author: "Aziel Eliab",
   identity: "Aziel Eliab",
   role: "trades-runtime",
   kind: "shadow-first-operating-intelligence",
   live_backends: false,
-  honesty: "Pure/stub TypeScript runtime. BYO local ServiceTitan + ProBooks inbound. Authoring node is not a data custodian. No central dump. No hosted uploader. No phone-home. No ServiceTitan or ProBooks write-back. live_backends false. Pages off (workflow deleted). Credentials local only. No production claim. Option C/D not started.",
+  honesty: "Pure/stub TypeScript runtime. BYO local ServiceTitan + ProBooks inbound. Authoring node is not a data custodian. No central dump. No hosted uploader. No phone-home. No ServiceTitan or ProBooks write-back. live_backends false. Pages off (workflow deleted). Credentials local only. No production claim. Option C code-ready / pilot not started. Option D not started. Not a live company pilot.",
+  launch_options: {
+    A: { name: "Merge-only", status: "done" },
+    B: { name: "Local spine", status: "done-in-software" },
+    C: {
+      name: "One-branch shadow",
+      status: "code-ready-pilot-not-started",
+      software: "code-ready",
+      pilot: "not-started"
+    },
+    D: { name: "Advise-lock pilot", status: "not-started" }
+  },
   modules: [
     { slug: "ids", path: "src/core/ids.ts", status: "live-pure", summary: "Canonical entity IDs." },
     { slug: "events", path: "src/core/events.ts", status: "live-pure", summary: "Event contracts and idempotency helpers." },
@@ -16,6 +27,9 @@ export const RUNTIME_MANIFEST = {
     { slug: "human-authority", path: "src/core/human-authority.ts", status: "live-pure", summary: "Human overrides win; disagreement preserved." },
     { slug: "actor-registry", path: "src/core/actor-registry.ts", status: "live-pure", summary: "Named roles, branch scope, lock-holder id. Override is not a bare boolean." },
     { slug: "shadow-modes", path: "src/core/shadow-modes.ts", status: "live-pure", summary: "SHADOW-SEALED / SHADOW-VISIBLE / ADVISE-LOCKED." },
+    { slug: "engagement-rules", path: "src/core/engagement-rules.ts", status: "live-pure", summary: "Written this-is-not-an-order rules. SHADOW-VISIBLE drops to SEALED if treated as a ticket/order." },
+    { slug: "shadow-branch", path: "src/core/shadow-branch.ts", status: "live-pure", summary: "One named branch. Never auto-promote SEALED→VISIBLE. ADVISE-LOCKED gated on actor registry. Pilot not started." },
+    { slug: "settlement-harness", path: "src/core/settlement-harness.ts", status: "live-pure", summary: "Required settlement fields. Hindsight cannot rewrite a sealed recommendation." },
     { slug: "trades-coherence", path: "src/inherited/trades-coherence.ts", status: "live-pure", summary: "Primary vs alternate path." },
     { slug: "evidence-packet", path: "src/inherited/evidence-packet.ts", status: "live-pure", summary: "Provenance wrapper; trust ≠ truth." },
     { slug: "decision-gate", path: "src/inherited/decision-gate.ts", status: "live-pure", summary: "High-consequence PASS|REVISE|BLOCK." },
@@ -55,6 +69,7 @@ export const RUNTIME_MANIFEST = {
     { slug: "local-inbound-config", path: "src/spine/local-inbound-config.ts", status: "live-pure", summary: "Optional local paths / read endpoints. No cloud account. Credentials stay on the user's machine." },
     { slug: "runtime-isolate", path: "src/spine/runtime-isolate.ts", status: "live-pure", summary: "Separate receipt/ledger files per runtime instance. No shared hosted corpus." },
     { slug: "byo-admit-demo", path: "src/demo/byo-admit.ts", status: "live-pure", summary: "Synthetic fixture admit proof. Wrapper ≠ VERIFIED. Writes throw. Not a customer dump." },
+    { slug: "shadow-sealed-demo", path: "src/demo/shadow-sealed.ts", status: "live-pure", summary: "Synthetic N-day sealed settlement proof. Mode + hashes. Not a company pilot." },
     { slug: "servicetitan-connector", path: "src/spine/servicetitan-shadow.ts", status: "stub", summary: "Live ServiceTitan writes stay refused." },
     { slug: "probooks-connector", path: "src/spine/probooks-shadow.ts", status: "stub", summary: "Live ProBooks writes stay refused." }
   ]
