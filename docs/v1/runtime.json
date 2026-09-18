@@ -5,8 +5,8 @@
   "title": "Trades-Runtime",
   "author": "Aziel Eliab",
   "identity": "Aziel Eliab",
-  "version": "0.3.1",
-  "runtime_version": "0.3.1",
+  "version": "0.3.2",
+  "runtime_version": "0.3.2",
   "spec_pack": "repo-root specs/ (not published on Pages)",
   "property_intelligence": "1.0",
   "role": "trades-runtime",
@@ -20,13 +20,19 @@
   "status": "live-pure",
   "live_backends": false,
   "one_line": "Shadow-first TypeScript operating system for multi-branch HVAC, plumbing, electrical, sewer, and cross-trades field service.",
-  "honesty": "Software modules in src/ are live-pure (executable, tested) or stub. BYO local ServiceTitan + ProBooks inbound (peer sources). Authoring node is not a data custodian. No central dump. No hosted uploader. No phone-home. No ServiceTitan or ProBooks write-back. live_backends false. Pages off (workflow deleted). Credentials local only. No live Worker backends, DOIs, or production APIs. Option C/D not started.",
+  "honesty": "Software modules in src/ are live-pure (executable, tested) or stub. BYO local ServiceTitan + ProBooks inbound (peer sources). Authoring node is not a data custodian. No central dump. No hosted uploader. No phone-home. No ServiceTitan or ProBooks write-back. live_backends false. Pages off (workflow deleted). Credentials local only. No live Worker backends, DOIs, or production APIs. Option C code-ready / pilot not started. Option D not started. Not a live company pilot.",
   "launch_options": {
     "A": { "name": "Merge-only", "status": "done" },
     "B": { "name": "Local spine", "status": "done-in-software" },
-    "C": { "name": "One-branch shadow", "status": "not-started" },
+    "C": {
+      "name": "One-branch shadow",
+      "status": "code-ready-pilot-not-started",
+      "software": "code-ready",
+      "pilot": "not-started",
+      "honesty": "Software scaffolding exists. Company/field pilot has not started. Not a live company OS."
+    },
     "D": { "name": "Advise-lock pilot", "status": "not-started" },
-    "note": "Do not fake Option C/D. Field launch is not live."
+    "note": "Do not fake Option C as a live company pilot. Option D is still NO. Field launch is not live."
   },
   "design_target": {
     "branches": "13-15",
@@ -285,6 +291,9 @@
     { "slug": "human-authority", "path": "src/core/human-authority.ts", "status": "live-pure", "summary": "Human overrides win; disagreement preserved." },
     { "slug": "actor-registry", "path": "src/core/actor-registry.ts", "status": "live-pure", "summary": "Named roles, branch scope, lock-holder id. Override is not a bare boolean." },
     { "slug": "shadow-modes", "path": "src/core/shadow-modes.ts", "status": "live-pure", "summary": "SHADOW-SEALED / SHADOW-VISIBLE / ADVISE-LOCKED." },
+    { "slug": "engagement-rules", "path": "src/core/engagement-rules.ts", "status": "live-pure", "summary": "Written this-is-not-an-order rules. SHADOW-VISIBLE drops to SEALED if treated as a ticket/order." },
+    { "slug": "shadow-branch", "path": "src/core/shadow-branch.ts", "status": "live-pure", "summary": "One named branch. Never auto-promote SEALED→VISIBLE. ADVISE-LOCKED gated on actor registry. Pilot not started." },
+    { "slug": "settlement-harness", "path": "src/core/settlement-harness.ts", "status": "live-pure", "summary": "Required settlement fields. Hindsight cannot rewrite a sealed recommendation." },
     { "slug": "trades-coherence", "path": "src/inherited/trades-coherence.ts", "status": "live-pure", "summary": "Primary vs alternate → PASS|FLAG|HOLD|HUMAN_REVIEW." },
     { "slug": "evidence-packet", "path": "src/inherited/evidence-packet.ts", "status": "live-pure", "summary": "Provenance wrapper; trust ≠ truth." },
     { "slug": "decision-gate", "path": "src/inherited/decision-gate.ts", "status": "live-pure", "summary": "Definition/Evidence/Impact/Integrity/Responsibility." },
@@ -324,6 +333,7 @@
     { "slug": "local-inbound-config", "path": "src/spine/local-inbound-config.ts", "status": "live-pure", "summary": "Optional local paths / read endpoints. No cloud account. Credentials stay on the user's machine." },
     { "slug": "runtime-isolate", "path": "src/spine/runtime-isolate.ts", "status": "live-pure", "summary": "Separate receipt/ledger files per runtime instance. No shared hosted corpus." },
     { "slug": "byo-admit-demo", "path": "src/demo/byo-admit.ts", "status": "live-pure", "summary": "Synthetic fixture admit proof. Wrapper ≠ VERIFIED. Writes throw. Not a customer dump." },
+    { "slug": "shadow-sealed-demo", "path": "src/demo/shadow-sealed.ts", "status": "live-pure", "summary": "Synthetic N-day sealed settlement proof. Mode + hashes. Not a company pilot." },
     { "slug": "servicetitan-connector", "path": "src/spine/servicetitan-shadow.ts", "status": "stub", "summary": "Live ServiceTitan writes stay refused." },
     { "slug": "probooks-connector", "path": "src/spine/probooks-shadow.ts", "status": "stub", "summary": "Live ProBooks writes stay refused." }
   ],
@@ -350,7 +360,8 @@
     { "slug": "decision-fabric", "name": "Decision Fabric reconciler", "status": "live-pure", "summary": "src/domain/decision-fabric.ts" },
     { "slug": "property-intelligence", "name": "Property / Neighborhood / Regional Intelligence", "status": "live-pure", "summary": "Addendum v1.0 — living property record, value ranges, neighborhood priors, regional ladder." },
     { "slug": "execution-spine", "name": "Execution spine (FragGate inbound / durable receipts / runAction)", "status": "live-pure", "summary": "TR-AUDIT-2026-09-17 cuts 4a–4c + TR-BYO-2026-09-17. Untrusted wrap ≠ evidence. ST + ProBooks peer inbound. Chain C survives restart. Isolate per instance." },
-    { "slug": "byo-inbound", "name": "BYO ServiceTitan + ProBooks inbound", "status": "live-pure", "summary": "Each user brings their ST and ProBooks into their local runtime. No central dump. No hosted uploader. Writes refused." }
+    { "slug": "byo-inbound", "name": "BYO ServiceTitan + ProBooks inbound", "status": "live-pure", "summary": "Each user brings their ST and ProBooks into their local runtime. No central dump. No hosted uploader. Writes refused." },
+    { "slug": "option-c-scaffold", "name": "Option C one-branch shadow scaffolding", "status": "live-pure", "summary": "Named branch + engagement rules + sealed settlement harness. Code-ready. Pilot not started. Not a live company OS." }
   ],
   "planned_ops": [
     { "slug": "observe", "name": "Observe", "status": "planned", "summary": "Ingest and normalize authorized operational data." },

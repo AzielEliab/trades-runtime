@@ -1,0 +1,102 @@
+{
+  "synthetic": true,
+  "customerData": false,
+  "pilotStarted": false,
+  "fieldLaunch": false,
+  "branchId": "tr:branch:midwest-3",
+  "mode": "SHADOW-SEALED",
+  "days": [
+    {
+      "day": "2026-09-14",
+      "sealedAt": "2026-09-14T12:05:00Z",
+      "settledAt": "2026-09-14T18:05:00Z",
+      "plannedAction": "dispatch",
+      "knownInputs": {
+        "call": "tr:call:no-cool-1042",
+        "issue": "no-cool",
+        "synthetic": true
+      },
+      "expected": {
+        "vanId": "tr:van:214",
+        "firstTrip": true
+      },
+      "confidence": {
+        "predictionConfidence": 0.72,
+        "evidenceStrength": "MEDIUM",
+        "sourceQuality": "HIGH",
+        "agreement": "MEDIUM",
+        "verificationStatus": "PARTIAL"
+      },
+      "actualOutcome": {
+        "vanId": "tr:van:088",
+        "firstTrip": false
+      },
+      "override": null
+    },
+    {
+      "day": "2026-09-15",
+      "sealedAt": "2026-09-15T12:05:00Z",
+      "settledAt": "2026-09-15T18:20:00Z",
+      "plannedAction": "dispatch",
+      "knownInputs": {
+        "call": "tr:call:backup-2201",
+        "issue": "main-line-backup",
+        "synthetic": true
+      },
+      "expected": {
+        "vanId": "tr:van:088",
+        "firstTrip": true
+      },
+      "confidence": {
+        "predictionConfidence": 0.68,
+        "evidenceStrength": "MEDIUM",
+        "sourceQuality": "MEDIUM",
+        "agreement": "MEDIUM",
+        "verificationStatus": "PARTIAL"
+      },
+      "actualOutcome": {
+        "vanId": "tr:van:214",
+        "firstTrip": false
+      },
+      "override": {
+        "actorId": "dispatcher-lee",
+        "role": "dispatcher",
+        "branchId": "tr:branch:midwest-3",
+        "lockHolderId": "dispatcher-lee",
+        "reason": "overflow board: keep 088 on laterals",
+        "replacementAction": "dispatch",
+        "replacementPayload": {
+          "vanId": "tr:van:214"
+        },
+        "at": "2026-09-15T12:08:00Z"
+      }
+    },
+    {
+      "day": "2026-09-16",
+      "sealedAt": "2026-09-16T11:40:00Z",
+      "settledAt": "2026-09-16T17:10:00Z",
+      "plannedAction": "hold-for-parts",
+      "knownInputs": {
+        "call": "tr:call:panel-upgrade-77",
+        "issue": "panel-upgrade",
+        "synthetic": true
+      },
+      "expected": {
+        "vanId": "tr:van:041",
+        "firstTrip": false
+      },
+      "confidence": {
+        "predictionConfidence": 0.61,
+        "evidenceStrength": "LOW",
+        "sourceQuality": "MEDIUM",
+        "agreement": "LOW",
+        "verificationStatus": "UNVERIFIED"
+      },
+      "actualOutcome": {
+        "vanId": "tr:van:041",
+        "firstTrip": false
+      },
+      "override": null
+    }
+  ]
+}

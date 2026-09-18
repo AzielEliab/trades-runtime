@@ -2,10 +2,22 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { RUNTIME_MANIFEST } from "../src/manifest.js";
 
-const PRODUCT = "0.3.1";
+const PRODUCT = "0.3.2";
+const IDENTITY = "Aziel Eliab";
+const PRODUCT_SURFACES = [
+  "README.md",
+  "IDENTITY.md",
+  "package.json",
+  "src/manifest.ts",
+  "src/cli.ts",
+  "docs/cite.json",
+  "docs/v1/runtime.json",
+  "docs/llms.txt",
+  "docs/index.html"
+];
 
-describe("TR-AUDIT-2026-09-18 hygiene + BYO demo version lockstep", () => {
-  it("keeps package, manifest, and catalog on 0.3.1", () => {
+describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", () => {
+  it("keeps package, manifest, and catalog on 0.3.2", () => {
     const pkg = JSON.parse(readFileSync("package.json", "utf8")) as { version: string; author: string };
     const runtime = JSON.parse(readFileSync("docs/v1/runtime.json", "utf8")) as {
       version: string;
@@ -17,7 +29,7 @@ describe("TR-AUDIT-2026-09-18 hygiene + BYO demo version lockstep", () => {
       author?: string;
       identity?: string;
       launch_options?: {
-        C?: { status: string };
+        C?: { status: string; software?: string; pilot?: string };
         D?: { status: string };
       };
     };
@@ -38,27 +50,55 @@ describe("TR-AUDIT-2026-09-18 hygiene + BYO demo version lockstep", () => {
     expect(RUNTIME_MANIFEST.live_backends).toBe(false);
     expect(RUNTIME_MANIFEST.honesty).toMatch(/BYO local ServiceTitan \+ ProBooks/);
     expect(RUNTIME_MANIFEST.honesty).toMatch(/Credentials local only/);
-    expect(RUNTIME_MANIFEST.honesty).toMatch(/Option C\/D not started/);
+    expect(RUNTIME_MANIFEST.honesty).toMatch(/Option C code-ready \/ pilot not started/);
+    expect(RUNTIME_MANIFEST.honesty).toMatch(/Option D not started/);
+    expect(RUNTIME_MANIFEST.honesty).toMatch(/Not a live company pilot/);
     expect(runtime.honesty).toMatch(/BYO local ServiceTitan \+ ProBooks/);
-    expect(runtime.honesty).toMatch(/Option C\/D not started/);
-    expect(runtime.launch_options?.C?.status).toBe("not-started");
+    expect(runtime.honesty).toMatch(/Option C code-ready \/ pilot not started/);
+    expect(runtime.honesty).toMatch(/Option D not started/);
+    expect(runtime.launch_options?.C?.status).toBe("code-ready-pilot-not-started");
+    expect(runtime.launch_options?.C?.software).toBe("code-ready");
+    expect(runtime.launch_options?.C?.pilot).toBe("not-started");
     expect(runtime.launch_options?.D?.status).toBe("not-started");
-    expect(readFileSync("README.md", "utf8")).toMatch(/\*\*Version:\*\* 0\.3\.1/);
+    expect(RUNTIME_MANIFEST.launch_options.C.status).toBe("code-ready-pilot-not-started");
+    expect(RUNTIME_MANIFEST.launch_options.D.status).toBe("not-started");
+    expect(readFileSync("README.md", "utf8")).toMatch(/\*\*Version:\*\* 0\.3\.2/);
     expect(readFileSync("README.md", "utf8")).toMatch(/TR-BOT-2026-09-17/);
     expect(readFileSync("README.md", "utf8")).toMatch(/TR-BYO-2026-09-17/);
-    expect(readFileSync("README.md", "utf8")).toMatch(/TR-AUDIT-2026-09-18/);
+    expect(readFileSync("README.md", "utf8")).toMatch(/TR-AUDIT-2026-09-18B/);
     expect(readFileSync("README.md", "utf8")).toMatch(/data\/inbound\/servicetitan/);
     expect(readFileSync("README.md", "utf8")).toMatch(/data\/inbound\/probooks/);
-    expect(readFileSync("README.md", "utf8")).toMatch(/Option C\/D not started/);
+    expect(readFileSync("README.md", "utf8")).toMatch(/Option C code-ready \/ pilot not started/);
+    expect(readFileSync("README.md", "utf8")).toMatch(/Option D not started/);
     expect(RUNTIME_MANIFEST.modules.some((module) => module.slug === "probooks-shadow")).toBe(true);
     expect(RUNTIME_MANIFEST.modules.some((module) => module.slug === "byo-admit-demo")).toBe(true);
-    expect(pkg.author).toBe("Aziel Eliab");
-    expect(RUNTIME_MANIFEST.author).toBe("Aziel Eliab");
-    expect(RUNTIME_MANIFEST.identity).toBe("Aziel Eliab");
-    expect(runtime.author).toBe("Aziel Eliab");
-    expect(runtime.identity).toBe("Aziel Eliab");
-    expect(cite.author).toBe("Aziel Eliab");
-    expect(cite.identity).toBe("Aziel Eliab");
+    expect(RUNTIME_MANIFEST.modules.some((module) => module.slug === "engagement-rules")).toBe(true);
+    expect(RUNTIME_MANIFEST.modules.some((module) => module.slug === "shadow-branch")).toBe(true);
+    expect(RUNTIME_MANIFEST.modules.some((module) => module.slug === "settlement-harness")).toBe(true);
+    expect(RUNTIME_MANIFEST.modules.some((module) => module.slug === "shadow-sealed-demo")).toBe(true);
+    expect(pkg.author).toBe(IDENTITY);
+    expect(RUNTIME_MANIFEST.author).toBe(IDENTITY);
+    expect(RUNTIME_MANIFEST.identity).toBe(IDENTITY);
+    expect(runtime.author).toBe(IDENTITY);
+    expect(runtime.identity).toBe(IDENTITY);
+    expect(cite.author).toBe(IDENTITY);
+    expect(cite.identity).toBe(IDENTITY);
+  });
+
+  it("locks public identity to Aziel Eliab only", () => {
+    expect(existsSync("IDENTITY.md")).toBe(true);
+    const identity = readFileSync("IDENTITY.md", "utf8");
+    expect(identity).toMatch(/Aziel Eliab only/);
+    expect(identity).toMatch(/legal name/);
+    expect(identity).toMatch(/home address/);
+    expect(identity).toMatch(/county/);
+    expect(identity).not.toMatch(/Elroi/);
+    expect(readFileSync("README.md", "utf8")).toMatch(/IDENTITY\.md/);
+    for (const path of PRODUCT_SURFACES) {
+      const text = readFileSync(path, "utf8");
+      expect(text).toMatch(/Aziel Eliab/);
+      expect(text).not.toMatch(/Elroi/);
+    }
   });
 
   it("lists only canonical communications / pricebook / truck-stock modules", () => {
