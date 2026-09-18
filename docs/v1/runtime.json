@@ -11,8 +11,9 @@
   "property_intelligence": "1.0",
   "role": "trades-runtime",
   "kind": "shadow-first-operating-intelligence",
-  "layer": "typescript-runtime + thin-pages-ui",
+  "layer": "typescript-runtime + docs-ui (Pages off)",
   "visibility": "private",
+  "pages": "off",
   "license": "Apache-2.0",
   "repository": "https://github.com/AzielEliab/trades-runtime",
   "sibling_of": "aziel-runtime",
@@ -72,7 +73,7 @@
     "cite": "/cite.json",
     "llms": "/llms.txt",
     "software": "src/",
-    "note": "Pages is a thin UI over the TypeScript runtime. Implementer specs stay at repo-root specs/ and are not published."
+    "note": "docs/ is a thin local UI catalog. GitHub Pages stays off. live_backends is false. Implementer specs stay at repo-root specs/ and are not published."
   },
   "deployment_ladder": [
     {
