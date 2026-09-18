@@ -1,0 +1,54 @@
+TRADES-RUNTIME · OPERATOR RE-AUDIT                                                                                              TR-AUDIT-2026-09-18B
+
+Trades-Runtime Operator Re-Audit (post fix-all)
+Receipt ID TR-AUDIT-2026-09-18B · successor to TR-AUDIT-2026-09-18
+Snapshot after hygiene merge · not a production claim
+Identity: Aziel Eliab only. Repo private. Pages off.
+
+Snapshot
+  main                         83891cbe26bb — Merge hygiene + BYO admit proof (0.3.1)
+  Version                      0.3.1 lockstep
+  Visibility                   private · has_pages false · Pages site 404
+  Branches                     main only
+  Open PRs                     none
+  CI @ tip                     success · 16 files · 110 passed
+  Workflows                    ci.yml only (pages.yml deleted)
+  PDF under docs/              none
+  Orphans                      none (comms.ts / pricebook-stock.ts gone)
+
+Prior findings disposition
+  G1 P2 orphan dupes           CLOSED — deleted; canonical communications / pricebook / truck-stock only
+  G2 P2 stale cursor branches  CLOSED — remote branches = [main] only
+  G3 P2 BYO admit unproven     CLOSED for software path — npm run byo:admit-demo + synthetic fixtures + tests;
+                               real customer ST/ProBooks still operator-local (TR-BYO; not a central dump)
+  G4 P2 Option C/D             OPEN by design — still NO; field launch ~25%; do not claim company OS live
+  G5 P3 pages:write workflow   CLOSED — pages.yml removed; Pages intentionally disabled in README
+  G6 P3 commit display name    OPEN (low) — product strings Aziel Eliab; committer display may still vary
+
+What holds
+  Constitution spine; FragGate ST+ProBooks; durable receipts + restart-replay; runAction; actor registry;
+  fulfillment SM; mission clock; PI↔jobs; live_backends false; writes refused; BYO law; no PDFs on Pages.
+
+Ladder
+  R0–R1 DONE
+  R2 CODE + synthetic admit demo DONE; real-box user exports still theirs
+  R3–R7 NOT STARTED (pilots)
+
+Launch readiness
+  A 10/10 · B ~9.5/10 · C 2/10 · D 1/10 · public/writes 0/10
+
+Open findings (remaining)
+  ID    Sev   Finding
+  H1    P2    Option C/D not started — needs named branch + real read sources on operator box + engagement rules
+  H2    P3    Commit author display may show Aziel Elroi Eliab while product identity is Aziel Eliab
+
+Advice — next physical act
+  On operator machine: clone 0.3.1, npm test, npm run byo:admit-demo, then point data/inbound at THEIR read-only
+  ST and/or ProBooks. No new architecture PDF. No central dump. No Pages enable.
+
+Disposition
+  Fix-all for G1/G2/G3(software)/G5 complete. Re-audited clean on tip. Working copy is Option B + BYO admit demo.
+  Honest blocker to field use remains Option C (human-facing shadow), not missing TypeScript modules.
+
+Method
+  GitHub connector: metadata, tree, CI logs (110 passed), workflows, branches. No customer credentials accessed.
