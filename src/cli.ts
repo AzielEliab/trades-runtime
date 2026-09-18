@@ -20,7 +20,7 @@ function main(argv: string[]): void {
       "  npx tsx src/cli.ts manifest   print software manifest",
       "  npx tsx src/cli.ts demo       run synthetic shadow-day + receipts",
       "",
-      "No live ServiceTitan writes. Design/stub connectors only.",
+      "BYO local ServiceTitan + ProBooks inbound. No live writes. Credentials stay on this machine.",
       ""
     ].join("\n")
   );

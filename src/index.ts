@@ -115,6 +115,7 @@ export {
 } from "./domain/property-intelligence-hooks.js";
 export * from "./rules/constitution.js";
 export {
+  admitHumanCorrection,
   admitInbound,
   admitInboundOrThrow,
   wrapperIsVerification
@@ -131,4 +132,21 @@ export {
   refuseServiceTitanWrite,
   refuseServiceTitanWriteMethod
 } from "./spine/servicetitan-shadow.js";
+export {
+  ingestProBooksBook,
+  ingestProBooksCost,
+  ingestProBooksItem,
+  ingestProBooksShadow,
+  ingestProBooksVendor,
+  mayWriteProBooks,
+  refuseProBooksWrite,
+  refuseProBooksWriteMethod
+} from "./spine/probooks-shadow.js";
+export {
+  inboundDir,
+  inboundPath,
+  refuseHostedTenantLayout
+} from "./spine/inbound-layout.js";
+export { defaultLocalInboundConfig, parseLocalInboundConfig } from "./spine/local-inbound-config.js";
+export { isolateReceiptPath, openIsolatedReceipts } from "./spine/runtime-isolate.js";
 export { runRecordedShadowDays, runShadowDayDemo } from "./demo/shadow-day.js";

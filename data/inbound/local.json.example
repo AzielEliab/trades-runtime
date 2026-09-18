@@ -1,0 +1,8 @@
+{
+  "instanceId": "local",
+  "servicetitanPath": "data/inbound/servicetitan",
+  "probooksPath": "data/inbound/probooks",
+  "servicetitanReadEndpoint": null,
+  "probooksReadEndpoint": null,
+  "note": "Paths and optional local read endpoints only. No cloud account. Credentials stay on this machine."
+}

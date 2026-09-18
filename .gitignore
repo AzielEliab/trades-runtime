@@ -2,5 +2,16 @@ node_modules/
 dist/
 .vitest/
 *.log
-data/*
+
+# Local BYO dumps, isolate ledgers, and receipts stay on the user's machine.
+data/**
 !data/.gitkeep
+!data/inbound/
+!data/inbound/README.md
+!data/inbound/local.json.example
+!data/inbound/servicetitan/
+!data/inbound/servicetitan/.gitkeep
+!data/inbound/probooks/
+!data/inbound/probooks/.gitkeep
+!data/runtime/
+!data/runtime/.gitkeep

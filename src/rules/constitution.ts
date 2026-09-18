@@ -181,3 +181,16 @@ export function valueEffectsAreEstimates(): boolean {
 export function costIsNotUplift(): boolean {
   return repairCostEqualsResaleUplift() === false;
 }
+
+export const RULES_BYO = [
+  "byo-not-central-dump",
+  "per-runtime-isolate",
+  "both-sources-first-class",
+  "fraggate-still-admits",
+  "wrapper-not-verified",
+  "writes-refused",
+  "credentials-local",
+  "no-tenant-data-on-pages"
+] as const;
+
+export type RuleIdByo = (typeof RULES_BYO)[number];
