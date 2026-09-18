@@ -3,17 +3,18 @@
 Private **TypeScript runtime** for a shadow-first AI operating system / company operating intelligence layer. Field trades: HVAC, plumbing, electrical, sewer, and cross-trades.
 
 **Author / identity:** Aziel Eliab only. See [`IDENTITY.md`](IDENTITY.md). No legal name, home, or county on exports.  
-**Version:** 0.3.2  
+**Version:** 0.3.3  
 **Role:** `trades-runtime`  
 **License:** Apache-2.0  
-**Visibility:** this repository stays **private**  
-**Status:** 0.3.2 lockstep with Property Intelligence v1.0 in-tree — live-pure core + honest stubs — **BYO** local ServiceTitan + ProBooks inbound — **no** live writes, Worker backends, DOIs, hosted uploader, or production deployment — **Option C code-ready / pilot not started** — **Option D not started**
+**Visibility:** this repository stays **private**; public get is the giveaway Worker  
+**Public Worker (if deployed):** https://trades-runtime.vibelock.workers.dev  
+**Status:** 0.3.3 public-giveaway cut — lockstep with Property Intelligence v1.0 in-tree — live-pure core + honest stubs — **BYO** local ServiceTitan + ProBooks inbound — **no** live writes, tenant data, ST/ProBooks write-back, DOIs, hosted uploader, or production company-OS claim — **Option C code-ready / pilot not started** — **Option D not started**
 
 The product is the software in `src/`. `docs/` is a thin local catalog/UI. GitHub Pages is **intentionally disabled** (`live_backends: false`). There is no Pages workflow. **PDFs are never published.** Implementer specs live at repo-root [`specs/`](specs/) (not under `docs/`).
 
 Standing rule: every PDF Aziel sends is a spec to implement as coded software.
 
-Paper trail: [`TR-AUDIT-2026-09-18B`](specs/TR-AUDIT-2026-09-18B.txt) · [`TR-AUDIT-2026-09-18`](specs/TR-AUDIT-2026-09-18.txt) · [`TR-AUDIT-2026-09-17`](specs/TR-AUDIT-2026-09-17.txt) · [`TR-CUT-2026-09-17`](specs/TR-CUT-2026-09-17.txt) · [`TR-BOT-2026-09-17`](specs/TR-BOT-2026-09-17.txt) (standing brief) · [`TR-BYO-2026-09-17`](specs/TR-BYO-2026-09-17.txt) (amends TR-BOT §9 and TR-CUT R2–R3).
+Paper trail: [`TR-AUDIT-2026-09-18C`](specs/TR-AUDIT-2026-09-18C.txt) · [`TR-AUDIT-2026-09-18B`](specs/TR-AUDIT-2026-09-18B.txt) · [`TR-AUDIT-2026-09-18`](specs/TR-AUDIT-2026-09-18.txt) · [`TR-AUDIT-2026-09-17`](specs/TR-AUDIT-2026-09-17.txt) · [`TR-CUT-2026-09-17`](specs/TR-CUT-2026-09-17.txt) · [`TR-BOT-2026-09-17`](specs/TR-BOT-2026-09-17.txt) (standing brief) · [`TR-BYO-2026-09-17`](specs/TR-BYO-2026-09-17.txt) (amends TR-BOT §9 and TR-CUT R2–R3).
 
 ## Install, test, demo
 
@@ -27,7 +28,7 @@ npm run shadow:sealed-demo
 npm run manifest
 ```
 
-`npm test` runs constitutional rule tests including Human Authority, confidence≠truth, CrossTrade secondary-only routing, v0.2 recognition / pricebook lock / mission board / location economics, the 0.3.2 execution spine (FragGate inbound, durable receipts, `runAction`), restart-replay of append-only JSONL receipts (`data/receipts.jsonl` or `{tmpdir}/tr-replay-*/receipts.jsonl`), the synthetic BYO admit demo, and Option C sealed-shadow scaffolding (no auto-promote, engagement drop-back, required settlement fields).
+`npm test` runs constitutional rule tests including Human Authority, confidence≠truth, CrossTrade secondary-only routing, v0.2 recognition / pricebook lock / mission board / location economics, the 0.3.3 execution spine (FragGate inbound, durable receipts, `runAction`), restart-replay of append-only JSONL receipts (`data/receipts.jsonl` or `{tmpdir}/tr-replay-*/receipts.jsonl`), the synthetic BYO admit demo, and Option C sealed-shadow scaffolding (no auto-promote, engagement drop-back, required settlement fields).
 
 CI (`.github/workflows/ci.yml`) runs `npm ci`, `npm run typecheck`, and `npm test` on pull requests and pushes to `main`. GitHub Pages is intentionally disabled — do not treat a github.io URL as a test gate.
 
@@ -105,11 +106,65 @@ Software for Option C exists (named branch, engagement rules, sealed settlement 
 
 Still human/operator-only: a real ServiceTitan path on their box, a named GM, and sealed days against their actuals. The authoring node does not hold that dump.
 
+## Public giveaway Worker
+
+Operator-authorized public surface is a Cloudflare Worker — **not** a hosted multi-tenant company OS:
+
+**https://trades-runtime.vibelock.workers.dev**
+
+Worker script name: `trades-runtime` (same `vibelock` workers.dev account pattern as `aziel-runtime.vibelock.workers.dev`). Source: [`workers/giveaway/`](workers/giveaway/).
+
+What it is:
+
+- Human landing + counted Apache-2.0 tarball download
+- Thin read-only `/openapi.json` and `/mcp` for AI clients (health / stats / cite / skill only)
+- Honest Workers KV counters (`COUNTS`): `views` and `downloads` start at 0; increment only on successful 200 responses; no sampling, no seed, no inflation
+
+What it is not:
+
+- Not a ServiceTitan or ProBooks write API
+- Not a central dump / hosted uploader / tenant store
+- Not a production company OS claim (`live_backends: false`)
+- Not GitHub Pages
+
+### Deploy (operator / box with wrangler auth)
+
+This repository does not deploy the Worker. First time on the `vibelock` account:
+
+```bash
+npm ci
+npm test
+cd workers/giveaway
+npm ci
+npx wrangler kv namespace create COUNTS
+# paste the printed id into wrangler.jsonc kv_namespaces[0].id
+npm run pack
+npx wrangler deploy
+```
+
+Later deploys from repo root:
+
+```bash
+npm run giveaway:pack
+cd workers/giveaway && npx wrangler deploy
+```
+
+Local smoke (Miniflare KV, no Cloudflare auth required):
+
+```bash
+npm run giveaway:pack
+cd workers/giveaway
+npx wrangler dev
+# GET http://127.0.0.1:8787/  /download  /v1/health  /v1/stats
+```
+
+Counters: see [`workers/giveaway/README.md`](workers/giveaway/README.md).
+
 ## Pages (intentionally disabled)
 
 GitHub Pages is **intentionally disabled**. There is no `.github/workflows/pages.yml`. Do not add a Pages deploy workflow. Do not enable Pages on the repository. Do not treat a github.io URL as a live product surface.
 
-Keep the repository private. Do not change visibility to public. Do not enable GitHub Pages. Do not add PDFs under `docs/`.
+Keep the repository private. Do not change visibility to public. Public get is the Worker download. Do not enable GitHub Pages. Do not add PDFs under `docs/`.
 
 Local UI preview (Pages stay off):
 

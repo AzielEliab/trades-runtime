@@ -2,6 +2,11 @@ node_modules/
 dist/
 .vitest/
 *.log
+.wrangler/
+
+# Packed giveaway tarball is built at deploy time; do not commit binaries.
+workers/giveaway/release/*.tgz
+workers/giveaway/release/manifest.json
 
 # Local BYO dumps, isolate ledgers, and receipts stay on the user's machine.
 # Keep folder markers only. Synthetic admit fixtures live in test/fixtures/byo/.

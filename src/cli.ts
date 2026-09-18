@@ -25,7 +25,7 @@ function main(argv: string[]): void {
   }
   process.stdout.write(
     [
-      "trades-runtime — private TypeScript runtime (Aziel Eliab)",
+      "trades-runtime — local-first TypeScript runtime (Aziel Eliab)",
       "",
       "  npx tsx src/cli.ts manifest              print software manifest",
       "  npx tsx src/cli.ts demo                  run synthetic shadow-day + receipts",
@@ -34,6 +34,7 @@ function main(argv: string[]): void {
       "",
       "BYO local ServiceTitan + ProBooks inbound. No live writes. Credentials stay on this machine.",
       "Option C code-ready / pilot not started. Option D not started. Pages intentionally disabled.",
+      "Public get (if deployed): https://trades-runtime.vibelock.workers.dev — giveaway UI + counted tarball only.",
       ""
     ].join("\n")
   );

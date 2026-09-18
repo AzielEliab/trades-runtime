@@ -30,3 +30,18 @@ jobs:
 
       - name: Test
         run: npm test
+
+      - name: Giveaway Worker install
+        run: npm ci
+        working-directory: workers/giveaway
+
+      - name: Giveaway Worker typecheck
+        run: npm run typecheck
+        working-directory: workers/giveaway
+
+      - name: Giveaway Worker test
+        run: npm test
+        working-directory: workers/giveaway
+
+      - name: Pack giveaway tarball
+        run: npm run giveaway:pack

@@ -1,0 +1,23 @@
+{
+  "name": "trades-runtime-giveaway-worker",
+  "version": "0.3.3",
+  "private": true,
+  "type": "module",
+  "author": "Aziel Eliab",
+  "license": "Apache-2.0",
+  "description": "Public giveaway Worker for Trades-Runtime. UI + counted tarball. Not a hosted company OS.",
+  "scripts": {
+    "pack": "node scripts/pack-release.mjs",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "dev": "npm run pack && wrangler dev",
+    "deploy": "npm run pack && wrangler deploy",
+    "cf-typegen": "wrangler types"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260918.1",
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.9",
+    "wrangler": "^4.40.0"
+  }
+}
