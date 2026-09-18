@@ -1,0 +1,83 @@
+TRADES-RUNTIME · OPERATOR AUDIT                                                                                                   TR-AUDIT-2026-09-18
+
+Trades-Runtime Operator Audit
+Receipt ID TR-AUDIT-2026-09-17 → successor TR-AUDIT-2026-09-18 · snapshot 2026-09-17 21:25 EDT
+Repo AzielEliab/trades-runtime · visibility private · not a production claim
+Identity: Aziel Eliab only. Companions: TR-BOT-2026-09-17, TR-BYO-2026-09-17, TR-CUT-2026-09-17.
+
+Scope
+Post-merge audit of main after Option A/B spine, TR-CUT 6–10, Option B restart-replay, and TR-BYO dual-source inbound.
+Compared prior audit tip (empty main / ab18a105 era) to current main @ 50c2921ab3d0. No merge, Pages enable, or visibility change performed in this audit.
+
+Snapshot
+  Owner / repo                 AzielEliab / trades-runtime
+  Visibility                   private · has_pages false · last push 2026-09-18T01:03:29Z
+  main                         50c2921ab3d0 — Merge TR-BYO: local ST + ProBooks dual-source ingest
+  Open PRs                     none
+  Declared version             0.3.0 lockstep (package.json, README, src/manifest.ts, docs/v1/runtime.json)
+  PI label                     Property Intelligence v1.0 in-tree
+  Tests (CI @ tip)             15 files · 108 passed · typecheck green
+  Live backends                false · pages: "off" · SERVICE_TITAN / ProBooks writes refused
+  Pages workflow               workflow_dispatch only (no push-to-main auto deploy)
+  PDF under docs/              none
+  Specs                        private repo-root specs/ (TR-AUDIT, TR-CUT, TR-BOT, TR-BYO + architecture pack)
+
+What holds
+  F1 (prior): main is the product — FIXED. Default clone is 0.3.0 software.
+  F2 (prior): execution spine — FIXED in code: FragGate, durable receipts, runAction().
+  F3 (prior): version split — FIXED at 0.3.0 lockstep (PI still labeled v1.0 as module family, not product version).
+  F4 (prior): Cursor branch as SoT — FIXED. Canonical history is main.
+  F5: Pages OFF — HOLDS. Do not enable.
+  Constitution spine intact: human wins; confidence≠truth; geography not sole; recognition not raw revenue;
+  LOCK holds; warranty UNKNOWN≠not-covered; pattern≠defect; repair cost≠uplift; lunar weight 0; ST/ProBooks writes throw.
+  Restart-replay of JSONL receipts proven (test + CI).
+  TR-BYO law encoded: BYO dual inbound, isolate per instance, no central dump, no cloudAccount config.
+
+Findings (current)
+  ID    Sev   Finding
+  G1    P2    Duplicate leftovers remain: src/domain/comms.ts vs communications.ts; pricebook-stock.ts vs split pricebook/truck-stock.
+              Manifest points at canonical names; orphans add confusion for operators reading the tree.
+  G2    P2    Merged agent branches still on remote: cursor/option-b-restart-replay-b818, cursor/tr-byo-inbound-7964.
+              Not default; cleanup optional.
+  G3    P2    R2–R3 are software-complete, operator-incomplete by design (TR-BYO). No live ST/ProBooks pull has been run
+              on a user box against real exports. That is not a dump-for-authoring-node task.
+  G4    P2    Option C/D still NO. Field launch overall still ~25%. Do not tell a GM the company OS is live.
+  G5    P3    pages.yml still requests pages:write permission on manual dispatch. Harmless while Pages off; keep manual-only.
+  G6    P3    Author display name on latest merge commit is "Aziel Elroi Eliab"; product identity strings correctly say Aziel Eliab.
+              Prefer Aziel Eliab on future commits for export lock consistency.
+
+Intentionally off (not defects)
+  Live ST/ProBooks writes. Public Pages. Scrape. Central tenant dump. Hosted uploader. Photo-as-misconduct.
+  Fuel-only routing. Auto 30-day penalty. Lunar plumbing as shipped demand. Worker/MCP public surface.
+  Wholesale aziel-runtime Softwares copy. Multi-branch field launch.
+
+Ladder state (TR-CUT / TR-BOT / TR-BYO)
+  R0  DONE — main + CI + 0.3.0
+  R1  DONE in software + restart-replay proof
+  R2  CODE DONE — user points THEIR ST and/or ProBooks; software admits+hashes locally (TR-BYO). Not a central dump.
+  R3–R7  NOT STARTED as operator pilots (SHADOW-VISIBLE / ADVISE-LOCKED / real jobs / second branch)
+
+Launch readiness
+  A Merge-only                 DONE 10/10
+  B Local spine                DONE ~9/10 (code + CI restart-replay; real-box operator clone still theirs)
+  C One-branch shadow          NO ~2/10
+  D Advise-lock pilot          NO ~1/10
+  Public / ST writes           REFUSED 0/10
+
+Advice — next physical act (one)
+  Do not write another architecture PDF.
+  Operator machine: clone main @ 50c2921, npm ci, npm test, npm run demo.
+  Point local config at THEIR read-only ST and/or ProBooks paths under data/inbound/{servicetitan,probooks}.
+  Confirm admit+hash on their machine. Credentials stay local. No write scopes.
+  Optional hygiene: delete merged cursor/* branches; remove or re-export orphan comms.ts / pricebook-stock.ts.
+
+Do not build next
+  Central collection point. Public Pages. ST/ProBooks write client. Scrape layer. Field launch claims. Another addendum until a user-box BYO admit hash exists.
+
+Disposition
+  Audited. Merged line is healthy. Private. Pages off. 108 tests green on tip. Option B is the working copy.
+  Option C has not started. Operator owns the next BYO admit on their box.
+
+Method and limits
+  GitHub connector as AzielEliab: repo metadata, commits, workflows, tree, README, manifest, runtime.json, CI logs (108 passed).
+  Tests not re-executed in this audit sandbox beyond CI log read. No ST/ProBooks credentials accessed.
