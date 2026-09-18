@@ -1,0 +1,260 @@
+TRADES-RUNTIME · GROK / AZBOT STANDING BRIEF                                                                                           TR-BOT-2026-09-17
+
+
+
+
+ Trades-Runtime — Full Standing Brief for Grok / AZbot
+ Document ID TR-BOT-2026-09-17 · issued 2026-09-17 20:26 EDT
+ Audience: Grok-class bots and AZbot operating on AzielEliab/trades-runtime
+ Identity on this file and on the repo: Aziel Eliab only. Repo stays private.
+ Supersedes session notes. Companions: TR-AUDIT-2026-09-17, TR-CUT-2026-09-17.
+
+
+ 0. How a Grok bot must treat this product
+ Load this brief before merging, enabling Pages, adding a connector, drafting a public README, or telling a human the system is
+ “ready to launch.” The product is a shadow-first TypeScript operating-intelligence layer for HVAC, plumbing, electrical, sewer,
+ and cross-trades. It is not aziel-runtime, not a Worker, not a PDF portal, and not a ServiceTitan replacement.
+     Rule                                    Bot behavior
+
+     Operator controls depth                 No unsolicited product surfaces. No public post. No Pages on.
+
+     Export lock                             Aziel Eliab / mesh identity only. No legal name. No home or county on artifacts.
+
+     Honesty                                 live_backends is false. Do not claim production, DOI, or live ST writes.
+
+     Constitution over feature               Human authorized override wins. Confidence ≠ truth. Wrapper ≠ verified.
+
+     Receipts                                Hash + path when a file is the deliverable. Prefer append-only narrative-light records.
+
+     Case boundary                           Horton v. Horton does not belong in this repo or this brief.
+
+     Next-cut discipline                     Do not add an addendum until the named next physical act is done.
+
+     Writes                                  ST POST/PUT/PATCH are refused. Do not compile a write client. New paper required first.
+
+
+ 1. Snapshot (authoritative as of this paper)
+     Repo                                 AzielEliab/trades-runtime · private · Apache-2.0
+
+     Default branch                       main @ 003b9e4f4a3a6d842c393ec42833cb144aad7a22
+
+     Merged                               2026-09-17T23:01:21Z — “Merge TR-AUDIT spine + TR-CUT 6–10 to main (0.3.0)”
+
+     Version                              0.3.0 lockstep (package.json, README, src/manifest.ts). PI labeled v1.0 in-tree.
+
+     Node                                 ≥20 · vitest · typescript · tsx. No production runtime dependencies.
+
+     CI                                   .github/workflows/ci.yml — npm ci + typecheck + test on pull_request and push to main
+
+     Pages                                OFF. pages.yml may still exist. Do not enable. Do not treat Pages as the test gate.
+
+     Live backends                        false. SERVICE_TITAN_WRITES_ENABLED = false.
+
+     Open PRs at issue                    PR #1 and #2 closed onto this line. Confirm no stray agent branch is default.
+
+
+ 2. What the product is
+ A local-first, shadow-first company OS for multi-trade field service. ServiceTitan remains the system of record. Trades-Runtime
+ recommends, freezes evidence, compares later, and never silently takes the wheel. Standing rule in README: every PDF Aziel
+ sends is a spec to implement as coded software. Implementer specs live in specs/. Pages UI lives in docs/. Product lives in src/.
+ Not: a dispatch optimizer, a revenue-as-skill leaderboard, a fixed morning router, an autonomous black box, photo-as-misconduct
+ proof, fuel-first routing, an automatic 30-day callback penalty, a listing scraper, an AVM, or a public mesh node.
+
+ 3. Constitution (must not regress)
+     Family                      Rule
+
+     Authority                   Authorized human override controls live operation. Disagreement is preserved on the receipt.
+
+     History                     Never erase a prior recommendation. Chains are append-only.
+
+     Drift                       Route drift rebases from actual state. Drift is evidence, not automatic failure.
+
+     Bookings                    Existing commitments have precedence. Silent displace is forbidden.
+
+
+
+
+PRIVATE · Aziel Eliab only · load this file before acting on the repo                                                                                p. 1
+TRADES-RUNTIME · GROK / AZBOT STANDING BRIEF                                                                                                  TR-BOT-2026-09-17
+
+
+
+     Family                   Rule
+
+     Fit                      Geography / fuel is never the sole decider.
+
+     Skill                    Revenue is not skill. Skill is normalized. Exploration required to avoid poisoned estimates.
+
+     Returns                  30-day return is a classification problem, not an automatic penalty.
+
+     Media                    Media alone is not proof of misconduct.
+
+     Warranty                 UNKNOWN / LOOKUP_FAILED / POSSIBLE is not “not covered.”
+
+     Evidence                 Material decisions need receipts. Confidence fields stay separated.
+
+     v0.2                     Recognition not raw revenue. Locked pricebook not auto-superseded. Lunar weight 0 without lift. Demand-first
+                              maintenance.
+
+     PI v1.0                  Pattern ≠ defect. Market data ≠ truth. Repair cost ≠ resale uplift. No scrape architecture.
+ Required confidence fields (never one score): prediction_confidence, evidence_strength, source_quality, cross_source_agreement,
+ verification_status (UNVERIFIED / PARTIAL / VERIFIED / CONFLICTED). A valid state: 97% prediction / LOW evidence /
+ UNVERIFIED → blocked from autonomous high-consequence action.
+
+ 4. Module map (0.3.0)
+     Layer                    Path                                                                                                Status
+
+     Core                     src/core/ ids, events, modes, confidence, chains, human-authority, actor-registry,                  live-pure
+                              shadow-modes, hash, warranty
+
+     Inherited                src/inherited/ trades-coherence, evidence-packet, decision-gate, receipt-ledger, shadow-engine,     live-pure
+                              trajectory-engine
+
+     Domain v0.2              call-fit, job-economics, cross-trade-matrix, chain-d, workforce-capacity, decision-fabric,          live-pure
+                              analytics, communications, recognition, mission-board, pricebook, truck-stock,
+                              weather-demand, maintenance-routing
+
+     PI v1.0                  property-record, property-improvement-ledger, property-value-engine,                                live-pure
+                              neighborhood-momentum, neighborhood-failure-patterns, regional-recalibration,
+                              property-intelligence-hooks, property-jobs
+
+     Spine 0.3.0              src/spine/ fraggate-inbound, durable-receipts, run-action, servicetitan-shadow                      live-pure
+
+     Rules                    src/rules/constitution.ts                                                                           live-pure
+
+     ST / ProBooks writes     —                                                                                                   refused
+ runAction() walk: packet → lock → primary → alternate → coherence → gate → receipt → override → shadow settle. FragGate:
+ admit stamps sourceKind, sourceId, receivedAt, hash, trust. Wrapper is not verification. Scrape refused. Durable receipts:
+ append-only JSONL; process exit must not erase Chain C. ST shadow: ingest + hash of job / pricebook / equipment / customer
+ (and listed entities). Client type has no post/put/patch. refuseServiceTitanWrite() throws.
+
+ 5. Test battery the bot must preserve
+     Layer                    Command / place                     Must prove                                        Must not
+
+     L0 Constitution          npm test (vitest). CI on PR +       Human wins, confidence≠truth, geography           Network. Fake ST writes.
+                              main.                               not sole, recognition not raw revenue, LOCK
+                                                                  holds, pattern≠defect, lunar weight 0, ST
+                                                                  writes throw.
+
+     L1 Pipeline              runAction golden fixtures under     Same input → same receipt hash. BLOCK on          Clock flakes. Hidden I/O.
+                              test/ + data/.                      unverified high-consequence. Override keeps
+                                                                  original rec.
+
+     L2 Shadow day            npm run demo + HVAC /               Planned / actual / counterfactual                 Score techs from the demo. Call it branch
+                              plumbing fixtures.                  reconstructable. Drift rebases. No silent         accuracy.
+                                                                  displace.
+
+     L3 Shadow-live read      Not shipped as a nightly. Future: Ingest completeness. Replay equals first pass.      POST/PUT/PATCH. Auto-dispatch.
+                              hashed ST dump replay.                                                                Auto pricebook change.
+ CI gate is constitution + typecheck, not coverage theater. If the bot adds a module, add a test that encodes a rule, not a snapshot of
+ incidental structure.
+
+
+PRIVATE · Aziel Eliab only · load this file before acting on the repo                                                                                           p. 2
+TRADES-RUNTIME · GROK / AZBOT STANDING BRIEF                                                                                                TR-BOT-2026-09-17
+
+
+
+ 6. Shadow modes
+     Mode                          Audience                              Live effect                              Bot must
+
+     SHADOW-SEALED                 Operator + designated managers        None. Recommendations hashed only.       Default. Never auto-promote.
+
+     SHADOW-VISIBLE                Dispatch / warehouse / selected       Display only. Not an order.              Drop to SEALED if treated as a ticket.
+                                   techs as side panel
+
+     ADVISE-LOCKED                 Named lock-holders on one branch      Only after named ACCEPT /                Refuse if actor registry cannot name the
+                                                                         OVERRIDE / LOCK                          holder.
+ Settlement fields stored with the receipt: planned action, contemporaneous evidence hash, five confidence fields, human override
+ if any, actual outcome, time-to-settle. Outcome must not rewrite the sealed recommendation.
+
+ 7. Slow integration ladder
+     Rung                                                State now                                        Pass condition
+
+     R0 Merge + CI + 0.3.0 on main                       DONE (003b9e4f). Confirm CI run green.           git clone of main; npm test.
+
+     R1 FragGate + durable ledger + runAction            CODE DONE. Prove on operator disk: restart       Receipt file survives process exit.
+                                                         replay.
+
+     R2 Manual ST export into quarantine                 NOT DONE. Ingest function exists; no live        Packet hashes stable. No tokens in repo.
+                                                         pull.
+
+     R3 Nightly read + sealed scoring vs actuals         NOT DONE.                                        N days of settlement receipts. No one treats
+                                                                                                          output as a ticket.
+
+     R4 One branch SHADOW-VISIBLE                        NOT DONE.                                        Written “this is not an order.” Complaints →
+                                                                                                          SEALED.
+
+     R5 ADVISE-LOCKED pricebook / stock +                Enums + SM exist. No pilot.                      Actor id on every lock. Zero silent writes.
+     warehouse queue
+
+     R6 PI attach on completed jobs                      Function exists. No real jobs.                   Pattern never marks subject defective.
+
+     R7 Second branch then stop                          NOT STARTED.                                     Writes remain a new paper, not a flag.
+
+
+ 8. Launch options and readiness
+     Option                            Ready?                                Score          Meaning
+
+     A Merge-only                      DONE                                  10/10          main is the product. Pages off. Private.
+
+     B Local spine                     CODE DONE / unproven on a real        8/10           Clone, test, demo. Restart-replay still an operator act.
+                                       box
+
+     C One-branch shadow               NO                                    2/10           Needs real ST dump + named GM + sealed days.
+
+     D Advise-lock pilot               NO                                    1/10           Needs C calm + named lock-holders + uncompiled writes.
+
+     Public / multi-branch / ST        REFUSED                               0/10           Do not offer as a launch path.
+     writes
+ Field launch overall ≈ 25%. Software launch to the operator is the only honest “go.” Do not tell a GM the company OS is live.
+
+ 9. Next physical act (only one)
+ Operator machine: clone main @ 003b9e4f, npm ci, npm test, npm run demo. Confirm JSONL receipts survive a process kill.
+ Then one read-only ServiceTitan export (or API pull) into FragGate quarantine. Hash the dump. No write scopes on the token.
+ Until that hash exists, stay on Option B. Do not start another architecture PDF.
+
+ 10. Off-limits list (bot refuse)
+ Enable public Pages. Flip repo public. Commit ST tokens. Compile POST/PUT/PATCH. Scrape listings. Treat comps as subject
+ truth. Set resale uplift = invoice. Score technicians from shadow numbers in a performance review. Photo-only misconduct.
+ Fuel-only dispatch. Auto 30-day penalty. Lunar plumbing as a shipped demand feature (weight stays 0 until branch lift is earned).
+ Wholesale copy of aziel-runtime Softwares. Worker/MCP public surface. Untraceable upload path. Legal name or residential
+ location on any export from this tree.
+
+
+
+PRIVATE · Aziel Eliab only · load this file before acting on the repo                                                                                        p. 3
+TRADES-RUNTIME · GROK / AZBOT STANDING BRIEF                                                                                             TR-BOT-2026-09-17
+
+
+
+ 11. Commands
+ npm install          npm test          npm run typecheck               npm run demo             npm run manifest
+ Local UI preview only (Pages stay off): python3 -m http.server 4173 --directory docs
+
+
+ 12. Paper trail
+     ID                                   What
+
+     TR-AUDIT-2026-09-17                  Operator audit at ab18a105 / empty-main era. Historical. Cuts 1–4 named there are now on main.
+
+     TR-CUT-2026-09-17                    Top 10 + test + shadow + rungs + launch A–D. Historical relative to 0.3.0 merge; ladder still governs C/D.
+
+     TR-BOT-2026-09-17                    This file. Standing brief for Grok/AZbot. Use this first.
+
+
+ 13. Limits of this brief
+ Tree and commits read via GitHub connector as AzielEliab. Tests were not re-executed in the authoring sandbox after 003b9e4f.
+ CI workflow is present; a green check on that SHA was not independently watched here. ST shadow ingest is record-shaped, not a
+ live exporter. Cap overclaim accordingly. This paper names structure and next cuts. It is not a toolkit bolt-on and not a public
+ product surface.
+
+ 14. Disposition
+ 0.3.0 is the software. Option A is finished. Option B is the working copy. Option C is the first human-facing launch and it has not
+ started. Grok/AZbot: execute the next physical act or wait. Do not invent R8.
+
+
+
+
+PRIVATE · Aziel Eliab only · load this file before acting on the repo                                                                                  p. 4
+
