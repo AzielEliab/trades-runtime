@@ -1,6 +1,5 @@
+import { existsSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { DEPRECATED_COMMS_BARREL } from "../src/domain/comms.js";
-import { DEPRECATED_PRICEBOOK_STOCK_BARREL } from "../src/domain/pricebook-stock.js";
 import { archiveChannel, CHANNEL_KINDS, createChannel } from "../src/domain/communications.js";
 import { mayRecognize, rewardRawRevenueAlone, turnoverAttribution } from "../src/domain/recognition.js";
 import { missionBoard } from "../src/domain/mission-board.js";
@@ -302,9 +301,12 @@ describe("v0.2 constitution additions", () => {
   });
 });
 
-describe("F10 leftover barrels are deprecated", () => {
-  it("points comms and pricebook-stock at one canonical path each", () => {
-    expect(DEPRECATED_COMMS_BARREL).toMatch(/communications\.ts/);
-    expect(DEPRECATED_PRICEBOOK_STOCK_BARREL).toMatch(/pricebook\.ts/);
+describe("G1 leftover barrels are gone", () => {
+  it("keeps only communications.ts plus split pricebook.ts and truck-stock.ts", () => {
+    expect(existsSync("src/domain/comms.ts")).toBe(false);
+    expect(existsSync("src/domain/pricebook-stock.ts")).toBe(false);
+    expect(existsSync("src/domain/communications.ts")).toBe(true);
+    expect(existsSync("src/domain/pricebook.ts")).toBe(true);
+    expect(existsSync("src/domain/truck-stock.ts")).toBe(true);
   });
 });

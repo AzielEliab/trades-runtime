@@ -4,6 +4,7 @@ dist/
 *.log
 
 # Local BYO dumps, isolate ledgers, and receipts stay on the user's machine.
+# Keep folder markers only. Synthetic admit fixtures live in test/fixtures/byo/.
 data/**
 !data/.gitkeep
 !data/inbound/

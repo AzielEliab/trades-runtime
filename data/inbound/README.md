@@ -25,3 +25,5 @@ Not `data/tenants/`. That word implies a hosted multi-tenant service.
 - No tenant data on GitHub Pages, Workers, or a shared demo.
 
 Copy `local.json.example` to `local.json` if you want path / read-endpoint hints. That file is gitignored. There is no cloud account field.
+
+Synthetic (not customer) fixtures for `npm run byo:admit-demo` live in `test/fixtures/byo/`. That demo copies them into a **temp** inbound dir and writes temp isolate receipts. Do not commit real ST or ProBooks exports here.

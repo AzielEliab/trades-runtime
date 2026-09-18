@@ -150,3 +150,4 @@ export {
 export { defaultLocalInboundConfig, parseLocalInboundConfig } from "./spine/local-inbound-config.js";
 export { isolateReceiptPath, openIsolatedReceipts } from "./spine/runtime-isolate.js";
 export { runRecordedShadowDays, runShadowDayDemo } from "./demo/shadow-day.js";
+export { runByoAdmitDemo, printByoAdmitDemo } from "./demo/byo-admit.js";

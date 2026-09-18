@@ -1,6 +1,6 @@
 {
   "name": "trades-runtime",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "private": true,
   "description": "Shadow-first operating intelligence for multi-branch field trades. Author: Aziel Eliab.",
   "type": "module",
@@ -14,7 +14,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "demo": "tsx src/cli.ts demo",
-    "manifest": "tsx src/cli.ts manifest"
+    "manifest": "tsx src/cli.ts manifest",
+    "byo:admit-demo": "tsx src/cli.ts byo-admit-demo"
   },
   "author": "Aziel Eliab",
   "license": "Apache-2.0",

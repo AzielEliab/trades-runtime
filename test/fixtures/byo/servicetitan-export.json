@@ -1,0 +1,25 @@
+{
+  "synthetic": true,
+  "note": "Synthetic ServiceTitan-shaped export for BYO admit demo. Not customer data. Authoring node is not a custodian.",
+  "exportedAt": "2026-09-18T00:00:00Z",
+  "source": "trades-runtime-fixture",
+  "jobs": [
+    {
+      "id": "SYN-ST-JOB-1042",
+      "jobNumber": 1042,
+      "trade": "hvac",
+      "status": "Completed",
+      "customerId": "SYN-CUST-1",
+      "businessUnit": "midwest-demo",
+      "summary": "Synthetic no-cool diagnostic"
+    }
+  ],
+  "pricebook": [
+    {
+      "id": "SYN-ST-PB-SKU-1",
+      "code": "SKU-SYN-1",
+      "description": "Synthetic condenser fan motor",
+      "price": 189
+    }
+  ]
+}

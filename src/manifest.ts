@@ -1,12 +1,12 @@
 export const RUNTIME_MANIFEST = {
   product: "trades-runtime",
-  version: "0.3.0",
+  version: "0.3.1",
   author: "Aziel Eliab",
   identity: "Aziel Eliab",
   role: "trades-runtime",
   kind: "shadow-first-operating-intelligence",
   live_backends: false,
-  honesty: "Pure/stub TypeScript runtime. BYO local ServiceTitan + ProBooks inbound. Authoring node is not a data custodian. No central dump. No hosted uploader. No phone-home. No ServiceTitan or ProBooks write-back. live_backends false. Pages off. Credentials local only. No production claim.",
+  honesty: "Pure/stub TypeScript runtime. BYO local ServiceTitan + ProBooks inbound. Authoring node is not a data custodian. No central dump. No hosted uploader. No phone-home. No ServiceTitan or ProBooks write-back. live_backends false. Pages off (workflow deleted). Credentials local only. No production claim. Option C/D not started.",
   modules: [
     { slug: "ids", path: "src/core/ids.ts", status: "live-pure", summary: "Canonical entity IDs." },
     { slug: "events", path: "src/core/events.ts", status: "live-pure", summary: "Event contracts and idempotency helpers." },
@@ -54,6 +54,7 @@ export const RUNTIME_MANIFEST = {
     { slug: "inbound-layout", path: "src/spine/inbound-layout.ts", status: "live-pure", summary: "Local BYO paths data/inbound/servicetitan and data/inbound/probooks. Not data/tenants." },
     { slug: "local-inbound-config", path: "src/spine/local-inbound-config.ts", status: "live-pure", summary: "Optional local paths / read endpoints. No cloud account. Credentials stay on the user's machine." },
     { slug: "runtime-isolate", path: "src/spine/runtime-isolate.ts", status: "live-pure", summary: "Separate receipt/ledger files per runtime instance. No shared hosted corpus." },
+    { slug: "byo-admit-demo", path: "src/demo/byo-admit.ts", status: "live-pure", summary: "Synthetic fixture admit proof. Wrapper ≠ VERIFIED. Writes throw. Not a customer dump." },
     { slug: "servicetitan-connector", path: "src/spine/servicetitan-shadow.ts", status: "stub", summary: "Live ServiceTitan writes stay refused." },
     { slug: "probooks-connector", path: "src/spine/probooks-shadow.ts", status: "stub", summary: "Live ProBooks writes stay refused." }
   ]
