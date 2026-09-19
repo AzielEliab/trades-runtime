@@ -14,13 +14,20 @@ const PRODUCT_SURFACES = [
   "docs/v1/runtime.json",
   "docs/llms.txt",
   "docs/index.html",
+  "docs/GLAMA.md",
+  "glama.json",
+  "cli/mcp-stdio.mjs",
   "workers/giveaway/src/identity.ts",
   "workers/giveaway/wrangler.jsonc"
 ];
 
 describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", () => {
   it("keeps package, manifest, and catalog on 0.3.3", () => {
-    const pkg = JSON.parse(readFileSync("package.json", "utf8")) as { version: string; author: string };
+    const pkg = JSON.parse(readFileSync("package.json", "utf8")) as {
+      version: string;
+      author: string;
+      scripts?: { mcp?: string };
+    };
     const runtime = JSON.parse(readFileSync("docs/v1/runtime.json", "utf8")) as {
       version: string;
       runtime_version: string;
@@ -91,6 +98,29 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
     expect(workerWrangler).toMatch(/"binding": "COUNTS"/);
     expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/export const VERSION = "0\.3\.3"/);
     expect(readFileSync("README.md", "utf8")).toMatch(/Public giveaway Worker/);
+    expect(readFileSync("README.md", "utf8")).toMatch(/glama\.ai\/mcp\/servers\/AzielEliab\/trades-runtime/);
+    expect(readFileSync("README.md", "utf8")).toMatch(/docs\/GLAMA\.md/);
+    const glama = JSON.parse(readFileSync("glama.json", "utf8")) as {
+      maintainers: string[];
+      name: string;
+      version: string;
+      description: string;
+    };
+    expect(glama.maintainers).toEqual(["AzielEliab"]);
+    expect(glama.version).toBe(PRODUCT);
+    expect(glama.name).toMatch(/Trades Runtime/i);
+    expect(glama.description).toMatch(/live_backends false/);
+    expect(glama.description).toMatch(/Not a hosted company OS/);
+    expect(glama.description).toMatch(/Aziel Eliab/);
+    expect(pkg.scripts).toMatchObject({ mcp: "node cli/mcp-stdio.mjs" });
+    expect(existsSync("cli/mcp-stdio.mjs")).toBe(true);
+    expect(existsSync("Dockerfile")).toBe(true);
+    expect(existsSync("docs/GLAMA.md")).toBe(true);
+    expect(readFileSync("Dockerfile", "utf8")).toMatch(/npm install --omit=dev/);
+    expect(readFileSync("Dockerfile", "utf8")).toMatch(/cli\/mcp-stdio\.mjs/);
+    expect(readFileSync("Dockerfile", "utf8")).toMatch(/Mozilla\/5\.0|TRADES_RUNTIME_URL/);
+    expect(readFileSync("cli/mcp-stdio.mjs", "utf8")).toMatch(/Mozilla\/5\.0/);
+    expect(readFileSync("cli/mcp-stdio.mjs", "utf8")).toMatch(/trades-runtime\.vibelock\.workers\.dev\/mcp/);
     expect(pkg.author).toBe(IDENTITY);
     expect(RUNTIME_MANIFEST.author).toBe(IDENTITY);
     expect(RUNTIME_MANIFEST.identity).toBe(IDENTITY);

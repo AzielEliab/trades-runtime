@@ -7,12 +7,16 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "trades-runtime": "dist/cli.js"
+    "trades-runtime": "dist/cli.js",
+    "trades-runtime-mcp": "cli/mcp-stdio.mjs"
   },
   "files": [
     "src",
     "docs",
     "test",
+    "cli",
+    "glama.json",
+    "Dockerfile",
     "LICENSE",
     "README.md",
     "IDENTITY.md",
@@ -23,6 +27,7 @@
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
+    "mcp": "node cli/mcp-stdio.mjs",
     "demo": "tsx src/cli.ts demo",
     "manifest": "tsx src/cli.ts manifest",
     "byo:admit-demo": "tsx src/cli.ts byo-admit-demo",
