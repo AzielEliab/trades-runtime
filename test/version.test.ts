@@ -113,8 +113,11 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
     expect(glama.version).toBe(PRODUCT);
     expect(glama.name).toMatch(/Trades Runtime/i);
     expect(glama.description).toMatch(/live_backends false/);
-    expect(glama.description).toMatch(/Not a hosted company OS/);
+    expect(glama.description).toMatch(/local-first BYO field-trades runtime/);
     expect(glama.description).toMatch(/Aziel Eliab/);
+    expect(glama.description).not.toMatch(/Not a hosted company OS/);
+    expect(glama.description).not.toMatch(/Not a FragGate/);
+    expect(glama.description).not.toMatch(/Zenodo/);
     expect(pkg.scripts).toMatchObject({ mcp: "node cli/mcp-stdio.mjs" });
     expect(existsSync("cli/mcp-stdio.mjs")).toBe(true);
     expect(existsSync("Dockerfile")).toBe(true);

@@ -108,7 +108,7 @@ describe("stdio MCP bridge", () => {
     const init = lines.find((line) => line.id === 1);
     const tools = lines.find((line) => line.id === 2);
     expect(init?.result?.serverInfo?.name).toBe("trades-runtime");
-    expect(init?.result?.serverInfo?.version).toBe("0.3.3");
+    expect(init?.result?.serverInfo?.version).toBe("0.3.4");
     const names = (tools?.result?.tools ?? []).map((tool) => tool.name).sort();
     expect(names).toEqual([
       "trades_runtime_cite",

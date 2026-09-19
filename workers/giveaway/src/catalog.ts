@@ -111,14 +111,6 @@ export function citeBody(): Record<string, unknown> {
     keywords: [...KEYWORDS],
     honesty: HONESTY.product,
     counters: HONESTY.counters,
-    not: [
-      "Not a hosted multi-tenant company OS.",
-      "Not a ServiceTitan or ProBooks write API.",
-      "Not a central dump or hosted uploader.",
-      "Not aziel-runtime wholesale.",
-      "Not an API orchestrator.",
-      "Not GitHub Pages."
-    ],
     how_to_cite: `Eliab, Aziel. (2026). ${PRODUCT_TITLE} ${VERSION} [Software]. ${LICENSE}. ${REPOSITORY} · ${PUBLIC_ORIGIN}/`
   };
 }
@@ -153,9 +145,6 @@ tar -xzf ${RELEASE_FILENAME}
 
 ## AI clients
 ${COMPATIBLE_AI_CLIENTS.map((name) => `- ${name}`).join("\n")}
-
-## Not
-- Not a hosted company OS · not ST/ProBooks write-back · not aziel-runtime wholesale · not API-orchestrator noise
 `;
 }
 
@@ -172,14 +161,7 @@ Worker: ${PUBLIC_ORIGIN}
 
 Local-first BYO TypeScript runtime for HVAC, plumbing, electrical, sewer, and cross-trades.
 People bring their own ServiceTitan and ProBooks. Dual surface: human UI + counted download.
-Thin OpenAPI/MCP for health, stats, cite, and this skill. Not a FragGate engine catalog.
-
-## What it is not
-
-Not a hosted multi-tenant company OS.
-Not a ServiceTitan or ProBooks write API.
-Not a central dump.
-Not a production company OS claim. live_backends is false.
+Thin OpenAPI/MCP for health, stats, cite, and this skill.
 
 ## Honest counters
 

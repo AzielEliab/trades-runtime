@@ -3,7 +3,7 @@
   "maintainers": ["AzielEliab"],
   "name": "Trades Runtime",
   "version": "0.3.4",
-  "description": "Trades Runtime 0.3.4 — local-first BYO field-trades runtime for HVAC, plumbing, electrical, sewer, and cross-trades. People bring their own ServiceTitan and ProBooks. Public Worker MCP is read-only (health, stats, cite, skill). live_backends false. Not a hosted company OS. Not a FragGate true-engine. Not an API orchestrator. Author: Aziel Eliab only. Person @id https://www.azieleliab.com/#aziel",
+  "description": "Trades Runtime 0.3.4 — local-first BYO field-trades runtime for HVAC, plumbing, electrical, sewer, and cross-trades. People bring their own ServiceTitan and ProBooks. Public Worker MCP is read-only (health, stats, cite, skill). live_backends false. Author: Aziel Eliab only. Person @id https://www.azieleliab.com/#aziel",
   "keywords": [
     "mcp",
     "model-context-protocol",
