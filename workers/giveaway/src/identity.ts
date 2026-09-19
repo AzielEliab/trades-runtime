@@ -1,6 +1,6 @@
 export const PRODUCT = "trades-runtime";
 export const PRODUCT_TITLE = "Trades-Runtime";
-export const VERSION = "0.3.3";
+export const VERSION = "0.3.4";
 export const AUTHOR = "Aziel Eliab";
 export const IDENTITY = "Aziel Eliab";
 export const LICENSE = "Apache-2.0";
@@ -8,6 +8,20 @@ export const WORKER_NAME = "trades-runtime";
 export const PUBLIC_ORIGIN = "https://trades-runtime.vibelock.workers.dev";
 export const REPOSITORY = "https://github.com/AzielEliab/trades-runtime";
 export const RELEASE_FILENAME = `trades-runtime-${VERSION}.tgz`;
+
+export const PERSON_ID = "https://www.azieleliab.com/#aziel";
+export const PERSON_URL = "https://www.azieleliab.com/";
+export const SOFTWARES_TAB = "https://www.azielcorpuslibrary.net/software";
+export const SISTER_CORPUS = "https://www.azielcorpuslibrary.net/";
+export const SISTER_GODLOCK = "https://godlock.uk/";
+export const GITHUB_AUTHOR = "https://github.com/AzielEliab";
+
+export const PAGE_TITLE = `${PRODUCT_TITLE} · local BYO HVAC/plumbing/electrical/sewer runtime · ${VERSION}`;
+export const PAGE_DESCRIPTION =
+  "Shadow-first local BYO TypeScript runtime for HVAC, plumbing, electrical, sewer, and cross-trades. Dual surface: human UI plus a counted download. Operators bring their own ServiceTitan and ProBooks. live_backends false. Pages off. Not a hosted company OS. Author: Aziel Eliab.";
+export const OG_TITLE = "Trades-Runtime — local-first trades software you run on your machine";
+export const OG_DESCRIPTION =
+  "HVAC, plumbing, electrical, sewer, and cross-trades. Human landing + counted /download. Thin OpenAPI/MCP for agents. Not an API orchestrator. Not a hosted company OS.";
 
 export const COMPATIBLE_AI_CLIENTS = [
   "ChatGPT (GPT Actions / OpenAI)",
@@ -29,11 +43,127 @@ export const COMPATIBLE_AI_CLIENTS = [
   "plus other MCP/OpenAPI-capable assistants"
 ] as const;
 
+export const KEYWORDS = [
+  "trades-runtime",
+  "Trades-Runtime",
+  "HVAC",
+  "plumbing",
+  "electrical",
+  "sewer",
+  "cross-trades",
+  "field trades",
+  "shadow-first",
+  "BYO",
+  "ServiceTitan",
+  "ProBooks",
+  "local-first",
+  "Aziel Eliab",
+  "human authority"
+] as const;
+
+export const SAME_AS = [
+  REPOSITORY,
+  PUBLIC_ORIGIN,
+  SOFTWARES_TAB,
+  PERSON_URL,
+  PERSON_ID,
+  SISTER_CORPUS,
+  SISTER_GODLOCK,
+  GITHUB_AUTHOR
+] as const;
+
+/** Explicit Allow set copied from live aziel-runtime robots.txt (2026-09-19). No invented UAs. */
+export const CRAWL_USER_AGENTS = [
+  "GPTBot",
+  "ChatGPT-User",
+  "OAI-SearchBot",
+  "Google-Extended",
+  "Googlebot",
+  "GoogleOther",
+  "Google-CloudVertexBot",
+  "ClaudeBot",
+  "Claude-SearchBot",
+  "Claude-User",
+  "anthropic-ai",
+  "PerplexityBot",
+  "Perplexity-User",
+  "bingbot",
+  "Meta-ExternalAgent",
+  "Meta-ExternalFetcher",
+  "Meta-WebIndexer",
+  "FacebookBot",
+  "facebookexternalhit",
+  "Meta-ExternalAds",
+  "Applebot",
+  "Applebot-Extended",
+  "Amazonbot",
+  "DuckDuckBot",
+  "DuckAssistBot",
+  "MistralAI-User",
+  "YouBot",
+  "CCBot",
+  "cohere-ai",
+  "cohere-training-data-crawler",
+  "Diffbot",
+  "AI2Bot",
+  "AI2Bot-Dolma",
+  "Timpibot",
+  "Petalbot",
+  "Bytespider",
+  "Omgili",
+  "Omgilibot",
+  "FirecrawlAgent",
+  "ImagesiftBot",
+  "Cloudflare-AI-Search",
+  "TikTokSpider",
+  "Baiduspider",
+  "Baiduspider-render",
+  "Baiduspider-ai",
+  "YandexBot",
+  "PanguBot",
+  "Kangaroo Bot",
+  "Cotoyogi",
+  "aiHitBot",
+  "webzio-extended",
+  "ICC-Crawler",
+  "DataForSeoBot",
+  "AwarioBot",
+  "AwarioSmartBot",
+  "AwarioRssBot",
+  "Sentibot",
+  "peer39_crawler",
+  "Seekr",
+  "Meltwater",
+  "TurnitinBot",
+  "Factset_spyderbot",
+  "NeevaBot"
+] as const;
+
+export const SITEMAP_PATHS = [
+  "/",
+  "/download",
+  "/cite.json",
+  "/llms.txt",
+  "/ai.txt",
+  "/humans.txt",
+  "/openapi.json",
+  "/robots.txt",
+  "/v1/health",
+  "/v1/stats",
+  "/count",
+  "/v1/skill",
+  "/mcp",
+  "/.well-known/mcp.json",
+  "/person.jsonld",
+  "/graph.jsonld",
+  "/sitemap.xml"
+] as const;
+
 export const HONESTY = {
   product:
     "Local-first BYO runtime. People bring their own ServiceTitan and ProBooks. No tenant data on this Worker. No ST/ProBooks write-back. live_backends false. Not a production company OS claim.",
   counters:
-    "Honest Workers KV counts. views increments exactly once per successful GET / HTML homepage 200. Health-check user-agents and non-GET / requests are not counted. downloads increments exactly once per successful GET /download 200 after the release tarball is verified as gzip. Assets, /v1/health, /v1/stats, /openapi.json, /mcp, /cite.json, /llms.txt, /robots.txt, and /v1/skill do not increment. No sampling. No inflation. No estimated unique visitors. Start at 0. Each increment writes one unique COUNTS key (views:<uuid> or downloads:<uuid>) and also does value = (parseInt(await kv.get(name))||0)+1 with put on the name key. GET /v1/stats lists the unique keys (source of truth) and never seeds or rounds up. KV list is eventually consistent — a just-written key may take up to ~60s to appear in another colo. Failed downloads never increment."
+    "Honest Workers KV counts. views increments exactly once per successful GET / HTML homepage 200. Health-check user-agents and non-GET / requests are not counted. downloads increments exactly once per successful GET /download 200 after the release tarball is verified as gzip. Assets, /v1/health, /v1/stats, /count, /openapi.json, /mcp, /cite.json, /llms.txt, /ai.txt, /humans.txt, /robots.txt, /sitemap.xml, /sitemap-index.xml, /.well-known/mcp.json, /person.jsonld, /graph.jsonld, and /v1/skill do not increment. No sampling. No inflation. No estimated unique visitors. Start at 0. Each increment writes one unique COUNTS key (views:<uuid> or downloads:<uuid>) and also does value = (parseInt(await kv.get(name))||0)+1 with put on the name key. GET /v1/stats lists the unique keys (source of truth) and never seeds or rounds up. KV list is eventually consistent — a just-written key may take up to ~60s to appear in another colo. Failed downloads never increment."
 } as const;
 
 export const HEALTH_UA_RE =
