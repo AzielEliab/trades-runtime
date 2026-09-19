@@ -17,16 +17,36 @@ GitHub Pages stays off. The repo may stay private. Public get is `GET /download`
 | Key | When it increments |
 | --- | --- |
 | `views` | Exactly once per successful `GET /` HTML **200**. Health-check user-agents (`healthcheck`, `kube-probe`, `GoogleHC`, `UptimeRobot`, …) are excluded. `HEAD /`, assets, and API routes are not views. |
-| `downloads` | Exactly once per successful `GET /download` **200**, after the release bytes are loaded and verified as gzip (`0x1f 0x8b`). Missing or invalid tarball returns **503** and does **not** increment. |
+| `views_human` / `views_bot` | Same event as `views`, split by classification. |
+| `downloads` | Exactly once per successful `GET /download` **200**, after the release bytes are loaded and verified as gzip (`0x1f 0x8b`). Missing or invalid tarball returns **503** and does **not** increment. `HEAD` does not increment. |
+| `downloads_human` / `downloads_bot` | Same event as `downloads`, split by classification. |
+| `total` | Fleet convention: equals `downloads`. |
 
-`GET /v1/stats` (alias `/stats`) returns:
+Classification (per counted request): health-check UA is skipped on homepage views; a counted tarball GET with a health-check UA is bot. If `request.cf.botManagement` is present, `verifiedBot === true` or `score <= 30` is bot, otherwise the UA denylist runs. Else human. `classification.method` is `cf.botManagement+ua` when Bot Management is on this isolate path, otherwise `ua+healthcheck`.
+
+`GET /v1/stats` (aliases `/stats`, `/count`) returns:
 
 ```json
-{ "views": 0, "downloads": 0, "note": "…" }
+{
+  "project": "trades-runtime",
+  "views": 0,
+  "downloads": 0,
+  "total": 0,
+  "views_human": 0,
+  "views_bot": 0,
+  "downloads_human": 0,
+  "downloads_bot": 0,
+  "human": { "views": 0, "downloads": 0 },
+  "bot": { "views": 0, "downloads": 0 },
+  "classification": { "method": "ua+healthcheck", "bot_score_threshold": 30, "note": "…" },
+  "note": "…"
+}
 ```
 
 - Start at **0**. No seed. No sampling. No inflation. No estimated unique visitors.
-- Each increment writes one unique key (`views:<uuid>` or `downloads:<uuid>`) and also does `value = (parseInt(await kv.get(name))||0)+1` with `put` on `views` / `downloads`.
+- Invariant: `views === views_human + views_bot` and `downloads === downloads_human + downloads_bot`.
+- Existing KV from before the split has `views` / `downloads` only. On read, any remainder is attributed to **human** (never seeded as bot).
+- Each increment writes unique keys (`views:<uuid>`, `views_human:<uuid>` or `views_bot:<uuid>`) and running totals via `parseInt(get)||0+1`.
 - `/v1/stats` lists the unique keys as the source of truth.
 - KV list is eventually consistent (a just-written key may take up to ~60s to appear in another colo). Failed increments are not invented later.
 
@@ -37,7 +57,7 @@ GitHub Pages stays off. The repo may stay private. Public get is `GET /download`
 | GET | `/` | views, on HTML 200 |
 | GET | `/download` | downloads, on verified gzip 200 |
 | GET | `/v1/health` | no |
-| GET | `/v1/stats`, `/stats` | no |
+| GET | `/v1/stats`, `/stats`, `/count` | no |
 | GET | `/cite.json`, `/llms.txt`, `/robots.txt` | no |
 | GET | `/v1/skill` | no |
 | GET | `/openapi.json` | no |

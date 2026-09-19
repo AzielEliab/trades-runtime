@@ -13,7 +13,8 @@ In another shell (Miniflare KV starts at 0):
 # Health / catalog — must NOT increment views or downloads
 curl -sS http://127.0.0.1:8787/v1/health
 curl -sS http://127.0.0.1:8787/v1/stats
-# expect {"views":0,"downloads":0,...}
+curl -sS http://127.0.0.1:8787/count
+# expect views/downloads/total + human/bot split, all 0
 
 curl -sS http://127.0.0.1:8787/cite.json
 curl -sS http://127.0.0.1:8787/llms.txt

@@ -1,5 +1,5 @@
 import { gzipSync } from "node:zlib";
-import type { CountStore } from "../src/counters.js";
+import type { BotManagementHint, CountStore } from "../src/counters.js";
 import type { Env } from "../src/index.js";
 
 export class MemoryKV implements CountStore {
@@ -53,4 +53,17 @@ export function makeEnv(options?: { kv?: MemoryKV; release?: ArrayBuffer | null 
       }
     } as Fetcher
   };
+}
+
+export function requestWithCf(
+  url: string,
+  init: RequestInit | undefined,
+  botManagement: BotManagementHint
+): Request {
+  const request = new Request(url, init);
+  Object.defineProperty(request, "cf", {
+    value: { botManagement },
+    enumerable: true
+  });
+  return request;
 }

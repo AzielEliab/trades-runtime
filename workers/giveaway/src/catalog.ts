@@ -11,7 +11,7 @@ import {
   REPOSITORY,
   VERSION
 } from "./identity.js";
-import { STATS_NOTE } from "./counters.js";
+import { STATS_NOTE, type FleetStats } from "./counters.js";
 
 export function json(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data, null, 2) + "\n", {
@@ -217,8 +217,13 @@ export function openApiSpec(): Record<string, unknown> {
         }
       },
       "/v1/health": { get: { summary: "Health JSON. Does not increment counters." } },
-      "/v1/stats": { get: { summary: "Honest KV views/downloads. Does not increment counters." } },
+      "/v1/stats": {
+        get: {
+          summary: "Honest KV views/downloads + human/bot fleet split. Does not increment counters."
+        }
+      },
       "/stats": { get: { summary: "Alias of /v1/stats." } },
+      "/count": { get: { summary: "Alias of /v1/stats (fleet download-tracker shape)." } },
       "/cite.json": { get: { summary: "Public cite. Does not increment counters." } },
       "/llms.txt": { get: { summary: "LLM-oriented product text." } },
       "/robots.txt": { get: { summary: "Robots allow list." } },
@@ -234,10 +239,6 @@ export function openApiSpec(): Record<string, unknown> {
   };
 }
 
-export function statsBody(views: number, downloads: number): Record<string, unknown> {
-  return {
-    views,
-    downloads,
-    note: STATS_NOTE
-  };
+export function statsBody(stats: FleetStats): Record<string, unknown> {
+  return { ...stats };
 }
