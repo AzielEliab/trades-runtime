@@ -3,13 +3,13 @@
 Private **TypeScript runtime** for a shadow-first AI operating system / company operating intelligence layer. Field trades: HVAC, plumbing, electrical, sewer, and cross-trades.
 
 **Author / identity:** Aziel Eliab only. See [`IDENTITY.md`](IDENTITY.md). No legal name, home, or county on exports.  
-**Version:** 0.3.3  
+**Version:** 0.3.4  
 **Role:** `trades-runtime`  
 **License:** Apache-2.0  
 **Visibility:** this repository stays **private**; public get is the giveaway Worker  
 **Public Worker (if deployed):** https://trades-runtime.vibelock.workers.dev  
 **Try on Glama (intended listing):** https://glama.ai/mcp/servers/AzielEliab/trades-runtime — pack is in-repo (`glama.json`, `Dockerfile`, `cli/mcp-stdio.mjs`). Do **not** treat Install Server as LIVE until a Glama admin Deploy + Make Release succeeds. See [`docs/GLAMA.md`](docs/GLAMA.md).  
-**Status:** 0.3.3 public-giveaway cut — lockstep with Property Intelligence v1.0 in-tree — live-pure core + honest stubs — **BYO** local ServiceTitan + ProBooks inbound — **no** live writes, tenant data, ST/ProBooks write-back, DOIs, hosted uploader, or production company-OS claim — **Option C code-ready / pilot not started** — **Option D not started**
+**Status:** 0.3.4 public-giveaway + Growth-ON crawl cut — lockstep with Property Intelligence v1.0 in-tree — live-pure core + honest stubs — **BYO** local ServiceTitan + ProBooks inbound — **no** live writes, tenant data, ST/ProBooks write-back, DOIs, hosted uploader, or production company-OS claim — **Option C code-ready / pilot not started** — **Option D not started**
 
 The product is the software in `src/`. `docs/` is a thin local catalog/UI. GitHub Pages is **intentionally disabled** (`live_backends: false`). There is no Pages workflow. **PDFs are never published.** Implementer specs live at repo-root [`specs/`](specs/) (not under `docs/`).
 
@@ -119,7 +119,8 @@ Worker script name: `trades-runtime` (same `vibelock` workers.dev account patter
 What it is:
 
 - Human landing + counted Apache-2.0 tarball download
-- Thin read-only `/openapi.json` and `/mcp` for AI clients (health / stats / cite / skill only)
+- Thin read-only `/openapi.json` and `POST /mcp` for AI clients (health / stats / cite / skill only)
+- Growth-ON crawl surfaces: `/robots.txt` (full Allow + Content-Signal), `/sitemap.xml`, `/ai.txt`, `/humans.txt`, `/.well-known/mcp.json`, `/person.jsonld`, `/graph.jsonld`
 - Stdio MCP bridge for Glama / Claude Desktop / Cursor: `npm run mcp` → [`cli/mcp-stdio.mjs`](cli/mcp-stdio.mjs) (forwards to Worker `POST /mcp`)
 - Honest Workers KV counters (`COUNTS`): `views` and `downloads` start at 0; increment only on successful 200 responses; no sampling, no seed, no inflation
 
@@ -158,7 +159,7 @@ Local smoke (Miniflare KV, no Cloudflare auth required):
 npm run giveaway:pack
 cd workers/giveaway
 npx wrangler dev
-# GET http://127.0.0.1:8787/  /download  /v1/health  /v1/stats
+# GET http://127.0.0.1:8787/  /download  /v1/health  /v1/stats  /robots.txt  /sitemap.xml  /ai.txt
 ```
 
 Counters: see [`workers/giveaway/README.md`](workers/giveaway/README.md).

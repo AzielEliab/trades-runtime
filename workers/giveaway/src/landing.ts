@@ -1,8 +1,13 @@
+import { homepageJsonLd } from "./crawl.js";
 import {
   AUTHOR,
   COMPATIBLE_AI_CLIENTS,
   HONESTY,
   LICENSE,
+  OG_DESCRIPTION,
+  OG_TITLE,
+  PAGE_DESCRIPTION,
+  PAGE_TITLE,
   PRODUCT_TITLE,
   PUBLIC_ORIGIN,
   RELEASE_FILENAME,
@@ -12,14 +17,27 @@ import {
 
 export function renderLanding(views: number, downloads: number): string {
   const clients = COMPATIBLE_AI_CLIENTS.map((name) => `<li>${escapeHtml(name)}</li>`).join("");
+  const jsonLd = JSON.stringify(homepageJsonLd());
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="author" content="${escapeHtml(AUTHOR)}">
-  <title>${escapeHtml(PRODUCT_TITLE)} · public giveaway · ${escapeHtml(VERSION)}</title>
-  <meta name="description" content="Trades-Runtime is a local-first BYO TypeScript runtime for field trades. Apache-2.0. Author: Aziel Eliab only. Not a hosted company OS.">
+  <title>${escapeHtml(PAGE_TITLE)}</title>
+  <meta name="description" content="${escapeHtml(PAGE_DESCRIPTION)}">
+  <link rel="canonical" href="${escapeHtml(PUBLIC_ORIGIN)}/">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="${escapeHtml(PRODUCT_TITLE)}">
+  <meta property="og:title" content="${escapeHtml(OG_TITLE)}">
+  <meta property="og:description" content="${escapeHtml(OG_DESCRIPTION)}">
+  <meta property="og:url" content="${escapeHtml(PUBLIC_ORIGIN)}/">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="${escapeHtml(OG_TITLE)}">
+  <meta name="twitter:description" content="${escapeHtml(OG_DESCRIPTION)}">
+  <script type="application/ld+json">${jsonLd}</script>
   <style>
     :root {
       --bg: #121410;
@@ -142,15 +160,20 @@ npm run demo</pre>
     </div>
 
     <h2>AI clients (OpenAPI / MCP)</h2>
-    <p>Thin read-only surface: <a href="/openapi.json">/openapi.json</a> and <a href="/mcp"><code>POST /mcp</code></a> (health, stats, cite, skill). Public, no OAuth. Not a FragGate engine catalog.</p>
+    <p>Thin read-only surface: <a href="/openapi.json">/openapi.json</a> and <a href="/mcp"><code>POST /mcp</code></a> (health, stats, cite, skill). Public, no OAuth. Not a FragGate engine catalog. Discover at <a href="/.well-known/mcp.json"><code>/.well-known/mcp.json</code></a>.</p>
     <ul>${clients}</ul>
 
     <h2>Cite</h2>
     <p>
       <a href="/v1/health">/v1/health</a> ·
       <a href="/v1/stats">/v1/stats</a> ·
+      <a href="/count">/count</a> ·
       <a href="/cite.json">/cite.json</a> ·
       <a href="/llms.txt">/llms.txt</a> ·
+      <a href="/ai.txt">/ai.txt</a> ·
+      <a href="/humans.txt">/humans.txt</a> ·
+      <a href="/robots.txt">/robots.txt</a> ·
+      <a href="/sitemap.xml">/sitemap.xml</a> ·
       <a href="/v1/skill">/v1/skill</a> ·
       <a href="${escapeHtml(REPOSITORY)}">GitHub (may stay private)</a>
     </p>

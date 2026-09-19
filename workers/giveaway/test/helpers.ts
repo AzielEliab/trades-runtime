@@ -41,12 +41,12 @@ export function makeEnv(options?: { kv?: MemoryKV; release?: ArrayBuffer | null 
   const release = options?.release === undefined ? gzipBytes() : options.release;
   return {
     COUNTS: kv as unknown as KVNamespace,
-    PRODUCT_VERSION: "0.3.3",
-    RELEASE_FILENAME: "trades-runtime-0.3.3.tgz",
+    PRODUCT_VERSION: "0.3.4",
+    RELEASE_FILENAME: "trades-runtime-0.3.4.tgz",
     ASSETS: {
       fetch: async (input: RequestInfo | URL) => {
         const url = String(input);
-        if (release && url.includes("trades-runtime-0.3.3.tgz")) {
+        if (release && url.includes("trades-runtime-0.3.4.tgz")) {
           return new Response(release, { status: 200 });
         }
         return new Response("missing", { status: 404 });

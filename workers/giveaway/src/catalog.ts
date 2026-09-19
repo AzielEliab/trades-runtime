@@ -1,14 +1,19 @@
 import {
   AUTHOR,
+  CITE_SAME_AS,
   COMPATIBLE_AI_CLIENTS,
   HONESTY,
   IDENTITY,
+  KEYWORDS,
   LICENSE,
+  PERSON_ID,
+  PERSON_URL,
   PRODUCT,
   PRODUCT_TITLE,
   PUBLIC_ORIGIN,
   RELEASE_FILENAME,
   REPOSITORY,
+  SOFTWARES_TAB,
   VERSION
 } from "./identity.js";
 import { STATS_NOTE, type FleetStats } from "./counters.js";
@@ -19,6 +24,17 @@ export function json(data: unknown, status = 200): Response {
     headers: {
       "Content-Type": "application/json; charset=utf-8",
       "Cache-Control": "no-store",
+      "Access-Control-Allow-Origin": "*"
+    }
+  });
+}
+
+export function jsonLd(data: unknown, status = 200): Response {
+  return new Response(JSON.stringify(data, null, 2) + "\n", {
+    status,
+    headers: {
+      "Content-Type": "application/ld+json; charset=utf-8",
+      "Cache-Control": status === 200 ? "public, max-age=300" : "no-store",
       "Access-Control-Allow-Origin": "*"
     }
   });
@@ -67,17 +83,32 @@ export function citeBody(): Record<string, unknown> {
     version: VERSION,
     author: AUTHOR,
     identity: IDENTITY,
+    person_id: PERSON_ID,
     license: LICENSE,
     live_backends: false,
+    hosted_company_os: false,
+    pages: "off",
     repository: REPOSITORY,
     worker: PUBLIC_ORIGIN,
     download: `${PUBLIC_ORIGIN}/download`,
     health: `${PUBLIC_ORIGIN}/v1/health`,
     stats: `${PUBLIC_ORIGIN}/v1/stats`,
+    count: `${PUBLIC_ORIGIN}/count`,
     openapi: `${PUBLIC_ORIGIN}/openapi.json`,
     mcp: `${PUBLIC_ORIGIN}/mcp`,
     skill: `${PUBLIC_ORIGIN}/v1/skill`,
+    llms: `${PUBLIC_ORIGIN}/llms.txt`,
+    ai: `${PUBLIC_ORIGIN}/ai.txt`,
+    humans: `${PUBLIC_ORIGIN}/humans.txt`,
+    robots: `${PUBLIC_ORIGIN}/robots.txt`,
+    sitemap: `${PUBLIC_ORIGIN}/sitemap.xml`,
+    person_jsonld: `${PUBLIC_ORIGIN}/person.jsonld`,
+    graph_jsonld: `${PUBLIC_ORIGIN}/graph.jsonld`,
+    mcp_discovery: `${PUBLIC_ORIGIN}/.well-known/mcp.json`,
+    software_tab: SOFTWARES_TAB,
     compatible_ai_clients: [...COMPATIBLE_AI_CLIENTS],
+    sameAs: [...CITE_SAME_AS],
+    keywords: [...KEYWORDS],
     honesty: HONESTY.product,
     counters: HONESTY.counters,
     not: [
@@ -85,75 +116,46 @@ export function citeBody(): Record<string, unknown> {
       "Not a ServiceTitan or ProBooks write API.",
       "Not a central dump or hosted uploader.",
       "Not aziel-runtime wholesale.",
+      "Not an API orchestrator.",
       "Not GitHub Pages."
-    ]
+    ],
+    how_to_cite: `Eliab, Aziel. (2026). ${PRODUCT_TITLE} ${VERSION} [Software]. ${LICENSE}. ${REPOSITORY} · ${PUBLIC_ORIGIN}/`
   };
 }
 
 export function llmsTxt(): string {
   return `# Trades-Runtime
-
-> Local-first TypeScript runtime for field-trades companies.
-> Author / identity: Aziel Eliab only.
+> Shadow-first local BYO runtime for HVAC, plumbing, electrical, sewer, and cross-trades.
+> Author / identity: Aziel Eliab only. Person @id ${PERSON_ID}
 > Version: ${VERSION}
 > License: ${LICENSE}
-> Public Worker: ${PUBLIC_ORIGIN}
+> Worker: ${PUBLIC_ORIGIN}
 
 ${HONESTY.product}
 
-## Get the software
+## Dual surface
+- Humans: ${PUBLIC_ORIGIN}/ (UI) + counted ${PUBLIC_ORIGIN}/download
+- Agents: POST ${PUBLIC_ORIGIN}/mcp · ${PUBLIC_ORIGIN}/openapi.json · ${PUBLIC_ORIGIN}/llms.txt · ${PUBLIC_ORIGIN}/ai.txt
 
-- Human UI: GET /
-- Counted tarball: GET /download
-- Stats: GET /v1/stats
-- Health: GET /v1/health
-- Cite: GET /cite.json
-- Skill: GET /v1/skill
-- OpenAPI: GET /openapi.json
-- MCP (read-only): POST /mcp
+## Discovery (Growth-ON)
+- robots.txt — full AI Allow + Content-Signal (search/ai-input/ai-train)
+- sitemap.xml
+- cite.json · person.jsonld · graph.jsonld
+- .well-known/mcp.json
+- Softwares tab: ${SOFTWARES_TAB}
+- Stats: ${PUBLIC_ORIGIN}/v1/stats · ${PUBLIC_ORIGIN}/count
 
 ## Install
-
 \`\`\`
 curl -fsSL ${PUBLIC_ORIGIN}/download -o ${RELEASE_FILENAME}
 tar -xzf ${RELEASE_FILENAME}
-cd package
-npm install
-npm test
 \`\`\`
 
-Bring your own ServiceTitan and ProBooks to your local machine. This Worker does not store tenant data.
-
 ## AI clients
-
 ${COMPATIBLE_AI_CLIENTS.map((name) => `- ${name}`).join("\n")}
-`;
-}
 
-export function robotsTxt(): string {
-  return `# Trades-Runtime public giveaway Worker
-User-agent: *
-Allow: /
-Allow: /download
-Allow: /v1/health
-Allow: /v1/stats
-Allow: /cite.json
-Allow: /llms.txt
-Allow: /openapi.json
-Allow: /v1/skill
-
-User-agent: GPTBot
-Allow: /
-User-agent: ChatGPT-User
-Allow: /
-User-agent: ClaudeBot
-Allow: /
-User-agent: anthropic-ai
-Allow: /
-User-agent: PerplexityBot
-Allow: /
-User-agent: Google-Extended
-Allow: /
+## Not
+- Not a hosted company OS · not ST/ProBooks write-back · not aziel-runtime wholesale · not API-orchestrator noise
 `;
 }
 
@@ -162,6 +164,7 @@ export function skillMarkdown(): string {
 
 Product: Trades-Runtime ${VERSION}
 Author / identity: Aziel Eliab only
+Person @id: ${PERSON_ID}
 License: ${LICENSE}
 Worker: ${PUBLIC_ORIGIN}
 
@@ -197,9 +200,10 @@ export function openApiSpec(): Record<string, unknown> {
       version: VERSION,
       summary: "Public giveaway Worker for Trades-Runtime. Read-only distribution surface.",
       description: `${HONESTY.product} Counters: ${STATS_NOTE}`,
-      contact: { name: AUTHOR },
+      contact: { name: AUTHOR, url: PERSON_URL },
       license: { name: LICENSE },
       "x-identity": IDENTITY,
+      "x-person-id": PERSON_ID,
       "x-compatible-ai-clients": [...COMPATIBLE_AI_CLIENTS]
     },
     servers: [{ url: PUBLIC_ORIGIN }],
@@ -226,10 +230,17 @@ export function openApiSpec(): Record<string, unknown> {
       "/count": { get: { summary: "Alias of /v1/stats (fleet download-tracker shape)." } },
       "/cite.json": { get: { summary: "Public cite. Does not increment counters." } },
       "/llms.txt": { get: { summary: "LLM-oriented product text." } },
-      "/robots.txt": { get: { summary: "Robots allow list." } },
+      "/ai.txt": { get: { summary: "Honest trades product lead for agents and crawlers." } },
+      "/humans.txt": { get: { summary: "Short human pointer to / and /download." } },
+      "/robots.txt": { get: { summary: "Open crawl Allow list + Content-Signal." } },
+      "/sitemap.xml": { get: { summary: "Absolute URLs for this Worker." } },
+      "/person.jsonld": { get: { summary: "Person JSON-LD. Machine 15:20 disambiguation. No HTML chrome." } },
+      "/graph.jsonld": { get: { summary: "SoftwareApplication + WebSite + Person JSON-LD." } },
+      "/.well-known/mcp.json": { get: { summary: "MCP discovery for POST /mcp + OpenAPI." } },
       "/v1/skill": { get: { summary: "Agent skill markdown." } },
       "/openapi.json": { get: { summary: "This OpenAPI document." } },
       "/mcp": {
+        get: { summary: "MCP transport note. Use POST for JSON-RPC." },
         post: {
           summary: "Read-only MCP JSON-RPC (initialize, tools/list, tools/call)",
           description: "Tools: health, stats, cite, skill. Public, no OAuth. Does not increment counters."

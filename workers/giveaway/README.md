@@ -6,7 +6,7 @@ Public dual-surface giveaway — human UI + counted download. **Not** a hosted m
 - **Worker name:** `trades-runtime`
 - **Intended URL:** https://trades-runtime.vibelock.workers.dev
 - **License:** Apache-2.0
-- **Product version:** 0.3.3
+- **Product version:** 0.3.4
 
 This Worker does not ingest ServiceTitan dumps, does not write to ServiceTitan or ProBooks, and does not store tenant data. `live_backends` is false.
 
@@ -58,10 +58,13 @@ Classification (per counted request): health-check UA is skipped on homepage vie
 | GET | `/download` | downloads, on verified gzip 200 |
 | GET | `/v1/health` | no |
 | GET | `/v1/stats`, `/stats`, `/count` | no |
-| GET | `/cite.json`, `/llms.txt`, `/robots.txt` | no |
+| GET | `/cite.json`, `/llms.txt`, `/ai.txt`, `/humans.txt`, `/robots.txt` | no |
+| GET | `/sitemap.xml` | no |
+| GET | `/person.jsonld`, `/graph.jsonld` | no |
+| GET | `/.well-known/mcp.json` | no |
 | GET | `/v1/skill` | no |
 | GET | `/openapi.json` | no |
-| POST | `/mcp` | no (read-only health/stats/cite/skill) |
+| GET / POST | `/mcp` | no (GET is a transport note; POST is read-only health/stats/cite/skill) |
 
 No write API. No ST/ProBooks routes.
 
@@ -81,8 +84,9 @@ npx wrangler kv namespace create COUNTS
 # paste the id into wrangler.jsonc → kv_namespaces[0].id
 # (replace the placeholder 00000000000000000000000000000000)
 
-npm run pack          # builds release/trades-runtime-0.3.3.tgz via npm pack
+npm run pack          # builds release/trades-runtime-0.3.4.tgz via npm pack
 npx wrangler deploy   # Worker name trades-runtime → trades-runtime.vibelock.workers.dev
+# COUNTS KV is already bound (id in wrangler.jsonc). Do not recreate unless the namespace is gone.
 ```
 
 Later:

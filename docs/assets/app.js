@@ -112,7 +112,7 @@
     if (footer) {
       footer.innerHTML = `
         <div class="wrap">
-          <div>© ${year} Aziel Eliab · Trades-Runtime 0.3.3 · local-first · Apache-2.0 · giveaway Worker is not a company OS</div>
+          <div>© ${year} Aziel Eliab · Trades-Runtime 0.3.4 · local-first · Apache-2.0 · giveaway Worker is not a company OS</div>
           <div>
             <a href="${prefix}v1/runtime.json">runtime.json</a>
             · <a href="${prefix}cite.json">cite.json</a>
