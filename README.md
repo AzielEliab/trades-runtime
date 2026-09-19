@@ -8,6 +8,7 @@ Private **TypeScript runtime** for a shadow-first AI operating system / company 
 **License:** Apache-2.0  
 **Visibility:** this repository stays **private**; public get is the giveaway Worker  
 **Public Worker (if deployed):** https://trades-runtime.vibelock.workers.dev  
+**Try on Glama (intended listing):** https://glama.ai/mcp/servers/AzielEliab/trades-runtime — pack is in-repo (`glama.json`, `Dockerfile`, `cli/mcp-stdio.mjs`). Do **not** treat Install Server as LIVE until a Glama admin Deploy + Make Release succeeds. See [`docs/GLAMA.md`](docs/GLAMA.md).  
 **Status:** 0.3.3 public-giveaway cut — lockstep with Property Intelligence v1.0 in-tree — live-pure core + honest stubs — **BYO** local ServiceTitan + ProBooks inbound — **no** live writes, tenant data, ST/ProBooks write-back, DOIs, hosted uploader, or production company-OS claim — **Option C code-ready / pilot not started** — **Option D not started**
 
 The product is the software in `src/`. `docs/` is a thin local catalog/UI. GitHub Pages is **intentionally disabled** (`live_backends: false`). There is no Pages workflow. **PDFs are never published.** Implementer specs live at repo-root [`specs/`](specs/) (not under `docs/`).
@@ -26,6 +27,7 @@ npm run demo
 npm run byo:admit-demo
 npm run shadow:sealed-demo
 npm run manifest
+npm run mcp
 ```
 
 `npm test` runs constitutional rule tests including Human Authority, confidence≠truth, CrossTrade secondary-only routing, v0.2 recognition / pricebook lock / mission board / location economics, the 0.3.3 execution spine (FragGate inbound, durable receipts, `runAction`), restart-replay of append-only JSONL receipts (`data/receipts.jsonl` or `{tmpdir}/tr-replay-*/receipts.jsonl`), the synthetic BYO admit demo, and Option C sealed-shadow scaffolding (no auto-promote, engagement drop-back, required settlement fields).
@@ -118,6 +120,7 @@ What it is:
 
 - Human landing + counted Apache-2.0 tarball download
 - Thin read-only `/openapi.json` and `/mcp` for AI clients (health / stats / cite / skill only)
+- Stdio MCP bridge for Glama / Claude Desktop / Cursor: `npm run mcp` → [`cli/mcp-stdio.mjs`](cli/mcp-stdio.mjs) (forwards to Worker `POST /mcp`)
 - Honest Workers KV counters (`COUNTS`): `views` and `downloads` start at 0; increment only on successful 200 responses; no sampling, no seed, no inflation
 
 What it is not:
@@ -159,6 +162,24 @@ npx wrangler dev
 ```
 
 Counters: see [`workers/giveaway/README.md`](workers/giveaway/README.md).
+
+## Glama (Install Server pack)
+
+Intended listing: **[Try on Glama](https://glama.ai/mcp/servers/AzielEliab/trades-runtime)**
+
+The listing URL is documented so agents and humans can find it. The Git pack (`glama.json` + `Dockerfile` + `cli/mcp-stdio.mjs`) is what Glama needs to index and host a stdio process. **Install Server is not LIVE until GitBaby / TradesBot (or a human signed in as `AzielEliab`) finish Glama admin: Score claim → Deploy → Make Release.** That cannot be done from git alone. Steps: [`docs/GLAMA.md`](docs/GLAMA.md).
+
+Do not invent Glama TDQS scores. Do not claim the listing is already live.
+
+Local / Docker:
+
+```bash
+npm run mcp
+# or
+node cli/mcp-stdio.mjs
+docker build -t trades-runtime-mcp .
+docker run --rm -i trades-runtime-mcp
+```
 
 ## Pages (intentionally disabled)
 

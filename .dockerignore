@@ -1,0 +1,9 @@
+node_modules
+dist
+.git
+.vitest
+*.log
+.wrangler
+workers/giveaway/release/*.tgz
+workers/giveaway/release/manifest.json
+data
