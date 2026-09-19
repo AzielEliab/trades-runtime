@@ -5,7 +5,7 @@
   "type": "module",
   "author": "Aziel Eliab",
   "license": "Apache-2.0",
-  "description": "Public giveaway Worker for Trades-Runtime. UI + counted tarball. Not a hosted company OS.",
+  "description": "Public giveaway Worker for Trades-Runtime. UI + counted tarball. Local-first BYO field-trades runtime.",
   "scripts": {
     "pack": "node scripts/pack-release.mjs",
     "test": "vitest run",

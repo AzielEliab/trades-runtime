@@ -108,7 +108,6 @@ export function renderLanding(views: number, downloads: number): string {
     <p class="lede">
       Shadow-first TypeScript runtime for HVAC, plumbing, electrical, sewer, and cross-trades.
       You bring your own ServiceTitan and your own ProBooks. This Worker is a human UI plus a counted download.
-      It is <strong>not</strong> a hosted multi-tenant company OS.
     </p>
     <p>
       <span class="badge">Aziel Eliab only</span>
@@ -160,7 +159,7 @@ npm run demo</pre>
     </div>
 
     <h2>AI clients (OpenAPI / MCP)</h2>
-    <p>Thin read-only surface: <a href="/openapi.json">/openapi.json</a> and <a href="/mcp"><code>POST /mcp</code></a> (health, stats, cite, skill). Public, no OAuth. Not a FragGate engine catalog. Discover at <a href="/.well-known/mcp.json"><code>/.well-known/mcp.json</code></a>.</p>
+    <p>Thin read-only surface: <a href="/openapi.json">/openapi.json</a> and <a href="/mcp"><code>POST /mcp</code></a> (health, stats, cite, skill). Public, no OAuth. Discover at <a href="/.well-known/mcp.json"><code>/.well-known/mcp.json</code></a>.</p>
     <ul>${clients}</ul>
 
     <h2>Cite</h2>

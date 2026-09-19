@@ -25,7 +25,7 @@ export function robotsTxt(): string {
 # Shadow-first local BYO runtime for HVAC, plumbing, electrical, sewer, and cross-trades.
 # Author / identity: Aziel Eliab only. Person @id ${PERSON_ID}.
 # Content-Signal opens search + AI input + AI train. No Disallow for GPTBot.
-# Not an API orchestrator. Dual-surface: MCP/OpenAPI for agents; human UI + counted /download.
+# Dual-surface: MCP/OpenAPI for agents; human UI + counted /download.
 
 User-agent: *
 Allow: /
@@ -59,7 +59,7 @@ export function aiTxt(): string {
 
 ## What this is
 
-Trades-Runtime is a shadow-first, local-first TypeScript runtime for HVAC, plumbing, electrical, sewer, and cross-trades field businesses. Operators bring their own ServiceTitan and ProBooks dumps onto their own machines (BYO). Human authority always wins. Append-only receipts, FragGate-shaped inbound validation, shadow modes, mission board, and fulfillment — on the operator box, not as a hosted multi-tenant company OS.
+Trades-Runtime is a shadow-first, local-first TypeScript runtime for HVAC, plumbing, electrical, sewer, and cross-trades field businesses. Operators bring their own ServiceTitan and ProBooks dumps onto their own machines (BYO). Human authority always wins. Append-only receipts, FragGate-shaped inbound validation, shadow modes, mission board, and fulfillment run on the operator box.
 
 Public name: Trades-Runtime (trades-runtime). Author / identity: Aziel Eliab only (Person @id ${PERSON_ID}).
 Version: ${VERSION}. License: ${LICENSE}.
@@ -73,7 +73,6 @@ Softwares tab: ${SOFTWARES_TAB}
 - No ServiceTitan or ProBooks write-back on this Worker
 - No tenant data stored on this Worker
 - GitHub Pages: off
-- Not aziel-runtime wholesale; not an API orchestrator; not FragGate-exec company OS
 - ${HONESTY.product}
 
 ## How to use
@@ -95,13 +94,6 @@ Softwares tab: ${SOFTWARES_TAB}
 ## Compatible AI clients
 
 ${COMPATIBLE_AI_CLIENTS.map((name) => `- ${name}`).join("\n")}
-
-## What this is not
-
-- Not a hosted multi-tenant company OS
-- Not a central ServiceTitan/ProBooks dump or write API
-- Not merely an API orchestrator or software aggregator
-- Not aziel-runtime / FragGate Softwares suite wholesale
 
 Identity: Aziel Eliab only. Person @id ${PERSON_ID}.
 `;
@@ -154,7 +146,7 @@ export function graphJsonLd(): Record<string, unknown> {
         downloadUrl: `${PUBLIC_ORIGIN}/download`,
         codeRepository: REPOSITORY,
         description:
-          "Shadow-first local BYO TypeScript runtime for HVAC, plumbing, electrical, sewer, and cross-trades. Operators bring their own ServiceTitan and ProBooks. Human authority wins. Not a hosted multi-tenant company OS. live_backends false.",
+          "Shadow-first local BYO TypeScript runtime for HVAC, plumbing, electrical, sewer, and cross-trades. Operators bring their own ServiceTitan and ProBooks. Human authority wins. live_backends false.",
         offers: { "@type": "Offer", price: "0", priceCurrency: "USD" }
       },
       {
@@ -197,6 +189,6 @@ export function wellKnownMcp(): Record<string, unknown> {
     author: AUTHOR,
     identity: IDENTITY,
     person_id: PERSON_ID,
-    note: "Read-only product MCP (health, stats, cite, skill). Not FragGate-exec company OS. live_backends false."
+    note: "Read-only product MCP (health, stats, cite, skill). live_backends false."
   };
 }

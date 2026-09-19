@@ -110,7 +110,7 @@ Still human/operator-only: a real ServiceTitan path on their box, a named GM, an
 
 ## Public giveaway Worker
 
-Operator-authorized public surface is a Cloudflare Worker — **not** a hosted multi-tenant company OS:
+Operator-authorized public surface is a Cloudflare Worker:
 
 **https://trades-runtime.vibelock.workers.dev**
 
@@ -123,13 +123,6 @@ What it is:
 - Growth-ON crawl surfaces: `/robots.txt` (full Allow + Content-Signal), `/sitemap.xml`, `/ai.txt`, `/humans.txt`, `/.well-known/mcp.json`, `/person.jsonld`, `/graph.jsonld`
 - Stdio MCP bridge for Glama / Claude Desktop / Cursor: `npm run mcp` → [`cli/mcp-stdio.mjs`](cli/mcp-stdio.mjs) (forwards to Worker `POST /mcp`)
 - Honest Workers KV counters (`COUNTS`): `views` and `downloads` start at 0; increment only on successful 200 responses; no sampling, no seed, no inflation
-
-What it is not:
-
-- Not a ServiceTitan or ProBooks write API
-- Not a central dump / hosted uploader / tenant store
-- Not a production company OS claim (`live_backends: false`)
-- Not GitHub Pages
 
 ### Deploy (operator / box with wrangler auth)
 

@@ -1,6 +1,6 @@
 # Trades-Runtime giveaway Worker
 
-Public dual-surface giveaway — human UI + counted download. **Not** a hosted multi-tenant company OS.
+Public dual-surface giveaway — human UI + counted download. Local-first BYO field-trades runtime.
 
 - **Identity:** Aziel Eliab only
 - **Worker name:** `trades-runtime`

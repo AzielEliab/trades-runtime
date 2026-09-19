@@ -24,7 +24,7 @@ Do not invent Glama TDQS scores. Do not claim the listing or Install Server is a
 
 - Local-first BYO field-trades runtime (HVAC / plumbing / electrical / sewer / cross-trades).
 - Public MCP tools are read-only: `trades_runtime_health`, `trades_runtime_stats`, `trades_runtime_cite`, `trades_runtime_skill`.
-- `live_backends` false. Not a hosted company OS. Not a FragGate true-engine. Not an API orchestrator.
+- `live_backends` false.
 - Dual surface: agents via MCP / OpenAPI; humans via Worker UI + counted `/download`.
 
 ## Why stdio
@@ -114,4 +114,4 @@ No Wrangler deploy is required for the listing. HTTP `/mcp` on the Worker is unc
 
 ## Author
 
-Aziel Eliab. Do not invent Zenodo DOIs.
+Aziel Eliab.

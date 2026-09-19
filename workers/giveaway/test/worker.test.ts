@@ -35,7 +35,7 @@ describe("giveaway Worker routes", () => {
     expect(html).toContain("Trades-Runtime");
     expect(html).toContain(AUTHOR);
     expect(html).toContain("BYO");
-    expect(html).toContain("not</strong> a hosted multi-tenant company OS");
+    expect(html).toContain("local-first software you run on your own machine");
     expect(html).toContain("live_backends false");
     expect(html).toContain("/download");
 
@@ -126,6 +126,8 @@ describe("giveaway Worker routes", () => {
       keywords: string[];
       how_to_cite: string;
       compatible_ai_clients: string[];
+      honesty: string;
+      not?: unknown;
     };
     expect(cite.identity).toBe(AUTHOR);
     expect(cite.version).toBe(VERSION);
@@ -139,6 +141,11 @@ describe("giveaway Worker routes", () => {
     expect(cite.keywords.join(" ")).toMatch(/HVAC/);
     expect(cite.how_to_cite).toMatch(/Eliab, Aziel/);
     expect(cite.compatible_ai_clients).toEqual([...COMPATIBLE_AI_CLIENTS]);
+    expect(cite.honesty).toMatch(/Local-first BYO runtime/);
+    expect(cite.not).toBeUndefined();
+    expect(JSON.stringify(cite)).not.toMatch(/Not aziel-runtime/);
+    expect(JSON.stringify(cite)).not.toMatch(/Not a FragGate/);
+    expect(JSON.stringify(cite)).not.toMatch(/Zenodo/);
 
     const openapi = await (await hit(env, "/openapi.json")).json() as {
       info: { "x-compatible-ai-clients": string[] };
@@ -251,9 +258,14 @@ describe("giveaway Worker routes", () => {
     expect(ai).toMatch(/HVAC/);
     expect(ai).toMatch(/live_backends: false/);
     expect(ai).toMatch(/https:\/\/www\.azieleliab\.com\/#aziel/);
-    expect(ai).toMatch(/Not merely an API orchestrator/);
+    expect(ai).toMatch(/local-first TypeScript runtime/);
     expect(ai).toMatch(/POST /);
     expect(ai).toContain("/mcp");
+    expect(ai).not.toMatch(/What this is not/i);
+    expect(ai).not.toMatch(/Not aziel-runtime/);
+    expect(ai).not.toMatch(/Not a FragGate/);
+    expect(ai).not.toMatch(/Zenodo/);
+    expect(ai).not.toMatch(/blocked from/i);
     expect(ai).not.toMatch(/node-meshed orchestration suite of MCP-connected software/);
 
     const humans = await (await hit(env, "/humans.txt")).text();
@@ -289,7 +301,8 @@ describe("giveaway Worker routes", () => {
     expect(home).toContain("og:title");
     expect(home).toContain("Trades-Runtime by Aziel Eliab");
     expect(home).toContain("application/ld+json");
-    expect(home).toContain("not</strong> a hosted multi-tenant company OS");
+    expect(home).toContain("local-first software you run on your own machine");
+    expect(home).not.toMatch(/Not a FragGate/);
     expect(home).toMatch(/1 Chronicles 15:20/);
     const visible = home.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/, "");
     expect(visible).not.toMatch(/1 Chronicles/);
@@ -303,6 +316,12 @@ describe("giveaway Worker routes", () => {
     expect(llms).toContain("POST ");
     expect(llms).toContain("/mcp");
     expect(llms).toContain("live_backends false");
+    expect(llms).toContain("local BYO runtime");
+    expect(llms).not.toMatch(/^## Not$/m);
+    expect(llms).not.toMatch(/Not aziel-runtime/);
+    expect(llms).not.toMatch(/Not a FragGate/);
+    expect(llms).not.toMatch(/Zenodo/);
+    expect(llms).not.toMatch(/blocked from/i);
 
     const stats = await (await hit(env, "/v1/stats")).json() as { views: number; downloads: number };
     expect(stats.views).toBe(1);

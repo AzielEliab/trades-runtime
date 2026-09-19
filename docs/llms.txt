@@ -5,13 +5,13 @@
 > Version: 0.3.4
 > Status: live-pure core + stubs. BYO local ServiceTitan + ProBooks. Option C code-ready / pilot not started. Option D not started. No live backends. Pages off. Public get is the giveaway Worker.
 
-Product is src/. docs/ is a thin local UI. Implementer specs are at repo-root specs/ (not published on the Worker). Public download: https://trades-runtime.vibelock.workers.dev/download
+Product is src/. docs/ is a thin local UI. Implementer specs are at repo-root specs/. Public download: https://trades-runtime.vibelock.workers.dev/download
 
 ## Software
 
 - npm test — constitutional rules, CrossTrade secondary-only, Human Authority, confidence≠truth, v0.2 pricebook lock / recognition / weather / maintenance
 - npm run demo — synthetic shadow-day + receipts
-- npm run byo:admit-demo — synthetic ST+ProBooks admit proof (not customer data)
+- npm run byo:admit-demo — synthetic ST+ProBooks admit proof
 - npm run shadow:sealed-demo — synthetic N-day sealed settlement (pilot not started)
 - Manifest: /v1/runtime.json and /modules/
 
@@ -25,4 +25,4 @@ A Full-Day Trajectory · B Call-to-Call Ledger · C Human Override / Recalibrati
 
 ## Public surface
 
-https://trades-runtime.vibelock.workers.dev — human UI + counted tarball. Not a hosted company OS. Repo may stay private.
+https://trades-runtime.vibelock.workers.dev — human UI + counted tarball. Repo may stay private.

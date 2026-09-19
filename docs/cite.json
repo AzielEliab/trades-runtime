@@ -42,14 +42,5 @@
     "Aziel Eliab"
   ],
   "how_to_cite": "Aziel Eliab, Trades-Runtime 0.3.4, https://trades-runtime.vibelock.workers.dev/cite.json (Person @id https://www.azieleliab.com/#aziel)",
-  "description": "Local-first TypeScript runtime for shadow-first field-trades operating intelligence. BYO local ServiceTitan + ProBooks inbound. Pages off. Public get is the giveaway Worker (UI + counted tarball), not a hosted company OS. Specs are not published as PDFs.",
-  "not": [
-    "Not a PDF portal.",
-    "Not a public Softwares suite.",
-    "Not aziel-runtime wholesale.",
-    "Not a hosted multi-tenant company OS.",
-    "Not a ServiceTitan or ProBooks write API.",
-    "Not a Glama listing.",
-    "Not a DOI."
-  ]
+  "description": "Local-first TypeScript runtime for shadow-first field-trades operating intelligence. BYO local ServiceTitan + ProBooks inbound. Pages off. Public get is the giveaway Worker (UI + counted tarball)."
 }

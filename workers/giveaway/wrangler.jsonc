@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  // Author / identity: Aziel Eliab only. Public giveaway Worker, not a hosted company OS.
+  // Author / identity: Aziel Eliab only. Public giveaway Worker. Local-first BYO field-trades runtime.
   "name": "trades-runtime",
   "main": "src/index.ts",
   "compatibility_date": "2026-09-18",
