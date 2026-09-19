@@ -1,22 +1,13 @@
+import { citeBody, healthBody, json, jsonLd, llmsTxt, openApiSpec, skillMarkdown, statsBody, text } from "./catalog.js";
 import {
   aiTxt,
-  citeBody,
   graphJsonLd,
-  healthBody,
   humansTxt,
-  json,
-  jsonLd,
-  llmsTxt,
-  openApiSpec,
   personJsonLd,
   robotsTxt,
-  sitemapIndexXml,
   sitemapXml,
-  skillMarkdown,
-  statsBody,
-  text,
   wellKnownMcp
-} from "./catalog.js";
+} from "./crawl.js";
 import {
   classifyRequest,
   classificationMethodForRequest,
@@ -79,7 +70,6 @@ export async function handleRequest(request: Request, env: Env, _ctx?: WorkerCon
   if (pathname === "/humans.txt") return text(humansTxt(), "text/plain; charset=utf-8");
   if (pathname === "/robots.txt") return text(robotsTxt(), "text/plain; charset=utf-8");
   if (pathname === "/sitemap.xml") return text(sitemapXml(), "application/xml; charset=utf-8");
-  if (pathname === "/sitemap-index.xml") return text(sitemapIndexXml(), "application/xml; charset=utf-8");
   if (pathname === "/person.jsonld") return jsonLd(personJsonLd());
   if (pathname === "/graph.jsonld") return jsonLd(graphJsonLd());
   if (pathname === "/.well-known/mcp.json") return json(wellKnownMcp());

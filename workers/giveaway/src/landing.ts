@@ -1,4 +1,4 @@
-import { homepageJsonLd } from "./catalog.js";
+import { homepageJsonLd } from "./crawl.js";
 import {
   AUTHOR,
   COMPATIBLE_AI_CLIENTS,
@@ -79,22 +79,12 @@ export function renderLanding(views: number, downloads: number): string {
     .counts { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
     .count { background: var(--bg-inset); border-radius: 12px; padding: 1rem; }
     .count b { display: block; font-family: var(--mono); font-size: 1.8rem; color: var(--good); }
-    .cta { display: flex; flex-wrap: wrap; gap: 0.7rem; align-items: center; margin: 1rem 0; }
     .btn {
       display: inline-block;
       background: var(--accent);
       color: var(--accent-ink);
       text-decoration: none;
       font-weight: 700;
-      padding: 0.7rem 1.1rem;
-      border-radius: 10px;
-    }
-    .btn-ghost {
-      display: inline-block;
-      border: 1px solid var(--line);
-      color: var(--ink);
-      text-decoration: none;
-      font-weight: 600;
       padding: 0.7rem 1.1rem;
       border-radius: 10px;
     }
@@ -126,16 +116,6 @@ export function renderLanding(views: number, downloads: number): string {
       <span class="badge">live_backends false</span>
       <span class="badge">${escapeHtml(LICENSE)}</span>
     </p>
-
-    <div class="panel">
-      <h2>Dual surface</h2>
-      <p>Humans use this page and the counted tarball. Agents use OpenAPI and read-only MCP. Same product. Not an API orchestrator.</p>
-      <p class="cta">
-        <a class="btn" href="/download">Download ${escapeHtml(RELEASE_FILENAME)}</a>
-        <a class="btn-ghost" href="/openapi.json">OpenAPI</a>
-        <a class="btn-ghost" href="/mcp">MCP note (POST)</a>
-      </p>
-    </div>
 
     <div class="panel">
       <h2>Honesty</h2>

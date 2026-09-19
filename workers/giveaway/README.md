@@ -59,7 +59,7 @@ Classification (per counted request): health-check UA is skipped on homepage vie
 | GET | `/v1/health` | no |
 | GET | `/v1/stats`, `/stats`, `/count` | no |
 | GET | `/cite.json`, `/llms.txt`, `/ai.txt`, `/humans.txt`, `/robots.txt` | no |
-| GET | `/sitemap.xml`, `/sitemap-index.xml` | no |
+| GET | `/sitemap.xml` | no |
 | GET | `/person.jsonld`, `/graph.jsonld` | no |
 | GET | `/.well-known/mcp.json` | no |
 | GET | `/v1/skill` | no |

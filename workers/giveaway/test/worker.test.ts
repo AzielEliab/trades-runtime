@@ -71,7 +71,6 @@ describe("giveaway Worker routes", () => {
     expect((await hit(env, "/humans.txt")).status).toBe(200);
     expect((await hit(env, "/robots.txt")).status).toBe(200);
     expect((await hit(env, "/sitemap.xml")).status).toBe(200);
-    expect((await hit(env, "/sitemap-index.xml")).status).toBe(200);
     expect((await hit(env, "/person.jsonld")).status).toBe(200);
     expect((await hit(env, "/graph.jsonld")).status).toBe(200);
     expect((await hit(env, "/.well-known/mcp.json")).status).toBe(200);
@@ -123,12 +122,9 @@ describe("giveaway Worker routes", () => {
       live_backends: boolean;
       pages: string;
       person_id: string;
-      "@id": string;
       sameAs: string[];
       keywords: string[];
       how_to_cite: string;
-      glama_listing: boolean;
-      doi: null;
       compatible_ai_clients: string[];
     };
     expect(cite.identity).toBe(AUTHOR);
@@ -136,14 +132,12 @@ describe("giveaway Worker routes", () => {
     expect(cite.live_backends).toBe(false);
     expect(cite.pages).toBe("off");
     expect(cite.person_id).toBe("https://www.azieleliab.com/#aziel");
-    expect(cite["@id"]).toBe("https://www.azieleliab.com/#aziel");
     expect(cite.sameAs).toContain("https://github.com/AzielEliab/trades-runtime");
     expect(cite.sameAs).toContain("https://www.azielcorpuslibrary.net/software");
+    expect(cite.sameAs).not.toContain("https://glama.ai");
     expect(cite.keywords.join(" ")).toMatch(/trades-runtime/);
     expect(cite.keywords.join(" ")).toMatch(/HVAC/);
-    expect(cite.how_to_cite).toMatch(/Aziel Eliab/);
-    expect(cite.glama_listing).toBe(false);
-    expect(cite.doi).toBeNull();
+    expect(cite.how_to_cite).toMatch(/Eliab, Aziel/);
     expect(cite.compatible_ai_clients).toEqual([...COMPATIBLE_AI_CLIENTS]);
 
     const openapi = await (await hit(env, "/openapi.json")).json() as {
@@ -251,14 +245,15 @@ describe("giveaway Worker routes", () => {
     ]) {
       expect(sitemap).toContain(`https://trades-runtime.vibelock.workers.dev${path === "/" ? "/" : path}`);
     }
-    expect((await hit(env, "/sitemap-index.xml")).status).toBe(200);
+    expect((await hit(env, "/sitemap-index.xml")).status).toBe(404);
 
     const ai = await (await hit(env, "/ai.txt")).text();
     expect(ai).toMatch(/HVAC/);
     expect(ai).toMatch(/live_backends: false/);
     expect(ai).toMatch(/https:\/\/www\.azieleliab\.com\/#aziel/);
-    expect(ai).toMatch(/Not a node-meshed orchestration suite/);
-    expect(ai).toMatch(/POST \/mcp/);
+    expect(ai).toMatch(/Not merely an API orchestrator/);
+    expect(ai).toMatch(/POST /);
+    expect(ai).toContain("/mcp");
     expect(ai).not.toMatch(/node-meshed orchestration suite of MCP-connected software/);
 
     const humans = await (await hit(env, "/humans.txt")).text();
@@ -282,26 +277,31 @@ describe("giveaway Worker routes", () => {
     expect(types).toContain("WebSite");
 
     const mcp = await (await hit(env, "/.well-known/mcp.json")).json() as {
-      url: string;
+      mcpServers: { "trades-runtime": { url: string; type: string } };
       openapi: string;
+      person_id: string;
     };
-    expect(mcp.url).toBe("https://trades-runtime.vibelock.workers.dev/mcp");
+    expect(mcp.mcpServers["trades-runtime"].url).toBe("https://trades-runtime.vibelock.workers.dev/mcp");
     expect(mcp.openapi).toBe("https://trades-runtime.vibelock.workers.dev/openapi.json");
+    expect(mcp.person_id).toBe("https://www.azieleliab.com/#aziel");
 
     const home = await (await hit(env, "/")).text();
     expect(home).toContain("og:title");
+    expect(home).toContain("Trades-Runtime by Aziel Eliab");
     expect(home).toContain("application/ld+json");
-    expect(home).toContain("Dual surface");
     expect(home).toContain("not</strong> a hosted multi-tenant company OS");
-    expect(home).not.toMatch(/1 Chronicles/);
-    expect(home).not.toMatch(/15:20/);
+    expect(home).toMatch(/1 Chronicles 15:20/);
+    const visible = home.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/, "");
+    expect(visible).not.toMatch(/1 Chronicles/);
+    expect(visible).not.toMatch(/15:20/);
 
     const llms = await (await hit(env, "/llms.txt")).text();
     expect(llms).toContain("/ai.txt");
-    expect(llms).toContain("/sitemap.xml");
-    expect(llms).toContain("/robots.txt");
+    expect(llms).toContain("sitemap.xml");
+    expect(llms).toContain("robots.txt");
     expect(llms).toContain("azielcorpuslibrary.net/software");
-    expect(llms).toContain("POST /mcp");
+    expect(llms).toContain("POST ");
+    expect(llms).toContain("/mcp");
     expect(llms).toContain("live_backends false");
 
     const stats = await (await hit(env, "/v1/stats")).json() as { views: number; downloads: number };

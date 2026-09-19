@@ -19,6 +19,7 @@ const PRODUCT_SURFACES = [
   "cli/mcp-stdio.mjs",
   "workers/giveaway/src/identity.ts",
   "workers/giveaway/src/catalog.ts",
+  "workers/giveaway/src/crawl.ts",
   "workers/giveaway/src/landing.ts",
   "workers/giveaway/wrangler.jsonc"
 ];

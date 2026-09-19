@@ -16,12 +16,12 @@ export const SISTER_CORPUS = "https://www.azielcorpuslibrary.net/";
 export const SISTER_GODLOCK = "https://godlock.uk/";
 export const GITHUB_AUTHOR = "https://github.com/AzielEliab";
 
-export const PAGE_TITLE = `${PRODUCT_TITLE} · local BYO HVAC/plumbing/electrical/sewer runtime · ${VERSION}`;
+export const PAGE_TITLE = `${PRODUCT_TITLE} · public giveaway · ${VERSION}`;
 export const PAGE_DESCRIPTION =
-  "Shadow-first local BYO TypeScript runtime for HVAC, plumbing, electrical, sewer, and cross-trades. Dual surface: human UI plus a counted download. Operators bring their own ServiceTitan and ProBooks. live_backends false. Pages off. Not a hosted company OS. Author: Aziel Eliab.";
-export const OG_TITLE = "Trades-Runtime — local-first trades software you run on your machine";
+  "Trades-Runtime — shadow-first local BYO runtime for HVAC, plumbing, electrical, sewer, and cross-trades. Author Aziel Eliab. Not a hosted company OS. live_backends false.";
+export const OG_TITLE = "Trades-Runtime by Aziel Eliab";
 export const OG_DESCRIPTION =
-  "HVAC, plumbing, electrical, sewer, and cross-trades. Human landing + counted /download. Thin OpenAPI/MCP for agents. Not an API orchestrator. Not a hosted company OS.";
+  "Shadow-first local BYO field-trades runtime. HVAC, plumbing, electrical, sewer, cross-trades. Not a hosted company OS.";
 
 export const COMPATIBLE_AI_CLIENTS = [
   "ChatGPT (GPT Actions / OpenAI)",
@@ -44,33 +44,44 @@ export const COMPATIBLE_AI_CLIENTS = [
 ] as const;
 
 export const KEYWORDS = [
-  "trades-runtime",
   "Trades-Runtime",
+  "trades-runtime",
+  "Aziel Eliab",
   "HVAC",
   "plumbing",
   "electrical",
   "sewer",
   "cross-trades",
-  "field trades",
-  "shadow-first",
   "BYO",
   "ServiceTitan",
   "ProBooks",
-  "local-first",
-  "Aziel Eliab",
-  "human authority"
+  "shadow-first",
+  "local-first"
 ] as const;
 
-export const SAME_AS = [
+/** cite.json sameAs — product + sister hubs. No fake Glama listing. */
+export const CITE_SAME_AS = [
   REPOSITORY,
-  PUBLIC_ORIGIN,
+  `${PUBLIC_ORIGIN}/`,
   SOFTWARES_TAB,
   PERSON_URL,
   PERSON_ID,
   SISTER_CORPUS,
-  SISTER_GODLOCK,
   GITHUB_AUTHOR
 ] as const;
+
+/** Person / graph JSON-LD sameAs. Includes godlock.uk as a sister hub. */
+export const PERSON_SAME_AS = [
+  PERSON_URL,
+  GITHUB_AUTHOR,
+  REPOSITORY,
+  `${PUBLIC_ORIGIN}/`,
+  SOFTWARES_TAB,
+  SISTER_CORPUS,
+  SISTER_GODLOCK
+] as const;
+
+export const SAME_AS = CITE_SAME_AS;
 
 /** Explicit Allow set copied from live aziel-runtime robots.txt (2026-09-19). No invented UAs. */
 export const CRAWL_USER_AGENTS = [
@@ -139,31 +150,33 @@ export const CRAWL_USER_AGENTS = [
   "NeevaBot"
 ] as const;
 
-export const SITEMAP_PATHS = [
-  "/",
-  "/download",
-  "/cite.json",
-  "/llms.txt",
-  "/ai.txt",
-  "/humans.txt",
-  "/openapi.json",
-  "/robots.txt",
-  "/v1/health",
-  "/v1/stats",
-  "/count",
-  "/v1/skill",
-  "/mcp",
-  "/.well-known/mcp.json",
-  "/person.jsonld",
-  "/graph.jsonld",
-  "/sitemap.xml"
+export const SITEMAP_ENTRIES = [
+  { path: "/", changefreq: "daily", priority: "1.0" },
+  { path: "/download", changefreq: "daily", priority: "0.95" },
+  { path: "/cite.json", changefreq: "daily", priority: "0.9" },
+  { path: "/llms.txt", changefreq: "daily", priority: "0.9" },
+  { path: "/ai.txt", changefreq: "daily", priority: "0.9" },
+  { path: "/humans.txt", changefreq: "weekly", priority: "0.7" },
+  { path: "/openapi.json", changefreq: "daily", priority: "0.9" },
+  { path: "/robots.txt", changefreq: "weekly", priority: "0.6" },
+  { path: "/sitemap.xml", changefreq: "weekly", priority: "0.5" },
+  { path: "/v1/health", changefreq: "daily", priority: "0.5" },
+  { path: "/v1/stats", changefreq: "hourly", priority: "0.7" },
+  { path: "/count", changefreq: "hourly", priority: "0.7" },
+  { path: "/v1/skill", changefreq: "daily", priority: "0.85" },
+  { path: "/mcp", changefreq: "daily", priority: "0.9" },
+  { path: "/.well-known/mcp.json", changefreq: "daily", priority: "0.85" },
+  { path: "/person.jsonld", changefreq: "weekly", priority: "0.8" },
+  { path: "/graph.jsonld", changefreq: "weekly", priority: "0.8" }
 ] as const;
+
+export const SITEMAP_PATHS = SITEMAP_ENTRIES.map((entry) => entry.path);
 
 export const HONESTY = {
   product:
     "Local-first BYO runtime. People bring their own ServiceTitan and ProBooks. No tenant data on this Worker. No ST/ProBooks write-back. live_backends false. Not a production company OS claim.",
   counters:
-    "Honest Workers KV counts. views increments exactly once per successful GET / HTML homepage 200. Health-check user-agents and non-GET / requests are not counted. downloads increments exactly once per successful GET /download 200 after the release tarball is verified as gzip. Assets, /v1/health, /v1/stats, /count, /openapi.json, /mcp, /cite.json, /llms.txt, /ai.txt, /humans.txt, /robots.txt, /sitemap.xml, /sitemap-index.xml, /.well-known/mcp.json, /person.jsonld, /graph.jsonld, and /v1/skill do not increment. No sampling. No inflation. No estimated unique visitors. Start at 0. Each increment writes one unique COUNTS key (views:<uuid> or downloads:<uuid>) and also does value = (parseInt(await kv.get(name))||0)+1 with put on the name key. GET /v1/stats lists the unique keys (source of truth) and never seeds or rounds up. KV list is eventually consistent — a just-written key may take up to ~60s to appear in another colo. Failed downloads never increment."
+    "Honest Workers KV counts. views increments exactly once per successful GET / HTML homepage 200. Health-check user-agents and non-GET / requests are not counted. downloads increments exactly once per successful GET /download 200 after the release tarball is verified as gzip. Assets, /v1/health, /v1/stats, /openapi.json, /mcp, /cite.json, /llms.txt, /robots.txt, and /v1/skill do not increment. No sampling. No inflation. No estimated unique visitors. Start at 0. Each increment writes one unique COUNTS key (views:<uuid> or downloads:<uuid>) and also does value = (parseInt(await kv.get(name))||0)+1 with put on the name key. GET /v1/stats lists the unique keys (source of truth) and never seeds or rounds up. KV list is eventually consistent — a just-written key may take up to ~60s to appear in another colo. Failed downloads never increment."
 } as const;
 
 export const HEALTH_UA_RE =
