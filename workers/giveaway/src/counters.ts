@@ -21,13 +21,6 @@ export interface BotManagementHint {
   score?: number;
 }
 
-export interface ClassifyableRequest {
-  headers: Headers;
-  cf?: {
-    botManagement?: BotManagementHint;
-  };
-}
-
 export interface Classification {
   class: TrafficClass;
   method: ClassificationMethod;
@@ -78,12 +71,19 @@ export function isDenylistedBotUserAgent(userAgent: string | null): boolean {
   return BOT_UA_RE.test(userAgent);
 }
 
-export function botManagementFromRequest(request: ClassifyableRequest): BotManagementHint | null {
-  const bm = request.cf?.botManagement;
-  return bm && typeof bm === "object" ? bm : null;
+export function botManagementFromRequest(request: Request): BotManagementHint | null {
+  const cf = request.cf;
+  if (!cf || typeof cf !== "object") return null;
+  const bm = (cf as { botManagement?: unknown }).botManagement;
+  if (!bm || typeof bm !== "object") return null;
+  const rec = bm as { verifiedBot?: unknown; score?: unknown };
+  const hint: BotManagementHint = {};
+  if (typeof rec.verifiedBot === "boolean") hint.verifiedBot = rec.verifiedBot;
+  if (typeof rec.score === "number") hint.score = rec.score;
+  return hint;
 }
 
-export function classificationMethodForRequest(request: ClassifyableRequest): ClassificationMethod {
+export function classificationMethodForRequest(request: Request): ClassificationMethod {
   return botManagementFromRequest(request) ? "cf.botManagement+ua" : "ua+healthcheck";
 }
 
@@ -91,7 +91,7 @@ export function classificationNote(method: ClassificationMethod): string {
   return method === "cf.botManagement+ua" ? CLASSIFICATION_NOTE_BOT_MANAGEMENT : CLASSIFICATION_NOTE_UA_FALLBACK;
 }
 
-export function classifyRequest(request: ClassifyableRequest): Classification {
+export function classifyRequest(request: Request): Classification {
   const userAgent = request.headers.get("user-agent");
   const botManagement = botManagementFromRequest(request);
   const usedBotManagement = botManagement !== null;
