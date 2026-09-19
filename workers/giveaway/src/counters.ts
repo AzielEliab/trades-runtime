@@ -53,13 +53,13 @@ export const BOT_UA_RE =
   /googlebot|google-extended|bingbot|bingpreview|yandex|baiduspider|duckduckbot|facebookexternalhit|twitterbot|linkedinbot|slackbot|discordbot|gptbot|chatgpt-user|claudebot|anthropic-ai|bytespider|petalsbot|petalbot|ccbot|semrush|ahrefs|mj12bot|dotbot|amazonbot|applebot|perplexitybot|ia_archiver|\bslurp\b|rogerbot|scribd|embedly|pinterest|redditbot|telegrambot/i;
 
 export const STATS_NOTE =
-  "Honest KV increments for 200 responses only. views = successful GET / HTML homepage 200 (health-check user-agents excluded). downloads = successful GET /download 200 after gzip tarball verify. Human/bot split: views === views_human + views_bot and downloads === downloads_human + downloads_bot. Pre-split legacy remainder is attributed to human (never seeded as bot). No sampling. No inflation. No estimated uniques. Start at 0. Source of truth is unique COUNTS keys (views:<uuid>, downloads:<uuid>) plus parallel running totals views_human / views_bot / downloads_human / downloads_bot (and matching :<uuid> event keys). A running total key is also updated with parseInt(get)||0+1 put. KV list is eventually consistent.";
+  "Honest KV increments for 200 responses only. views = successful GET / HTML homepage 200 (health-check user-agents skipped). downloads = successful GET /download 200 after gzip tarball verify. Additive fleet split: views_human/views_bot and downloads_human/downloads_bot with human{} bot{} and classification{method, bot_score_threshold:30, note}. Invariant: views===views_human+views_bot and downloads===downloads_human+downloads_bot. Pre-split remainder attributed to human. Classification: health-check skip; cf.botManagement verifiedBot or score<=30 → bot; UA denylist → bot; else human. Fallback method ua+healthcheck when botManagement absent. No sampling. No inflation. No estimated uniques. Start at 0. Unique COUNTS keys (views:, downloads:) plus running totals. KV list is eventually consistent.";
 
 export const CLASSIFICATION_NOTE_BOT_MANAGEMENT =
-  "Cloudflare Bot Management plus UA denylist. verifiedBot or score <= 30 is bot; otherwise UA denylist; else human. Health-check user-agents are skipped on homepage views and counted as bot only if a verified tarball GET is incremented.";
+  "Classified with cf.botManagement + UA denylist. verifiedBot or score<=30 is bot. Author Aziel Eliab.";
 
 export const CLASSIFICATION_NOTE_UA_FALLBACK =
-  "CF Bot Management was unavailable on this Worker isolate path, so classification uses UA denylist plus health-check user-agents only.";
+  "CF Bot Management unavailable on this request path; classified with UA denylist + health-check only. Author Aziel Eliab.";
 
 export function isHealthCheckUserAgent(userAgent: string | null): boolean {
   if (!userAgent) return false;
@@ -136,15 +136,14 @@ async function incrementRunningTotal(kv: CountStore, name: string): Promise<numb
   return next;
 }
 
-export async function incrementCount(
+export async function incrementClassified(
   kv: CountStore,
   name: CounterName,
-  traffic: TrafficClass
+  actor: TrafficClass
 ): Promise<number> {
   const id = crypto.randomUUID();
-  const split: SplitName = `${name}_${traffic}`;
-  await kv.put(`${name}:${id}`, traffic);
-  await kv.put(`${split}:${id}`, "1");
+  const split: SplitName = `${name}_${actor}`;
+  await kv.put(`${name}:${id}`, actor);
   const next = await incrementRunningTotal(kv, name);
   await incrementRunningTotal(kv, split);
   return next;

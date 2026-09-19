@@ -12,7 +12,7 @@ import {
 import {
   classifyRequest,
   classificationMethodForRequest,
-  incrementCount,
+  incrementClassified,
   readFleetStats,
   shouldCountDownload,
   shouldCountHomepageView,
@@ -97,7 +97,7 @@ export async function handleRequest(request: Request, env: Env, _ctx?: WorkerCon
       return new Response(null, { status: 200, headers: releaseHeaders(filename, bytes.byteLength) });
     }
     try {
-      await incrementCount(kv, "downloads", classifyRequest(request).class);
+      await incrementClassified(kv, "downloads", classifyRequest(request).class);
     } catch (error) {
       console.error(JSON.stringify({ event: "download_count_failed", error: String(error) }));
     }
@@ -113,7 +113,7 @@ export async function handleRequest(request: Request, env: Env, _ctx?: WorkerCon
     }
     if (request.method === "GET" && shouldCountHomepageView("GET", "/", request.headers.get("user-agent"))) {
       try {
-        await incrementCount(kv, "views", classifyRequest(request).class);
+        await incrementClassified(kv, "views", classifyRequest(request).class);
       } catch (error) {
         console.error(JSON.stringify({ event: "view_count_failed", error: String(error) }));
       }

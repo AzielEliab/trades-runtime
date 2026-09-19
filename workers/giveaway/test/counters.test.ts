@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   BOT_SCORE_THRESHOLD,
+  CLASSIFICATION_NOTE_UA_FALLBACK,
   classifyRequest,
-  incrementCount,
+  incrementClassified,
   isHealthCheckUserAgent,
   readCount,
   readFleetStats,
@@ -27,27 +28,32 @@ describe("honest KV counters", () => {
 
   it("increments once per call using unique keys plus parseInt(get)||0+1", async () => {
     const kv = new MemoryKV();
-    await incrementCount(kv, "views", "human");
-    await incrementCount(kv, "views", "human");
-    await incrementCount(kv, "downloads", "human");
+    await incrementClassified(kv, "views", "human");
+    await incrementClassified(kv, "views", "human");
+    await incrementClassified(kv, "downloads", "human");
     expect(await readCount(kv, "views")).toBe(2);
     expect(await readCount(kv, "downloads")).toBe(1);
     expect(kv.store.get("views")).toBe("2");
     expect(kv.store.get("downloads")).toBe("1");
     expect(kv.store.get("views_human")).toBe("2");
     expect(kv.store.get("downloads_human")).toBe("1");
-    const uniqueViews = [...kv.store.keys()].filter((key) => key.startsWith("views:")).length;
-    expect(uniqueViews).toBe(2);
+    const uniqueViews = [...kv.store.keys()].filter((key) => key.startsWith("views:"));
+    expect(uniqueViews).toHaveLength(2);
+    expect(uniqueViews.every((key) => kv.store.get(key) === "human")).toBe(true);
+    expect([...kv.store.keys()].some((key) => key.startsWith("views_human:"))).toBe(false);
   });
 
   it("does not invent uniques or round up", async () => {
     const kv = new MemoryKV();
-    await incrementCount(kv, "views", "human");
+    await incrementClassified(kv, "views", "human");
     expect(await readCount(kv, "views")).toBe(1);
     expect(STATS_NOTE).toMatch(/No sampling/);
     expect(STATS_NOTE).toMatch(/No inflation/);
     expect(STATS_NOTE).toMatch(/Start at 0/);
-    expect(STATS_NOTE).toMatch(/human\/bot/i);
+    expect(STATS_NOTE).toMatch(/human\{\} bot\{\}/);
+    expect(CLASSIFICATION_NOTE_UA_FALLBACK).toBe(
+      "CF Bot Management unavailable on this request path; classified with UA denylist + health-check only. Author Aziel Eliab."
+    );
   });
 
   it("excludes health-check user-agents from homepage views", () => {
@@ -94,9 +100,9 @@ describe("honest KV counters", () => {
 
   it("holds the human/bot invariant and attributes legacy remainder to human", async () => {
     const kv = new MemoryKV();
-    await incrementCount(kv, "views", "human");
-    await incrementCount(kv, "views", "bot");
-    await incrementCount(kv, "downloads", "bot");
+    await incrementClassified(kv, "views", "human");
+    await incrementClassified(kv, "views", "bot");
+    await incrementClassified(kv, "downloads", "bot");
     const live = await readFleetStats(kv, "ua+healthcheck");
     expect(live.views).toBe(live.views_human + live.views_bot);
     expect(live.downloads).toBe(live.downloads_human + live.downloads_bot);
@@ -118,7 +124,7 @@ describe("honest KV counters", () => {
     expect(reconciled.downloads).toBe(4);
     expect(reconciled.downloads_human).toBe(4);
     expect(reconciled.downloads_bot).toBe(0);
-    expect(reconciled.note).toMatch(/legacy/);
+    expect(reconciled.note).toMatch(/Pre-split remainder attributed to human/);
 
     expect(reconcileLegacySplit(10, 2, 1)).toEqual({ total: 10, human: 9, bot: 1 });
     expect(reconcileLegacySplit(3, 2, 1)).toEqual({ total: 3, human: 2, bot: 1 });

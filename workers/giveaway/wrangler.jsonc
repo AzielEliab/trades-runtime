@@ -12,8 +12,8 @@
     "head_sampling_rate": 1
   },
   "vars": {
-    "PRODUCT_VERSION": "0.3.4",
-    "RELEASE_FILENAME": "trades-runtime-0.3.4.tgz"
+    "PRODUCT_VERSION": "0.3.3",
+    "RELEASE_FILENAME": "trades-runtime-0.3.3.tgz"
   },
   // COUNTS is the honest view/download namespace.
   // First deploy on the vibelock account:

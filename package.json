@@ -1,6 +1,6 @@
 {
   "name": "trades-runtime",
-  "version": "0.3.4",
+  "version": "0.3.3",
   "private": true,
   "description": "Shadow-first operating intelligence for multi-branch field trades. Author: Aziel Eliab.",
   "type": "module",

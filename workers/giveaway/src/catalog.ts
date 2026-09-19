@@ -74,7 +74,6 @@ export function citeBody(): Record<string, unknown> {
     download: `${PUBLIC_ORIGIN}/download`,
     health: `${PUBLIC_ORIGIN}/v1/health`,
     stats: `${PUBLIC_ORIGIN}/v1/stats`,
-    count: `${PUBLIC_ORIGIN}/count`,
     openapi: `${PUBLIC_ORIGIN}/openapi.json`,
     mcp: `${PUBLIC_ORIGIN}/mcp`,
     skill: `${PUBLIC_ORIGIN}/v1/skill`,
@@ -106,7 +105,7 @@ ${HONESTY.product}
 
 - Human UI: GET /
 - Counted tarball: GET /download
-- Stats: GET /v1/stats (aliases /stats, /count)
+- Stats: GET /v1/stats
 - Health: GET /v1/health
 - Cite: GET /cite.json
 - Skill: GET /v1/skill
@@ -138,8 +137,6 @@ Allow: /
 Allow: /download
 Allow: /v1/health
 Allow: /v1/stats
-Allow: /stats
-Allow: /count
 Allow: /cite.json
 Allow: /llms.txt
 Allow: /openapi.json
@@ -222,11 +219,11 @@ export function openApiSpec(): Record<string, unknown> {
       "/v1/health": { get: { summary: "Health JSON. Does not increment counters." } },
       "/v1/stats": {
         get: {
-          summary: "Honest KV views/downloads with human/bot split. Does not increment counters."
+          summary: "Honest KV views/downloads + human/bot fleet split. Does not increment counters."
         }
       },
       "/stats": { get: { summary: "Alias of /v1/stats." } },
-      "/count": { get: { summary: "Alias of /v1/stats (fleet Σ /count)." } },
+      "/count": { get: { summary: "Alias of /v1/stats (fleet download-tracker shape)." } },
       "/cite.json": { get: { summary: "Public cite. Does not increment counters." } },
       "/llms.txt": { get: { summary: "LLM-oriented product text." } },
       "/robots.txt": { get: { summary: "Robots allow list." } },

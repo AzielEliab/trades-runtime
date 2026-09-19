@@ -48,7 +48,8 @@ describe("giveaway Worker routes", () => {
     expect(stats.views).toBe(stats.views_human + stats.views_bot);
     expect(stats.downloads).toBe(stats.downloads_human + stats.downloads_bot);
     expect(stats.note).toMatch(/200 responses only/);
-    expect(stats.note).toMatch(/human\/bot/i);
+    expect(stats.note).toMatch(/views_human\/views_bot/);
+    expect(stats.classification.note).toMatch(/Author Aziel Eliab/);
     expect(stats.project).toBe("trades-runtime");
     expect(stats.classification.bot_score_threshold).toBe(30);
     expect(stats.classification.method).toBe("ua+healthcheck");
@@ -83,7 +84,7 @@ describe("giveaway Worker routes", () => {
     expect(download.status).toBe(200);
     const bytes = await download.arrayBuffer();
     expect(isGzipTarball(bytes)).toBe(true);
-    expect(download.headers.get("Content-Disposition")).toContain("trades-runtime-0.3.4.tgz");
+    expect(download.headers.get("Content-Disposition")).toContain("trades-runtime-0.3.3.tgz");
     const stats = await (await hit(env, "/v1/stats")).json() as FleetStats;
     expect(stats.downloads).toBe(1);
     expect(stats.downloads_human).toBe(1);

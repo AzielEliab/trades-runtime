@@ -1,6 +1,6 @@
 {
   "name": "trades-runtime-giveaway-worker",
-  "version": "0.3.4",
+  "version": "0.3.3",
   "private": true,
   "type": "module",
   "author": "Aziel Eliab",
