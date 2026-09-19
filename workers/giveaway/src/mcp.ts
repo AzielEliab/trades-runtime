@@ -1,6 +1,6 @@
 import { citeBody, healthBody, skillMarkdown, statsBody } from "./catalog.js";
 import type { CountStore } from "./counters.js";
-import { readCount } from "./counters.js";
+import { classificationMethodForRequest, readFleetStats } from "./counters.js";
 import { AUTHOR, PRODUCT, VERSION } from "./identity.js";
 
 interface JsonRpcRequest {
@@ -21,7 +21,7 @@ const TOOLS = [
   },
   {
     name: "trades_runtime_stats",
-    description: "Honest KV view/download counts. Read-only. Does not increment counters.",
+    description: "Honest KV view/download counts with human/bot split. Read-only. Does not increment counters.",
     inputSchema: { type: "object", properties: {}, additionalProperties: false }
   },
   {
@@ -90,7 +90,7 @@ export async function handleMcp(
       return rpcTool(id, healthBody(releaseReady, releaseBytes));
     }
     if (name === "trades_runtime_stats") {
-      return rpcTool(id, statsBody(await readCount(kv, "views"), await readCount(kv, "downloads")));
+      return rpcTool(id, statsBody(await readFleetStats(kv, classificationMethodForRequest(request))));
     }
     if (name === "trades_runtime_cite") {
       return rpcTool(id, citeBody());

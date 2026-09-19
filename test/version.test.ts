@@ -2,7 +2,7 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { RUNTIME_MANIFEST } from "../src/manifest.js";
 
-const PRODUCT = "0.3.3";
+const PRODUCT = "0.3.4";
 const IDENTITY = "Aziel Eliab";
 const PRODUCT_SURFACES = [
   "README.md",
@@ -19,7 +19,7 @@ const PRODUCT_SURFACES = [
 ];
 
 describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", () => {
-  it("keeps package, manifest, and catalog on 0.3.3", () => {
+  it("keeps package, manifest, and catalog on 0.3.4", () => {
     const pkg = JSON.parse(readFileSync("package.json", "utf8")) as { version: string; author: string };
     const runtime = JSON.parse(readFileSync("docs/v1/runtime.json", "utf8")) as {
       version: string;
@@ -64,7 +64,7 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
     expect(runtime.launch_options?.D?.status).toBe("not-started");
     expect(RUNTIME_MANIFEST.launch_options.C.status).toBe("code-ready-pilot-not-started");
     expect(RUNTIME_MANIFEST.launch_options.D.status).toBe("not-started");
-    expect(readFileSync("README.md", "utf8")).toMatch(/\*\*Version:\*\* 0\.3\.3/);
+    expect(readFileSync("README.md", "utf8")).toMatch(/\*\*Version:\*\* 0\.3\.4/);
     expect(readFileSync("README.md", "utf8")).toMatch(/TR-BOT-2026-09-17/);
     expect(readFileSync("README.md", "utf8")).toMatch(/TR-BYO-2026-09-17/);
     expect(readFileSync("README.md", "utf8")).toMatch(/TR-AUDIT-2026-09-18C/);
@@ -89,7 +89,7 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
     expect(workerPkg.author).toBe(IDENTITY);
     expect(workerWrangler).toMatch(/"name": "trades-runtime"/);
     expect(workerWrangler).toMatch(/"binding": "COUNTS"/);
-    expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/export const VERSION = "0\.3\.3"/);
+    expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/export const VERSION = "0\.3\.4"/);
     expect(readFileSync("README.md", "utf8")).toMatch(/Public giveaway Worker/);
     expect(pkg.author).toBe(IDENTITY);
     expect(RUNTIME_MANIFEST.author).toBe(IDENTITY);

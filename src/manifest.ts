@@ -1,6 +1,6 @@
 export const RUNTIME_MANIFEST = {
   product: "trades-runtime",
-  version: "0.3.3",
+  version: "0.3.4",
   author: "Aziel Eliab",
   identity: "Aziel Eliab",
   role: "trades-runtime",

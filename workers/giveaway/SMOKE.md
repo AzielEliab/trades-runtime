@@ -1,6 +1,6 @@
 # Giveaway Worker smoke notes
 
-Run after `npm run giveaway:pack` so `release/trades-runtime-0.3.3.tgz` exists.
+Run after `npm run giveaway:pack` so `release/trades-runtime-0.3.4.tgz` exists.
 
 ```bash
 cd workers/giveaway
@@ -13,7 +13,8 @@ In another shell (Miniflare KV starts at 0):
 # Health / catalog — must NOT increment views or downloads
 curl -sS http://127.0.0.1:8787/v1/health
 curl -sS http://127.0.0.1:8787/v1/stats
-# expect {"views":0,"downloads":0,...}
+curl -sS http://127.0.0.1:8787/count
+# expect views/downloads/total + human/bot split, all 0
 
 curl -sS http://127.0.0.1:8787/cite.json
 curl -sS http://127.0.0.1:8787/llms.txt
@@ -39,7 +40,7 @@ curl -sS http://127.0.0.1:8787/v1/stats
 
 # Failed download (if you temporarily hide the tarball) must not increment.
 # Successful download increments downloads by 1
-curl -sS -o /tmp/trades-runtime-0.3.3.tgz -w "%{http_code}\n" http://127.0.0.1:8787/download
+curl -sS -o /tmp/trades-runtime-0.3.4.tgz -w "%{http_code}\n" http://127.0.0.1:8787/download
 # 200; file starts with gzip magic 1f 8b
 curl -sS http://127.0.0.1:8787/v1/stats
 # views=1 downloads=1

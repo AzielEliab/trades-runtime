@@ -1,13 +1,28 @@
 import { describe, expect, it } from "vitest";
+import type { FleetStats } from "../src/counters.js";
 import { AUTHOR, COMPATIBLE_AI_CLIENTS, VERSION } from "../src/identity.js";
 import { handleRequest } from "../src/index.js";
 import { isGzipTarball } from "../src/release.js";
-import { gzipBytes, makeEnv, MemoryKV } from "./helpers.js";
+import { gzipBytes, makeEnv, MemoryKV, requestWithCf } from "./helpers.js";
 
 const origin = "https://trades-runtime.vibelock.workers.dev";
 
 async function hit(env: ReturnType<typeof makeEnv>, path: string, init?: RequestInit): Promise<Response> {
   return handleRequest(new Request(`${origin}${path}`, init), env);
+}
+
+function counterFields(stats: FleetStats) {
+  return {
+    views: stats.views,
+    downloads: stats.downloads,
+    total: stats.total,
+    views_human: stats.views_human,
+    views_bot: stats.views_bot,
+    downloads_human: stats.downloads_human,
+    downloads_bot: stats.downloads_bot,
+    human: stats.human,
+    bot: stats.bot
+  };
 }
 
 describe("giveaway Worker routes", () => {
@@ -24,10 +39,19 @@ describe("giveaway Worker routes", () => {
     expect(html).toContain("live_backends false");
     expect(html).toContain("/download");
 
-    const stats = await (await hit(env, "/v1/stats")).json() as { views: number; downloads: number; note: string };
+    const stats = await (await hit(env, "/v1/stats")).json() as FleetStats;
     expect(stats.views).toBe(1);
     expect(stats.downloads).toBe(0);
+    expect(stats.total).toBe(0);
+    expect(stats.views_human).toBe(1);
+    expect(stats.views_bot).toBe(0);
+    expect(stats.views).toBe(stats.views_human + stats.views_bot);
+    expect(stats.downloads).toBe(stats.downloads_human + stats.downloads_bot);
     expect(stats.note).toMatch(/200 responses only/);
+    expect(stats.note).toMatch(/human\/bot/i);
+    expect(stats.project).toBe("trades-runtime");
+    expect(stats.classification.bot_score_threshold).toBe(30);
+    expect(stats.classification.method).toBe("ua+healthcheck");
 
     await hit(env, "/");
     const again = await (await hit(env, "/stats")).json() as { views: number };
@@ -39,13 +63,15 @@ describe("giveaway Worker routes", () => {
     const env = makeEnv({ kv });
     expect((await hit(env, "/v1/health")).status).toBe(200);
     expect((await hit(env, "/v1/stats")).status).toBe(200);
+    expect((await hit(env, "/count")).status).toBe(200);
     expect((await hit(env, "/cite.json")).status).toBe(200);
     expect((await hit(env, "/llms.txt")).status).toBe(200);
     expect((await hit(env, "/robots.txt")).status).toBe(200);
     expect((await hit(env, "/openapi.json")).status).toBe(200);
     expect((await hit(env, "/v1/skill")).status).toBe(200);
     expect((await hit(env, "/", { headers: { "User-Agent": "kube-probe/1.0" } })).status).toBe(200);
-    const stats = await (await hit(env, "/v1/stats")).json() as { views: number; downloads: number };
+    expect((await hit(env, "/download", { method: "HEAD" })).status).toBe(200);
+    const stats = await (await hit(env, "/v1/stats")).json() as FleetStats;
     expect(stats.views).toBe(0);
     expect(stats.downloads).toBe(0);
   });
@@ -57,9 +83,12 @@ describe("giveaway Worker routes", () => {
     expect(download.status).toBe(200);
     const bytes = await download.arrayBuffer();
     expect(isGzipTarball(bytes)).toBe(true);
-    expect(download.headers.get("Content-Disposition")).toContain("trades-runtime-0.3.3.tgz");
-    const stats = await (await hit(env, "/v1/stats")).json() as { views: number; downloads: number };
+    expect(download.headers.get("Content-Disposition")).toContain("trades-runtime-0.3.4.tgz");
+    const stats = await (await hit(env, "/v1/stats")).json() as FleetStats;
     expect(stats.downloads).toBe(1);
+    expect(stats.downloads_human).toBe(1);
+    expect(stats.downloads_bot).toBe(0);
+    expect(stats.total).toBe(1);
     expect(stats.views).toBe(0);
   });
 
@@ -104,9 +133,55 @@ describe("giveaway Worker routes", () => {
     const payload = (await listed.json()) as { result: { tools: Array<{ name: string }> } };
     expect(payload.result.tools.map((tool) => tool.name)).toContain("trades_runtime_stats");
 
-    const stats = await (await hit(env, "/v1/stats")).json() as { views: number; downloads: number };
+    const stats = await (await hit(env, "/v1/stats")).json() as FleetStats;
     expect(stats.views).toBe(0);
     expect(stats.downloads).toBe(0);
+  });
+
+  it("does not bump views for health-check UA, bots increment views_bot, humans increment views_human", async () => {
+    const kv = new MemoryKV();
+    const env = makeEnv({ kv });
+    expect((await hit(env, "/", { headers: { "User-Agent": "GoogleHC/1.0" } })).status).toBe(200);
+    expect((await hit(env, "/", { headers: { "User-Agent": "GPTBot/1.0" } })).status).toBe(200);
+    expect((await hit(env, "/", { headers: { "User-Agent": "Mozilla/5.0" } })).status).toBe(200);
+    const stats = (await (await hit(env, "/v1/stats")).json()) as FleetStats;
+    expect(stats.views).toBe(2);
+    expect(stats.views_human).toBe(1);
+    expect(stats.views_bot).toBe(1);
+    expect(stats.views).toBe(stats.views_human + stats.views_bot);
+  });
+
+  it("treats cf.botManagement verifiedBot and low score as bot views", async () => {
+    const kv = new MemoryKV();
+    const env = makeEnv({ kv });
+    const verified = requestWithCf(`${origin}/`, { headers: { "User-Agent": "Mozilla/5.0" } }, { verifiedBot: true, score: 99 });
+    expect((await handleRequest(verified, env)).status).toBe(200);
+    const low = requestWithCf(`${origin}/`, { headers: { "User-Agent": "Mozilla/5.0" } }, { verifiedBot: false, score: 1 });
+    expect((await handleRequest(low, env)).status).toBe(200);
+    const human = requestWithCf(`${origin}/`, { headers: { "User-Agent": "Mozilla/5.0" } }, { verifiedBot: false, score: 95 });
+    expect((await handleRequest(human, env)).status).toBe(200);
+    const stats = (await handleRequest(requestWithCf(`${origin}/v1/stats`, undefined, { verifiedBot: false, score: 95 }), env)).json();
+    const body = (await stats) as FleetStats;
+    expect(body.views).toBe(3);
+    expect(body.views_bot).toBe(2);
+    expect(body.views_human).toBe(1);
+    expect(body.views).toBe(body.views_human + body.views_bot);
+    expect(body.classification.method).toBe("cf.botManagement+ua");
+    expect(body.classification.bot_score_threshold).toBe(30);
+  });
+
+  it("serves /count with the same counter fields as /v1/stats", async () => {
+    const kv = new MemoryKV();
+    const env = makeEnv({ kv });
+    await hit(env, "/", { headers: { "User-Agent": "Mozilla/5.0" } });
+    await hit(env, "/", { headers: { "User-Agent": "bingbot" } });
+    const v1 = (await (await hit(env, "/v1/stats")).json()) as FleetStats;
+    const count = (await (await hit(env, "/count")).json()) as FleetStats;
+    const alias = (await (await hit(env, "/stats")).json()) as FleetStats;
+    expect(counterFields(count)).toEqual(counterFields(v1));
+    expect(counterFields(alias)).toEqual(counterFields(v1));
+    expect(v1.views).toBe(v1.views_human + v1.views_bot);
+    expect(v1.downloads).toBe(v1.downloads_human + v1.downloads_bot);
   });
 
   it("refuses unknown routes and does not claim ST write-back", async () => {

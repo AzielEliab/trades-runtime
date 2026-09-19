@@ -149,6 +149,7 @@ npm run demo</pre>
     <p>
       <a href="/v1/health">/v1/health</a> ·
       <a href="/v1/stats">/v1/stats</a> ·
+      <a href="/count">/count</a> ·
       <a href="/cite.json">/cite.json</a> ·
       <a href="/llms.txt">/llms.txt</a> ·
       <a href="/v1/skill">/v1/skill</a> ·

@@ -9,7 +9,15 @@ import {
   statsBody,
   text
 } from "./catalog.js";
-import { incrementCount, readCount, shouldCountHomepageView, type CountStore } from "./counters.js";
+import {
+  classifyRequest,
+  classificationMethodForRequest,
+  incrementCount,
+  readFleetStats,
+  shouldCountDownload,
+  shouldCountHomepageView,
+  type CountStore
+} from "./counters.js";
 import { RELEASE_FILENAME, VERSION } from "./identity.js";
 import { renderLanding } from "./landing.js";
 import { handleMcp } from "./mcp.js";
@@ -53,8 +61,8 @@ export async function handleRequest(request: Request, env: Env, _ctx?: WorkerCon
     return json(healthBody(release.ok, release.bytes));
   }
 
-  if (pathname === "/v1/stats" || pathname === "/stats") {
-    return json(statsBody(await readCount(kv, "views"), await readCount(kv, "downloads")));
+  if (pathname === "/v1/stats" || pathname === "/stats" || pathname === "/count") {
+    return json(statsBody(await readFleetStats(kv, classificationMethodForRequest(request))));
   }
 
   if (pathname === "/cite.json") return json(citeBody());
@@ -85,11 +93,11 @@ export async function handleRequest(request: Request, env: Env, _ctx?: WorkerCon
         503
       );
     }
-    if (request.method === "HEAD") {
+    if (request.method === "HEAD" || !shouldCountDownload(request.method, pathname)) {
       return new Response(null, { status: 200, headers: releaseHeaders(filename, bytes.byteLength) });
     }
     try {
-      await incrementCount(kv, "downloads");
+      await incrementCount(kv, "downloads", classifyRequest(request).class);
     } catch (error) {
       console.error(JSON.stringify({ event: "download_count_failed", error: String(error) }));
     }
@@ -105,13 +113,13 @@ export async function handleRequest(request: Request, env: Env, _ctx?: WorkerCon
     }
     if (request.method === "GET" && shouldCountHomepageView("GET", "/", request.headers.get("user-agent"))) {
       try {
-        await incrementCount(kv, "views");
+        await incrementCount(kv, "views", classifyRequest(request).class);
       } catch (error) {
         console.error(JSON.stringify({ event: "view_count_failed", error: String(error) }));
       }
     }
-    const [views, downloads] = await Promise.all([readCount(kv, "views"), readCount(kv, "downloads")]);
-    const html = renderLanding(views, downloads);
+    const landingStats = await readFleetStats(kv, classificationMethodForRequest(request));
+    const html = renderLanding(landingStats.views, landingStats.downloads);
     return new Response(html, {
       status: 200,
       headers: {

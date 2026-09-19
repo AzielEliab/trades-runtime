@@ -11,7 +11,7 @@ import {
   REPOSITORY,
   VERSION
 } from "./identity.js";
-import { STATS_NOTE } from "./counters.js";
+import { STATS_NOTE, type FleetStats } from "./counters.js";
 
 export function json(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data, null, 2) + "\n", {
@@ -74,6 +74,7 @@ export function citeBody(): Record<string, unknown> {
     download: `${PUBLIC_ORIGIN}/download`,
     health: `${PUBLIC_ORIGIN}/v1/health`,
     stats: `${PUBLIC_ORIGIN}/v1/stats`,
+    count: `${PUBLIC_ORIGIN}/count`,
     openapi: `${PUBLIC_ORIGIN}/openapi.json`,
     mcp: `${PUBLIC_ORIGIN}/mcp`,
     skill: `${PUBLIC_ORIGIN}/v1/skill`,
@@ -105,7 +106,7 @@ ${HONESTY.product}
 
 - Human UI: GET /
 - Counted tarball: GET /download
-- Stats: GET /v1/stats
+- Stats: GET /v1/stats (aliases /stats, /count)
 - Health: GET /v1/health
 - Cite: GET /cite.json
 - Skill: GET /v1/skill
@@ -137,6 +138,8 @@ Allow: /
 Allow: /download
 Allow: /v1/health
 Allow: /v1/stats
+Allow: /stats
+Allow: /count
 Allow: /cite.json
 Allow: /llms.txt
 Allow: /openapi.json
@@ -217,8 +220,13 @@ export function openApiSpec(): Record<string, unknown> {
         }
       },
       "/v1/health": { get: { summary: "Health JSON. Does not increment counters." } },
-      "/v1/stats": { get: { summary: "Honest KV views/downloads. Does not increment counters." } },
+      "/v1/stats": {
+        get: {
+          summary: "Honest KV views/downloads with human/bot split. Does not increment counters."
+        }
+      },
       "/stats": { get: { summary: "Alias of /v1/stats." } },
+      "/count": { get: { summary: "Alias of /v1/stats (fleet Σ /count)." } },
       "/cite.json": { get: { summary: "Public cite. Does not increment counters." } },
       "/llms.txt": { get: { summary: "LLM-oriented product text." } },
       "/robots.txt": { get: { summary: "Robots allow list." } },
@@ -234,10 +242,6 @@ export function openApiSpec(): Record<string, unknown> {
   };
 }
 
-export function statsBody(views: number, downloads: number): Record<string, unknown> {
-  return {
-    views,
-    downloads,
-    note: STATS_NOTE
-  };
+export function statsBody(stats: FleetStats): Record<string, unknown> {
+  return { ...stats };
 }
