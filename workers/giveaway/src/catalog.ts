@@ -14,7 +14,9 @@ import {
   RELEASE_FILENAME,
   REPOSITORY,
   SOFTWARES_TAB,
-  VERSION
+  VERSION,
+  X_HANDLE,
+  X_URL
 } from "./identity.js";
 import { STATS_NOTE, type FleetStats } from "./counters.js";
 
@@ -119,6 +121,7 @@ export function llmsTxt(): string {
   return `# Trades-Runtime
 > Shadow-first local BYO runtime for HVAC, plumbing, electrical, sewer, and cross-trades.
 > Author / identity: Aziel Eliab only. Person @id ${PERSON_ID}
+> X / Twitter: ${X_HANDLE} ${X_URL}
 > Version: ${VERSION}
 > License: ${LICENSE}
 > Worker: ${PUBLIC_ORIGIN}
@@ -154,6 +157,7 @@ export function skillMarkdown(): string {
 Product: Trades-Runtime ${VERSION}
 Author / identity: Aziel Eliab only
 Person @id: ${PERSON_ID}
+X / Twitter: ${X_HANDLE} ${X_URL}
 License: ${LICENSE}
 Worker: ${PUBLIC_ORIGIN}
 
