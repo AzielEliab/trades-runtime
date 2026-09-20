@@ -49,6 +49,7 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
       version: string;
       author: string;
       identity: string;
+      glama_listing?: boolean;
     };
 
     expect(pkg.version).toBe(PRODUCT);
@@ -108,7 +109,10 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
       name: string;
       version: string;
       description: string;
+      homepage?: string;
+      documentation?: string;
     };
+    const glamaDocs = readFileSync("docs/GLAMA.md", "utf8");
     expect(glama.maintainers).toEqual(["AzielEliab"]);
     expect(glama.version).toBe(PRODUCT);
     expect(glama.name).toMatch(/Trades Runtime/i);
@@ -118,13 +122,27 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
     expect(glama.description).not.toMatch(/Not a hosted company OS/);
     expect(glama.description).not.toMatch(/Not a FragGate/);
     expect(glama.description).not.toMatch(/Zenodo/);
+    expect(glama.description).not.toMatch(/AI-coach/i);
+    expect(glama.homepage).toBe("https://glama.ai/mcp/servers/AzielEliab/trades-runtime");
+    expect(glama.documentation).toBe(
+      "https://github.com/AzielEliab/trades-runtime/blob/main/docs/GLAMA.md"
+    );
+    expect(cite.glama_listing).toBe(false);
     expect(pkg.scripts).toMatchObject({ mcp: "node cli/mcp-stdio.mjs" });
     expect(existsSync("cli/mcp-stdio.mjs")).toBe(true);
     expect(existsSync("Dockerfile")).toBe(true);
     expect(existsSync("docs/GLAMA.md")).toBe(true);
     expect(readFileSync("Dockerfile", "utf8")).toMatch(/npm install --omit=dev/);
-    expect(readFileSync("Dockerfile", "utf8")).toMatch(/cli\/mcp-stdio\.mjs/);
+    expect(readFileSync("Dockerfile", "utf8")).toMatch(/CMD \["node", "cli\/mcp-stdio\.mjs"\]/);
     expect(readFileSync("Dockerfile", "utf8")).toMatch(/Mozilla\/5\.0|TRADES_RUNTIME_URL/);
+    expect(glamaDocs).toMatch(/version` \(`0\.3\.4`\)/);
+    expect(glamaDocs).not.toMatch(/`0\.3\.3`/);
+    expect(glamaDocs).toMatch(/\["npm install --omit=dev"\]/);
+    expect(glamaDocs).toMatch(/\["node", "cli\/mcp-stdio\.mjs"\]/);
+    expect(glamaDocs).toMatch(/homepage/);
+    expect(glamaDocs).toMatch(/documentation/);
+    expect(glamaDocs).toMatch(/do \*\*not\*\* treat Install Server as LIVE/);
+    expect(glamaDocs).not.toMatch(/Install Server is LIVE/);
     expect(readFileSync("cli/mcp-stdio.mjs", "utf8")).toMatch(/Mozilla\/5\.0/);
     expect(readFileSync("cli/mcp-stdio.mjs", "utf8")).toMatch(/trades-runtime\.vibelock\.workers\.dev\/mcp/);
     expect(pkg.author).toBe(IDENTITY);

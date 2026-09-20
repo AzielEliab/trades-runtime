@@ -20,5 +20,7 @@
     "probooks",
     "shadow-first",
     "giveaway"
-  ]
+  ],
+  "homepage": "https://glama.ai/mcp/servers/AzielEliab/trades-runtime",
+  "documentation": "https://github.com/AzielEliab/trades-runtime/blob/main/docs/GLAMA.md"
 }
