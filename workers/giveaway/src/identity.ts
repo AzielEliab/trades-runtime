@@ -15,6 +15,8 @@ export const SOFTWARES_TAB = "https://www.azielcorpuslibrary.net/software";
 export const SISTER_CORPUS = "https://www.azielcorpuslibrary.net/";
 export const SISTER_GODLOCK = "https://godlock.uk/";
 export const GITHUB_AUTHOR = "https://github.com/AzielEliab";
+export const X_URL = "https://x.com/AzielEliab";
+export const X_HANDLE = "@AzielEliab";
 
 export const PAGE_TITLE = `${PRODUCT_TITLE} · public giveaway · ${VERSION}`;
 export const PAGE_DESCRIPTION =
@@ -67,7 +69,8 @@ export const CITE_SAME_AS = [
   PERSON_URL,
   PERSON_ID,
   SISTER_CORPUS,
-  GITHUB_AUTHOR
+  GITHUB_AUTHOR,
+  X_URL
 ] as const;
 
 /** Person / graph JSON-LD sameAs. Includes godlock.uk as a sister hub. */
@@ -78,7 +81,8 @@ export const PERSON_SAME_AS = [
   `${PUBLIC_ORIGIN}/`,
   SOFTWARES_TAB,
   SISTER_CORPUS,
-  SISTER_GODLOCK
+  SISTER_GODLOCK,
+  X_URL
 ] as const;
 
 export const SAME_AS = CITE_SAME_AS;

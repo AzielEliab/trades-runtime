@@ -16,7 +16,9 @@ import {
   REPOSITORY,
   SITEMAP_ENTRIES,
   SOFTWARES_TAB,
-  VERSION
+  VERSION,
+  X_HANDLE,
+  X_URL
 } from "./identity.js";
 
 export function robotsTxt(): string {
@@ -95,7 +97,7 @@ Softwares tab: ${SOFTWARES_TAB}
 
 ${COMPATIBLE_AI_CLIENTS.map((name) => `- ${name}`).join("\n")}
 
-Identity: Aziel Eliab only. Person @id ${PERSON_ID}.
+Identity: Aziel Eliab only. Person @id ${PERSON_ID}. X / Twitter: ${X_HANDLE} ${X_URL}.
 `;
 }
 

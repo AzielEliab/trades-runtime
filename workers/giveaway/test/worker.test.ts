@@ -135,6 +135,7 @@ describe("giveaway Worker routes", () => {
     expect(cite.pages).toBe("off");
     expect(cite.person_id).toBe("https://www.azieleliab.com/#aziel");
     expect(cite.sameAs).toContain("https://github.com/AzielEliab/trades-runtime");
+    expect(cite.sameAs).toContain("https://x.com/AzielEliab");
     expect(cite.sameAs).toContain("https://www.azielcorpuslibrary.net/software");
     expect(cite.sameAs).not.toContain("https://glama.ai");
     expect(cite.keywords.join(" ")).toMatch(/trades-runtime/);
