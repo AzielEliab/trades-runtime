@@ -3,7 +3,7 @@
 > Local-first TypeScript operating system for field-trades companies.
 > Author / identity: Aziel Eliab only.
 X / Twitter: @AzielEliab https://x.com/AzielEliab
-> Version: 0.4.0
+> Version: 0.4.1
 > Status: live-pure core + stubs. BYO local ServiceTitan + ProBooks. Option C code-ready / pilot not started. Option D not started. No live backends. Pages off. Public get is the giveaway Worker.
 
 Product is src/. docs/ is a thin local UI. Implementer specs are at repo-root specs/. Public download: https://trades-runtime.vibelock.workers.dev/download

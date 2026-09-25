@@ -1,6 +1,7 @@
 import { gzipSync } from "node:zlib";
 import type { BotManagementHint, CountStore } from "../src/counters.js";
 import type { Env } from "../src/index.js";
+import { RELEASE_FILENAME, VERSION } from "../src/identity.js";
 
 export class MemoryKV implements CountStore {
   readonly store = new Map<string, string>();
@@ -41,12 +42,12 @@ export function makeEnv(options?: { kv?: MemoryKV; release?: ArrayBuffer | null 
   const release = options?.release === undefined ? gzipBytes() : options.release;
   return {
     COUNTS: kv as unknown as KVNamespace,
-    PRODUCT_VERSION: "0.4.0",
-    RELEASE_FILENAME: "trades-runtime-0.4.0.tgz",
+    PRODUCT_VERSION: VERSION,
+    RELEASE_FILENAME,
     ASSETS: {
       fetch: async (input: RequestInfo | URL) => {
         const url = String(input);
-        if (release && url.includes("trades-runtime-0.4.0.tgz")) {
+        if (release && url.includes(RELEASE_FILENAME)) {
           return new Response(release, { status: 200 });
         }
         return new Response("missing", { status: 404 });

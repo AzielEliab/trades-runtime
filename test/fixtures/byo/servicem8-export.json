@@ -1,0 +1,18 @@
+{
+  "synthetic": true,
+  "vendor": "servicem8",
+  "note": "Synthetic ServiceM8-shaped export. Not customer data.",
+  "exportedAt": "2026-09-25T00:00:00Z",
+  "jobs": [
+    {
+      "uuid": "SYN-SM8-1",
+      "generated_job_id": "SM8-1001",
+      "status": "Completed",
+      "job_address": "1 Synthetic Street",
+      "company_uuid": "SYN-CO-1",
+      "company_name": "Synthetic Co",
+      "job_description": "Synthetic hot water service",
+      "date": "2026-09-24"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "synthetic": true,
+  "vendor": "successware",
+  "note": "Synthetic SuccessWare-shaped call export. Not customer data.",
+  "exportedAt": "2026-09-25T00:00:00Z",
+  "calls": [
+    {
+      "callId": "SYN-SW-1",
+      "locationId": "LOC-SYN-1",
+      "agreementNumber": "AGR-SYN-1",
+      "jobClass": "Service",
+      "department": "HVAC",
+      "callType": "No Cool",
+      "status": "Completed",
+      "scheduledDate": "2026-09-22",
+      "technicianId": "SYN-SW-T",
+      "technician": "Synthetic Tech"
+    }
+  ]
+}
