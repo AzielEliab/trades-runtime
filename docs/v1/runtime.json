@@ -5,8 +5,8 @@
   "title": "Trades-Runtime",
   "author": "Aziel Eliab",
   "identity": "Aziel Eliab",
-  "version": "0.4.2",
-  "runtime_version": "0.4.2",
+  "version": "0.4.3",
+  "runtime_version": "0.4.3",
   "spec_pack": "repo-root specs/ (not published on Pages)",
   "property_intelligence": "1.0",
   "role": "trades-runtime",
@@ -19,8 +19,10 @@
   "sibling_of": "aziel-runtime",
   "status": "live-pure",
   "live_backends": false,
+  "pilot_started": false,
+  "field_launch": false,
   "one_line": "Shadow-first TypeScript operating system for multi-branch HVAC, plumbing, electrical, sewer, and cross-trades field service.",
-  "honesty": "Software modules in src/ are live-pure (executable, tested) or stub. BYO local ServiceTitan + ProBooks inbound (peer sources) plus a read-only trades-app drop-in. Authoring node is not a data custodian. No central dump. No hosted uploader. No phone-home. No ServiceTitan or ProBooks write-back. live_backends false. Pages off (workflow deleted). Credentials local only. Public giveaway Worker is UI + counted tarball only — not a hosted company OS, not a tenant host, no ST/ProBooks write-back. The human operator desk runs on the operator machine. Local alert rules stay on that machine. No DOIs or production company APIs. Option C code-ready / pilot not started. Option D not started. Not a live company pilot.",
+  "honesty": "Software modules in src/ are live-pure (executable, tested) or stub. BYO local ServiceTitan + ProBooks inbound (peer sources) plus a read-only trades-app drop-in. Authoring node is not a data custodian. No central dump. No hosted uploader. No phone-home. No ServiceTitan or ProBooks write-back. live_backends false. Pages off (workflow deleted). Credentials local only. Public giveaway Worker is UI + counted tarball only — not a hosted company OS, not a tenant host, no ST/ProBooks write-back. The human operator desk runs on the operator machine. Local alert rules stay on that machine. No DOIs or production company APIs. Option C code-ready / pilot not started. Option C prep (TR-OPTION-C-PREP-2026-09-25) checks the operator box and prints a receipt with pilot_started false. It does not start the pilot. Option D not started. Not a live company pilot.",
   "launch_options": {
     "A": { "name": "Merge-only", "status": "done" },
     "B": { "name": "Local spine", "status": "done-in-software" },
@@ -29,7 +31,9 @@
       "status": "code-ready-pilot-not-started",
       "software": "code-ready",
       "pilot": "not-started",
-      "honesty": "Software scaffolding exists. Company/field pilot has not started. Not a live company OS."
+      "prep": "local-runbook",
+      "pilot_started": false,
+      "honesty": "Software scaffolding exists. Local prep validates the operator box and does not start the pilot. Company/field pilot has not started. Not a live company OS."
     },
     "D": { "name": "Advise-lock pilot", "status": "not-started" },
     "note": "Do not fake Option C as a live company pilot. Option D is still NO. Field launch is not live."
@@ -334,7 +338,10 @@
     { "slug": "probooks-shadow", "path": "src/spine/probooks-shadow.ts", "status": "live-pure", "summary": "Read-only ProBooks books/items/costs/vendor ingest + hash. First-class peer inbound. Writes refused." },
     { "slug": "inbound-layout", "path": "src/spine/inbound-layout.ts", "status": "live-pure", "summary": "Local BYO paths data/inbound/servicetitan, data/inbound/probooks, and data/inbound/trades-app. Not data/tenants." },
     { "slug": "local-inbound-config", "path": "src/spine/local-inbound-config.ts", "status": "live-pure", "summary": "Optional local paths / read-endpoint hints. Hints are not called. No cloud account. Credentials stay on the user's machine." },
-    { "slug": "runtime-isolate", "path": "src/spine/runtime-isolate.ts", "status": "live-pure", "summary": "Separate receipt/ledger files per runtime instance. No shared hosted corpus." },
+    { "slug": "runtime-isolate", "path": "src/spine/runtime-isolate.ts", "status": "live-pure", "summary": "Separate receipt/ledger files per runtime instance. Names ST, ProBooks, and trades-app inbound plus the local alerts file. No shared hosted corpus." },
+    { "slug": "engagement-receipt", "path": "src/spine/engagement-receipt.ts", "status": "live-pure", "summary": "Lifecycle receipt when SHADOW-VISIBLE drops to SHADOW-SEALED. Does not record a promotion or a started pilot." },
+    { "slug": "health-local", "path": "src/spine/health-local.ts", "status": "live-pure", "summary": "Operator-box honesty card. pilot_started false. live_backends false. Not the public Worker health route." },
+    { "slug": "option-c-prep", "path": "src/spine/option-c-prep.ts", "status": "live-pure", "summary": "Option C box validator. Folders, example config, synthetic admit, desk boot, refuse-write. Prints a receipt. Pilot not started." },
     { "slug": "byo-admit-demo", "path": "src/demo/byo-admit.ts", "status": "live-pure", "summary": "Synthetic fixture admit proof. Wrapper ≠ VERIFIED. Writes throw. Not a customer dump." },
     { "slug": "shadow-sealed-demo", "path": "src/demo/shadow-sealed.ts", "status": "live-pure", "summary": "Synthetic N-day sealed settlement proof. Mode + hashes. Not a company pilot." },
     { "slug": "trades-app-shadow", "path": "src/spine/trades-app-shadow.ts", "status": "live-pure", "summary": "Read-only generic trades-app ingest + hash. MEDIUM trust. Unverified. Writes refused." },
@@ -370,7 +377,8 @@
     { "slug": "byo-inbound", "name": "BYO ServiceTitan + ProBooks inbound", "status": "live-pure", "summary": "Each user brings their ST and ProBooks into their local runtime. No central dump. No hosted uploader. Writes refused." },
     { "slug": "trades-app-drop-in", "name": "Universal trades-app drop-in", "status": "live-pure", "summary": "Schema sniff for Jobber, Housecall Pro, Service Fusion, QuickBooks-shaped books, ServiceM8, AccuLynx, SuccessWare, Xero, FieldEdge, ServiceTrade, and generic CSV/JSON. Known profile when the fingerprint matches. Named ST and ProBooks peers stay first-class. Read-only." },
     { "slug": "operator-desk", "name": "Local human operator desk", "status": "live-pure", "summary": "Charts, metrics, alerts, and scores on 127.0.0.1. Synthetic demo until a local drop is admitted. Not hosted on the public Worker." },
-    { "slug": "option-c-scaffold", "name": "Option C one-branch shadow scaffolding", "status": "live-pure", "summary": "Named branch + engagement rules + sealed settlement harness. Code-ready. Pilot not started. Not a live company OS." }
+    { "slug": "option-c-scaffold", "name": "Option C one-branch shadow scaffolding", "status": "live-pure", "summary": "Named branch + engagement rules + sealed settlement harness. Code-ready. Pilot not started. Not a live company OS." },
+    { "slug": "option-c-prep", "name": "Option C BYO pilot prep", "status": "live-pure", "summary": "Local runbook and validator. Prints a receipt with pilot_started false. Does not start a company pilot." }
   ],
   "planned_ops": [
     { "slug": "observe", "name": "Observe", "status": "planned", "summary": "Ingest and normalize authorized operational data." },

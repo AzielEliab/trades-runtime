@@ -35,6 +35,9 @@ describe("giveaway Worker routes", () => {
     expect(html).toContain("npx tsx src/cli.ts desk");
     expect(html).toContain("does not load company jobs");
     expect(html).toContain("Local alert rules stay on that machine");
+    expect(html).toContain("npm run pilot:prep");
+    expect(html).toContain("pilot_started false");
+    expect(html).toContain("does not start a company pilot");
     expect(html).toContain("Aziel Eliab");
     expect(html).not.toContain("SYN-");
     const stats = (await (await hit(env, "/v1/stats")).json()) as FleetStats;

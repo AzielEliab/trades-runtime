@@ -159,7 +159,10 @@ export {
   refuseHostedTenantLayout
 } from "./spine/inbound-layout.js";
 export { defaultLocalInboundConfig, parseLocalInboundConfig } from "./spine/local-inbound-config.js";
-export { isolateReceiptPath, openIsolatedReceipts } from "./spine/runtime-isolate.js";
+export { isolateAlertsPath, isolateReceiptPath, openIsolatedReceipts, describeRuntimeIsolate } from "./spine/runtime-isolate.js";
+export { healthLocal } from "./spine/health-local.js";
+export { recordEngagementDrop } from "./spine/engagement-receipt.js";
+export { runOptionCPrep } from "./spine/option-c-prep.js";
 export { runRecordedShadowDays, runShadowDayDemo } from "./demo/shadow-day.js";
 export { runByoAdmitDemo, printByoAdmitDemo } from "./demo/byo-admit.js";
 export { runDropInDemo, printDropInDemo } from "./demo/drop-in.js";

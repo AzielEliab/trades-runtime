@@ -34,6 +34,7 @@ describe("local operator desk", () => {
     expect(snapshot.writes).toBe(false);
     expect(snapshot.author).toBe("Aziel Eliab");
     expect(snapshot.version).toBe(RUNTIME_MANIFEST.version);
+    expect(snapshot.pilot_started).toBe(false);
     expect(snapshot.pilot).toEqual({ optionC: "not-started", optionD: "not-started" });
     expect(snapshot.series.length).toBeGreaterThan(1);
     expect(snapshot.metrics.jobs).toBeGreaterThan(0);
@@ -64,6 +65,7 @@ describe("local operator desk", () => {
     expect(html).toContain("live_backends false");
     expect(html).toContain("UNVERIFIED");
     expect(html).toContain("Operator desk");
+    expect(html).toContain("pilot_started false");
     expect(html).toContain("Acknowledge");
     expect(html).toContain("Active rules");
     expect(html).toContain("History");
