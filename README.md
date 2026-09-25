@@ -3,19 +3,19 @@
 Private **TypeScript runtime** for a shadow-first AI operating system / company operating intelligence layer. Field trades: HVAC, plumbing, electrical, sewer, and cross-trades.
 
 **Author / identity:** Aziel Eliab only. See [`IDENTITY.md`](IDENTITY.md). No legal name, home, or county on exports.  
-**Version:** 0.4.0  
+**Version:** 0.4.1  
 **Role:** `trades-runtime`  
 **License:** Apache-2.0  
 **Visibility:** this repository stays **private**; public get is the giveaway Worker  
 **Public Worker (if deployed):** https://trades-runtime.vibelock.workers.dev  
 **Try on Glama (intended listing):** https://glama.ai/mcp/servers/AzielEliab/trades-runtime — pack is in-repo (`glama.json`, `Dockerfile`, `cli/mcp-stdio.mjs`). Do **not** treat Install Server as LIVE until a Glama admin Deploy + Make Release succeeds. See [`docs/GLAMA.md`](docs/GLAMA.md).  
-**Status:** 0.4.0 universal trades-app drop-in + local operator desk — lockstep with Property Intelligence v1.0 in-tree — live-pure core + honest stubs — **BYO** local ServiceTitan + ProBooks + trades-app inbound — **no** live writes, tenant data, ST/ProBooks write-back, DOIs, hosted uploader, or production company-OS claim — **Option C code-ready / pilot not started** — **Option D not started**
+**Status:** 0.4.1 named trades-app vendor profiles on the 0.4.0 universal drop-in + local operator desk — lockstep with Property Intelligence v1.0 in-tree — live-pure core + honest stubs — **BYO** local ServiceTitan + ProBooks + trades-app inbound — **no** live writes, tenant data, ST/ProBooks write-back, DOIs, hosted uploader, or production company-OS claim — **Option C code-ready / pilot not started** — **Option D not started**
 
 The product is the software in `src/`. `docs/` is a thin local catalog/UI. GitHub Pages is **intentionally disabled** (`live_backends: false`). There is no Pages workflow. **PDFs are never published.** Implementer specs live at repo-root [`specs/`](specs/) (not under `docs/`).
 
 Standing rule: every PDF Aziel sends is a spec to implement as coded software.
 
-Paper trail: [`TR-DESK-2026-09-25`](specs/TR-DESK-2026-09-25.txt) (universal drop-in + local human desk) · [`TR-AUDIT-2026-09-18C`](specs/TR-AUDIT-2026-09-18C.txt) · [`TR-AUDIT-2026-09-18B`](specs/TR-AUDIT-2026-09-18B.txt) · [`TR-AUDIT-2026-09-18`](specs/TR-AUDIT-2026-09-18.txt) · [`TR-AUDIT-2026-09-17`](specs/TR-AUDIT-2026-09-17.txt) · [`TR-CUT-2026-09-17`](specs/TR-CUT-2026-09-17.txt) · [`TR-BOT-2026-09-17`](specs/TR-BOT-2026-09-17.txt) (standing brief) · [`TR-BYO-2026-09-17`](specs/TR-BYO-2026-09-17.txt) (amends TR-BOT §9 and TR-CUT R2–R3).
+Paper trail: [`TR-VENDOR-2026-09-25`](specs/TR-VENDOR-2026-09-25.txt) (named vendor profiles) · [`TR-DESK-2026-09-25`](specs/TR-DESK-2026-09-25.txt) (universal drop-in + local human desk) · [`TR-AUDIT-2026-09-18C`](specs/TR-AUDIT-2026-09-18C.txt) · [`TR-AUDIT-2026-09-18B`](specs/TR-AUDIT-2026-09-18B.txt) · [`TR-AUDIT-2026-09-18`](specs/TR-AUDIT-2026-09-18.txt) · [`TR-AUDIT-2026-09-17`](specs/TR-AUDIT-2026-09-17.txt) · [`TR-CUT-2026-09-17`](specs/TR-CUT-2026-09-17.txt) · [`TR-BOT-2026-09-17`](specs/TR-BOT-2026-09-17.txt) (standing brief) · [`TR-BYO-2026-09-17`](specs/TR-BYO-2026-09-17.txt) (amends TR-BOT §9 and TR-CUT R2–R3).
 
 ## Install, test, demo
 
@@ -89,7 +89,7 @@ Local inbound on that machine (contents gitignored):
 
 - `data/inbound/servicetitan/` — ST export or read-only pull the user places
 - `data/inbound/probooks/` — ProBooks books / items / costs / vendor files the user places
-- `data/inbound/trades-app/` — other field-service / job / pricebook / customer / appointment exports (Jobber, Housecall Pro, Service Fusion, QuickBooks-shaped books, generic CSV/JSON)
+- `data/inbound/trades-app/` — other field-service / job / pricebook / customer / appointment exports. Named profiles: Jobber, Housecall Pro, Service Fusion, QuickBooks-shaped books, ServiceM8, AccuLynx, SuccessWare, Xero, FieldEdge, ServiceTrade. Generic CSV/JSON when no fingerprint matches.
 - `data/runtime/<instanceId>/receipts.jsonl` and `ledger.jsonl` — isolate per runtime instance
 
 Not `data/tenants/` (that word implies a hosted multi-tenant service). Optional local config lists paths or read-endpoint hints only — **no cloud account**, and the runtime does not call those hints. Tokens stay on the user’s machine or their sealed vault.
@@ -98,7 +98,7 @@ FragGate first-class `sourceKind` values: `servicetitan` (MEDIUM, hashed, `live:
 
 ## Universal drop-in (TR-DESK-2026-09-25)
 
-ServiceTitan and ProBooks stay named peer classes. A third inbound class, `trades-app`, admits the same family of exports without a new paper for each vendor. The drop-in sniffs JSON/CSV shape and applies a mapping profile (Jobber, Housecall Pro, Service Fusion, QuickBooks Online, QuickBooks Desktop, generic JSON, generic CSV). A file that still looks like ServiceTitan or ProBooks stays on that peer class.
+ServiceTitan and ProBooks stay named peer classes. A third inbound class, `trades-app`, admits the same family of exports without a new paper for each vendor. The drop-in sniffs JSON/CSV shape and applies a mapping profile. 0.4.1 prefers a named profile when keys, headers, or the filename match: Jobber, Housecall Pro, Service Fusion, QuickBooks Online, QuickBooks Desktop, ServiceM8, AccuLynx, SuccessWare, Xero, FieldEdge, and ServiceTrade. Otherwise it uses generic JSON or generic CSV. A file that still looks like ServiceTitan or ProBooks stays on that peer class. See [`TR-VENDOR-2026-09-25`](specs/TR-VENDOR-2026-09-25.txt).
 
 ```bash
 npm run drop-in:demo

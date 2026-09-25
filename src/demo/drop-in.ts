@@ -16,6 +16,13 @@ const TRADES_APP_FIXTURES = [
   "service-fusion-export.json",
   "qbo-export.json",
   "qbd-export.json",
+  "servicem8-export.json",
+  "acculynx-export.json",
+  "successware-export.json",
+  "successware-calls.csv",
+  "xero-export.json",
+  "fieldedge-export.json",
+  "servicetrade-export.json",
   "generic-jobs.json",
   "generic-jobs.csv"
 ] as const;

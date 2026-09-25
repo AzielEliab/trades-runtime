@@ -1,0 +1,61 @@
+TRADES-RUNTIME · NAMED VENDOR MAPPING PROFILES                                                                                                        TR-VENDOR-2026-09-25
+
+
+
+
+ Receipt ID TR-VENDOR-2026-09-25 · 2026-09-25
+ Identity: Aziel Eliab only.
+ Amends the drop-in surface of TR-DESK-2026-09-25. Does not amend the eight BYO laws.
+ live_backends remains false. Pages remain off. Option C pilot remains not started. Option D remains not started.
+ This cut does not deploy the public Worker.
+
+
+ What changed
+ 0.4.1 adds named mapping profiles on the existing trades-app sniff. Additive only.
+ No new inbound class. No write client. No hosted uploader. No tenant store.
+
+ A dropped file prefers a known profile when a fingerprint matches.
+ Fingerprints are keys, CSV headers, or the file name.
+ If none match, the generic JSON or CSV sniff from 0.4.0 still admits the rows.
+ A ServiceTitan-shaped or ProBooks-shaped file stays on that named peer.
+ ServiceTrade is not ServiceTitan. Xero is not QuickBooks QueryResponse.
+
+ Profiles added
+    ServiceM8        generated_job_id plus job address, company uuid, or uuid
+    AccuLynx         current milestone plus job name, job number, or trade type
+    SuccessWare      call id plus agreement, job class, or location id
+                     calls normalize to the job shadow entity
+    Xero             books-shaped InvoiceID, Type ACCREC, or Contact.ContactID
+    FieldEdge        work-order number plus call reason, dispatch board, or agreement
+    ServiceTrade     service line plus store number or deficiencies
+
+ Profiles kept
+    Jobber, Housecall Pro, Service Fusion, QuickBooks Online, QuickBooks Desktop,
+    generic CSV, generic JSON, ServiceTitan, ProBooks.
+
+ Normalization
+ Each trades-app profile maps into the same shadow entities used by trades-app-shadow:
+ job, pricebook, customer, appointment, invoice, technician, equipment.
+ Admit path is unchanged: FragGate admitInbound, then the read-only shadow ingest.
+ Trust default MEDIUM. Hash the payload. live:false. write:false. verification UNVERIFIED.
+ Wrapper admission is not verification.
+ scrape, central-dump, and hosted-upload still refuse.
+
+ Synthetic fixtures only, under test/fixtures/byo/. Not customer data.
+ The authoring node is not a data custodian.
+
+
+ Laws held
+    Law                         This cut
+
+    BYO, not central dump       Profiles read a local drop. They do not collect tenants.
+    FragGate still admits       Sniffed rows become evidence packets only through admitInbound.
+    Wrapper ≠ verified          Status stays UNVERIFIED.
+    Writes refused              No POST/PUT/PATCH for ST, ProBooks, or trades-app.
+    No tenant data on Worker    Public Worker source may cite 0.4.1. This cut does not deploy it.
+    Pages off                   No Pages workflow.
+
+
+ Demo
+ npm run drop-in:demo admits the synthetic named-profile fixtures with the 0.4.0 peers
+ and still proves writes throw.

@@ -1,6 +1,6 @@
 export const RUNTIME_MANIFEST = {
   product: "trades-runtime",
-  version: "0.4.0",
+  version: "0.4.1",
   author: "Aziel Eliab",
   identity: "Aziel Eliab",
   role: "trades-runtime",
@@ -71,7 +71,7 @@ export const RUNTIME_MANIFEST = {
     { slug: "byo-admit-demo", path: "src/demo/byo-admit.ts", status: "live-pure", summary: "Synthetic fixture admit proof. Wrapper ≠ VERIFIED. Writes throw. Not a customer dump." },
     { slug: "shadow-sealed-demo", path: "src/demo/shadow-sealed.ts", status: "live-pure", summary: "Synthetic N-day sealed settlement proof. Mode + hashes. Not a company pilot." },
     { slug: "trades-app-shadow", path: "src/spine/trades-app-shadow.ts", status: "live-pure", summary: "Read-only generic trades-app ingest + hash. MEDIUM trust. Unverified. Writes refused." },
-    { slug: "drop-in", path: "src/spine/drop-in.ts", status: "live-pure", summary: "Schema sniff and mapping profiles for ServiceTitan, ProBooks, and trades-app shaped exports. Read-only." },
+    { slug: "drop-in", path: "src/spine/drop-in.ts", status: "live-pure", summary: "Schema sniff and mapping profiles for ServiceTitan, ProBooks, and trades-app exports (Jobber, Housecall Pro, Service Fusion, QuickBooks, ServiceM8, AccuLynx, SuccessWare, Xero, FieldEdge, ServiceTrade, generic CSV/JSON). Known profile when the fingerprint matches; generic sniff otherwise. Read-only." },
     { slug: "operator-desk", path: "src/desk/server.ts", status: "live-pure", summary: "Local human operator desk. Charts, metrics, alerts, scores, and SSE from local state. No tenant data leaves the machine." },
     { slug: "drop-in-demo", path: "src/demo/drop-in.ts", status: "live-pure", summary: "Synthetic multi-vendor drop-in proof. Wrapper is not VERIFIED. Writes throw." },
     { slug: "servicetitan-connector", path: "src/spine/servicetitan-shadow.ts", status: "stub", summary: "Live ServiceTitan writes stay refused." },

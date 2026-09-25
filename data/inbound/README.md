@@ -10,12 +10,27 @@ Authoring node / GitHub is **not** a data custodian. Do not send tenant dumps up
 | --- | --- |
 | `data/inbound/servicetitan/` | Their ST export or read-only API pull (jobs, pricebook, equipment, customer, appointments). Named peer class. |
 | `data/inbound/probooks/` | Their ProBooks books / items / costs / vendor files or read-only pull. Named peer class. |
-| `data/inbound/trades-app/` | Other field-service exports in the same class: Jobber, Housecall Pro, Service Fusion, QuickBooks Online or Desktop-shaped books, generic CSV/JSON job boards. |
+| `data/inbound/trades-app/` | Other field-service exports in the same class. Named profiles when the fingerprint matches; otherwise generic CSV/JSON. |
 | `data/runtime/<instanceId>/` | Isolated receipts + ledger for this runtime instance only. |
 
 Not `data/tenants/`. That word implies a hosted multi-tenant service.
 
-The drop-in sniffs shape. A ServiceTitan-shaped or ProBooks-shaped file stays on that named peer even if it is dropped in `trades-app/`. Mapping profiles cover the vendors above. A new vendor with job, customer, appointment, or pricebook columns can use the generic JSON or CSV profile. There is no per-vendor paper required for that.
+The drop-in sniffs shape. A ServiceTitan-shaped or ProBooks-shaped file stays on that named peer even if it is dropped in `trades-app/`. A known mapping profile wins when its fingerprint matches (keys, CSV headers, or filename). If none match, the generic JSON or CSV sniff is used. There is still no per-vendor paper required for a new column layout that the generic sniff can read.
+
+Named trades-app profiles (0.4.1, synthetic fixtures only — not live connectors):
+
+| Profile | Fingerprint |
+| --- | --- |
+| ServiceM8 | `generated_job_id` plus `job_address`, `company_uuid`, or `uuid`. Filename `servicem8` or `service-m8`. |
+| AccuLynx | `currentMilestone` plus job name, job number, or trade type. Filename `acculynx` or `accu-lynx`. |
+| SuccessWare | `callId` plus agreement number, job class, or location id (calls normalize to jobs). Filename `successware` or `success-ware`. |
+| Xero | Books-shaped `InvoiceID`, `Type` `ACCREC`, or `Contact.ContactID`. Filename `xero`. Not QuickBooks `QueryResponse`. |
+| FieldEdge | Work-order number plus call reason, dispatch board, or agreement. Filename `fieldedge` or `field-edge`. |
+| ServiceTrade | `serviceLine` plus store number or deficiencies. Filename `servicetrade` or `service-trade`. This is not ServiceTitan. |
+
+Kept: Jobber, Housecall Pro, Service Fusion, QuickBooks Online, QuickBooks Desktop, generic CSV, generic JSON, ServiceTitan, ProBooks.
+
+Each named profile normalizes into the same trades-app shadow entities (`job`, `pricebook`, `customer`, `appointment`, `invoice`, `technician`, `equipment`) and is admitted through FragGate as MEDIUM, `live:false`, `write:false`, UNVERIFIED. Wrapper ≠ verified. Receipt: [`specs/TR-VENDOR-2026-09-25.txt`](../../specs/TR-VENDOR-2026-09-25.txt).
 
 ## Law
 

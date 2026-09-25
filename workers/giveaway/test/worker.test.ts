@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { FleetStats } from "../src/counters.js";
-import { AUTHOR, COMPATIBLE_AI_CLIENTS, VERSION } from "../src/identity.js";
+import { AUTHOR, COMPATIBLE_AI_CLIENTS, RELEASE_FILENAME, VERSION } from "../src/identity.js";
 import { handleRequest } from "../src/index.js";
 import { isGzipTarball } from "../src/release.js";
 import { gzipBytes, makeEnv, MemoryKV, requestWithCf } from "./helpers.js";
@@ -104,7 +104,7 @@ describe("giveaway Worker routes", () => {
     expect(download.status).toBe(200);
     const bytes = await download.arrayBuffer();
     expect(isGzipTarball(bytes)).toBe(true);
-    expect(download.headers.get("Content-Disposition")).toContain("trades-runtime-0.4.0.tgz");
+    expect(download.headers.get("Content-Disposition")).toContain(RELEASE_FILENAME);
     const stats = await (await hit(env, "/v1/stats")).json() as FleetStats;
     expect(stats.downloads).toBe(1);
     expect(stats.downloads_human).toBe(1);

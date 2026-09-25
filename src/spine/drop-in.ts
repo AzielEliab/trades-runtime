@@ -50,11 +50,15 @@ export interface CanonicalTradeRecord {
   raw: Record<string, unknown>;
 }
 
+export interface MappingSniffContext {
+  fileName?: string;
+}
+
 export interface MappingProfile {
   id: string;
   vendorHint: string;
   peerClass: DropInPeerClass;
-  sniff(doc: Record<string, unknown>): number;
+  sniff(doc: Record<string, unknown>, context?: MappingSniffContext): number;
   map(doc: Record<string, unknown>): CanonicalTradeRecord[];
 }
 
@@ -157,6 +161,12 @@ function vendorToken(doc: Record<string, unknown>): string {
     return "servicetitan";
   }
   if (raw.includes("probooks") || raw.includes("pro-books") || raw.includes("pro books")) return "probooks";
+  if (raw.includes("servicem8") || raw.includes("service-m8") || raw.includes("service m8")) return "servicem8";
+  if (raw.includes("acculynx") || raw.includes("accu-lynx") || raw.includes("accu lynx")) return "acculynx";
+  if (raw.includes("successware") || raw.includes("success-ware") || raw.includes("success ware")) return "successware";
+  if (/(^|[^a-z0-9])xero([^a-z0-9]|$)/.test(raw)) return "xero";
+  if (raw.includes("fieldedge") || raw.includes("field-edge") || raw.includes("field edge")) return "fieldedge";
+  if (raw.includes("servicetrade") || raw.includes("service-trade") || raw.includes("service trade")) return "servicetrade";
   if (raw.includes("generic-csv")) return "generic-csv";
   return "";
 }
@@ -432,6 +442,304 @@ function mapQuickBooksOnline(doc: Record<string, unknown>): CanonicalTradeRecord
   return out;
 }
 
+/** Compare keys after camelCase split, lowercasing, and space/hyphen folding. Also accepts the CSV-lowercased compact form. */
+function keyForms(key: string): string[] {
+  const snake = key
+    .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
+    .toLowerCase()
+    .replace(/[\s-]+/g, "_")
+    .replace(/_+/g, "_");
+  const flat = snake.replace(/_/g, "");
+  return flat === snake ? [snake] : [snake, flat];
+}
+
+function rowKeyForms(row: Record<string, unknown>): Set<string> {
+  const forms = new Set<string>();
+  for (const key of Object.keys(row)) {
+    for (const form of keyForms(key)) forms.add(form);
+  }
+  return forms;
+}
+
+function rowHas(row: Record<string, unknown>, needle: string): boolean {
+  const forms = rowKeyForms(row);
+  return keyForms(needle).some((form) => forms.has(form));
+}
+
+function rowHasAny(row: Record<string, unknown>, needles: string[]): boolean {
+  return needles.some((needle) => rowHas(row, needle));
+}
+
+function pick(row: Record<string, unknown>, keys: string[]): unknown {
+  const wanted = new Set(keys.flatMap(keyForms));
+  for (const [key, value] of Object.entries(row)) {
+    if (value == null || value === "") continue;
+    if (keyForms(key).some((form) => wanted.has(form))) return value;
+  }
+  return undefined;
+}
+
+function pickText(row: Record<string, unknown>, keys: string[]): string {
+  return text(pick(row, keys));
+}
+
+function rowsFrom(doc: Record<string, unknown>, keys: string[]): Record<string, unknown>[] {
+  const out: Record<string, unknown>[] = [];
+  for (const key of keys) out.push(...asRecords(doc[key]));
+  return out;
+}
+
+function fileMentions(fileName: string | undefined, needles: string[]): boolean {
+  if (!fileName) return false;
+  const blob = `-${fileName.toLowerCase().replace(/[_\s.]+/g, "-")}-`;
+  return needles.some((needle) => {
+    const escaped = needle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return new RegExp(`(?:^|[^a-z0-9])${escaped}(?:[^a-z0-9]|$)`).test(blob);
+  });
+}
+
+function namedFileScore(fileName: string | undefined, needles: string[], doc: Record<string, unknown>): number {
+  if (!fileMentions(fileName, needles)) return 0;
+  const hasRows =
+    genericRows(doc).length > 0 ||
+    rowsFrom(doc, ["jobs", "records", "calls", "Calls", "Invoices", "invoices", "workOrders", "WorkOrders"]).length > 0;
+  return hasRows ? 0.86 : 0;
+}
+
+function isServiceM8Job(row: Record<string, unknown>): boolean {
+  return rowHas(row, "generated_job_id") && rowHasAny(row, ["job_address", "company_uuid", "uuid"]);
+}
+
+function isAccuLynxJob(row: Record<string, unknown>): boolean {
+  return rowHas(row, "current_milestone") && rowHasAny(row, ["job_name", "job_number", "trade_types", "trade_type"]);
+}
+
+function isSuccessWareCall(row: Record<string, unknown>): boolean {
+  return rowHas(row, "call_id") && rowHasAny(row, ["agreement_number", "job_class", "location_id"]);
+}
+
+function isXeroInvoice(row: Record<string, unknown>): boolean {
+  if (rowHas(row, "invoice_id")) return true;
+  if (pickText(row, ["type"]).toUpperCase() === "ACCREC") return true;
+  const contact = pick(row, ["contact"]);
+  return isRecord(contact) && rowHas(contact, "contact_id");
+}
+
+function isFieldEdgeOrder(row: Record<string, unknown>): boolean {
+  return rowHasAny(row, ["work_order_number", "work_order_no", "wo_number"]) && rowHasAny(row, ["call_reason", "dispatch_board", "agreement"]);
+}
+
+function isServiceTradeJob(row: Record<string, unknown>): boolean {
+  if (!rowHasAny(row, ["service_line", "service_lines"])) return false;
+  if (rowHas(row, "store_number")) return true;
+  const location = pick(row, ["location"]);
+  if (isRecord(location) && rowHas(location, "store_number")) return true;
+  return Array.isArray(pick(row, ["deficiencies"]));
+}
+
+function mapServiceM8(doc: Record<string, unknown>): CanonicalTradeRecord[] {
+  const jobs = rowsFrom(doc, ["jobs", "records"]).filter(isServiceM8Job);
+  if (!jobs.length) return mapGenericRows(genericRows(doc));
+  const out: CanonicalTradeRecord[] = [];
+  jobs.forEach((row, index) => {
+    const id = pickText(row, ["uuid", "generated_job_id", "id"]) || `row-job-${index + 1}`;
+    out.push({
+      entity: "job",
+      externalId: id,
+      observedAt: pickText(row, ["date", "job_is_scheduled_until_stamp"]) || undefined,
+      status: pickText(row, ["status"]) || undefined,
+      raw: row
+    });
+    const companyId = pickText(row, ["company_uuid"]);
+    if (companyId) {
+      const name = pickText(row, ["company_name"]);
+      out.push({
+        entity: "customer",
+        externalId: companyId,
+        raw: name ? { company_uuid: companyId, company_name: name } : { company_uuid: companyId }
+      });
+    }
+  });
+  return out;
+}
+
+function mapAccuLynx(doc: Record<string, unknown>): CanonicalTradeRecord[] {
+  const jobs = rowsFrom(doc, ["jobs", "records"]).filter(isAccuLynxJob);
+  if (!jobs.length) return mapGenericRows(genericRows(doc));
+  const out: CanonicalTradeRecord[] = [];
+  jobs.forEach((row, index) => {
+    const id = pickText(row, ["id", "job_number"]) || `row-job-${index + 1}`;
+    const appointment = pickText(row, ["initial_appointment", "appointment_date"]);
+    out.push({
+      entity: "job",
+      externalId: id,
+      observedAt: appointment || undefined,
+      status: pickText(row, ["current_milestone"]) || undefined,
+      raw: row
+    });
+    const contacts = asRecords(pick(row, ["contacts"]));
+    const primary = contacts.find((contact) => contact.isPrimary === true || contact.is_primary === true) ?? contacts[0];
+    if (primary) {
+      out.push({
+        entity: "customer",
+        externalId: pickText(primary, ["id"]) || `${id}:contact`,
+        raw: primary
+      });
+    }
+    if (appointment) {
+      out.push({
+        entity: "appointment",
+        externalId: `${id}:appt`,
+        observedAt: appointment,
+        status: pickText(row, ["current_milestone"]) || undefined,
+        raw: { initialAppointment: appointment }
+      });
+    }
+  });
+  return out;
+}
+
+function mapSuccessWare(doc: Record<string, unknown>): CanonicalTradeRecord[] {
+  const calls = rowsFrom(doc, ["calls", "Calls", "jobs", "records"]).filter(isSuccessWareCall);
+  if (!calls.length) return mapGenericRows(genericRows(doc));
+  const out: CanonicalTradeRecord[] = [];
+  calls.forEach((row, index) => {
+    const id = pickText(row, ["call_id", "id"]) || `row-job-${index + 1}`;
+    const scheduled = pickText(row, ["scheduled_date", "sched_date", "date"]);
+    out.push({
+      entity: "job",
+      externalId: id,
+      observedAt: scheduled || undefined,
+      status: pickText(row, ["status"]) || undefined,
+      raw: row
+    });
+    const techId = pickText(row, ["technician_id", "tech_id"]);
+    const techName = pickText(row, ["technician", "tech"]);
+    if (techId || techName) {
+      out.push({
+        entity: "technician",
+        externalId: techId || techName,
+        raw: { technicianId: techId || undefined, technician: techName || undefined }
+      });
+    }
+    if (scheduled) {
+      out.push({
+        entity: "appointment",
+        externalId: `${id}:appt`,
+        observedAt: scheduled,
+        status: pickText(row, ["status"]) || undefined,
+        raw: { scheduledDate: scheduled }
+      });
+    }
+  });
+  return out;
+}
+
+function mapXero(doc: Record<string, unknown>): CanonicalTradeRecord[] {
+  const invoices = rowsFrom(doc, ["Invoices", "invoices"]).filter(isXeroInvoice);
+  if (!invoices.length) return mapGenericRows(genericRows(doc));
+  const out: CanonicalTradeRecord[] = [];
+  invoices.forEach((row, index) => {
+    const id = pickText(row, ["invoice_id", "invoice_number", "id"]) || `row-invoice-${index + 1}`;
+    out.push({
+      entity: "invoice",
+      externalId: id,
+      observedAt: pickText(row, ["date", "date_string"]) || undefined,
+      status: pickText(row, ["status"]) || undefined,
+      raw: row
+    });
+    const contact = pick(row, ["contact"]);
+    if (isRecord(contact)) {
+      out.push({
+        entity: "customer",
+        externalId: pickText(contact, ["contact_id", "id"]) || `${id}:contact`,
+        raw: contact
+      });
+    }
+    asRecords(pick(row, ["line_items"])).forEach((item, itemIndex) => {
+      out.push({
+        entity: "pricebook",
+        externalId: pickText(item, ["item_code", "id"]) || `${id}:line:${itemIndex + 1}`,
+        raw: item
+      });
+    });
+  });
+  return out;
+}
+
+function mapFieldEdge(doc: Record<string, unknown>): CanonicalTradeRecord[] {
+  const orders = rowsFrom(doc, ["workOrders", "WorkOrders", "records"]).filter(isFieldEdgeOrder);
+  if (!orders.length) return mapGenericRows(genericRows(doc));
+  const out: CanonicalTradeRecord[] = [];
+  orders.forEach((row, index) => {
+    const id = pickText(row, ["work_order_id", "id", "work_order_number"]) || `row-job-${index + 1}`;
+    out.push({
+      entity: "job",
+      externalId: id,
+      status: pickText(row, ["status"]) || undefined,
+      raw: row
+    });
+    const customer = pick(row, ["customer"]);
+    if (isRecord(customer)) {
+      out.push({
+        entity: "customer",
+        externalId: pickText(customer, ["customer_id", "id"]) || `${id}:customer`,
+        raw: customer
+      });
+    }
+    const assignment = pick(row, ["assignment"]);
+    if (isRecord(assignment)) {
+      const techId = pickText(assignment, ["technician_id", "tech_id", "id"]);
+      const techName = pickText(assignment, ["tech_name", "technician"]);
+      if (techId || techName) {
+        out.push({
+          entity: "technician",
+          externalId: techId || `${id}:tech`,
+          raw: assignment
+        });
+      }
+      const start = pickText(assignment, ["scheduled_start", "start"]);
+      if (start) {
+        out.push({
+          entity: "appointment",
+          externalId: `${id}:appt`,
+          observedAt: start,
+          status: pickText(row, ["status"]) || undefined,
+          raw: assignment
+        });
+      }
+    }
+  });
+  return out;
+}
+
+function mapServiceTrade(doc: Record<string, unknown>): CanonicalTradeRecord[] {
+  const jobs = rowsFrom(doc, ["jobs", "records"]).filter(isServiceTradeJob);
+  if (!jobs.length) return mapGenericRows(genericRows(doc));
+  const out: CanonicalTradeRecord[] = [];
+  jobs.forEach((row, index) => {
+    const id = pickText(row, ["id", "number"]) || `row-job-${index + 1}`;
+    const scheduled = pickText(row, ["scheduled_date", "scheduled_at", "start"]);
+    out.push({
+      entity: "job",
+      externalId: id,
+      observedAt: scheduled || undefined,
+      status: pickText(row, ["status"]) || undefined,
+      raw: row
+    });
+    if (scheduled) {
+      out.push({
+        entity: "appointment",
+        externalId: `${id}:appt`,
+        observedAt: scheduled,
+        status: pickText(row, ["status"]) || undefined,
+        raw: { scheduledDate: scheduled }
+      });
+    }
+  });
+  return out;
+}
+
 function mapQuickBooksDesktop(doc: Record<string, unknown>): CanonicalTradeRecord[] {
   return asRecords(doc.transactions)
     .filter((row) => text(row.TxnType).toLowerCase() === "invoice" || text(row.Amount) || text(row.amount))
@@ -535,6 +843,72 @@ export const MAPPING_PROFILES: MappingProfile[] = [
     map: mapQuickBooksDesktop
   },
   {
+    id: "servicem8",
+    vendorHint: "servicem8",
+    peerClass: "trades-app",
+    sniff(doc, context) {
+      if (vendorToken(doc) === "servicem8") return 0.96;
+      if (rowsFrom(doc, ["jobs", "records"]).some(isServiceM8Job)) return 0.91;
+      return namedFileScore(context?.fileName, ["servicem8", "service-m8"], doc);
+    },
+    map: mapServiceM8
+  },
+  {
+    id: "acculynx",
+    vendorHint: "acculynx",
+    peerClass: "trades-app",
+    sniff(doc, context) {
+      if (vendorToken(doc) === "acculynx") return 0.96;
+      if (rowsFrom(doc, ["jobs", "records"]).some(isAccuLynxJob)) return 0.91;
+      return namedFileScore(context?.fileName, ["acculynx", "accu-lynx"], doc);
+    },
+    map: mapAccuLynx
+  },
+  {
+    id: "successware",
+    vendorHint: "successware",
+    peerClass: "trades-app",
+    sniff(doc, context) {
+      if (vendorToken(doc) === "successware") return 0.96;
+      if (rowsFrom(doc, ["calls", "Calls", "jobs", "records"]).some(isSuccessWareCall)) return 0.91;
+      return namedFileScore(context?.fileName, ["successware", "success-ware"], doc);
+    },
+    map: mapSuccessWare
+  },
+  {
+    id: "xero",
+    vendorHint: "xero",
+    peerClass: "trades-app",
+    sniff(doc, context) {
+      if (vendorToken(doc) === "xero") return 0.96;
+      if (rowsFrom(doc, ["Invoices", "invoices"]).some(isXeroInvoice)) return 0.91;
+      return namedFileScore(context?.fileName, ["xero"], doc);
+    },
+    map: mapXero
+  },
+  {
+    id: "fieldedge",
+    vendorHint: "fieldedge",
+    peerClass: "trades-app",
+    sniff(doc, context) {
+      if (vendorToken(doc) === "fieldedge") return 0.96;
+      if (rowsFrom(doc, ["workOrders", "WorkOrders", "records"]).some(isFieldEdgeOrder)) return 0.91;
+      return namedFileScore(context?.fileName, ["fieldedge", "field-edge"], doc);
+    },
+    map: mapFieldEdge
+  },
+  {
+    id: "servicetrade",
+    vendorHint: "servicetrade",
+    peerClass: "trades-app",
+    sniff(doc, context) {
+      if (vendorToken(doc) === "servicetrade") return 0.96;
+      if (rowsFrom(doc, ["jobs", "records"]).some(isServiceTradeJob)) return 0.91;
+      return namedFileScore(context?.fileName, ["servicetrade", "service-trade"], doc);
+    },
+    map: mapServiceTrade
+  },
+  {
     id: "generic-csv",
     vendorHint: "generic-csv",
     peerClass: "trades-app",
@@ -566,7 +940,7 @@ function refuse(code: DropInRefuse["code"], reason: string): DropInRefuse {
 
 export function detectDropIn(
   input: unknown,
-  hint?: { preferClass?: DropInPeerClass }
+  hint?: { preferClass?: DropInPeerClass; fileName?: string }
 ): DropInDetection | DropInRefuse {
   const doc = coerceDoc(input);
   if (!doc) return refuse("FG-REFUSE-EMPTY", "drop-in document is empty");
@@ -579,7 +953,10 @@ export function detectDropIn(
     return refuse("FG-REFUSE-UNAUTHORIZED", "central-dump and hosted-upload inbound are refused");
   }
 
-  const scored = MAPPING_PROFILES.map((profile) => ({ profile, score: profile.sniff(doc) }))
+  const scored = MAPPING_PROFILES.map((profile) => ({
+    profile,
+    score: profile.sniff(doc, { fileName: hint?.fileName })
+  }))
     .filter((row) => row.score > 0)
     .sort((a, b) => b.score - a.score || a.profile.id.localeCompare(b.profile.id));
 
@@ -718,9 +1095,9 @@ function admitRecord(
 
 export function admitDropInDocument(
   input: unknown,
-  options: { receivedAt: string; preferClass?: DropInPeerClass }
+  options: { receivedAt: string; preferClass?: DropInPeerClass; fileName?: string }
 ): DropInResult {
-  const detected = detectDropIn(input, { preferClass: options.preferClass });
+  const detected = detectDropIn(input, { preferClass: options.preferClass, fileName: options.fileName });
   if (!detected.ok) return detected;
   const doc = coerceDoc(input);
   if (!doc) return refuse("FG-REFUSE-EMPTY", "drop-in document is empty");

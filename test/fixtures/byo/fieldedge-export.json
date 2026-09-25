@@ -1,0 +1,22 @@
+{
+  "synthetic": true,
+  "vendor": "fieldedge",
+  "note": "Synthetic FieldEdge-shaped work-order export. Not customer data.",
+  "exportedAt": "2026-09-25T00:00:00Z",
+  "workOrders": [
+    {
+      "workOrderId": "SYN-FE-1",
+      "workOrderNumber": "WO-SYN-220",
+      "callReason": "No heat",
+      "dispatchBoard": "HVAC",
+      "status": "Completed",
+      "agreement": { "planId": "SYN-PLAN", "planName": "Synthetic Comfort" },
+      "customer": { "customerId": "SYN-FE-C", "displayName": "Synthetic House" },
+      "assignment": {
+        "technicianId": "SYN-FE-T",
+        "techName": "Synthetic Tech",
+        "scheduledStart": "2026-09-24T13:00:00Z"
+      }
+    }
+  ]
+}
