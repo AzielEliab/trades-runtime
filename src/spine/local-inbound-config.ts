@@ -23,6 +23,8 @@ export interface LocalInboundConfig {
   tradesAppReadEndpoint?: string;
   receiptPath: string;
   ledgerPath: string;
+  /** Optional path to a local alert-rule file. Missing file uses built-in defaults. */
+  alertsPath?: string;
   cloudAccount?: never;
   hostedUploader?: never;
   tenants?: never;
@@ -73,9 +75,13 @@ export function parseLocalInboundConfig(raw: unknown): LocalInboundConfig {
   const tradesAppPath = optionalString(record.tradesAppPath, "tradesAppPath") ?? defaults.tradesAppPath;
   const receiptPath = optionalString(record.receiptPath, "receiptPath") ?? defaults.receiptPath;
   const ledgerPath = optionalString(record.ledgerPath, "ledgerPath") ?? defaults.ledgerPath;
+  const alertsPath = optionalString(record.alertsPath, "alertsPath");
 
-  for (const path of [servicetitanPath, probooksPath, tradesAppPath, receiptPath, ledgerPath]) {
-    if (isHostedTenantLayout(path)) refuseHostedTenantLayout(path);
+  for (const path of [servicetitanPath, probooksPath, tradesAppPath, receiptPath, ledgerPath, alertsPath]) {
+    if (path && isHostedTenantLayout(path)) refuseHostedTenantLayout(path);
+  }
+  if (alertsPath && /^[a-z][a-z0-9+.-]*:\/\//i.test(alertsPath)) {
+    throw new Error("local inbound config alertsPath must be a local file path");
   }
 
   return {
@@ -87,6 +93,7 @@ export function parseLocalInboundConfig(raw: unknown): LocalInboundConfig {
     probooksReadEndpoint: optionalString(record.probooksReadEndpoint, "probooksReadEndpoint"),
     tradesAppReadEndpoint: optionalString(record.tradesAppReadEndpoint, "tradesAppReadEndpoint"),
     receiptPath,
-    ledgerPath
+    ledgerPath,
+    alertsPath
   };
 }

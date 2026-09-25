@@ -45,6 +45,14 @@ Each named profile normalizes into the same trades-app shadow entities (`job`, `
 
 Copy `local.json.example` to `local.json` if you want path / read-endpoint hints. That file is gitignored. There is no cloud account field. Read-endpoint hints are not called by the runtime.
 
+## Local alert rules (0.4.2)
+
+Receipt: [`specs/TR-ALERTS-2026-09-25.txt`](../../specs/TR-ALERTS-2026-09-25.txt).
+
+Copy [`../runtime/alerts.json.example`](../runtime/alerts.json.example) to `data/runtime/<instanceId>/alerts.json`. That copy is gitignored. `local.json` may set `alertsPath`, or an `alerts` object with the same shape. Missing file uses the example defaults.
+
+Rules read desk scores already on the page: mission pace, evidence trust, verification, and booking block, plus the capacity series and unfinished jobs. They do not invent an accuracy percent. The in-desk banner, history, and acknowledge stay on this machine. A file hook is a local path. A webhook must be `127.0.0.1`, `localhost`, or `::1`. No phone-home.
+
 ## Open the human desk
 
 From the repo root, after `npm install`:

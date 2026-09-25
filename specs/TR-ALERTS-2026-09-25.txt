@@ -1,0 +1,62 @@
+TRADES-RUNTIME · LOCAL ALERT RULES                                                                                                                    TR-ALERTS-2026-09-25
+
+
+
+
+ Receipt ID TR-ALERTS-2026-09-25 · 2026-09-25
+ Identity: Aziel Eliab only.
+ Amends the local desk of TR-DESK-2026-09-25. Does not amend the eight BYO laws.
+ live_backends remains false. Pages remain off. Option C pilot remains not started. Option D remains not started.
+ This cut does not deploy the public Worker.
+
+
+ What changed
+ 0.4.2 adds local threshold rules on the operator desk. The rules read scores the desk already shows.
+ They do not invent an accuracy percent. They do not phone home. They do not write to ServiceTitan,
+ ProBooks, or a trades app.
+
+ Rules
+    capacity             Open slots at or below a local count, only when the desk has a lane.
+                         A BYO desk with blank open slots waits. No utilization percent is filled in.
+    late jobs            Unfinished jobs before the mission day, plus same-day unfinished jobs
+                         after a configured fraction of the day. A count, not an on-time percent.
+    trust-band           Evidence-trust score at or below a floor, or a drop remembered in local state.
+                         n/a does not count as a company drop. Trust is not truth.
+    booking block        recommendBlock is one of the configured blocks.
+    verification stall   Verification score stays in the configured statuses for N minutes
+                         measured from the oldest observation clock. No clock, no invented stall.
+                         Wrapper admission is not verification.
+
+ Desk
+ Active rules render in the in-desk banner and in the alerts panel.
+ History stays in a local state file. Acknowledge is a local POST on 127.0.0.1.
+ Acknowledged rules leave the banner and stay in history.
+ Labels stay synthetic demo, BYO-admitted, or BYO-admitted synthetic drill.
+
+ Config
+ Copy data/runtime/alerts.json.example to data/runtime/<instanceId>/alerts.json (gitignored).
+ data/inbound/local.json may set alertsPath, or an alerts object, on this machine.
+ Missing file uses the same defaults as the example. Hooks default off.
+
+ Hooks
+    file                 Append one JSON line per newly raised rule to a local path.
+    webhook              POST that same line to loopback only (127.0.0.1, localhost, ::1).
+ Any other host is refused. No phone-home. No tenant body. live_backends false. writes false.
+
+
+ Laws held
+    Law                         This cut
+
+    BYO, not central dump       Rules and history stay on the operator machine.
+    Per-runtime isolate         State file sits under data/runtime/<instanceId>/.
+    Wrapper ≠ verified          A stall reports UNVERIFIED. It does not promote verification.
+    Writes refused              Acknowledge writes local state only. No ST/ProBooks/trades-app client.
+    No phone-home               Webhook host must be loopback. Public Worker URLs are refused.
+    No tenant data on Worker    The public page may cite the install path. This cut does not deploy it.
+    Pages off                   No Pages workflow.
+
+
+ Demo
+ npm test covers the five rules, the example file, acknowledge, the local file hook,
+ and refusal of a non-loopback webhook.
+ npm run desk shows firing rules on the synthetic demo and switches the label when a local drop is admitted.

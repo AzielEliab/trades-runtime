@@ -14,6 +14,21 @@ import {
 } from "../spine/drop-in.js";
 import { BYO_INBOUND_ROOT, type ByoInboundKind } from "../spine/inbound-layout.js";
 import { defaultLocalInboundConfig, parseLocalInboundConfig, type LocalInboundConfig } from "../spine/local-inbound-config.js";
+import {
+  applyDeskAlerts,
+  defaultAlertStatePath,
+  dispatchLocalHooks,
+  emptyAlertState,
+  enabledRuleList,
+  readAlertState,
+  resolveAlertConfig,
+  writeAlertState,
+  type AlertConfig,
+  type AlertRuleKind,
+  type DeskRuleSignals,
+  type ResolvedAlertConfig,
+  type StoredAlert
+} from "./alerts.js";
 
 /** Recorded synthetic shadow-day confidence from src/demo/shadow-day.ts. A fixture, not measured accuracy. */
 export const RECORDED_SYNTHETIC_SHADOW_CONFIDENCE: ConfidenceSeparation = {
@@ -109,6 +124,13 @@ export interface OperatorSnapshot {
   fulfillment: { label: DeskDataLabel | "none"; steps: { step: FulfillmentStep; reached: boolean }[] };
   scores: DeskScore[];
   alerts: DeskAlert[];
+  ruleAlerts: StoredAlert[];
+  alertHistory: StoredAlert[];
+  alertRules: {
+    source: ResolvedAlertConfig["source"];
+    enabled: AlertRuleKind[];
+    hooks: { file: boolean; webhook: boolean };
+  };
   inbound: DeskInboundRow[];
   refused: { file: string; code: string; reason: string }[];
   readEndpointHints: string[];
@@ -121,6 +143,9 @@ export interface DeskSnapshotOptions {
   config?: LocalInboundConfig;
   folders?: { dir: string; preferClass: DropInPeerClass }[];
   receiptPath?: string;
+  alertConfig?: AlertConfig;
+  alertStatePath?: string;
+  persistAlertState?: boolean;
 }
 
 function isCompleted(status: string | undefined): boolean {
@@ -158,11 +183,16 @@ function resolveUnder(cwd: string, path: string): string {
   return join(cwd, path);
 }
 
-function loadConfig(cwd: string): { config: LocalInboundConfig; configAlert?: DeskAlert } {
+function loadConfig(cwd: string): { config: LocalInboundConfig; configAlert?: DeskAlert; inlineAlerts?: unknown } {
   const path = join(cwd, BYO_INBOUND_ROOT, "local.json");
   if (!existsSync(path)) return { config: defaultLocalInboundConfig() };
   try {
-    return { config: parseLocalInboundConfig(JSON.parse(readFileSync(path, "utf8")) as unknown) };
+    const raw = JSON.parse(readFileSync(path, "utf8")) as unknown;
+    const record = raw && typeof raw === "object" && !Array.isArray(raw) ? (raw as Record<string, unknown>) : undefined;
+    return {
+      config: parseLocalInboundConfig(raw),
+      inlineAlerts: record && "alerts" in record ? record.alerts : undefined
+    };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     return {
@@ -174,6 +204,58 @@ function loadConfig(cwd: string): { config: LocalInboundConfig; configAlert?: De
       }
     };
   }
+}
+
+function countLateJobs(args: {
+  dataLabel: DeskDataLabel;
+  series: DeskSeriesPoint[];
+  records: CollectedRecord[];
+  missionDay: string;
+  elapsedFraction: number;
+  sameDayAt: number;
+}): { count: number; basis: string } {
+  const sameDayNote = `Same-day unfinished jobs count only after day fraction ${args.sameDayAt.toFixed(2)}. Current day fraction is ${args.elapsedFraction.toFixed(2)}.`;
+  if (args.dataLabel === "synthetic-demo") {
+    let prior = 0;
+    let today = 0;
+    for (const point of args.series) {
+      const open = Math.max(0, point.jobs - point.completed);
+      if (point.t < args.missionDay) prior += open;
+      else if (point.t === args.missionDay) today += open;
+    }
+    const countedToday = args.elapsedFraction >= args.sameDayAt ? today : 0;
+    return {
+      count: prior + countedToday,
+      basis: `Synthetic desk series: ${prior} unfinished jobs on days before the mission clock, ${countedToday} counted today. ${sameDayNote}`
+    };
+  }
+  let prior = 0;
+  let today = 0;
+  for (const record of args.records) {
+    if (record.entity !== "job" || isCompleted(record.status)) continue;
+    if (record.day < args.missionDay) prior += 1;
+    else if (record.day === args.missionDay) today += 1;
+  }
+  const countedToday = args.elapsedFraction >= args.sameDayAt ? today : 0;
+  return {
+    count: prior + countedToday,
+    basis: `Admitted job rows: ${prior} unfinished before the mission day, ${countedToday} counted today. ${sameDayNote}`
+  };
+}
+
+function oldestObservation(dataLabel: DeskDataLabel, series: DeskSeriesPoint[], records: CollectedRecord[]): string | null {
+  if (dataLabel === "synthetic-demo") {
+    const first = [...series].sort((a, b) => a.t.localeCompare(b.t))[0];
+    return first ? `${first.t}T00:00:00Z` : null;
+  }
+  let best: { at: number; iso: string } | null = null;
+  for (const record of records) {
+    if (!record.observedAt) continue;
+    const at = Date.parse(record.observedAt);
+    if (!Number.isFinite(at)) continue;
+    if (!best || at < best.at) best = { at, iso: new Date(at).toISOString() };
+  }
+  return best?.iso ?? null;
 }
 
 function endpointHints(config: LocalInboundConfig | undefined): string[] {
@@ -447,6 +529,65 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
     alerts.push({ severity: "info", title: "Read endpoint hint", detail: hint });
   }
 
+  const resolvedAlerts = resolveAlertConfig({
+    cwd,
+    instanceId: config?.instanceId ?? "local",
+    alertsPath: config?.alertsPath,
+    inline: loaded?.inlineAlerts,
+    override: options.alertConfig
+  });
+  if (resolvedAlerts.hold) alerts.push(resolvedAlerts.hold);
+  const enabledRules = enabledRuleList(resolvedAlerts.config);
+  alerts.push({
+    severity: "info",
+    title: "Local alert rules",
+    detail: `Source ${resolvedAlerts.source}. Enabled: ${enabledRules.join(", ") || "none"}. File hook ${resolvedAlerts.config.hooks.file ? "on" : "off"}. Webhook hook ${resolvedAlerts.config.hooks.webhook ? "loopback" : "off"}. Hooks stay on this machine.`
+  });
+
+  const late = countLateJobs({
+    dataLabel,
+    series,
+    records: collected.records,
+    missionDay,
+    elapsedFraction: pace?.elapsedFraction ?? 0,
+    sameDayAt: resolvedAlerts.config.rules.lateJobs.sameDayElapsedFractionAtOrAbove
+  });
+  const capacityPoint = capacity.find((point) => point.t === missionDay) ?? capacity[capacity.length - 1];
+  const trustValue = scores.find((score) => score.id === "evidence-trust")?.value;
+  const verificationValue = scores.find((score) => score.id === "verification")?.value;
+  const signals: DeskRuleSignals = {
+    dataLabel,
+    now,
+    evidenceTrust: trustValue === "LOW" || trustValue === "MEDIUM" || trustValue === "HIGH" ? trustValue : "n/a",
+    verification:
+      verificationValue === "PARTIAL" || verificationValue === "VERIFIED" || verificationValue === "CONFLICTED"
+        ? verificationValue
+        : "UNVERIFIED",
+    bookingBlock,
+    openSlots: capacityPoint?.open ?? null,
+    booked: capacityPoint?.booked ?? 0,
+    lane: dataLabel === "synthetic-demo" ? SYNTHETIC_CAPACITY_LANE : null,
+    lateJobs: late.count,
+    lateBasis: late.basis,
+    oldestObservationAt: oldestObservation(dataLabel, series, collected.records),
+    missionElapsedFraction: pace?.elapsedFraction ?? 0,
+    missionActual: pace?.actual ?? 0,
+    missionExpectedPace: pace?.expectedPace ?? 0
+  };
+  const instanceId = config?.instanceId ?? "local";
+  const statePath = options.alertStatePath ?? defaultAlertStatePath(cwd, instanceId);
+  const applied = applyDeskAlerts({
+    signals,
+    config: resolvedAlerts.config,
+    state: options.persistAlertState ? readAlertState(statePath) : emptyAlertState(),
+    now
+  });
+  if (options.persistAlertState) {
+    writeAlertState(statePath, applied.state);
+    dispatchLocalHooks({ cwd, config: resolvedAlerts.config, raised: applied.raised, now });
+  }
+  for (const notice of applied.notices) alerts.push(notice);
+
   const sampleHashes = collected.inbound.flatMap((row) => row.sampleHashes).slice(0, 6);
   const report = requireReportMetadata({
     scope: dataLabel === "synthetic-demo" ? "local-operator-desk:synthetic" : "local-operator-desk:byo",
@@ -508,6 +649,16 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
     fulfillment,
     scores,
     alerts,
+    ruleAlerts: applied.active,
+    alertHistory: applied.history,
+    alertRules: {
+      source: resolvedAlerts.source,
+      enabled: enabledRules,
+      hooks: {
+        file: Boolean(resolvedAlerts.config.hooks.file),
+        webhook: Boolean(resolvedAlerts.config.hooks.webhook)
+      }
+    },
     inbound: collected.inbound,
     refused: collected.refused,
     readEndpointHints: endpointHints(config),

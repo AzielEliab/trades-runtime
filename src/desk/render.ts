@@ -13,6 +13,18 @@ export function renderBanner(snapshot: OperatorSnapshot): string {
   return `<p class="banner" data-label="${esc(snapshot.dataLabel)}">${esc(snapshot.honesty)}</p>`;
 }
 
+export function renderRuleBanner(snapshot: OperatorSnapshot): string {
+  const pending = snapshot.ruleAlerts.filter((alert) => !alert.acknowledgedAt);
+  if (!pending.length) return "";
+  return pending
+    .map(
+      (alert) => `<p class="rule-banner ${esc(alert.severity)}" data-rule="${esc(alert.rule)}" data-label="${esc(alert.dataLabel)}">
+        <strong>${esc(alert.severity)} · ${esc(alert.rule)}</strong> ${esc(alert.title)}. ${esc(alert.detail)}
+      </p>`
+    )
+    .join("");
+}
+
 export function renderMetrics(snapshot: OperatorSnapshot): string {
   const cards: [string, number][] = [
     ["Jobs in view", snapshot.metrics.jobs],
@@ -58,9 +70,26 @@ export function renderScores(snapshot: OperatorSnapshot): string {
     .join("");
 }
 
+function renderRuleArticle(alert: OperatorSnapshot["ruleAlerts"][number], history: boolean): string {
+  const ack = alert.acknowledgedAt
+    ? `<p class="quiet">Acknowledged ${esc(alert.acknowledgedAt)}${alert.acknowledgedBy ? ` by ${esc(alert.acknowledgedBy)}` : ""}.</p>`
+    : history
+      ? ""
+      : `<button type="button" class="ack" data-ack="${esc(alert.id)}">Acknowledge</button>`;
+  const state = history ? (alert.active ? "active" : "cleared") : alert.acknowledgedAt ? "acknowledged" : "open";
+  return `<article class="alert ${esc(alert.severity)}" data-rule="${esc(alert.rule)}" data-state="${state}">
+        <span>${esc(alert.severity)} · ${esc(alert.rule)} · ${esc(alert.dataLabel)}</span>
+        <h3>${esc(alert.title)}</h3>
+        <p>${esc(alert.detail)}</p>
+        ${ack}
+      </article>`;
+}
+
 export function renderAlerts(snapshot: OperatorSnapshot): string {
-  if (!snapshot.alerts.length) return `<p class="quiet">No alerts.</p>`;
-  return snapshot.alerts
+  const active = snapshot.ruleAlerts.length
+    ? snapshot.ruleAlerts.map((alert) => renderRuleArticle(alert, false)).join("")
+    : `<p class="quiet">No rule is firing on this clock.</p>`;
+  const notices = snapshot.alerts
     .map(
       (alert) => `<article class="alert ${esc(alert.severity)}">
         <span>${esc(alert.severity)}</span>
@@ -69,6 +98,24 @@ export function renderAlerts(snapshot: OperatorSnapshot): string {
       </article>`
     )
     .join("");
+  const history = snapshot.alertHistory.length
+    ? snapshot.alertHistory
+        .slice(0, 12)
+        .map(
+          (alert) => `<li data-state="${alert.active ? "active" : "cleared"}">
+            <span>${esc(alert.severity)} · ${esc(alert.rule)}</span>
+            ${esc(alert.title)}
+            <em>${alert.active ? "active" : "cleared"}${alert.acknowledgedAt ? " · acknowledged" : ""}</em>
+          </li>`
+        )
+        .join("")
+    : `<li class="quiet">No alert history on this machine yet.</li>`;
+  return `<h3 class="subhead">Active rules</h3>
+    <div class="rule-alerts">${active}</div>
+    <h3 class="subhead">History</h3>
+    <ul class="history">${history}</ul>
+    <h3 class="subhead">Desk notes</h3>
+    ${notices || `<p class="quiet">No alerts.</p>`}`;
 }
 
 export function renderMission(snapshot: OperatorSnapshot): string {
@@ -176,7 +223,17 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
     @keyframes pulse { 70% { box-shadow: 0 0 0 8px rgba(143, 181, 106, 0); } }
     .chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.8rem 0; }
     .chip { border: 1px solid var(--line); border-radius: 999px; padding: 0.15rem 0.6rem; color: var(--muted); font-size: 0.78rem; }
-    .banner { background: var(--bg-raised); border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 12px; padding: 0.85rem 1rem; }
+    .banner, .rule-banner { background: var(--bg-raised); border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 12px; padding: 0.85rem 1rem; }
+    .rule-banner { margin-top: 0.55rem; }
+    .rule-banner.watch { border-left-color: var(--watch); }
+    .rule-banner.hold { border-left-color: var(--hold); }
+    .rule-banner strong { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.05em; text-transform: uppercase; margin-right: 0.35rem; }
+    .subhead { margin: 0.8rem 0 0.2rem; font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    button.ack { margin-top: 0.45rem; background: transparent; color: var(--ink); border: 1px solid var(--line); border-radius: 999px; padding: 0.2rem 0.7rem; font: inherit; cursor: pointer; }
+    button.ack:hover { border-color: var(--accent); }
+    .history { list-style: none; padding: 0; margin: 0; }
+    .history li { border-top: 1px solid var(--line); padding: 0.45rem 0; color: var(--muted); font-size: 0.88rem; }
+    .history span, .history em { font-family: var(--mono); font-size: 0.72rem; font-style: normal; letter-spacing: 0.04em; text-transform: uppercase; }
     .metrics, .scores, .charts { display: grid; gap: 0.75rem; }
     .metrics { grid-template-columns: repeat(4, 1fr); margin: 0.9rem 0; }
     .metric, .score, .chart-card, .panel { background: var(--bg-raised); border: 1px solid var(--line); border-radius: 14px; padding: 0.85rem 0.95rem; }
@@ -232,6 +289,7 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
       <span class="chip" id="clock">updated ${esc(snapshot.generatedAt)}</span>
     </div>
     <div id="banner">${renderBanner(snapshot)}</div>
+    <div id="rule-banner">${renderRuleBanner(snapshot)}</div>
     <section class="metrics" id="metrics">${renderMetrics(snapshot)}</section>
     <section class="charts" id="charts">${renderCharts(snapshot)}</section>
     <section class="split">
@@ -261,12 +319,13 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
     <footer>
       Human surface. Agent MCP stays a separate read-only bridge and does not carry this desk.
       Drop folders: <code>data/inbound/servicetitan</code>, <code>data/inbound/probooks</code>, <code>data/inbound/trades-app</code>.
+      Alert rules: copy <code>data/runtime/alerts.json.example</code> to <code>data/runtime/&lt;instanceId&gt;/alerts.json</code>.
       Refresh ${snapshot.tracking.intervalMs}ms from ${esc(snapshot.tracking.source)}.
     </footer>
   </main>
   <script id="desk-boot" type="application/json">${embedded}</script>
   <script>
-    const slots = ["banner", "metrics", "charts", "scores", "alerts", "mission", "fulfillment", "inbound"];
+    const slots = ["banner", "rule-banner", "metrics", "charts", "scores", "alerts", "mission", "fulfillment", "inbound"];
     function apply(view) {
       for (const slot of slots) {
         const node = document.getElementById(slot);
@@ -290,6 +349,26 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
         if (state) state.textContent = "reconnecting to local desk";
       };
     }
+    document.body.addEventListener("click", (event) => {
+      const button = event.target instanceof Element ? event.target.closest("[data-ack]") : null;
+      if (!(button instanceof HTMLButtonElement)) return;
+      const id = button.getAttribute("data-ack");
+      if (!id) return;
+      button.disabled = true;
+      fetch("/api/alerts/ack", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ id: id, by: "operator" })
+      }).then((response) => {
+        if (!response.ok) {
+          button.disabled = false;
+          return;
+        }
+        button.textContent = "Acknowledged";
+      }).catch(() => {
+        button.disabled = false;
+      });
+    });
   </script>
 </body>
 </html>`;
@@ -300,6 +379,7 @@ export function renderDeskView(snapshot: OperatorSnapshot): Record<string, strin
     generatedAt: snapshot.generatedAt,
     dataLabel: snapshot.dataLabel,
     banner: renderBanner(snapshot),
+    "rule-banner": renderRuleBanner(snapshot),
     metrics: renderMetrics(snapshot),
     charts: renderCharts(snapshot),
     scores: renderScores(snapshot),

@@ -34,6 +34,7 @@ describe("giveaway Worker routes", () => {
     const html = await page.text();
     expect(html).toContain("npx tsx src/cli.ts desk");
     expect(html).toContain("does not load company jobs");
+    expect(html).toContain("Local alert rules stay on that machine");
     expect(html).toContain("Aziel Eliab");
     expect(html).not.toContain("SYN-");
     const stats = (await (await hit(env, "/v1/stats")).json()) as FleetStats;

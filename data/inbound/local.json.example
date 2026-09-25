@@ -6,5 +6,6 @@
   "servicetitanReadEndpoint": null,
   "probooksReadEndpoint": null,
   "tradesAppReadEndpoint": null,
-  "note": "Paths and optional local read-endpoint hints only. The runtime does not call those hints. No cloud account. Credentials stay on this machine."
+  "alertsPath": "data/runtime/local/alerts.json",
+  "note": "Paths and optional local read-endpoint hints only. The runtime does not call those hints. No cloud account. Credentials stay on this machine. alertsPath points at a gitignored threshold file. Copy data/runtime/alerts.json.example there. Webhook hooks in that file must be loopback. No phone-home."
 }

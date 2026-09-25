@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { RUNTIME_MANIFEST } from "../src/manifest.js";
+import { defaultAlertConfig } from "../src/desk/alerts.js";
 import { buildOperatorSnapshot, RECORDED_SYNTHETIC_SHADOW_CONFIDENCE } from "../src/desk/snapshot.js";
 import { renderDeskPage } from "../src/desk/render.js";
 import { startOperatorDesk } from "../src/desk/server.js";
@@ -23,7 +24,11 @@ function emptyFolders(root: string) {
 describe("local operator desk", () => {
   it("labels an empty inbound root as synthetic demo and withholds invented accuracy", () => {
     const root = mkdtempSync(join(tmpdir(), "tr-desk-empty-"));
-    const snapshot = buildOperatorSnapshot({ now: NOW, folders: emptyFolders(root) });
+    const snapshot = buildOperatorSnapshot({
+      now: NOW,
+      folders: emptyFolders(root),
+      alertConfig: defaultAlertConfig()
+    });
     expect(snapshot.dataLabel).toBe("synthetic-demo");
     expect(snapshot.live_backends).toBe(false);
     expect(snapshot.writes).toBe(false);
@@ -42,6 +47,14 @@ describe("local operator desk", () => {
     expect(recorded?.note).toMatch(/Not measured accuracy/);
     expect(snapshot.report.status).toBe("simulated");
     expect(snapshot.alerts.some((alert) => alert.title === "Synthetic demo")).toBe(true);
+    expect(snapshot.alerts.some((alert) => alert.title === "Local alert rules")).toBe(true);
+    expect(snapshot.ruleAlerts.map((alert) => alert.rule).sort()).toEqual([
+      "capacity",
+      "late-jobs",
+      "verification-stall"
+    ]);
+    expect(snapshot.ruleAlerts.every((alert) => alert.inventedAccuracy === false && alert.dataLabel === "synthetic-demo")).toBe(true);
+    expect(snapshot.ruleAlerts.every((alert) => !/\d+%/.test(alert.detail))).toBe(true);
     expect(snapshot.honesty).toMatch(/Not a live GM pilot/);
 
     const html = renderDeskPage(snapshot);
@@ -51,6 +64,10 @@ describe("local operator desk", () => {
     expect(html).toContain("live_backends false");
     expect(html).toContain("UNVERIFIED");
     expect(html).toContain("Operator desk");
+    expect(html).toContain("Acknowledge");
+    expect(html).toContain("Active rules");
+    expect(html).toContain("History");
+    expect(html).toContain("Open slots at or below the local threshold");
     expect(html).not.toContain("92%");
   });
 
@@ -103,7 +120,13 @@ describe("local operator desk", () => {
   it("serves the desk on localhost and refreshes after a new drop", async () => {
     const root = mkdtempSync(join(tmpdir(), "tr-desk-http-"));
     const folders = emptyFolders(root);
-    const desk = await startOperatorDesk({ port: 0, folders });
+    const desk = await startOperatorDesk({
+      port: 0,
+      folders,
+      cwd: root,
+      alertStatePath: join(root, "alert-state.json"),
+      alertConfig: defaultAlertConfig()
+    });
     try {
       const page = await fetch(desk.url);
       expect(page.status).toBe(200);

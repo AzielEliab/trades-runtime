@@ -1,4 +1,5 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import { acknowledgeStoredAlert, defaultAlertStatePath } from "./alerts.js";
 import { buildOperatorSnapshot, DESK_REFRESH_MS, type DeskSnapshotOptions, type OperatorSnapshot } from "./snapshot.js";
 import { renderDeskPage, renderDeskView } from "./render.js";
 
@@ -23,6 +24,24 @@ function send(res: ServerResponse, status: number, body: string, type: string): 
   res.end(body);
 }
 
+function readBody(req: IncomingMessage): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    let size = 0;
+    req.on("data", (chunk: Buffer) => {
+      size += chunk.length;
+      if (size > 2048) {
+        reject(new Error("body too large"));
+        req.destroy();
+        return;
+      }
+      chunks.push(chunk);
+    });
+    req.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")));
+    req.on("error", reject);
+  });
+}
+
 function snapshotFor(options: DeskSnapshotOptions): OperatorSnapshot {
   return buildOperatorSnapshot({ ...options, now: new Date().toISOString() });
 }
@@ -33,15 +52,57 @@ export function startOperatorDesk(options: DeskServerOptions = {}): Promise<Desk
     throw new Error("operator desk binds to 127.0.0.1 only");
   }
   const port = options.port ?? 4174;
+  const cwd = options.cwd ?? process.cwd();
+  const instanceId = options.config?.instanceId ?? "local";
   const deskOptions: DeskSnapshotOptions = {
-    cwd: options.cwd,
+    cwd,
     config: options.config,
     folders: options.folders,
-    receiptPath: options.receiptPath
+    receiptPath: options.receiptPath,
+    alertConfig: options.alertConfig,
+    alertStatePath: options.alertStatePath ?? defaultAlertStatePath(cwd, instanceId),
+    persistAlertState: options.persistAlertState ?? true
   };
 
   const server = createServer((req: IncomingMessage, res: ServerResponse) => {
     const url = new URL(req.url ?? "/", "http://127.0.0.1");
+    if (req.method === "POST" && url.pathname === "/api/alerts/ack") {
+      void readBody(req)
+        .then((raw) => {
+          const body = raw ? (JSON.parse(raw) as { id?: unknown; by?: unknown }) : {};
+          const id = typeof body.id === "string" ? body.id.trim() : "";
+          const by = typeof body.by === "string" && body.by.trim() ? body.by.trim().slice(0, 80) : "operator";
+          if (!id) {
+            send(res, 400, JSON.stringify({ error: "id required", writes: false, vendorWrite: false }), "application/json; charset=utf-8");
+            return;
+          }
+          const result = acknowledgeStoredAlert(deskOptions.alertStatePath ?? defaultAlertStatePath(cwd, instanceId), id, by, new Date().toISOString());
+          if (!result.found) {
+            send(res, 404, JSON.stringify({ error: "unknown alert", id, writes: false, vendorWrite: false }), "application/json; charset=utf-8");
+            return;
+          }
+          send(
+            res,
+            200,
+            JSON.stringify({
+              ok: true,
+              id,
+              acknowledgedAt: result.acknowledgedAt,
+              writes: false,
+              vendorWrite: false,
+              phoneHome: false
+            }),
+            "application/json; charset=utf-8"
+          );
+        })
+        .catch((error: unknown) => {
+          const message = error instanceof Error ? error.message : String(error);
+          if (!res.headersSent) {
+            send(res, 400, JSON.stringify({ error: message, writes: false, vendorWrite: false }), "application/json; charset=utf-8");
+          }
+        });
+      return;
+    }
     if (req.method !== "GET" && req.method !== "HEAD") {
       send(res, 405, JSON.stringify({ error: "method not allowed", write: false }), "application/json; charset=utf-8");
       return;
