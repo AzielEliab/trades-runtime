@@ -93,6 +93,8 @@ export interface AdmittedDropRecord {
   wrapperIsVerification: false;
   status?: string;
   observedAt?: string;
+  /** Known trade token from the export. Absent when the file does not name one. Not a coordinate. */
+  lane?: string;
 }
 
 export interface DropInAdmit {
@@ -139,6 +141,27 @@ function firstText(row: Record<string, unknown>, keys: string[]): string {
     if (value) return value;
   }
   return "";
+}
+
+const KNOWN_TRADE_LANES = new Set(["hvac", "plumbing", "electrical", "sewer", "cross-trades"]);
+
+function normalizeTradeLane(value: string): string | undefined {
+  const token = value.trim().toLowerCase().replace(/[\s_]+/g, "-");
+  if (token === "cross-trade") return "cross-trades";
+  return KNOWN_TRADE_LANES.has(token) ? token : undefined;
+}
+
+/** A lane is a known trade token on the row. City names and coordinates are not lanes. */
+export function knownTradeLane(raw: Record<string, unknown>): string | undefined {
+  const direct = normalizeTradeLane(firstText(raw, ["trade", "trade_type", "tradeType", "Trade"]));
+  if (direct) return direct;
+  const list = raw.trade_types ?? raw.tradeTypes;
+  if (!Array.isArray(list)) return undefined;
+  for (const item of list) {
+    const lane = normalizeTradeLane(text(item));
+    if (lane) return lane;
+  }
+  return undefined;
 }
 
 function vendorToken(doc: Record<string, unknown>): string {
@@ -1018,6 +1041,8 @@ function admitRecord(
   profileId: string,
   vendorHint: string
 ): AdmittedDropRecord {
+  const lane = knownTradeLane(record.raw);
+  const withLane = (row: AdmittedDropRecord): AdmittedDropRecord => (lane ? { ...row, lane } : row);
   if (peerClass === "servicetitan") {
     const entity = isStEntity(record.entity) ? record.entity : "job";
     const ingested = ingestServiceTitanShadow({
@@ -1026,7 +1051,7 @@ function admitRecord(
       receivedAt,
       payload: record.raw
     });
-    return {
+    return withLane({
       entity,
       externalId: record.externalId,
       sourceId: ingested.inbound.packet.sourceId,
@@ -1039,7 +1064,7 @@ function admitRecord(
       wrapperIsVerification: false,
       status: record.status,
       observedAt: record.observedAt
-    };
+    });
   }
 
   if (peerClass === "probooks") {
@@ -1052,7 +1077,7 @@ function admitRecord(
           : entity === "vendor"
             ? ingestProBooksVendor(record.externalId, receivedAt, record.raw)
             : ingestProBooksItem(record.externalId, receivedAt, record.raw);
-    return {
+    return withLane({
       entity,
       externalId: record.externalId,
       sourceId: ingested.inbound.packet.sourceId,
@@ -1065,7 +1090,7 @@ function admitRecord(
       wrapperIsVerification: false,
       status: record.status,
       observedAt: record.observedAt
-    };
+    });
   }
 
   const entity: TradesAppEntity = isTradesEntity(record.entity) ? record.entity : "job";
@@ -1077,7 +1102,7 @@ function admitRecord(
     profileId,
     payload: record.raw
   });
-  return {
+  return withLane({
     entity,
     externalId: record.externalId,
     sourceId: ingested.inbound.packet.sourceId,
@@ -1090,7 +1115,7 @@ function admitRecord(
     wrapperIsVerification: false,
     status: record.status,
     observedAt: record.observedAt
-  };
+  });
 }
 
 export function admitDropInDocument(

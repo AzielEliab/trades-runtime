@@ -4,6 +4,8 @@ These text extracts drive implementation. Original PDFs stay offline / in chat a
 
 Standing rule: every PDF becomes coded software (current, prior, future).
 
+[`TR-DESK-POLISH-2026-09-25`](TR-DESK-POLISH-2026-09-25.txt) polishes the local operator desk (0.4.4): mission and tech boards, a capacity or known-trade lane (not a map), a light/dark theme in browser storage, and a printable local snapshot. It does not start the Option C pilot and does not deploy the Worker.
+
 [`TR-OPTION-C-PREP-2026-09-25`](TR-OPTION-C-PREP-2026-09-25.txt) is the Option C BYO pilot prep checklist (0.4.3). It covers local install, inbound drop, synthetic admit, desk and alerts, SHADOW-SEALED expectations, refuse-write proof, and what not to do. `npm run pilot:prep` validates the operator box and prints a receipt with `pilot_started` false. It does not start a company pilot.
 
 [`TR-ALERTS-2026-09-25`](TR-ALERTS-2026-09-25.txt) adds local alert rules on the operator desk (0.4.2): capacity, late jobs, trust-band, booking block, and verification stall. Thresholds live in a gitignored `data/runtime/<instanceId>/alerts.json` (example committed). In-desk banner, history, and acknowledge. File and loopback webhook hooks only. No phone-home. No accuracy percent.

@@ -2,6 +2,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from "node:ht
 import { healthLocal } from "../spine/health-local.js";
 import { acknowledgeStoredAlert, defaultAlertStatePath } from "./alerts.js";
 import { buildOperatorSnapshot, DESK_REFRESH_MS, type DeskSnapshotOptions, type OperatorSnapshot } from "./snapshot.js";
+import { renderPrintableSnapshot } from "./print.js";
 import { renderDeskPage, renderDeskView } from "./render.js";
 
 export interface DeskServerOptions extends DeskSnapshotOptions {
@@ -119,6 +120,16 @@ export function startOperatorDesk(options: DeskServerOptions = {}): Promise<Desk
     }
     if (url.pathname === "/api/view") {
       send(res, 200, JSON.stringify(renderDeskView(snapshotFor(deskOptions))), "application/json; charset=utf-8");
+      return;
+    }
+    if (url.pathname === "/api/receipt") {
+      const page = renderPrintableSnapshot(snapshotFor(deskOptions));
+      if (req.method === "HEAD") {
+        res.writeHead(200, { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "X-Trades-Desk": "local" });
+        res.end();
+        return;
+      }
+      send(res, 200, page, "text/html; charset=utf-8");
       return;
     }
     if (url.pathname === "/api/events") {

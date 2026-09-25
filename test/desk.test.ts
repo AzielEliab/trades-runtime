@@ -1,10 +1,11 @@
-import { copyFileSync, mkdirSync, mkdtempSync } from "node:fs";
+import { copyFileSync, mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { RUNTIME_MANIFEST } from "../src/manifest.js";
 import { defaultAlertConfig } from "../src/desk/alerts.js";
 import { buildOperatorSnapshot, RECORDED_SYNTHETIC_SHADOW_CONFIDENCE } from "../src/desk/snapshot.js";
+import { renderPrintableSnapshot } from "../src/desk/print.js";
 import { renderDeskPage } from "../src/desk/render.js";
 import { startOperatorDesk } from "../src/desk/server.js";
 import { describeConfidence } from "../src/core/confidence.js";
@@ -57,6 +58,18 @@ describe("local operator desk", () => {
     expect(snapshot.ruleAlerts.every((alert) => alert.inventedAccuracy === false && alert.dataLabel === "synthetic-demo")).toBe(true);
     expect(snapshot.ruleAlerts.every((alert) => !/\d+%/.test(alert.detail))).toBe(true);
     expect(snapshot.honesty).toMatch(/Not a live GM pilot/);
+    expect(snapshot.map).toEqual({
+      drawn: false,
+      reason: "No coordinates are stored on this desk. A map is not drawn."
+    });
+    expect(snapshot.lanes[0]).toMatchObject({
+      id: "capacity",
+      kind: "capacity",
+      booked: 7,
+      open: 5,
+      geographic: false
+    });
+    expect(snapshot.lanes.some((lane) => lane.kind === "trade")).toBe(false);
 
     const html = renderDeskPage(snapshot);
     expect(html).toContain("<svg");
@@ -70,7 +83,15 @@ describe("local operator desk", () => {
     expect(html).toContain("Active rules");
     expect(html).toContain("History");
     expect(html).toContain("Open slots at or below the local threshold");
+    expect(html).toContain("Tech board");
+    expect(html).toContain("Lane view");
+    expect(html).toContain("Not a map");
+    expect(html).toContain("Print snapshot");
+    expect(html).toContain("trades-desk-theme");
+    expect(html).toContain('data-theme="dark"');
     expect(html).not.toContain("92%");
+    expect(html).not.toContain("openstreetmap");
+    expect(html).not.toContain("fonts.googleapis");
   });
 
   it("labels a dropped synthetic trades-app export as BYO-admitted and keeps confidence withheld", () => {
@@ -137,6 +158,15 @@ describe("local operator desk", () => {
       expect(html).toContain("Synthetic demo");
       const denied = await fetch(desk.url, { method: "POST", body: "{}" });
       expect(denied.status).toBe(405);
+      const receipt = await fetch(`${desk.url}api/receipt`);
+      expect(receipt.status).toBe(200);
+      const receiptHtml = await receipt.text();
+      expect(receiptHtml).toContain("Desk snapshot");
+      expect(receiptHtml).toContain("does not phone home");
+      expect(receiptHtml).toContain("pilot_started false");
+      expect(receiptHtml).toContain("Not a map");
+      expect(receiptHtml).not.toContain("https://");
+      expect(receiptHtml).not.toContain("fonts.googleapis");
       const before = (await (await fetch(`${desk.url}api/snapshot`)).json()) as { dataLabel: string };
       expect(before.dataLabel).toBe("synthetic-demo");
       const trades = folders.find((folder) => folder.preferClass === "trades-app");
@@ -168,5 +198,67 @@ describe("local operator desk", () => {
 
   it("refuses a non-local bind", () => {
     expect(() => startOperatorDesk({ host: "0.0.0.0", port: 0 })).toThrow(/127\.0\.0\.1/);
+  });
+
+  it("draws a trade lane from a known token and skips a city name", () => {
+    const root = mkdtempSync(join(tmpdir(), "tr-desk-lane-"));
+    const folders = emptyFolders(root);
+    const trades = folders.find((folder) => folder.preferClass === "trades-app");
+    if (!trades) throw new Error("missing trades-app folder");
+    copyFileSync(join(FIXTURES, "generic-jobs.json"), join(trades.dir, "generic-jobs.json"));
+    writeFileSync(
+      join(trades.dir, "city-named.json"),
+      JSON.stringify({
+        synthetic: true,
+        records: [
+          {
+            job_id: "SYN-CITY-1",
+            customer: "Synthetic Annex",
+            status: "scheduled",
+            scheduled_at: "2026-09-25T18:00:00Z",
+            trade: "Chicago"
+          }
+        ]
+      })
+    );
+    const receiptPath = join(root, "receipts.jsonl");
+    writeFileSync(
+      receiptPath,
+      `${JSON.stringify({
+        type: "receipt",
+        receipt: {
+          receiptId: "rcpt-local-1",
+          kind: "shadow",
+          at: NOW,
+          body: { customer: "Secret Household Name" },
+          prevHash: "abc",
+          hash: "deadbeefdeadbeefdeadbeefdeadbeef"
+        }
+      })}\n`
+    );
+    const snapshot = buildOperatorSnapshot({
+      now: NOW,
+      folders,
+      receiptPath,
+      alertConfig: defaultAlertConfig()
+    });
+    expect(snapshot.lanes.find((lane) => lane.kind === "trade")).toMatchObject({
+      label: "plumbing",
+      booked: 1,
+      geographic: false
+    });
+    expect(snapshot.lanes.some((lane) => /chicago/i.test(lane.label))).toBe(false);
+    expect(snapshot.map.drawn).toBe(false);
+    expect(snapshot.receiptDigest.lines).toBe(1);
+    expect(snapshot.receiptDigest.entries[0]).toMatchObject({ type: "receipt", id: "rcpt-local-1", kind: "shadow" });
+    expect(JSON.stringify(snapshot)).not.toContain("Secret Household Name");
+    expect(JSON.stringify(snapshot)).not.toContain("Synthetic Mill");
+    const page = renderPrintableSnapshot(snapshot);
+    expect(page).toContain("rcpt-local-1");
+    expect(page).toContain("plumbing");
+    expect(page).toContain("pilot_started false");
+    expect(page).not.toContain("Secret Household Name");
+    expect(page).not.toContain("Chicago");
+    expect(page).not.toContain("https://");
   });
 });

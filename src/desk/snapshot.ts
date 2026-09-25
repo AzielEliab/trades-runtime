@@ -95,6 +95,29 @@ export interface DeskCapacityPoint {
   open: number | null;
 }
 
+export interface DeskLane {
+  id: string;
+  label: string;
+  kind: "capacity" | "trade";
+  booked: number;
+  open: number | null;
+  note: string;
+  geographic: false;
+}
+
+export interface DeskReceiptEntry {
+  type: "genesis" | "receipt" | "unparsed";
+  id?: string;
+  kind?: string;
+  at?: string;
+  hash?: string;
+}
+
+export interface DeskReceiptDigest {
+  lines: number;
+  entries: DeskReceiptEntry[];
+}
+
 export interface OperatorSnapshot {
   product: "trades-runtime";
   version: string;
@@ -120,6 +143,9 @@ export interface OperatorSnapshot {
   series: DeskSeriesPoint[];
   capacity: DeskCapacityPoint[];
   capacityFormula: string;
+  lanes: DeskLane[];
+  map: { drawn: false; reason: string };
+  receiptDigest: DeskReceiptDigest;
   mission: MissionDayBoard;
   bookingBlock: BookingBlock;
   fulfillment: { label: DeskDataLabel | "none"; steps: { step: FulfillmentStep; reached: boolean }[] };
@@ -172,11 +198,33 @@ function clockOnDay(day: string, nowIso: string): string {
   return `${day}T${hh}:${mm}:${ss}Z`;
 }
 
-function countReceiptLines(filePath: string | undefined): number {
-  if (!filePath || !existsSync(filePath)) return 0;
-  const text = readFileSync(filePath, "utf8").trim();
-  if (!text) return 0;
-  return text.split(/\r?\n/).filter((line) => line.trim()).length;
+function readReceiptDigest(filePath: string | undefined): DeskReceiptDigest {
+  if (!filePath || !existsSync(filePath)) return { lines: 0, entries: [] };
+  const rawLines = readFileSync(filePath, "utf8")
+    .split(/\r?\n/)
+    .filter((line) => line.trim());
+  const entries = rawLines.slice(-8).map((line): DeskReceiptEntry => {
+    try {
+      const parsed = JSON.parse(line) as Record<string, unknown>;
+      if (parsed.type === "genesis" && typeof parsed.genesis === "string") {
+        return { type: "genesis", hash: parsed.genesis };
+      }
+      if (parsed.type === "receipt" && parsed.receipt && typeof parsed.receipt === "object") {
+        const receipt = parsed.receipt as Record<string, unknown>;
+        return {
+          type: "receipt",
+          id: typeof receipt.receiptId === "string" ? receipt.receiptId : undefined,
+          kind: typeof receipt.kind === "string" ? receipt.kind : undefined,
+          at: typeof receipt.at === "string" ? receipt.at : undefined,
+          hash: typeof receipt.hash === "string" ? receipt.hash : undefined
+        };
+      }
+      return { type: "unparsed" };
+    } catch {
+      return { type: "unparsed" };
+    }
+  });
+  return { lines: rawLines.length, entries };
 }
 
 function resolveUnder(cwd: string, path: string): string {
@@ -273,6 +321,7 @@ interface CollectedRecord {
   status?: string;
   observedAt?: string;
   day: string;
+  lane?: string;
 }
 
 function collect(files: DropInFileResult[], receivedAt: string): {
@@ -306,7 +355,8 @@ function collect(files: DropInFileResult[], receivedAt: string): {
         entity: record.entity,
         status: record.status,
         observedAt: record.observedAt,
-        day: dayKey(record.observedAt) ?? dayKey(receivedAt) ?? receivedAt.slice(0, 10)
+        day: dayKey(record.observedAt) ?? dayKey(receivedAt) ?? receivedAt.slice(0, 10),
+        lane: record.lane
       });
     }
   }
@@ -341,6 +391,51 @@ function syntheticFulfillment(at: string): OperatorSnapshot["fulfillment"] {
     label: "synthetic-demo",
     steps: FULFILLMENT_STEPS.map((step) => ({ step, reached: reached.has(step) }))
   };
+}
+
+const MAP_REASON = "No coordinates are stored on this desk. A map is not drawn.";
+
+function buildLanes(args: {
+  dataLabel: DeskDataLabel;
+  capacity: DeskCapacityPoint[];
+  missionDay: string;
+  records: CollectedRecord[];
+}): DeskLane[] {
+  const point = args.capacity.find((item) => item.t === args.missionDay) ?? args.capacity[args.capacity.length - 1];
+  const booked = point?.booked ?? 0;
+  const open = point?.open ?? null;
+  const capacityNote =
+    args.dataLabel === "synthetic-demo"
+      ? `Slot lane of ${SYNTHETIC_CAPACITY_LANE} on the mission day. Booked ${booked}, open ${open ?? "blank"}. Not a map. No coordinates are stored.`
+      : "Booked count is admitted jobs on the mission day. Open slots stay blank until a local capacity sample exists. Not a map. No coordinates are stored.";
+  const lanes: DeskLane[] = [
+    {
+      id: "capacity",
+      label: "Capacity lane",
+      kind: "capacity",
+      booked,
+      open,
+      note: capacityNote,
+      geographic: false
+    }
+  ];
+  const counts = new Map<string, number>();
+  for (const record of args.records) {
+    if (record.entity !== "job" || !record.lane) continue;
+    counts.set(record.lane, (counts.get(record.lane) ?? 0) + 1);
+  }
+  for (const [lane, count] of [...counts.entries()].sort((a, b) => a[0].localeCompare(b[0]))) {
+    lanes.push({
+      id: `trade-${lane}`,
+      label: lane,
+      kind: "trade",
+      booked: count,
+      open: null,
+      note: "Trade token copied from the local export. Not a place. No coordinates are stored.",
+      geographic: false
+    });
+  }
+  return lanes;
 }
 
 function emptyFulfillment(): OperatorSnapshot["fulfillment"] {
@@ -418,7 +513,8 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
       : "Booked bars are admitted job rows per day. Open slots stay blank until a local capacity sample exists. No accuracy is inferred.";
 
   const fulfillment = dataLabel === "synthetic-demo" ? syntheticFulfillment(now) : emptyFulfillment();
-  const receiptLines = countReceiptLines(
+  const lanes = buildLanes({ dataLabel, capacity, missionDay, records: collected.records });
+  const receiptDigest = readReceiptDigest(
     options.receiptPath ?? (config?.receiptPath ? resolveUnder(cwd, config.receiptPath) : undefined)
   );
   const admittedPackets = collected.inbound.reduce((sum, row) => sum + row.records, 0);
@@ -640,12 +736,15 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
       pricebookItems: collected.records.filter((record) => record.entity === "pricebook" || record.entity === "item").length,
       invoices: collected.records.filter((record) => record.entity === "invoice").length,
       admittedPackets,
-      receiptLines,
+      receiptLines: receiptDigest.lines,
       unverified: admittedPackets
     },
     series,
     capacity,
     capacityFormula,
+    lanes,
+    map: { drawn: false, reason: MAP_REASON },
+    receiptDigest,
     mission,
     bookingBlock,
     fulfillment,
