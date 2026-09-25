@@ -61,7 +61,7 @@ export function aiTxt(): string {
 
 ## What this is
 
-Trades-Runtime is a shadow-first, local-first TypeScript runtime for HVAC, plumbing, electrical, sewer, and cross-trades field businesses. Operators bring their own ServiceTitan and ProBooks dumps onto their own machines (BYO). Human authority always wins. Append-only receipts, FragGate-shaped inbound validation, shadow modes, mission board, and fulfillment run on the operator box.
+Trades-Runtime is a shadow-first, local-first TypeScript runtime for HVAC, plumbing, electrical, sewer, and cross-trades field businesses. Operators bring their own ServiceTitan, ProBooks, and other trades-app exports onto their own machines (BYO). Human authority always wins. Append-only receipts, FragGate-shaped inbound validation, shadow modes, mission board, and fulfillment run on the operator box. The human operator desk is local: npx tsx src/cli.ts desk.
 
 Public name: Trades-Runtime (trades-runtime). Author / identity: Aziel Eliab only (Person @id ${PERSON_ID}).
 Version: ${VERSION}. License: ${LICENSE}.
@@ -83,6 +83,7 @@ Softwares tab: ${SOFTWARES_TAB}
 2. Agents: POST ${PUBLIC_ORIGIN}/mcp (read-only health/stats/cite/skill) or OpenAPI at ${PUBLIC_ORIGIN}/openapi.json
 3. Install: curl -fsSL ${PUBLIC_ORIGIN}/download -o ${RELEASE_FILENAME} && tar -xzf ${RELEASE_FILENAME}
 4. Softwares card: ${SOFTWARES_TAB}
+5. Local human desk, on the operator machine: npx tsx src/cli.ts desk — install notes at ${PUBLIC_ORIGIN}/local-desk. This Worker does not serve that desk or tenant metrics.
 
 ## Discovery
 

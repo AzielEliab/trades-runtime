@@ -18,7 +18,7 @@ import {
   type CountStore
 } from "./counters.js";
 import { RELEASE_FILENAME, VERSION } from "./identity.js";
-import { renderLanding } from "./landing.js";
+import { renderLanding, renderLocalDesk } from "./landing.js";
 import { handleMcp } from "./mcp.js";
 import { loadReleaseBytes, releaseHeaders } from "./release.js";
 
@@ -109,6 +109,20 @@ export async function handleRequest(request: Request, env: Env, _ctx?: WorkerCon
     return new Response(bytes, {
       status: 200,
       headers: releaseHeaders(filename, bytes.byteLength)
+    });
+  }
+
+  if (pathname === "/local-desk") {
+    if (request.method !== "GET" && request.method !== "HEAD") {
+      return json({ error: "method not allowed" }, 405);
+    }
+    return new Response(request.method === "HEAD" ? null : renderLocalDesk(), {
+      status: 200,
+      headers: {
+        "Content-Type": "text/html; charset=utf-8",
+        "Cache-Control": "no-store",
+        "X-Product-Version": env.PRODUCT_VERSION || VERSION
+      }
     });
   }
 

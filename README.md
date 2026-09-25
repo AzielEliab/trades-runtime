@@ -3,19 +3,19 @@
 Private **TypeScript runtime** for a shadow-first AI operating system / company operating intelligence layer. Field trades: HVAC, plumbing, electrical, sewer, and cross-trades.
 
 **Author / identity:** Aziel Eliab only. See [`IDENTITY.md`](IDENTITY.md). No legal name, home, or county on exports.  
-**Version:** 0.3.4  
+**Version:** 0.4.0  
 **Role:** `trades-runtime`  
 **License:** Apache-2.0  
 **Visibility:** this repository stays **private**; public get is the giveaway Worker  
 **Public Worker (if deployed):** https://trades-runtime.vibelock.workers.dev  
 **Try on Glama (intended listing):** https://glama.ai/mcp/servers/AzielEliab/trades-runtime — pack is in-repo (`glama.json`, `Dockerfile`, `cli/mcp-stdio.mjs`). Do **not** treat Install Server as LIVE until a Glama admin Deploy + Make Release succeeds. See [`docs/GLAMA.md`](docs/GLAMA.md).  
-**Status:** 0.3.4 public-giveaway + Growth-ON crawl cut — lockstep with Property Intelligence v1.0 in-tree — live-pure core + honest stubs — **BYO** local ServiceTitan + ProBooks inbound — **no** live writes, tenant data, ST/ProBooks write-back, DOIs, hosted uploader, or production company-OS claim — **Option C code-ready / pilot not started** — **Option D not started**
+**Status:** 0.4.0 universal trades-app drop-in + local operator desk — lockstep with Property Intelligence v1.0 in-tree — live-pure core + honest stubs — **BYO** local ServiceTitan + ProBooks + trades-app inbound — **no** live writes, tenant data, ST/ProBooks write-back, DOIs, hosted uploader, or production company-OS claim — **Option C code-ready / pilot not started** — **Option D not started**
 
 The product is the software in `src/`. `docs/` is a thin local catalog/UI. GitHub Pages is **intentionally disabled** (`live_backends: false`). There is no Pages workflow. **PDFs are never published.** Implementer specs live at repo-root [`specs/`](specs/) (not under `docs/`).
 
 Standing rule: every PDF Aziel sends is a spec to implement as coded software.
 
-Paper trail: [`TR-AUDIT-2026-09-18C`](specs/TR-AUDIT-2026-09-18C.txt) · [`TR-AUDIT-2026-09-18B`](specs/TR-AUDIT-2026-09-18B.txt) · [`TR-AUDIT-2026-09-18`](specs/TR-AUDIT-2026-09-18.txt) · [`TR-AUDIT-2026-09-17`](specs/TR-AUDIT-2026-09-17.txt) · [`TR-CUT-2026-09-17`](specs/TR-CUT-2026-09-17.txt) · [`TR-BOT-2026-09-17`](specs/TR-BOT-2026-09-17.txt) (standing brief) · [`TR-BYO-2026-09-17`](specs/TR-BYO-2026-09-17.txt) (amends TR-BOT §9 and TR-CUT R2–R3).
+Paper trail: [`TR-DESK-2026-09-25`](specs/TR-DESK-2026-09-25.txt) (universal drop-in + local human desk) · [`TR-AUDIT-2026-09-18C`](specs/TR-AUDIT-2026-09-18C.txt) · [`TR-AUDIT-2026-09-18B`](specs/TR-AUDIT-2026-09-18B.txt) · [`TR-AUDIT-2026-09-18`](specs/TR-AUDIT-2026-09-18.txt) · [`TR-AUDIT-2026-09-17`](specs/TR-AUDIT-2026-09-17.txt) · [`TR-CUT-2026-09-17`](specs/TR-CUT-2026-09-17.txt) · [`TR-BOT-2026-09-17`](specs/TR-BOT-2026-09-17.txt) (standing brief) · [`TR-BYO-2026-09-17`](specs/TR-BYO-2026-09-17.txt) (amends TR-BOT §9 and TR-CUT R2–R3).
 
 ## Install, test, demo
 
@@ -25,12 +25,14 @@ npm test
 npm run typecheck
 npm run demo
 npm run byo:admit-demo
+npm run drop-in:demo
+npm run desk
 npm run shadow:sealed-demo
 npm run manifest
 npm run mcp
 ```
 
-`npm test` runs constitutional rule tests including Human Authority, confidence≠truth, CrossTrade secondary-only routing, v0.2 recognition / pricebook lock / mission board / location economics, the 0.3.3 execution spine (FragGate inbound, durable receipts, `runAction`), restart-replay of append-only JSONL receipts (`data/receipts.jsonl` or `{tmpdir}/tr-replay-*/receipts.jsonl`), the synthetic BYO admit demo, and Option C sealed-shadow scaffolding (no auto-promote, engagement drop-back, required settlement fields).
+`npm test` runs constitutional rule tests including Human Authority, confidence≠truth, CrossTrade secondary-only routing, v0.2 recognition / pricebook lock / mission board / location economics, the 0.3.3 execution spine (FragGate inbound, durable receipts, `runAction`), restart-replay of append-only JSONL receipts (`data/receipts.jsonl` or `{tmpdir}/tr-replay-*/receipts.jsonl`), the synthetic BYO admit demo, the universal drop-in demo, the local operator desk, and Option C sealed-shadow scaffolding (no auto-promote, engagement drop-back, required settlement fields).
 
 CI (`.github/workflows/ci.yml`) runs `npm ci`, `npm run typecheck`, and `npm test` on pull requests and pushes to `main`. GitHub Pages is intentionally disabled — do not treat a github.io URL as a test gate.
 
@@ -66,6 +68,10 @@ CI (`.github/workflows/ci.yml`) runs `npm ci`, `npm run typecheck`, and `npm tes
 | ProBooks shadow (read-only, peer inbound) | `src/spine/probooks-shadow.ts` | live-pure |
 | Local BYO inbound layout | `src/spine/inbound-layout.ts` | live-pure |
 | Local inbound config (no cloud account) | `src/spine/local-inbound-config.ts` | live-pure |
+| Universal trades-app drop-in | `src/spine/drop-in.ts` | live-pure |
+| Trades-app shadow (read-only) | `src/spine/trades-app-shadow.ts` | live-pure |
+| Local human operator desk | `src/desk/` | live-pure |
+| Synthetic drop-in demo | `src/demo/drop-in.ts` | live-pure |
 | Runtime isolate (per-instance receipts) | `src/spine/runtime-isolate.ts` | live-pure |
 | Synthetic BYO admit demo | `src/demo/byo-admit.ts` | live-pure |
 | Synthetic sealed-shadow demo | `src/demo/shadow-sealed.ts` | live-pure |
@@ -83,15 +89,41 @@ Local inbound on that machine (contents gitignored):
 
 - `data/inbound/servicetitan/` — ST export or read-only pull the user places
 - `data/inbound/probooks/` — ProBooks books / items / costs / vendor files the user places
+- `data/inbound/trades-app/` — other field-service / job / pricebook / customer / appointment exports (Jobber, Housecall Pro, Service Fusion, QuickBooks-shaped books, generic CSV/JSON)
 - `data/runtime/<instanceId>/receipts.jsonl` and `ledger.jsonl` — isolate per runtime instance
 
-Not `data/tenants/` (that word implies a hosted multi-tenant service). Optional local config lists paths or read endpoints only — **no cloud account**. Tokens stay on the user’s machine or their sealed vault.
+Not `data/tenants/` (that word implies a hosted multi-tenant service). Optional local config lists paths or read-endpoint hints only — **no cloud account**, and the runtime does not call those hints. Tokens stay on the user’s machine or their sealed vault.
 
-FragGate first-class `sourceKind` values: `servicetitan` (MEDIUM, hashed, `live:false` `write:false`), `probooks` (same), `operator-file` (LOW until origin tagged; still not truth), `human` (manager correction on Chain C with actor id). Wrapper ≠ verified. Scrape and silent promotion to VERIFIED are refused.
+FragGate first-class `sourceKind` values: `servicetitan` (MEDIUM, hashed, `live:false` `write:false`), `probooks` (same), `trades-app` (same, generic class), `operator-file` (LOW until origin tagged `servicetitan`, `probooks`, or `trades-app`; still not truth), `human` (manager correction on Chain C with actor id). Wrapper ≠ verified. Scrape, central-dump, hosted-upload, and silent promotion to VERIFIED are refused.
+
+## Universal drop-in (TR-DESK-2026-09-25)
+
+ServiceTitan and ProBooks stay named peer classes. A third inbound class, `trades-app`, admits the same family of exports without a new paper for each vendor. The drop-in sniffs JSON/CSV shape and applies a mapping profile (Jobber, Housecall Pro, Service Fusion, QuickBooks Online, QuickBooks Desktop, generic JSON, generic CSV). A file that still looks like ServiceTitan or ProBooks stays on that peer class.
+
+```bash
+npm run drop-in:demo
+```
+
+That demo copies synthetic fixtures from `test/fixtures/byo/` into a temp inbound tree, admits them through FragGate, hashes packets, writes temp isolate receipts, and proves writes still throw. It is not a customer dump.
+
+Real exports stay in the gitignored drop folders. `data/inbound/local.json` (copied from `local.json.example`) may name paths and read-endpoint hints. Hints are documentation for the operator. This process does not fetch them.
+
+## Human operator desk
+
+The desk is the human surface. Agent MCP stays a read-only bridge without this chrome.
+
+```bash
+npm run desk
+# http://127.0.0.1:4174/
+```
+
+It binds to `127.0.0.1` only. The page shows job/completion charts, a capacity chart, mission-board pace, fulfillment progress, alerts, and scores. Scores use mission pace, the evidence trust band, verification (`UNVERIFIED`), and `recommendBlock`. Prediction confidence stays withheld on a BYO drop. The recorded synthetic shadow-day confidence appears only on the synthetic demo, labeled as a fixture. An empty inbound folder shows that synthetic demo. Dropping a file updates the next SSE tick (about 2s) and the label switches to BYO-admitted, or BYO-admitted synthetic drill when every file declares `synthetic: true`.
+
+The public Worker may cite `npx tsx src/cli.ts desk` and `/local-desk` as install notes. It does not host the desk or tenant metrics.
 
 `npm run byo:admit-demo` is **operator-software proof** with synthetic fixtures under `test/fixtures/byo/`. It copies those fixtures into a temp inbound dir, admits via FragGate as `servicetitan` + `probooks`, hashes packets, writes isolate receipts under a temp `data/runtime/<id>/`, prints hashes, and proves wrapper ≠ VERIFIED while ST/ProBooks writes still throw. It is not a customer dump. The authoring node is not a data custodian.
 
-Real user exports belong only on that user's machine under `data/inbound/{servicetitan,probooks}/` (gitignored except `.gitkeep`).
+Real user exports belong only on that user's machine under `data/inbound/{servicetitan,probooks,trades-app}/` (gitignored except `.gitkeep`).
 
 Inherited names come only from [`specs/aziel-runtime-inheritance.txt`](specs/aziel-runtime-inheritance.txt). This is not a wholesale copy of aziel-runtime Softwares.
 
@@ -119,6 +151,7 @@ Worker script name: `trades-runtime` (same `vibelock` workers.dev account patter
 What it is:
 
 - Human landing + counted Apache-2.0 tarball download
+- `/local-desk` cites the local `npx tsx src/cli.ts desk` install. It does not host tenant metrics or a live company board
 - Thin read-only `/openapi.json` and `POST /mcp` for AI clients (health / stats / cite / skill only)
 - Growth-ON crawl surfaces: `/robots.txt` (full Allow + Content-Signal), `/sitemap.xml`, `/ai.txt`, `/humans.txt`, `/.well-known/mcp.json`, `/person.jsonld`, `/graph.jsonld`
 - Stdio MCP bridge for Glama / Claude Desktop / Cursor: `npm run mcp` → [`cli/mcp-stdio.mjs`](cli/mcp-stdio.mjs) (forwards to Worker `POST /mcp`)

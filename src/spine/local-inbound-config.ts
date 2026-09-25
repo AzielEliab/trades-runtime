@@ -17,8 +17,10 @@ export interface LocalInboundConfig {
   instanceId: string;
   servicetitanPath: string;
   probooksPath: string;
+  tradesAppPath: string;
   servicetitanReadEndpoint?: string;
   probooksReadEndpoint?: string;
+  tradesAppReadEndpoint?: string;
   receiptPath: string;
   ledgerPath: string;
   cloudAccount?: never;
@@ -32,6 +34,7 @@ export function defaultLocalInboundConfig(instanceId = "local"): LocalInboundCon
     instanceId: id,
     servicetitanPath: inboundDir("servicetitan"),
     probooksPath: inboundDir("probooks"),
+    tradesAppPath: inboundDir("trades-app"),
     receiptPath: isolateReceiptPath(id),
     ledgerPath: isolateLedgerPath(id)
   };
@@ -67,10 +70,11 @@ export function parseLocalInboundConfig(raw: unknown): LocalInboundConfig {
   const defaults = defaultLocalInboundConfig(instanceId);
   const servicetitanPath = optionalString(record.servicetitanPath, "servicetitanPath") ?? defaults.servicetitanPath;
   const probooksPath = optionalString(record.probooksPath, "probooksPath") ?? defaults.probooksPath;
+  const tradesAppPath = optionalString(record.tradesAppPath, "tradesAppPath") ?? defaults.tradesAppPath;
   const receiptPath = optionalString(record.receiptPath, "receiptPath") ?? defaults.receiptPath;
   const ledgerPath = optionalString(record.ledgerPath, "ledgerPath") ?? defaults.ledgerPath;
 
-  for (const path of [servicetitanPath, probooksPath, receiptPath, ledgerPath]) {
+  for (const path of [servicetitanPath, probooksPath, tradesAppPath, receiptPath, ledgerPath]) {
     if (isHostedTenantLayout(path)) refuseHostedTenantLayout(path);
   }
 
@@ -78,8 +82,10 @@ export function parseLocalInboundConfig(raw: unknown): LocalInboundConfig {
     instanceId,
     servicetitanPath,
     probooksPath,
+    tradesAppPath,
     servicetitanReadEndpoint: optionalString(record.servicetitanReadEndpoint, "servicetitanReadEndpoint"),
     probooksReadEndpoint: optionalString(record.probooksReadEndpoint, "probooksReadEndpoint"),
+    tradesAppReadEndpoint: optionalString(record.tradesAppReadEndpoint, "tradesAppReadEndpoint"),
     receiptPath,
     ledgerPath
   };

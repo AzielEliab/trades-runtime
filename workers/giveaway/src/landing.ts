@@ -144,8 +144,18 @@ npm run demo</pre>
       The archive is the npm-packable source (src, docs, tests, README, IDENTITY, LICENSE).
       Implementer specs stay in the private repo and are not dumped here.
       Credentials stay on your machine. Place your own exports under
-      <code>data/inbound/servicetitan/</code> and <code>data/inbound/probooks/</code>.
+      <code>data/inbound/servicetitan/</code>, <code>data/inbound/probooks/</code>,
+      and <code>data/inbound/trades-app/</code>.
     </p>
+
+    <h2>Human desk (your machine)</h2>
+    <p>
+      After install, the operator desk is a local page: charts, metrics, alerts, scores, and a live refresh from that machine's inbound folders.
+      This Worker does not host that desk and does not hold tenant metrics.
+    </p>
+    <pre>npx tsx src/cli.ts desk
+# http://127.0.0.1:4174/</pre>
+    <p class="notice">Install notes only: <a href="/local-desk">/local-desk</a>. Option C pilot is not started. Option D is not started.</p>
 
     <h2>What this Worker refuses</h2>
     <div class="panel">
@@ -184,6 +194,44 @@ npm run demo</pre>
       if (typeof s.downloads === "number") document.getElementById("downloads").textContent = String(s.downloads);
     }).catch(() => {});
   </script>
+</body>
+</html>`;
+}
+
+export function renderLocalDesk(): string {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Local operator desk · Trades-Runtime</title>
+  <meta name="description" content="Install notes for the local Trades-Runtime operator desk. Author: Aziel Eliab. This Worker does not host tenant metrics.">
+  <meta name="author" content="${escapeHtml(AUTHOR)}">
+  <link rel="canonical" href="${escapeHtml(PUBLIC_ORIGIN)}/local-desk">
+  <style>
+    :root { --bg:#121410; --ink:#ece7dc; --muted:#a39b8c; --line:#2c3128; --accent:#c47a3a; --inset:#0d0f0c; }
+    body { margin:0; background:var(--bg); color:var(--ink); font-family:"Segoe UI", Helvetica, Arial, sans-serif; line-height:1.55; }
+    .wrap { max-width:760px; margin:0 auto; padding:2rem 1.2rem 3rem; }
+    h1 { font-family:Georgia, "Iowan Old Style", serif; font-weight:500; }
+    a { color:var(--accent); }
+    pre { background:var(--inset); border:1px solid var(--line); border-radius:10px; padding:0.9rem 1rem; overflow:auto; }
+    .notice { color:var(--muted); }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <p class="notice">Public giveaway · v${escapeHtml(VERSION)} · ${escapeHtml(AUTHOR)} · install notes only</p>
+    <h1>The operator desk runs on your machine.</h1>
+    <p>This page cites the local install path. It does not load company jobs, scores, or tenant metrics. live_backends is false.</p>
+    <pre>curl -fsSL ${escapeHtml(PUBLIC_ORIGIN)}/download -o ${escapeHtml(RELEASE_FILENAME)}
+tar -xzf ${escapeHtml(RELEASE_FILENAME)}
+cd package
+npm install
+npx tsx src/cli.ts desk</pre>
+    <p>Drop your own exports in <code>data/inbound/servicetitan/</code>, <code>data/inbound/probooks/</code>, or <code>data/inbound/trades-app/</code>. The desk binds to 127.0.0.1:4174 and labels synthetic demo data until a local file is admitted.</p>
+    <p class="notice">ServiceTitan, ProBooks, and trades-app writes stay refused. Option C pilot is not started. Option D is not started.</p>
+    <p><a href="/">Back to the giveaway</a></p>
+  </main>
 </body>
 </html>`;
 }

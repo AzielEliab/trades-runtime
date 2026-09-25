@@ -1,0 +1,14 @@
+{
+  "synthetic": true,
+  "note": "Synthetic generic trades-app JSON. Not customer data. No vendor paper required.",
+  "exportedAt": "2026-09-25T00:00:00Z",
+  "records": [
+    {
+      "job_id": "SYN-GEN-1",
+      "customer": "Synthetic Mill",
+      "status": "scheduled",
+      "scheduled_at": "2026-09-25T16:00:00Z",
+      "trade": "plumbing"
+    }
+  ]
+}

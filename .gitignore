@@ -19,5 +19,7 @@ data/**
 !data/inbound/servicetitan/.gitkeep
 !data/inbound/probooks/
 !data/inbound/probooks/.gitkeep
+!data/inbound/trades-app/
+!data/inbound/trades-app/.gitkeep
 !data/runtime/
 !data/runtime/.gitkeep

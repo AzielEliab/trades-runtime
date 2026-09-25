@@ -4,6 +4,7 @@ import type { EvidenceBand } from "../core/confidence.js";
 export type EvidenceSourceType =
   | "servicetitan"
   | "probooks"
+  | "trades-app"
   | "operator-file"
   | "human"
   | "technician-note"

@@ -47,7 +47,7 @@ import { RULES_BYO } from "../src/rules/constitution.js";
 
 describe("TR-BYO first-class sourceKinds", () => {
   it("names servicetitan, probooks, operator-file, and human", () => {
-    expect(FIRST_CLASS_SOURCE_KINDS).toEqual(["servicetitan", "probooks", "operator-file", "human"]);
+    expect(FIRST_CLASS_SOURCE_KINDS).toEqual(["servicetitan", "probooks", "trades-app", "operator-file", "human"]);
   });
 
   it("admits servicetitan and probooks as peer inbound: MEDIUM, hashed, live:false, write:false, unverified", () => {

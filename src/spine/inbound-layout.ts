@@ -4,10 +4,11 @@ import { join } from "node:path";
 export const BYO_INBOUND_ROOT = "data/inbound";
 export const SERVICE_TITAN_INBOUND_DIR = "data/inbound/servicetitan";
 export const PROBOOKS_INBOUND_DIR = "data/inbound/probooks";
+export const TRADES_APP_INBOUND_DIR = "data/inbound/trades-app";
 export const RUNTIME_ISOLATE_ROOT = "data/runtime";
 export const HOSTED_TENANT_LAYOUT = "data/tenants";
 
-export type ByoInboundKind = "servicetitan" | "probooks";
+export type ByoInboundKind = "servicetitan" | "probooks" | "trades-app";
 
 export const TR_BYO_LAWS = [
   "byo-not-central-dump",
@@ -24,7 +25,8 @@ export type TrByoLaw = (typeof TR_BYO_LAWS)[number];
 
 const INBOUND_DIRS: Record<ByoInboundKind, string> = {
   servicetitan: SERVICE_TITAN_INBOUND_DIR,
-  probooks: PROBOOKS_INBOUND_DIR
+  probooks: PROBOOKS_INBOUND_DIR,
+  "trades-app": TRADES_APP_INBOUND_DIR
 };
 
 export function inboundDir(kind: ByoInboundKind): string {
@@ -47,7 +49,7 @@ export function isHostedTenantLayout(path: string): boolean {
 
 export function refuseHostedTenantLayout(path = HOSTED_TENANT_LAYOUT): never {
   throw new Error(
-    `hosted multi-tenant layout is refused (${path}); use ${SERVICE_TITAN_INBOUND_DIR} and ${PROBOOKS_INBOUND_DIR} on this machine`
+    `hosted multi-tenant layout is refused (${path}); use ${SERVICE_TITAN_INBOUND_DIR}, ${PROBOOKS_INBOUND_DIR}, and ${TRADES_APP_INBOUND_DIR} on this machine`
   );
 }
 
