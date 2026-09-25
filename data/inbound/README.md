@@ -64,6 +64,12 @@ npm run health:local
 
 `pilot:prep` checks these folders, copies `local.json.example` and `alerts.json.example` when the local copies are missing, admits synthetic fixtures in a temp tree, boots the desk on `127.0.0.1`, and prints a receipt. `pilot_started` stays false. It does not start a company pilot, does not fill these folders with fixtures, and does not write to ServiceTitan, ProBooks, or a trades app.
 
+## Desk polish (0.4.4)
+
+Receipt: [`specs/TR-DESK-POLISH-2026-09-25.txt`](../../specs/TR-DESK-POLISH-2026-09-25.txt).
+
+The local desk page keeps the same honesty labels. A light or dark theme is stored in the browser under `trades-desk-theme`. `/api/receipt` on `127.0.0.1` is a printable snapshot of the desk and local receipt identifiers. Receipt bodies stay in the file. The lane view shows the capacity slot count, and a trade lane only when a row names `hvac`, `plumbing`, `electrical`, `sewer`, or `cross-trades`. A city name is not a lane. No map is drawn. Nothing phones home. `pilot_started` stays false.
+
 ## Open the human desk
 
 From the repo root, after `npm install`:

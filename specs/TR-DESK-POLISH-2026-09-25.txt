@@ -1,0 +1,61 @@
+TRADES-RUNTIME · LOCAL OPERATOR DESK POLISH                                                                                                          TR-DESK-POLISH-2026-09-25
+
+
+
+
+ Receipt ID TR-DESK-POLISH-2026-09-25 · 2026-09-25
+ Identity: Aziel Eliab only.
+ Amends the local desk of TR-DESK-2026-09-25 and TR-ALERTS-2026-09-25. Does not amend the eight BYO laws.
+ live_backends remains false. Pages remain off. Option C pilot remains not started. Option D remains not started.
+ pilot_started remains false. This cut does not deploy the public Worker.
+
+
+ What changed
+ 0.4.4 polishes the human operator desk on the operator machine. Charts, metrics, alerts, scores,
+ and the SSE refresh stay. Honesty labels stay: synthetic demo, BYO-admitted, BYO-admitted synthetic drill,
+ UNVERIFIED, live_backends false, writes refused, pilot_started false.
+
+ Layout
+    Mission board            Pace bar plus the existing measure table. The bar is actual against target.
+                             The marker is expected pace at the local clock.
+    Tech board               Data label, verification, evidence trust, booking block, tracking, receipt
+                             line count, writes, live_backends, and pilot_started. Same scores as before.
+
+ Lane view
+ A lane is a count, not a place.
+    Capacity lane            Mission-day booked slots. The synthetic demo still uses the lane of 12.
+                             A BYO desk leaves open slots blank. No utilization percent is filled in.
+    Trade lane               Only when an admitted job names a known token: hvac, plumbing, electrical,
+                             sewer, or cross-trades. A city name, address, or free-text field is not a lane.
+ No coordinates are stored. A map is not drawn.
+
+ Theme
+ Light and dark. The choice is stored in this browser under trades-desk-theme. No account. No phone-home.
+ Charts follow the theme through local CSS. Default is dark.
+
+ Printable snapshot
+ GET /api/receipt on 127.0.0.1 returns HTML the operator can print or save as PDF.
+ The page is built from the local snapshot and from local receipt identifiers (id, kind, time, hash prefix).
+ Receipt bodies are not copied onto the page. No remote stylesheet, font, or script. No phone-home.
+
+ Agent MCP
+ The read-only MCP bridge does not carry this chrome. The public Worker page remains install notes.
+
+
+ Laws held
+    Law                         This cut
+
+    BYO, not central dump       The desk still reads local folders only.
+    Per-runtime isolate         The snapshot cites one machine's receipt file.
+    Wrapper ≠ verified          Verification on the tech board stays UNVERIFIED.
+    Writes refused              Theme and print do not write to ServiceTitan, ProBooks, or a trades app.
+    No phone-home               Printable HTML has no remote URL. Theme stays in localStorage.
+    No tenant data on Worker    This cut does not deploy the Worker. /local-desk stays install notes.
+    Pages off                   No Pages workflow.
+    Pilot not started           pilot_started stays false. Option C prep is unchanged.
+
+
+ Demo
+ npm test covers the theme key, the lane rules, the refusal to treat a city name as geography,
+ and a printable snapshot that cites a receipt id without its body.
+ npm run desk opens the human page. Print snapshot is /api/receipt on that same host.

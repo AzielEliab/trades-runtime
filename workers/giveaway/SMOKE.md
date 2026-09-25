@@ -1,6 +1,6 @@
 # Giveaway Worker smoke notes
 
-Run after `npm run giveaway:pack` so `release/trades-runtime-0.4.3.tgz` exists.
+Run after `npm run giveaway:pack` so `release/trades-runtime-0.4.4.tgz` exists.
 
 ```bash
 cd workers/giveaway
@@ -44,7 +44,7 @@ curl -sS http://127.0.0.1:8787/v1/stats
 
 # Failed download (if you temporarily hide the tarball) must not increment.
 # Successful download increments downloads by 1
-curl -sS -o /tmp/trades-runtime-0.4.3.tgz -w "%{http_code}\n" http://127.0.0.1:8787/download
+curl -sS -o /tmp/trades-runtime-0.4.4.tgz -w "%{http_code}\n" http://127.0.0.1:8787/download
 # 200; file starts with gzip magic 1f 8b
 curl -sS http://127.0.0.1:8787/v1/stats
 # views=1 downloads=1
