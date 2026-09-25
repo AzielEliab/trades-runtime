@@ -1,0 +1,15 @@
+{
+  "synthetic": true,
+  "app": "housecall-pro",
+  "note": "Synthetic Housecall Pro-shaped export. Not customer data.",
+  "exportedAt": "2026-09-25T00:00:00Z",
+  "jobs": [
+    {
+      "id": "SYN-HCP-1",
+      "work_status": "complete",
+      "description": "Synthetic water heater flush",
+      "customer": { "id": "SYN-CU-9", "name": "Synthetic Household" },
+      "schedule": { "scheduled_start": "2026-09-23T14:00:00Z" }
+    }
+  ]
+}

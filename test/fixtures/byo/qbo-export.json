@@ -1,0 +1,19 @@
+{
+  "synthetic": true,
+  "vendor": "quickbooks-online",
+  "note": "Synthetic QuickBooks Online-shaped book export. Not customer data.",
+  "exportedAt": "2026-09-25T00:00:00Z",
+  "QueryResponse": {
+    "Invoice": [
+      {
+        "Id": "SYN-INV-1",
+        "TxnDate": "2026-09-22",
+        "TotalAmt": 240,
+        "CustomerRef": { "value": "SYN-CUST-Q", "name": "Synthetic Books" }
+      }
+    ],
+    "Item": [
+      { "Id": "SYN-QBO-ITEM-1", "Name": "Synthetic filter" }
+    ]
+  }
+}

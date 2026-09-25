@@ -4,6 +4,8 @@ These text extracts drive implementation. Original PDFs stay offline / in chat a
 
 Standing rule: every PDF becomes coded software (current, prior, future).
 
+[`TR-DESK-2026-09-25`](TR-DESK-2026-09-25.txt) adds the universal trades-app drop-in and the local human operator desk on top of the BYO laws. ServiceTitan and ProBooks stay named peers. The public Worker cites the desk install path and does not host tenant metrics.
+
 [`TR-BYO-2026-09-17`](TR-BYO-2026-09-17.txt) amends [`TR-BOT-2026-09-17`](TR-BOT-2026-09-17.txt) §9 and [`TR-CUT-2026-09-17`](TR-CUT-2026-09-17.txt) R2–R3: BYO dual-source ingest on the user’s runtime, not a dump the authoring node runs.
 
 [`TR-AUDIT-2026-09-18`](TR-AUDIT-2026-09-18.txt) is the post-merge operator audit (G1 orphan modules, G3 BYO admit proof, G5 Pages-off).

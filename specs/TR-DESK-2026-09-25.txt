@@ -1,0 +1,67 @@
+TRADES-RUNTIME · UNIVERSAL DROP-IN + LOCAL HUMAN DESK                                                                                          TR-DESK-2026-09-25
+
+
+
+
+ Receipt ID TR-DESK-2026-09-25 · 2026-09-25
+ Identity: Aziel Eliab only.
+ Amends the inbound surface of TR-BYO-2026-09-17. Does not amend the eight BYO laws.
+ live_backends remains false. Pages remain off. Option C pilot remains not started. Option D remains not started.
+
+
+ What changed
+ 0.4.0 adds two surfaces on the operator's machine.
+
+ 1. Universal auto drop-in.
+    servicetitan and probooks stay named peer classes.
+    trades-app is a first-class inbound kind for field-service, job, pricebook, customer, and appointment
+    shaped exports from tools in the same class (Jobber, Housecall Pro, Service Fusion, QuickBooks Online
+    and Desktop-shaped book exports, generic CSV/JSON).
+    Detection is schema sniff plus mapping profiles. A file that still matches ServiceTitan or ProBooks
+    stays on that peer. Explicit sourceKind wins when it is an authorized class.
+    Admit path is the existing FragGate wall and the read-only shadow ingest.
+    Trust default MEDIUM. Hash the payload. live:false. write:false. verification UNVERIFIED.
+    Wrapper admission is not verification.
+    scrape, central-dump, and hosted-upload refuse.
+    Drop folders:
+      data/inbound/servicetitan/
+      data/inbound/probooks/
+      data/inbound/trades-app/
+    Optional data/inbound/local.json (gitignored) may name paths and read-endpoint hints.
+    Hints are not fetched. No tokens in the repo. No hosted uploader.
+
+ 2. Local human operator desk.
+    Command: npx tsx src/cli.ts desk
+    Binds 127.0.0.1:4174. Human surface. Agent MCP stays a read-only bridge without this chrome.
+    Charts (jobs/completions, capacity), metrics, alerts, mission-board pace, fulfillment rail.
+    Scores already in the domain: mission pace from openMissionDay, booking block from recommendBlock,
+    evidence trust band, verification status. Prediction confidence is withheld on a BYO drop.
+    The recorded synthetic shadow-day confidence is shown only on the empty-folder demo and is labeled
+    as a fixture, not measured accuracy.
+    Empty inbound renders the synthetic demo. A local drop switches the label to BYO-admitted
+    (or BYO-admitted synthetic drill when every file declares synthetic:true).
+    SSE refreshes from local folders and the mission clock. No write-back.
+
+ Public Worker
+ trades-runtime.vibelock.workers.dev may cite the local desk command at / and /local-desk.
+ That page is install notes. It does not host tenant metrics or a fake live company board.
+ PRODUCT_VERSION on the Worker source moves to 0.4.0 with the package. The deployed Worker
+ updates when an operator deploys it. This repo does not deploy it.
+
+
+ Laws held
+    Law                         This cut
+
+    BYO, not central dump       Drop folders and the desk stay on the operator machine.
+    Per-runtime isolate         Desk reads one local config. It does not mix tenants.
+    Both sources first-class    servicetitan and probooks remain peers. trades-app joins them.
+    FragGate still admits       Sniffed rows become evidence packets only through admitInbound.
+    Wrapper ≠ verified          treatAsVerified is ignored. Status stays UNVERIFIED.
+    Writes refused              No POST/PUT/PATCH client for ST, ProBooks, or trades-app.
+    Credentials local           local.json has paths and hints. No cloud account field.
+    No tenant data on Pages     Pages stay off. The public Worker does not store exports.
+
+
+ Demo
+ npm run drop-in:demo copies synthetic fixtures into a temp inbound tree, admits, hashes, and proves writes throw.
+ npm run desk opens the human page. With empty folders the page says synthetic demo.

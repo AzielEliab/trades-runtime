@@ -1,0 +1,15 @@
+{
+  "synthetic": true,
+  "vendor": "quickbooks-desktop",
+  "note": "Synthetic QuickBooks Desktop-shaped book export. Not customer data.",
+  "exportedAt": "2026-09-25T00:00:00Z",
+  "transactions": [
+    {
+      "TxnType": "Invoice",
+      "RefNumber": "SYN-QBD-1",
+      "Name": "Synthetic Shop",
+      "Amount": 96,
+      "Date": "2026-09-21"
+    }
+  ]
+}

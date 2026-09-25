@@ -67,6 +67,7 @@ export {
   PROBOOKS_INBOUND_DIR,
   RUNTIME_ISOLATE_ROOT,
   SERVICE_TITAN_INBOUND_DIR,
+  TRADES_APP_INBOUND_DIR,
   TR_BYO_LAWS,
   assertLocalInboundPath,
   inboundDir,
@@ -79,6 +80,32 @@ export {
   parseLocalInboundConfig,
   type LocalInboundConfig
 } from "./local-inbound-config.js";
+export {
+  TRADES_APP_ENTITIES,
+  TRADES_APP_WRITES_ENABLED,
+  ingestTradesAppShadow,
+  mayWriteTradesApp,
+  openTradesAppShadowClient,
+  refuseTradesAppWrite,
+  refuseTradesAppWriteMethod,
+  type NoCompiledTradesAppWrite,
+  type TradesAppEntity,
+  type TradesAppShadowIngest,
+  type TradesAppShadowRecord
+} from "./trades-app-shadow.js";
+export {
+  DROP_IN_PEER_CLASSES,
+  MAPPING_PROFILES,
+  admitDropInDocument,
+  admitDropInFile,
+  admitDropInFolder,
+  admitDropInText,
+  detectDropIn,
+  parseCsv,
+  type DropInAdmit,
+  type DropInPeerClass,
+  type DropInResult
+} from "./drop-in.js";
 export {
   assertIsolatePath,
   assertIsolatesDoNotMix,

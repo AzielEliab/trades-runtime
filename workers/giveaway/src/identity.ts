@@ -1,6 +1,6 @@
 export const PRODUCT = "trades-runtime";
 export const PRODUCT_TITLE = "Trades-Runtime";
-export const VERSION = "0.3.4";
+export const VERSION = "0.4.0";
 export const AUTHOR = "Aziel Eliab";
 export const IDENTITY = "Aziel Eliab";
 export const LICENSE = "Apache-2.0";
@@ -157,6 +157,7 @@ export const CRAWL_USER_AGENTS = [
 export const SITEMAP_ENTRIES = [
   { path: "/", changefreq: "daily", priority: "1.0" },
   { path: "/download", changefreq: "daily", priority: "0.95" },
+  { path: "/local-desk", changefreq: "weekly", priority: "0.8" },
   { path: "/cite.json", changefreq: "daily", priority: "0.9" },
   { path: "/llms.txt", changefreq: "daily", priority: "0.9" },
   { path: "/ai.txt", changefreq: "daily", priority: "0.9" },
@@ -178,7 +179,7 @@ export const SITEMAP_PATHS = SITEMAP_ENTRIES.map((entry) => entry.path);
 
 export const HONESTY = {
   product:
-    "Local-first BYO runtime. People bring their own ServiceTitan and ProBooks. No tenant data on this Worker. No ST/ProBooks write-back. live_backends false.",
+    "Local-first BYO runtime. People bring their own ServiceTitan and ProBooks. Trades-app drop-in and the operator desk run on the operator machine. No tenant data on this Worker. No ST/ProBooks write-back. live_backends false.",
   counters:
     "Honest Workers KV counts. views increments exactly once per successful GET / HTML homepage 200. Health-check user-agents and non-GET / requests are not counted. downloads increments exactly once per successful GET /download 200 after the release tarball is verified as gzip. Assets, /v1/health, /v1/stats, /openapi.json, /mcp, /cite.json, /llms.txt, /robots.txt, and /v1/skill do not increment. No sampling. No inflation. No estimated unique visitors. Start at 0. Each increment writes one unique COUNTS key (views:<uuid> or downloads:<uuid>) and also does value = (parseInt(await kv.get(name))||0)+1 with put on the name key. GET /v1/stats lists the unique keys (source of truth) and never seeds or rounds up. KV list is eventually consistent — a just-written key may take up to ~60s to appear in another colo. Failed downloads never increment."
 } as const;

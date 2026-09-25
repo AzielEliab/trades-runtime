@@ -2,7 +2,9 @@
   "instanceId": "local",
   "servicetitanPath": "data/inbound/servicetitan",
   "probooksPath": "data/inbound/probooks",
+  "tradesAppPath": "data/inbound/trades-app",
   "servicetitanReadEndpoint": null,
   "probooksReadEndpoint": null,
-  "note": "Paths and optional local read endpoints only. No cloud account. Credentials stay on this machine."
+  "tradesAppReadEndpoint": null,
+  "note": "Paths and optional local read-endpoint hints only. The runtime does not call those hints. No cloud account. Credentials stay on this machine."
 }

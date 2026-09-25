@@ -3,7 +3,7 @@
 > Local-first TypeScript operating system for field-trades companies.
 > Author / identity: Aziel Eliab only.
 X / Twitter: @AzielEliab https://x.com/AzielEliab
-> Version: 0.3.4
+> Version: 0.4.0
 > Status: live-pure core + stubs. BYO local ServiceTitan + ProBooks. Option C code-ready / pilot not started. Option D not started. No live backends. Pages off. Public get is the giveaway Worker.
 
 Product is src/. docs/ is a thin local UI. Implementer specs are at repo-root specs/. Public download: https://trades-runtime.vibelock.workers.dev/download
@@ -13,6 +13,8 @@ Product is src/. docs/ is a thin local UI. Implementer specs are at repo-root sp
 - npm test — constitutional rules, CrossTrade secondary-only, Human Authority, confidence≠truth, v0.2 pricebook lock / recognition / weather / maintenance
 - npm run demo — synthetic shadow-day + receipts
 - npm run byo:admit-demo — synthetic ST+ProBooks admit proof
+- npm run drop-in:demo — synthetic ST + ProBooks + trades-app drop-in proof
+- npm run desk — local human operator desk at http://127.0.0.1:4174/
 - npm run shadow:sealed-demo — synthetic N-day sealed settlement (pilot not started)
 - Manifest: /v1/runtime.json and /modules/
 

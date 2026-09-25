@@ -175,6 +175,7 @@ ${HONESTY.counters}
 
 curl -fsSL ${PUBLIC_ORIGIN}/download -o ${RELEASE_FILENAME}
 tar -xzf ${RELEASE_FILENAME} && cd package && npm install && npm test
+npx tsx src/cli.ts desk
 `;
 }
 

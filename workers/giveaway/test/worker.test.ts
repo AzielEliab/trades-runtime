@@ -26,6 +26,20 @@ function counterFields(stats: FleetStats) {
 }
 
 describe("giveaway Worker routes", () => {
+  it("cites the local desk without hosting tenant metrics", async () => {
+    const kv = new MemoryKV();
+    const env = makeEnv({ kv });
+    const page = await hit(env, "/local-desk");
+    expect(page.status).toBe(200);
+    const html = await page.text();
+    expect(html).toContain("npx tsx src/cli.ts desk");
+    expect(html).toContain("does not load company jobs");
+    expect(html).toContain("Aziel Eliab");
+    expect(html).not.toContain("SYN-");
+    const stats = (await (await hit(env, "/v1/stats")).json()) as FleetStats;
+    expect(stats.views).toBe(0);
+  });
+
   it("serves landing HTML and increments views once per 200", async () => {
     const kv = new MemoryKV();
     const env = makeEnv({ kv });
@@ -90,7 +104,7 @@ describe("giveaway Worker routes", () => {
     expect(download.status).toBe(200);
     const bytes = await download.arrayBuffer();
     expect(isGzipTarball(bytes)).toBe(true);
-    expect(download.headers.get("Content-Disposition")).toContain("trades-runtime-0.3.4.tgz");
+    expect(download.headers.get("Content-Disposition")).toContain("trades-runtime-0.4.0.tgz");
     const stats = await (await hit(env, "/v1/stats")).json() as FleetStats;
     expect(stats.downloads).toBe(1);
     expect(stats.downloads_human).toBe(1);
@@ -236,6 +250,7 @@ describe("giveaway Worker routes", () => {
     for (const path of [
       "/",
       "/download",
+      "/local-desk",
       "/cite.json",
       "/llms.txt",
       "/ai.txt",

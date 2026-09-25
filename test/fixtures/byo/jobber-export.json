@@ -1,0 +1,16 @@
+{
+  "synthetic": true,
+  "vendor": "jobber",
+  "note": "Synthetic Jobber-shaped export. Not customer data.",
+  "exportedAt": "2026-09-25T00:00:00Z",
+  "jobs": [
+    {
+      "id": "SYN-JB-1",
+      "jobNumber": "J-1001",
+      "title": "Synthetic drain clear",
+      "client": { "id": "SYN-CL-1", "name": "Synthetic Client" },
+      "visits": [{ "startAt": "2026-09-24T15:00:00Z", "status": "completed" }],
+      "lineItems": [{ "id": "SYN-JB-LI-1", "name": "auger", "unitPrice": 180 }]
+    }
+  ]
+}

@@ -162,4 +162,13 @@ export { defaultLocalInboundConfig, parseLocalInboundConfig } from "./spine/loca
 export { isolateReceiptPath, openIsolatedReceipts } from "./spine/runtime-isolate.js";
 export { runRecordedShadowDays, runShadowDayDemo } from "./demo/shadow-day.js";
 export { runByoAdmitDemo, printByoAdmitDemo } from "./demo/byo-admit.js";
+export { runDropInDemo, printDropInDemo } from "./demo/drop-in.js";
 export { runSealedShadowDemo, printSealedShadowDemo } from "./demo/shadow-sealed.js";
+export { buildOperatorSnapshot } from "./desk/snapshot.js";
+export { startOperatorDesk } from "./desk/server.js";
+export {
+  ingestTradesAppShadow,
+  mayWriteTradesApp,
+  refuseTradesAppWrite
+} from "./spine/trades-app-shadow.js";
+export { admitDropInDocument, admitDropInFolder, detectDropIn } from "./spine/drop-in.js";

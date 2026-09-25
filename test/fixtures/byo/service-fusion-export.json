@@ -1,0 +1,17 @@
+{
+  "synthetic": true,
+  "source": "service-fusion",
+  "note": "Synthetic Service Fusion-shaped export. Not customer data.",
+  "exportedAt": "2026-09-25T00:00:00Z",
+  "jobs": [
+    {
+      "id": "SYN-SF-1",
+      "job_number": "SF-440",
+      "status": "Completed",
+      "customer_name": "Synthetic Plaza",
+      "techs": [{ "id": "SYN-TECH-1" }],
+      "category": "electrical",
+      "scheduled_at": "2026-09-22T16:00:00Z"
+    }
+  ]
+}
