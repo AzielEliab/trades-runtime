@@ -3,13 +3,13 @@
 Private **TypeScript runtime** for a shadow-first AI operating system / company operating intelligence layer. Field trades: HVAC, plumbing, electrical, sewer, and cross-trades.
 
 **Author / identity:** Aziel Eliab only. See [`IDENTITY.md`](IDENTITY.md). No legal name, home, or county on exports.  
-**Version:** 0.4.1  
+**Version:** 0.4.2  
 **Role:** `trades-runtime`  
 **License:** Apache-2.0  
 **Visibility:** this repository stays **private**; public get is the giveaway Worker  
 **Public Worker (if deployed):** https://trades-runtime.vibelock.workers.dev  
 **Try on Glama (intended listing):** https://glama.ai/mcp/servers/AzielEliab/trades-runtime — pack is in-repo (`glama.json`, `Dockerfile`, `cli/mcp-stdio.mjs`). Do **not** treat Install Server as LIVE until a Glama admin Deploy + Make Release succeeds. See [`docs/GLAMA.md`](docs/GLAMA.md).  
-**Status:** 0.4.1 named trades-app vendor profiles on the 0.4.0 universal drop-in + local operator desk — lockstep with Property Intelligence v1.0 in-tree — live-pure core + honest stubs — **BYO** local ServiceTitan + ProBooks + trades-app inbound — **no** live writes, tenant data, ST/ProBooks write-back, DOIs, hosted uploader, or production company-OS claim — **Option C code-ready / pilot not started** — **Option D not started**
+**Status:** 0.4.2 local alert rules on the operator desk — 0.4.1 named trades-app vendor profiles on the 0.4.0 universal drop-in — lockstep with Property Intelligence v1.0 in-tree — live-pure core + honest stubs — **BYO** local ServiceTitan + ProBooks + trades-app inbound — **no** live writes, tenant data, ST/ProBooks write-back, phone-home, DOIs, hosted uploader, or production company-OS claim — **Option C code-ready / pilot not started** — **Option D not started**
 
 The product is the software in `src/`. `docs/` is a thin local catalog/UI. GitHub Pages is **intentionally disabled** (`live_backends: false`). There is no Pages workflow. **PDFs are never published.** Implementer specs live at repo-root [`specs/`](specs/) (not under `docs/`).
 
@@ -119,7 +119,13 @@ npm run desk
 
 It binds to `127.0.0.1` only. The page shows job/completion charts, a capacity chart, mission-board pace, fulfillment progress, alerts, and scores. Scores use mission pace, the evidence trust band, verification (`UNVERIFIED`), and `recommendBlock`. Prediction confidence stays withheld on a BYO drop. The recorded synthetic shadow-day confidence appears only on the synthetic demo, labeled as a fixture. An empty inbound folder shows that synthetic demo. Dropping a file updates the next SSE tick (about 2s) and the label switches to BYO-admitted, or BYO-admitted synthetic drill when every file declares `synthetic: true`.
 
-The public Worker may cite `npx tsx src/cli.ts desk` and `/local-desk` as install notes. It does not host the desk or tenant metrics.
+### Local alert rules (TR-ALERTS-2026-09-25)
+
+The same scores drive local thresholds: capacity (open slots, only when a lane exists), late jobs (unfinished rows against the mission clock), trust-band (evidence-trust floor or a drop remembered on this machine), booking block (`recommendBlock`), and verification stall (the verification score stays `UNVERIFIED` or `CONFLICTED` for N minutes from the oldest observation). No accuracy percent is computed. A missing clock does not invent a stall. Blank open slots on a BYO desk do not invent a utilization percent.
+
+Copy [`data/runtime/alerts.json.example`](data/runtime/alerts.json.example) to `data/runtime/<instanceId>/alerts.json` (gitignored). `data/inbound/local.json` may set `alertsPath` or an `alerts` object. The desk banner shows unacknowledged rules. The alerts panel shows active rules, history, and acknowledge. Acknowledge is a local POST on `127.0.0.1` and writes only `alert-state.json`. Optional hooks append a local JSONL file or POST to loopback (`127.0.0.1`, `localhost`, `::1`). Any other webhook host is refused. No phone-home.
+
+The public Worker may cite `npx tsx src/cli.ts desk` and `/local-desk` as install notes. It does not host the desk, the alert hooks, or tenant metrics. This repo does not deploy the Worker.
 
 `npm run byo:admit-demo` is **operator-software proof** with synthetic fixtures under `test/fixtures/byo/`. It copies those fixtures into a temp inbound dir, admits via FragGate as `servicetitan` + `probooks`, hashes packets, writes isolate receipts under a temp `data/runtime/<id>/`, prints hashes, and proves wrapper ≠ VERIFIED while ST/ProBooks writes still throw. It is not a customer dump. The authoring node is not a data custodian.
 

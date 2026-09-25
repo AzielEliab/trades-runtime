@@ -4,6 +4,8 @@ These text extracts drive implementation. Original PDFs stay offline / in chat a
 
 Standing rule: every PDF becomes coded software (current, prior, future).
 
+[`TR-ALERTS-2026-09-25`](TR-ALERTS-2026-09-25.txt) adds local alert rules on the operator desk (0.4.2): capacity, late jobs, trust-band, booking block, and verification stall. Thresholds live in a gitignored `data/runtime/<instanceId>/alerts.json` (example committed). In-desk banner, history, and acknowledge. File and loopback webhook hooks only. No phone-home. No accuracy percent.
+
 [`TR-VENDOR-2026-09-25`](TR-VENDOR-2026-09-25.txt) adds named trades-app mapping profiles (ServiceM8, AccuLynx, SuccessWare, Xero, FieldEdge, ServiceTrade) on the 0.4.0 drop-in. Fingerprint match prefers the profile; otherwise the generic sniff remains. MEDIUM, `live:false`, `write:false`, UNVERIFIED. Wrapper ≠ verified.
 
 [`TR-DESK-2026-09-25`](TR-DESK-2026-09-25.txt) adds the universal trades-app drop-in and the local human operator desk on top of the BYO laws. ServiceTitan and ProBooks stay named peers. The public Worker cites the desk install path and does not host tenant metrics.

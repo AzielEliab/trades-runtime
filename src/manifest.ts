@@ -1,12 +1,12 @@
 export const RUNTIME_MANIFEST = {
   product: "trades-runtime",
-  version: "0.4.1",
+  version: "0.4.2",
   author: "Aziel Eliab",
   identity: "Aziel Eliab",
   role: "trades-runtime",
   kind: "shadow-first-operating-intelligence",
   live_backends: false,
-  honesty: "Pure/stub TypeScript runtime. BYO local ServiceTitan + ProBooks inbound, plus a read-only trades-app drop-in for the same class of field-service exports. Authoring node is not a data custodian. No central dump. No hosted uploader. No phone-home. No ServiceTitan or ProBooks write-back. live_backends false. Pages off (workflow deleted). Credentials local only. No production claim. Public giveaway Worker is UI + counted tarball only — not a hosted company OS and not a tenant host. The human operator desk runs on the operator machine. Option C code-ready / pilot not started. Option D not started. Not a live company pilot.",
+  honesty: "Pure/stub TypeScript runtime. BYO local ServiceTitan + ProBooks inbound, plus a read-only trades-app drop-in for the same class of field-service exports. Authoring node is not a data custodian. No central dump. No hosted uploader. No phone-home. No ServiceTitan or ProBooks write-back. live_backends false. Pages off (workflow deleted). Credentials local only. No production claim. Public giveaway Worker is UI + counted tarball only — not a hosted company OS and not a tenant host. The human operator desk runs on the operator machine. Local alert rules stay on that machine. Option C code-ready / pilot not started. Option D not started. Not a live company pilot.",
   launch_options: {
     A: { name: "Merge-only", status: "done" },
     B: { name: "Local spine", status: "done-in-software" },
@@ -72,7 +72,8 @@ export const RUNTIME_MANIFEST = {
     { slug: "shadow-sealed-demo", path: "src/demo/shadow-sealed.ts", status: "live-pure", summary: "Synthetic N-day sealed settlement proof. Mode + hashes. Not a company pilot." },
     { slug: "trades-app-shadow", path: "src/spine/trades-app-shadow.ts", status: "live-pure", summary: "Read-only generic trades-app ingest + hash. MEDIUM trust. Unverified. Writes refused." },
     { slug: "drop-in", path: "src/spine/drop-in.ts", status: "live-pure", summary: "Schema sniff and mapping profiles for ServiceTitan, ProBooks, and trades-app exports (Jobber, Housecall Pro, Service Fusion, QuickBooks, ServiceM8, AccuLynx, SuccessWare, Xero, FieldEdge, ServiceTrade, generic CSV/JSON). Known profile when the fingerprint matches; generic sniff otherwise. Read-only." },
-    { slug: "operator-desk", path: "src/desk/server.ts", status: "live-pure", summary: "Local human operator desk. Charts, metrics, alerts, scores, and SSE from local state. No tenant data leaves the machine." },
+    { slug: "operator-desk", path: "src/desk/server.ts", status: "live-pure", summary: "Local human operator desk. Charts, metrics, alert rules, scores, and SSE from local state. No tenant data leaves the machine." },
+    { slug: "alert-rules", path: "src/desk/alerts.ts", status: "live-pure", summary: "Local thresholds for capacity, late jobs, trust-band, booking block, and verification stall. In-desk banner, history, acknowledge. File and loopback webhook hooks. No phone-home. No accuracy percent." },
     { slug: "drop-in-demo", path: "src/demo/drop-in.ts", status: "live-pure", summary: "Synthetic multi-vendor drop-in proof. Wrapper is not VERIFIED. Writes throw." },
     { slug: "servicetitan-connector", path: "src/spine/servicetitan-shadow.ts", status: "stub", summary: "Live ServiceTitan writes stay refused." },
     { slug: "probooks-connector", path: "src/spine/probooks-shadow.ts", status: "stub", summary: "Live ProBooks writes stay refused." }

@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "note": "Local operator thresholds only. Copy to data/runtime/<instanceId>/alerts.json (gitignored). No phone-home. Webhook must be 127.0.0.1, localhost, or ::1. File hook is a local path. These rules read desk scores. They do not invent an accuracy percent.",
+  "rules": {
+    "capacity": {
+      "enabled": true,
+      "openSlotsAtOrBelow": 6
+    },
+    "lateJobs": {
+      "enabled": true,
+      "countAtOrAbove": 1,
+      "sameDayElapsedFractionAtOrAbove": 0.75
+    },
+    "trustBand": {
+      "enabled": true,
+      "atOrBelow": "LOW"
+    },
+    "bookingBlock": {
+      "enabled": true,
+      "when": ["HOLD", "BLOCK_NEW_BOOKING", "CLOSED"]
+    },
+    "verificationStall": {
+      "enabled": true,
+      "whenStatus": ["UNVERIFIED", "CONFLICTED"],
+      "stallMinutes": 720
+    }
+  },
+  "hooks": {
+    "file": null,
+    "webhook": null
+  }
+}

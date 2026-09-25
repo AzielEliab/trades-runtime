@@ -167,6 +167,14 @@ export { runSealedShadowDemo, printSealedShadowDemo } from "./demo/shadow-sealed
 export { buildOperatorSnapshot } from "./desk/snapshot.js";
 export { startOperatorDesk } from "./desk/server.js";
 export {
+  acknowledgeAlert,
+  applyDeskAlerts,
+  assertLocalWebhook,
+  defaultAlertConfig,
+  dispatchLocalHooks,
+  parseAlertConfig
+} from "./desk/alerts.js";
+export {
   ingestTradesAppShadow,
   mayWriteTradesApp,
   refuseTradesAppWrite
