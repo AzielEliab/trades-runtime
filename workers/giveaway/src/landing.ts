@@ -229,6 +229,7 @@ cd package
 npm install
 npx tsx src/cli.ts desk</pre>
     <p>Drop your own exports in <code>data/inbound/servicetitan/</code>, <code>data/inbound/probooks/</code>, or <code>data/inbound/trades-app/</code>. The desk binds to 127.0.0.1:4174 and labels synthetic demo data until a local file is admitted. Local alert rules stay on that machine. Copy <code>data/runtime/alerts.json.example</code>. Webhook hooks accept loopback only. This page does not receive them.</p>
+    <p>Option C prep on that machine is <code>npm run pilot:prep</code>. The receipt keeps <code>pilot_started false</code>. It does not start a company pilot, and this Worker does not run that prep.</p>
     <p class="notice">ServiceTitan, ProBooks, and trades-app writes stay refused. Option C pilot is not started. Option D is not started.</p>
     <p><a href="/">Back to the giveaway</a></p>
   </main>

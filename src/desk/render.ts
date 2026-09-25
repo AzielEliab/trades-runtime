@@ -286,6 +286,7 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
       <span class="chip">UNVERIFIED</span>
       <span class="chip">127.0.0.1 only</span>
       <span class="chip">Option C pilot not started</span>
+      <span class="chip">pilot_started false</span>
       <span class="chip" id="clock">updated ${esc(snapshot.generatedAt)}</span>
     </div>
     <div id="banner">${renderBanner(snapshot)}</div>

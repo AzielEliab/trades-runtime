@@ -53,6 +53,17 @@ Copy [`../runtime/alerts.json.example`](../runtime/alerts.json.example) to `data
 
 Rules read desk scores already on the page: mission pace, evidence trust, verification, and booking block, plus the capacity series and unfinished jobs. They do not invent an accuracy percent. The in-desk banner, history, and acknowledge stay on this machine. A file hook is a local path. A webhook must be `127.0.0.1`, `localhost`, or `::1`. No phone-home.
 
+## Option C prep (0.4.3)
+
+Receipt: [`specs/TR-OPTION-C-PREP-2026-09-25.txt`](../../specs/TR-OPTION-C-PREP-2026-09-25.txt).
+
+```bash
+npm run pilot:prep
+npm run health:local
+```
+
+`pilot:prep` checks these folders, copies `local.json.example` and `alerts.json.example` when the local copies are missing, admits synthetic fixtures in a temp tree, boots the desk on `127.0.0.1`, and prints a receipt. `pilot_started` stays false. It does not start a company pilot, does not fill these folders with fixtures, and does not write to ServiceTitan, ProBooks, or a trades app.
+
 ## Open the human desk
 
 From the repo root, after `npm install`:

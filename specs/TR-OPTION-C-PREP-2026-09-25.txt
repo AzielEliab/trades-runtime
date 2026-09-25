@@ -1,0 +1,147 @@
+TRADES-RUNTIME · OPTION C BYO PILOT PREP                                                                                              TR-OPTION-C-PREP-2026-09-25
+
+
+
+
+ Receipt ID TR-OPTION-C-PREP-2026-09-25 · 2026-09-25
+ Identity: Aziel Eliab only.
+ Prep for a human Option C pilot on an operator box. This cut does not start that pilot.
+ live_backends remains false. Pages remain off. Option D remains not started.
+ This cut does not deploy the public Worker. No tenant data is placed on the Worker.
+
+
+ What this is
+ 0.4.3 makes Option C ready to be attempted by a human on their own machine.
+ The software for one named branch, engagement rules, the sealed settlement harness,
+ the local desk, and alert rules was already in tree. This paper is the checklist
+ and the machine validator. A green prep receipt means the box can host a future
+ shadow. It does not mean a company, a GM, or a field pilot is underway.
+
+
+ Checklist
+
+ 1. Local install
+    Node.js 20 or newer. From a checkout of this repo:
+
+      npm install
+      npm test
+      npm run typecheck
+
+    Author on every export is Aziel Eliab only. Credentials stay on this machine.
+    Do not point the install at a shared server, a hosted uploader, or GitHub as a dump.
+
+ 2. Inbound drop (ServiceTitan, ProBooks, trades-app)
+    These folders are the only inbound layout:
+
+      data/inbound/servicetitan/     their read-only ST export, when they choose to place one
+      data/inbound/probooks/         their read-only ProBooks export
+      data/inbound/trades-app/       other field-service exports in the same class
+
+    Not data/tenants/. That word is a hosted multi-tenant layout and the runtime refuses it.
+    Real exports stay gitignored. The authoring node is not a data custodian.
+    Copy nothing upstream. Do not commit a customer file.
+
+    Until a human places their own files, the folders stay empty and the desk
+    labels the page as a synthetic demo. Empty is honest. Do not fill them
+    with fixtures and call that a company drop.
+
+ 3. Config example
+    Copy data/inbound/local.json.example to data/inbound/local.json (gitignored).
+    Copy data/runtime/alerts.json.example to data/runtime/<instanceId>/alerts.json.
+    Paths and read-endpoint hints are documentation. This process does not call
+    those hints. There is no cloud account field. Webhook hooks, if set later,
+    must be loopback (127.0.0.1, localhost, ::1). No phone-home.
+
+    npm run pilot:prep copies the examples when the local files are missing.
+    It does not overwrite a file the operator already edited.
+
+ 4. Admit demo
+    Synthetic proof, not a customer dump:
+
+      npm run byo:admit-demo
+      npm run drop-in:demo
+
+    Both copy fixtures from test/fixtures/byo/ into a temp tree, admit them
+    through FragGate, and leave the operator drop folders alone.
+    Wrapper admission is not verification. Status stays UNVERIFIED.
+    MEDIUM trust is not truth.
+
+ 5. Desk and alerts
+      npm run desk
+      # http://127.0.0.1:4174/
+
+    The desk binds to 127.0.0.1 only. Charts, scores, and alert rules read
+    local state. Acknowledge writes local alert state only.
+    /api/health on that desk is health-local: pilot_started false,
+    live_backends false, writes false, mode SHADOW-SEALED.
+    The public Worker may cite the install path. It does not serve this desk.
+
+ 6. SHADOW-SEALED expectations
+    The default one-branch config is SHADOW-SEALED.
+    Auto-promote from SHADOW-SEALED to SHADOW-VISIBLE throws.
+    An explicit mode change, if a human later requests one, still does not
+    set pilotStarted. Field launch stays false.
+    The written notice is: this is not an order. Treating a recommendation
+    as a ticket, booking, or dispatch write drops SHADOW-VISIBLE back to
+    SHADOW-SEALED. That drop is a lifecycle receipt on the isolate ledger.
+    Settlement, when a human later compares a sealed day to actuals, still
+    requires the settlement fields. Hindsight must not rewrite the sealed
+    recommendation. Human authority wins. This prep run does not open a
+    sealed day against company actuals.
+
+ 7. Refuse-write proof
+    ServiceTitan, ProBooks, and trades-app POST, PUT, and PATCH throw.
+    mayWriteServiceTitan, mayWriteProBooks, and mayWriteTradesApp are false.
+    The prep receipt lists those refusal lines. A green receipt is not a
+    write client.
+
+ 8. Prep command
+      npm run pilot:prep
+      npm run health:local
+
+    pilot:prep checks the folders, the copied config, synthetic fixture admit,
+    the engagement drop, refuse-write, and a desk boot on 127.0.0.1.
+    It prints one JSON receipt and appends that receipt to
+    data/runtime/<instanceId>/receipts.jsonl.
+    ready true means the box passed the checks.
+    pilot_started is false either way.
+    Exit code 1 when ready is false. The receipt is still printed.
+
+
+ What NOT to do
+    No central dump. Do not upload tenant exports to the authoring node,
+    to GitHub, to the public Worker, or to a shared demo.
+    No Pages. Do not add a Pages workflow. docs/ is a local catalog only.
+    No live ServiceTitan writes. No ProBooks writes. No trades-app writes.
+    No phone-home. No hosted uploader. No cloud account in local.json.
+    No tenant data on the Worker. Do not deploy the Worker for this cut.
+    Do not tell a GM the company OS is live.
+    Do not invent a completed Option C pilot, a named-GM result, or sealed
+    days against their actuals. Option D stays not started.
+    Do not treat the wrapper, the desk label, or a prep receipt as VERIFIED.
+    Do not treat Install Server, a Worker URL, or this paper as a live pilot.
+
+
+ Laws held
+    Law                         This cut
+
+    BYO, not central dump       Drops, config, alerts, and the prep receipt stay on the operator machine.
+    Per-runtime isolate         Receipts sit under data/runtime/<instanceId>/.
+    Both sources first-class    Prep admits synthetic ServiceTitan and ProBooks, plus one trades-app fixture.
+    FragGate still admits       Synthetic admit goes through the existing inbound wall.
+    Wrapper ≠ verified          Admit status stays UNVERIFIED.
+    Writes refused              ST, ProBooks, and trades-app write methods throw.
+    Credentials local           Example config has no cloud account. Hints are not called.
+    No tenant data on Worker    health-local is the desk and the CLI. The Worker is not deployed.
+    Pages off                   No Pages workflow.
+    Human authority             Engagement drop and sealed settlement do not outrank a human.
+    pilot_started false         Manifest, health-local, desk, and the prep receipt all say so.
+
+
+ Honesty
+    Option C software: code-ready.
+    Option C pilot: not started.
+    Option C prep: this runbook plus npm run pilot:prep.
+    Option D: not started.
+    Field launch: false.
+    live_backends: false.

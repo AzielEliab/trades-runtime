@@ -2,7 +2,7 @@
   "product": "trades-runtime",
   "name": "Trades-Runtime",
   "title": "Trades-Runtime",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "author": "Aziel Eliab",
   "identity": "Aziel Eliab",
   "person_id": "https://www.azieleliab.com/#aziel",
@@ -42,6 +42,6 @@
     "ProBooks",
     "Aziel Eliab"
   ],
-  "how_to_cite": "Aziel Eliab, Trades-Runtime 0.4.2, https://trades-runtime.vibelock.workers.dev/cite.json (Person @id https://www.azieleliab.com/#aziel)",
+  "how_to_cite": "Aziel Eliab, Trades-Runtime 0.4.3, https://trades-runtime.vibelock.workers.dev/cite.json (Person @id https://www.azieleliab.com/#aziel)",
   "description": "Local-first TypeScript runtime for shadow-first field-trades operating intelligence. BYO local ServiceTitan + ProBooks inbound. Pages off. Public get is the giveaway Worker (UI + counted tarball)."
 }

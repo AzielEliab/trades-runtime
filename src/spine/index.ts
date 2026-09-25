@@ -107,9 +107,11 @@ export {
   type DropInResult
 } from "./drop-in.js";
 export {
+  ALERTS_EXAMPLE_PATH,
   assertIsolatePath,
   assertIsolatesDoNotMix,
   describeRuntimeIsolate,
+  isolateAlertsPath,
   isolateLedgerPath,
   isolateReceiptPath,
   isolatesDoNotMix,
@@ -117,3 +119,6 @@ export {
   refuseSharedHostedCorpus,
   sanitizeInstanceId
 } from "./runtime-isolate.js";
+export { healthLocal, type HealthLocal } from "./health-local.js";
+export { recordEngagementDrop, type EngagementDropReceiptBody } from "./engagement-receipt.js";
+export { runOptionCPrep, type OptionCPrepReceipt } from "./option-c-prep.js";

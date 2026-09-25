@@ -1,4 +1,5 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import { healthLocal } from "../spine/health-local.js";
 import { acknowledgeStoredAlert, defaultAlertStatePath } from "./alerts.js";
 import { buildOperatorSnapshot, DESK_REFRESH_MS, type DeskSnapshotOptions, type OperatorSnapshot } from "./snapshot.js";
 import { renderDeskPage, renderDeskView } from "./render.js";
@@ -105,6 +106,10 @@ export function startOperatorDesk(options: DeskServerOptions = {}): Promise<Desk
     }
     if (req.method !== "GET" && req.method !== "HEAD") {
       send(res, 405, JSON.stringify({ error: "method not allowed", write: false }), "application/json; charset=utf-8");
+      return;
+    }
+    if (url.pathname === "/api/health") {
+      send(res, 200, JSON.stringify(healthLocal()), "application/json; charset=utf-8");
       return;
     }
     if (url.pathname === "/api/snapshot") {

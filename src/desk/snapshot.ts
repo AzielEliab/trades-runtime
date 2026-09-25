@@ -104,6 +104,7 @@ export interface OperatorSnapshot {
   writes: false;
   dataLabel: DeskDataLabel;
   honesty: string;
+  pilot_started: false;
   pilot: { optionC: "not-started"; optionD: "not-started" };
   tracking: { transport: "sse"; intervalMs: number; source: string };
   metrics: {
@@ -625,6 +626,7 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
     writes: false,
     dataLabel,
     honesty,
+    pilot_started: false,
     pilot: { optionC: "not-started", optionD: "not-started" },
     tracking: {
       transport: "sse",

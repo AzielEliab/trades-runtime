@@ -1,12 +1,14 @@
 export const RUNTIME_MANIFEST = {
   product: "trades-runtime",
-  version: "0.4.2",
+  version: "0.4.3",
   author: "Aziel Eliab",
   identity: "Aziel Eliab",
   role: "trades-runtime",
   kind: "shadow-first-operating-intelligence",
   live_backends: false,
-  honesty: "Pure/stub TypeScript runtime. BYO local ServiceTitan + ProBooks inbound, plus a read-only trades-app drop-in for the same class of field-service exports. Authoring node is not a data custodian. No central dump. No hosted uploader. No phone-home. No ServiceTitan or ProBooks write-back. live_backends false. Pages off (workflow deleted). Credentials local only. No production claim. Public giveaway Worker is UI + counted tarball only — not a hosted company OS and not a tenant host. The human operator desk runs on the operator machine. Local alert rules stay on that machine. Option C code-ready / pilot not started. Option D not started. Not a live company pilot.",
+  pilot_started: false,
+  field_launch: false,
+  honesty: "Pure/stub TypeScript runtime. BYO local ServiceTitan + ProBooks inbound, plus a read-only trades-app drop-in for the same class of field-service exports. Authoring node is not a data custodian. No central dump. No hosted uploader. No phone-home. No ServiceTitan or ProBooks write-back. live_backends false. Pages off (workflow deleted). Credentials local only. No production claim. Public giveaway Worker is UI + counted tarball only — not a hosted company OS and not a tenant host. The human operator desk runs on the operator machine. Local alert rules stay on that machine. Option C code-ready / pilot not started. Option C prep (TR-OPTION-C-PREP-2026-09-25) checks the operator box and prints a receipt with pilot_started false. It does not start the pilot. Option D not started. Not a live company pilot.",
   launch_options: {
     A: { name: "Merge-only", status: "done" },
     B: { name: "Local spine", status: "done-in-software" },
@@ -14,7 +16,9 @@ export const RUNTIME_MANIFEST = {
       name: "One-branch shadow",
       status: "code-ready-pilot-not-started",
       software: "code-ready",
-      pilot: "not-started"
+      pilot: "not-started",
+      prep: "local-runbook",
+      pilot_started: false
     },
     D: { name: "Advise-lock pilot", status: "not-started" }
   },
@@ -67,7 +71,10 @@ export const RUNTIME_MANIFEST = {
     { slug: "probooks-shadow", path: "src/spine/probooks-shadow.ts", status: "live-pure", summary: "Read-only ProBooks books/items/costs/vendor ingest + hash. First-class peer inbound. Writes refused." },
     { slug: "inbound-layout", path: "src/spine/inbound-layout.ts", status: "live-pure", summary: "Local BYO paths data/inbound/servicetitan, data/inbound/probooks, and data/inbound/trades-app. Not data/tenants." },
     { slug: "local-inbound-config", path: "src/spine/local-inbound-config.ts", status: "live-pure", summary: "Optional local paths / read-endpoint hints. Hints are not called. No cloud account. Credentials stay on the user's machine." },
-    { slug: "runtime-isolate", path: "src/spine/runtime-isolate.ts", status: "live-pure", summary: "Separate receipt/ledger files per runtime instance. No shared hosted corpus." },
+    { slug: "runtime-isolate", path: "src/spine/runtime-isolate.ts", status: "live-pure", summary: "Separate receipt/ledger files per runtime instance. Names ST, ProBooks, and trades-app inbound plus the local alerts file. No shared hosted corpus." },
+    { slug: "engagement-receipt", path: "src/spine/engagement-receipt.ts", status: "live-pure", summary: "Lifecycle receipt when SHADOW-VISIBLE drops to SHADOW-SEALED. Does not record a promotion or a started pilot." },
+    { slug: "health-local", path: "src/spine/health-local.ts", status: "live-pure", summary: "Operator-box honesty card. pilot_started false. live_backends false. Not the public Worker health route." },
+    { slug: "option-c-prep", path: "src/spine/option-c-prep.ts", status: "live-pure", summary: "Option C box validator. Folders, example config, synthetic admit, desk boot, refuse-write. Prints a receipt. Pilot not started." },
     { slug: "byo-admit-demo", path: "src/demo/byo-admit.ts", status: "live-pure", summary: "Synthetic fixture admit proof. Wrapper ≠ VERIFIED. Writes throw. Not a customer dump." },
     { slug: "shadow-sealed-demo", path: "src/demo/shadow-sealed.ts", status: "live-pure", summary: "Synthetic N-day sealed settlement proof. Mode + hashes. Not a company pilot." },
     { slug: "trades-app-shadow", path: "src/spine/trades-app-shadow.ts", status: "live-pure", summary: "Read-only generic trades-app ingest + hash. MEDIUM trust. Unverified. Writes refused." },

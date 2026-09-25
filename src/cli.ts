@@ -5,6 +5,8 @@ import { printByoAdmitDemo } from "./demo/byo-admit.js";
 import { printDropInDemo } from "./demo/drop-in.js";
 import { printSealedShadowDemo } from "./demo/shadow-sealed.js";
 import { startOperatorDesk } from "./desk/server.js";
+import { healthLocal } from "./spine/health-local.js";
+import { runOptionCPrep } from "./spine/option-c-prep.js";
 
 function flagValue(argv: string[], name: string): string | undefined {
   const index = argv.indexOf(name);
@@ -33,6 +35,24 @@ function main(argv: string[]): void {
   }
   if (cmd === "shadow-sealed-demo") {
     printSealedShadowDemo();
+    return;
+  }
+  if (cmd === "health-local") {
+    process.stdout.write(`${JSON.stringify(healthLocal(), null, 2)}\n`);
+    return;
+  }
+  if (cmd === "pilot-prep") {
+    const cwd = flagValue(argv, "--root") ?? process.cwd();
+    runOptionCPrep({ cwd })
+      .then((receipt) => {
+        process.stdout.write(`${JSON.stringify(receipt, null, 2)}\n`);
+        if (!receipt.ready || receipt.pilot_started !== false) process.exitCode = 1;
+      })
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : String(error);
+        process.stderr.write(`${message}\n`);
+        process.exitCode = 1;
+      });
     return;
   }
   if (cmd === "desk") {
@@ -65,6 +85,8 @@ function main(argv: string[]): void {
       "  npx tsx src/cli.ts desk [--port 4174]    local human operator desk (127.0.0.1)",
       "                                    alert rules: data/runtime/alerts.json.example",
       "  npx tsx src/cli.ts shadow-sealed-demo    synthetic N-day sealed settlement (pilot not started)",
+      "  npx tsx src/cli.ts health-local          local honesty card (pilot_started false)",
+      "  npx tsx src/cli.ts pilot-prep            Option C box prep receipt (does not start the pilot)",
       "",
       "BYO local ServiceTitan, ProBooks, and trades-app inbound. No live writes. Credentials stay on this machine.",
       "Option C code-ready / pilot not started. Option D not started. Pages intentionally disabled.",
