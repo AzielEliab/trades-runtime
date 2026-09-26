@@ -64,7 +64,12 @@ function main(argv: string[]): void {
     startOperatorDesk({ port, cwd })
       .then((desk) => {
         process.stdout.write(
-          `trades-runtime operator desk ${desk.url} (local only, live_backends false, writes refused)\n`
+          [
+            `trades-runtime operator desk ${desk.url} (local only, live_backends false, writes refused)`,
+            "  /api/receipt  /api/huddle  /api/huddle.json  /api/calls/week.json",
+            "  filters: ?calls=callback | warranty | not-classified",
+            ""
+          ].join("\n")
         );
       })
       .catch((error: unknown) => {
@@ -83,6 +88,8 @@ function main(argv: string[]): void {
       "  npx tsx src/cli.ts byo-admit-demo        synthetic ST+ProBooks admit proof (not customer data)",
       "  npx tsx src/cli.ts drop-in-demo          synthetic ST + ProBooks + trades-app drop-in proof",
       "  npx tsx src/cli.ts desk [--port 4174]    local human operator desk (127.0.0.1)",
+      "                                    /api/receipt /api/huddle /api/huddle.json /api/calls/week.json",
+      "                                    filters: ?calls=callback | warranty | not-classified",
       "                                    alert rules: data/runtime/alerts.json.example",
       "  npx tsx src/cli.ts shadow-sealed-demo    synthetic N-day sealed settlement (pilot not started)",
       "  npx tsx src/cli.ts health-local          local honesty card (pilot_started false)",

@@ -8,7 +8,9 @@
       "customer": "Synthetic Mill",
       "status": "scheduled",
       "scheduled_at": "2026-09-25T16:00:00Z",
-      "trade": "plumbing"
+      "trade": "plumbing",
+      "technicianId": "tech-luis",
+      "technicianName": "Luis Ortega"
     }
   ]
 }

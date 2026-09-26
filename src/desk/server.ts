@@ -1,8 +1,9 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import { parseCallDeskFilter } from "../domain/call-class.js";
 import { healthLocal } from "../spine/health-local.js";
 import { acknowledgeStoredAlert, alertDigestCsv, buildAlertDigest, defaultAlertStatePath } from "./alerts.js";
 import { buildOperatorSnapshot, DESK_REFRESH_MS, type DeskSnapshotOptions, type OperatorSnapshot } from "./snapshot.js";
-import { renderPrintableSnapshot } from "./print.js";
+import { renderPrintableHuddle, renderPrintableSnapshot } from "./print.js";
 import { renderDeskPage, renderDeskView } from "./render.js";
 
 export interface DeskServerOptions extends DeskSnapshotOptions {
@@ -45,8 +46,29 @@ function readBody(req: IncomingMessage): Promise<string> {
   });
 }
 
-function snapshotFor(options: DeskSnapshotOptions): OperatorSnapshot {
-  return buildOperatorSnapshot({ ...options, now: options.now ?? new Date().toISOString() });
+function snapshotFor(options: DeskSnapshotOptions, requestUrl: URL): OperatorSnapshot {
+  return buildOperatorSnapshot({
+    ...options,
+    callFilter: parseCallDeskFilter(requestUrl.searchParams.get("calls")),
+    now: options.now ?? new Date().toISOString()
+  });
+}
+
+function huddleJson(snapshot: OperatorSnapshot): string {
+  return JSON.stringify({
+    product: snapshot.product,
+    version: snapshot.version,
+    author: snapshot.author,
+    generatedAt: snapshot.generatedAt,
+    live_backends: false,
+    writes: false,
+    phoneHome: false,
+    pilot_started: false,
+    loopback: true,
+    dataLabel: snapshot.dataLabel,
+    geographic: false,
+    huddle: snapshot.huddle
+  });
 }
 
 export function startOperatorDesk(options: DeskServerOptions = {}): Promise<DeskServer> {
@@ -116,12 +138,45 @@ export function startOperatorDesk(options: DeskServerOptions = {}): Promise<Desk
       return;
     }
     if (url.pathname === "/api/snapshot") {
-      const snapshot = snapshotFor(deskOptions);
+      const snapshot = snapshotFor(deskOptions, url);
       send(res, 200, JSON.stringify(snapshot), "application/json; charset=utf-8");
       return;
     }
     if (url.pathname === "/api/view") {
-      send(res, 200, JSON.stringify(renderDeskView(snapshotFor(deskOptions))), "application/json; charset=utf-8");
+      send(res, 200, JSON.stringify(renderDeskView(snapshotFor(deskOptions, url))), "application/json; charset=utf-8");
+      return;
+    }
+    if (url.pathname === "/api/calls/week" || url.pathname === "/api/calls/week.json") {
+      const digest = snapshotFor(deskOptions, url).callbackWeek;
+      const body = JSON.stringify(digest);
+      if (req.method === "HEAD") {
+        res.writeHead(200, {
+          "Content-Type": "application/json; charset=utf-8",
+          "Cache-Control": "no-store",
+          "Content-Disposition": 'attachment; filename="trades-runtime-callback-week.json"',
+          "X-Trades-Desk": "local"
+        });
+        res.end();
+        return;
+      }
+      send(res, 200, body, "application/json; charset=utf-8", {
+        "Content-Disposition": 'attachment; filename="trades-runtime-callback-week.json"'
+      });
+      return;
+    }
+    if (url.pathname === "/api/huddle.json" || (url.pathname === "/api/huddle" && url.searchParams.get("format") === "json")) {
+      const body = huddleJson(snapshotFor(deskOptions, url));
+      send(res, 200, body, "application/json; charset=utf-8");
+      return;
+    }
+    if (url.pathname === "/api/huddle" || url.pathname === "/api/huddle.html") {
+      const page = renderPrintableHuddle(snapshotFor(deskOptions, url));
+      if (req.method === "HEAD") {
+        res.writeHead(200, { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "X-Trades-Desk": "local" });
+        res.end();
+        return;
+      }
+      send(res, 200, page, "text/html; charset=utf-8");
       return;
     }
     if (
@@ -129,7 +184,7 @@ export function startOperatorDesk(options: DeskServerOptions = {}): Promise<Desk
       url.pathname === "/api/alerts/digest.json" ||
       url.pathname === "/api/alerts/digest.csv"
     ) {
-      const snapshot = snapshotFor(deskOptions);
+      const snapshot = snapshotFor(deskOptions, url);
       const digest = buildAlertDigest({
         version: snapshot.version,
         generatedAt: snapshot.generatedAt,
@@ -155,7 +210,7 @@ export function startOperatorDesk(options: DeskServerOptions = {}): Promise<Desk
       return;
     }
     if (url.pathname === "/api/receipt") {
-      const page = renderPrintableSnapshot(snapshotFor(deskOptions));
+      const page = renderPrintableSnapshot(snapshotFor(deskOptions, url));
       if (req.method === "HEAD") {
         res.writeHead(200, { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "X-Trades-Desk": "local" });
         res.end();
@@ -172,7 +227,7 @@ export function startOperatorDesk(options: DeskServerOptions = {}): Promise<Desk
         "X-Trades-Desk": "local"
       });
       const push = () => {
-        const view = renderDeskView(snapshotFor(deskOptions));
+        const view = renderDeskView(snapshotFor(deskOptions, url));
         res.write(`event: snapshot\ndata: ${JSON.stringify(view)}\n\n`);
       };
       push();
@@ -181,7 +236,7 @@ export function startOperatorDesk(options: DeskServerOptions = {}): Promise<Desk
       return;
     }
     if (url.pathname === "/" || url.pathname === "/desk") {
-      const page = renderDeskPage(snapshotFor(deskOptions));
+      const page = renderDeskPage(snapshotFor(deskOptions, url));
       if (req.method === "HEAD") {
         res.writeHead(200, { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" });
         res.end();

@@ -271,6 +271,13 @@ describe("local operator desk", () => {
     expect(page).not.toContain("Secret Household Name");
     expect(page).not.toContain("Chicago");
     expect(page).not.toContain("https://");
+    const city = snapshot.calls.find((row) => row.id === "SYN-CITY-1");
+    expect(city?.lane).toBeNull();
+    expect(city?.notClassified).toBe(true);
+    expect(city?.reason).toMatch(/silent/);
+    expect(city?.reason).not.toMatch(/Chicago/);
+    expect(snapshot.huddle.techs.some((tech) => tech.id === "tech-luis")).toBe(true);
+    expect(snapshot.huddle.techs.find((tech) => tech.id === "unassigned")?.capacity.open).toBeNull();
   });
 
   it("exports the local alert digest and prints a booking-block reason", async () => {
@@ -315,6 +322,148 @@ describe("local operator desk", () => {
       expect(page).toContain("BLOCK_NEW_BOOKING");
       expect(page).toContain("Callback");
       expect(page).toContain("Warranty");
+      expect(page).toContain("Callback rate by trade lane");
+      expect(page).toContain("Not classified");
+    } finally {
+      await desk.close();
+    }
+  });
+
+  it("filters calls, prints a classify reason, and serves the week digest and huddle", async () => {
+    const root = mkdtempSync(join(tmpdir(), "tr-desk-huddle-"));
+    const folders = emptyFolders(root);
+    const snapshot = buildOperatorSnapshot({
+      now: NOW,
+      folders,
+      alertConfig: defaultAlertConfig()
+    });
+    expect(snapshot.calls.length).toBe(10);
+    expect(snapshot.visibleCalls).toHaveLength(snapshot.calls.length);
+    expect(snapshot.calls.every((row) => row.invented === false && row.reason.length > 0)).toBe(true);
+    const silent = snapshot.calls.find((row) => row.id === "SYN-DESK-EL-2");
+    expect(silent?.notClassified).toBe(true);
+    expect(silent?.reason).toMatch(/silent/);
+    expect(silent?.reason).not.toMatch(/30-day/);
+    const possible = snapshot.calls.find((row) => row.id === "SYN-DESK-SW-2");
+    expect(possible?.reason).toMatch(/not a coverage decision/);
+    const callbacks = buildOperatorSnapshot({
+      now: NOW,
+      folders,
+      alertConfig: defaultAlertConfig(),
+      callFilter: "callback"
+    });
+    expect(callbacks.callFilter.label).toBe("Callbacks only");
+    expect(callbacks.visibleCalls.length).toBeGreaterThan(0);
+    expect(callbacks.visibleCalls.every((row) => row.callback === "yes")).toBe(true);
+    expect(callbacks.metrics.callbackCalls).toBe(snapshot.metrics.callbackCalls);
+    const warranty = buildOperatorSnapshot({
+      now: NOW,
+      folders,
+      alertConfig: defaultAlertConfig(),
+      callFilter: "warranty"
+    });
+    expect(warranty.visibleCalls.length).toBeGreaterThan(0);
+    expect(warranty.visibleCalls.every((row) => row.warranty === "yes")).toBe(true);
+    const unclassified = buildOperatorSnapshot({
+      now: NOW,
+      folders,
+      alertConfig: defaultAlertConfig(),
+      callFilter: "not-classified"
+    });
+    expect(unclassified.visibleCalls.length).toBeGreaterThan(0);
+    expect(unclassified.visibleCalls.every((row) => row.notClassified)).toBe(true);
+
+    expect(snapshot.callbackWeek.lanes.map((lane) => lane.lane)).toEqual([
+      "hvac",
+      "plumbing",
+      "electrical",
+      "sewer",
+      "cross-trades"
+    ]);
+    const hvac = snapshot.callbackWeek.lanes.find((lane) => lane.lane === "hvac");
+    expect(hvac?.calls).toBeGreaterThan(0);
+    expect(hvac?.callbackRate.value).toBeCloseTo((hvac?.callbacks ?? 0) / (hvac?.calls ?? 1));
+    expect(snapshot.callbackWeek.note).not.toMatch(/%/);
+    expect(snapshot.callbackWeek.phoneHome).toBe(false);
+    expect(snapshot.callbackWeek.loopback).toBe(true);
+
+    expect(snapshot.huddle.techs.map((tech) => tech.id).sort()).toEqual([
+      "tech-andre",
+      "tech-luis",
+      "tech-maya",
+      "tech-priya",
+      "tech-sam"
+    ]);
+    const priya = snapshot.huddle.techs.find((tech) => tech.id === "tech-priya");
+    const maya = snapshot.huddle.techs.find((tech) => tech.id === "tech-maya");
+    expect(priya?.lateRisk).toBeGreaterThan(0);
+    expect(maya?.lateRisk).toBe(0);
+    expect(maya?.openJobs).toBeGreaterThan(0);
+    expect(maya?.capacity.slots).toBe(4);
+    expect(maya?.capacity.open).toBe(3);
+    expect(priya?.notASkillScore).toBe(true);
+    expect(priya?.callbackShareWhy).not.toMatch(/%/);
+    expect(snapshot.huddle.geographic).toBe(false);
+
+    const html = renderDeskPage(snapshot);
+    expect(html).toContain("Morning huddle");
+    expect(html).toContain("Callbacks only");
+    expect(html).toContain("Warranty only");
+    expect(html).toContain("Not classified");
+    expect(html).toContain("/api/huddle");
+    expect(html).toContain("/api/calls/week.json");
+    expect(html).toContain("Maya Chen");
+    expect(html).toContain(silent?.reason ?? "missing reason");
+    const receipt = renderPrintableSnapshot(snapshot);
+    expect(receipt).toContain("SYN-DESK-EL-2");
+    expect(receipt).toContain("Callback rate by trade lane");
+    expect(receipt).toContain("Morning huddle");
+    expect(receipt).toContain(silent?.reason ?? "missing reason");
+
+    const desk = await startOperatorDesk({
+      port: 0,
+      folders,
+      cwd: root,
+      now: NOW,
+      alertStatePath: join(root, "alert-state.json"),
+      alertConfig: defaultAlertConfig(),
+      persistAlertState: false
+    });
+    try {
+      const filtered = (await (await fetch(`${desk.url}api/snapshot?calls=not-classified`)).json()) as {
+        callFilter: { value: string; shown: number };
+        visibleCalls: { notClassified: boolean }[];
+        metrics: { callsNotClassified: number };
+      };
+      expect(filtered.callFilter.value).toBe("not-classified");
+      expect(filtered.visibleCalls.length).toBe(filtered.callFilter.shown);
+      expect(filtered.visibleCalls.every((row) => row.notClassified)).toBe(true);
+      expect(filtered.metrics.callsNotClassified).toBe(snapshot.metrics.callsNotClassified);
+      const week = (await (await fetch(`${desk.url}api/calls/week.json`)).json()) as {
+        loopback: boolean;
+        phoneHome: boolean;
+        lanes: { lane: string }[];
+        author: string;
+      };
+      expect(week.loopback).toBe(true);
+      expect(week.phoneHome).toBe(false);
+      expect(week.author).toBe("Aziel Eliab");
+      expect(week.lanes.length).toBeGreaterThan(0);
+      const huddlePage = await fetch(`${desk.url}api/huddle`);
+      expect(huddlePage.headers.get("content-type")).toMatch(/text\/html/);
+      const huddleHtml = await huddlePage.text();
+      expect(huddleHtml).toContain("Morning huddle");
+      expect(huddleHtml).toContain("not a skill score");
+      expect(huddleHtml).toContain("pilot_started false");
+      expect(huddleHtml).not.toContain("https://");
+      const huddle = (await (await fetch(`${desk.url}api/huddle.json`)).json()) as {
+        live_backends: boolean;
+        writes: boolean;
+        huddle: { techs: { id: string }[] };
+      };
+      expect(huddle.live_backends).toBe(false);
+      expect(huddle.writes).toBe(false);
+      expect(huddle.huddle.techs.length).toBe(5);
     } finally {
       await desk.close();
     }

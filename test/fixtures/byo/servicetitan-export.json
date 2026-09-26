@@ -8,6 +8,8 @@
       "id": "SYN-ST-JOB-1042",
       "jobNumber": 1042,
       "trade": "hvac",
+      "technicianId": "tech-maya",
+      "technicianName": "Maya Chen",
       "isCallback": true,
       "isWarranty": false,
       "jobType": "no cool",

@@ -37,7 +37,15 @@ export { applyCrossTradeWeight, assertSecondaryOnly, buildPrimaryPool } from "./
 export { reconcileJob, asSkillScore } from "./domain/job-economics.js";
 export { reconstructHandoff, systemBeforeBlame } from "./domain/chain-d.js";
 export { explainBookingBlock, recommendBlock, scoreRescheduleRisk } from "./domain/workforce-capacity.js";
-export { aggregateCallClasses, classifyCall } from "./domain/call-class.js";
+export {
+  aggregateCallClasses,
+  callMatchesFilter,
+  classifyCall,
+  describeCallReason,
+  parseCallDeskFilter
+} from "./domain/call-class.js";
+export { buildHuddleBoard } from "./domain/huddle-board.js";
+export { buildWeeklyCallbackDigest } from "./desk/callback-week.js";
 export { reconcilePipelines, paretoFrontier } from "./domain/decision-fabric.js";
 export { requireReportMetadata } from "./domain/analytics.js";
 export {

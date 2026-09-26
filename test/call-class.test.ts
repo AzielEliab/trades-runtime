@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
   aggregateCallClasses,
+  callMatchesFilter,
   classifyCall,
+  describeCallReason,
+  parseCallDeskFilter,
   syntheticDeskCallClasses,
   SYNTHETIC_DESK_CALLS
 } from "../src/domain/call-class.js";
@@ -136,5 +139,28 @@ describe("score explanations", () => {
     expect(open.block).toBe("OPEN");
     expect(open.blocked).toBe(false);
     expect(open.headline).toMatch(/Nothing is blocking new booking/);
+  });
+
+  it("states a per-call reason and leaves a silent export not classified", () => {
+    const silent = classifyCall({ jobType: "service", summary: "warranty callback from last month" });
+    expect(describeCallReason(silent)).toMatch(/Not classified/);
+    expect(describeCallReason(silent)).toMatch(/silent/);
+    expect(describeCallReason(silent)).toMatch(/not warranty-covered/);
+    expect(describeCallReason(silent)).not.toMatch(/30-day/);
+    expect(describeCallReason(silent)).not.toMatch(/likely/);
+
+    const possible = classifyCall({ warrantyState: "POSSIBLE" });
+    expect(describeCallReason(possible)).toMatch(/not a coverage decision/);
+    expect(describeCallReason(possible)).not.toMatch(/CONFIRMED/);
+
+    const labeled = classifyCall({ isCallback: true, isWarranty: false });
+    expect(describeCallReason(labeled)).toMatch(/Callback label/);
+    expect(describeCallReason(labeled)).toMatch(/not warranty-covered/);
+    expect(callMatchesFilter(labeled, "callback")).toBe(true);
+    expect(callMatchesFilter(labeled, "warranty")).toBe(false);
+    expect(callMatchesFilter(silent, "not-classified")).toBe(true);
+    expect(parseCallDeskFilter("callbacks-only")).toBe("callback");
+    expect(parseCallDeskFilter("nope")).toBe("all");
+    expect(SYNTHETIC_DESK_CALLS.every((row) => row.day && row.technicianId)).toBe(true);
   });
 });
