@@ -184,6 +184,8 @@ describe("universal trades-app drop-in", () => {
     expect(csv.result.synthetic).toBe(true);
     expect(csv.result.records[0]?.externalId).toBe("SYN-CSV-1");
     expect(csv.result.records[0]?.callClass).toMatchObject({ callback: "yes", warranty: "no" });
+    expect(csv.result.records[0]?.technicianId).toBe("tech-maya");
+    expect(csv.result.records[0]?.technicianName).toBe("Maya Chen");
     expect(inboundDir("trades-app")).toBe(TRADES_APP_INBOUND_DIR);
     const config = parseLocalInboundConfig({
       instanceId: "desk-1",

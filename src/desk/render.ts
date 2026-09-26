@@ -1,3 +1,4 @@
+import { callFilterLabel, type CallDeskFilter } from "../domain/call-class.js";
 import { explainMissionPace } from "../domain/mission-board.js";
 import { capacityChart, jobsChart } from "./charts.js";
 import type { OperatorSnapshot } from "./snapshot.js";
@@ -167,10 +168,96 @@ export function renderMission(snapshot: OperatorSnapshot): string {
     <h3 class="subhead">Callback and warranty</h3>
     <p>Callback calls <strong>${calls.callback}</strong>. Warranty calls <strong>${calls.warranty}</strong>. Not classified <strong>${calls.notClassified}</strong>.</p>
     <p class="quiet">${esc(snapshot.callClass.note)}</p>
+    <p class="quiet">Per-call reasons and the callbacks, warranty, and not-classified filters are on the calls panel. Counts here stay the full desk.</p>
     <table>
       <thead><tr><th>Measure</th><th>Target</th><th>Actual</th><th>Expected pace</th><th>Gap</th><th>Projected</th><th>Band</th></tr></thead>
       <tbody>${goalRows}</tbody>
     </table>`;
+}
+
+function filterHref(filter: CallDeskFilter): string {
+  return filter === "all" ? "?" : `?calls=${filter}`;
+}
+
+export function renderCalls(snapshot: OperatorSnapshot): string {
+  const filters: CallDeskFilter[] = ["all", "callback", "warranty", "not-classified"];
+  const nav = filters
+    .map((filter) => {
+      const current = snapshot.callFilter.value === filter ? ` aria-current="page"` : "";
+      return `<a href="${filterHref(filter)}" data-filter="${filter}"${current}>${esc(callFilterLabel(filter))}</a>`;
+    })
+    .join("");
+  const rows = snapshot.visibleCalls
+    .map(
+      (row) => `<tr data-callback="${esc(row.callback)}" data-warranty="${esc(row.warranty)}" data-classified="${row.notClassified ? "no" : "yes"}">
+        <td>${esc(row.id)}</td>
+        <td>${esc(row.lane ?? "unnamed")}</td>
+        <td>${esc(row.day)}</td>
+        <td>${esc(row.technicianName ?? "—")}</td>
+        <td>${esc(row.callback)}</td>
+        <td>${esc(row.warranty)}</td>
+        <td>${esc(row.reason)}</td>
+      </tr>`
+    )
+    .join("");
+  return `<nav class="filters" aria-label="Call filters">${nav}</nav>
+    <p class="quiet">${esc(snapshot.callFilter.label)}. Showing ${snapshot.callFilter.shown} of ${snapshot.callFilter.total}. Counts on the mission board stay the full desk. Unknown is not a callback and is not warranty-covered.</p>
+    <table>
+      <thead><tr><th>Call</th><th>Lane</th><th>Day</th><th>Tech</th><th>Callback</th><th>Warranty</th><th>Reason</th></tr></thead>
+      <tbody>${rows || `<tr><td colspan="7">No rows in this filter. The export was not relabeled.</td></tr>`}</tbody>
+    </table>`;
+}
+
+export function renderCallbackWeek(snapshot: OperatorSnapshot): string {
+  const week = snapshot.callbackWeek;
+  const rows = week.lanes
+    .map((lane) => {
+      const fraction = lane.callbackRate.calls === 0 ? "—" : `${lane.callbacks}/${lane.calls}`;
+      return `<tr>
+        <td>${esc(lane.lane)}</td>
+        <td>${lane.calls}</td>
+        <td>${lane.callbacks}</td>
+        <td>${esc(fraction)}</td>
+        <td>${lane.warranty}</td>
+        <td>${lane.notClassified}</td>
+      </tr>`;
+    })
+    .join("");
+  return `<p class="quiet">${esc(week.weekStart)} through ${esc(week.weekEnd)}. <a href="/api/calls/week.json">Week JSON</a></p>
+    <p>${esc(week.note)}</p>
+    <table>
+      <thead><tr><th>Lane</th><th>Calls</th><th>Callbacks</th><th>Rate</th><th>Warranty</th><th>Not classified</th></tr></thead>
+      <tbody>${rows || `<tr><td colspan="6">No calls in this week.</td></tr>`}</tbody>
+    </table>`;
+}
+
+export function renderHuddle(snapshot: OperatorSnapshot): string {
+  const cards = snapshot.huddle.techs
+    .map((tech) => {
+      const slots = tech.capacity.slots;
+      const bookedWidth = slots && slots > 0 ? Math.min(100, (tech.capacity.booked / slots) * 100) : 0;
+      const bar =
+        slots == null
+          ? `<p class="quiet">Open slots blank.</p>`
+          : `<div class="pace" role="img" aria-label="${esc(tech.name)} booked ${tech.capacity.booked} of ${slots} slots">
+              <div class="pace-track"><div class="pace-actual" style="width:${bookedWidth.toFixed(1)}%"></div></div>
+              <p class="quiet">Bar is booked on the mission day against known slots.</p>
+            </div>`;
+      const openLabel = tech.capacity.open == null ? "blank" : String(tech.capacity.open);
+      return `<article class="goal" data-tech="${esc(tech.id)}">
+        <header><h3>${esc(tech.name)}</h3><span>${esc(tech.lane ?? "lane unnamed")} · open ${tech.openJobs} · late ${tech.lateRisk}</span></header>
+        ${bar}
+        <p class="why">${esc(tech.lateRiskWhy)}</p>
+        <p>Callback share <strong>${esc(tech.callbackShare)}</strong>. Warranty share <strong>${esc(tech.warrantyShare)}</strong>. Capacity booked ${tech.capacity.booked}, open ${esc(openLabel)}.</p>
+        <p class="why">${esc(tech.callbackShareWhy)}</p>
+        <p class="why">${esc(tech.warrantyShareWhy)}</p>
+        <p class="quiet">${esc(tech.capacity.why)}</p>
+      </article>`;
+    })
+    .join("");
+  return `<p class="quiet">${esc(snapshot.huddle.note)}</p>
+    <p class="quiet"><a href="/api/huddle">Print huddle</a> · <a href="/api/huddle.json">Huddle JSON</a></p>
+    ${cards || `<p class="quiet">No technicians on this desk.</p>`}`;
 }
 
 export function renderTech(snapshot: OperatorSnapshot): string {
@@ -362,6 +449,16 @@ const DESK_STYLES = `
     .why-row td { color: var(--ink); font-size: 0.86rem; }
     .banner-detail { font-size: 0.92rem; }
     .subhead { margin: 0.95rem 0 0.25rem; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 650; }
+    .filters { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.55rem 0 0.2rem; }
+    .filters a {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 0.18rem 0.65rem;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.78rem;
+    }
+    .filters a[aria-current="page"] { color: var(--ink); border-color: var(--accent); }
     button.ack { margin-top: 0.5rem; background: transparent; }
     .history { list-style: none; padding: 0; margin: 0; }
     .history li { border-top: 1px solid var(--line); padding: 0.5rem 0; color: var(--muted); font-size: 0.88rem; }
@@ -472,7 +569,9 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
       </div>
       <div class="actions">
         <button type="button" class="text-btn" id="theme-toggle">Light theme</button>
-        <a class="text-btn" href="/api/receipt">Print snapshot</a>
+        <a class="text-btn" href="${snapshot.callFilter.value === "all" ? "/api/receipt" : `/api/receipt?calls=${snapshot.callFilter.value}`}">Print snapshot</a>
+        <a class="text-btn" href="/api/huddle">Print huddle</a>
+        <a class="text-btn" href="/api/calls/week.json">Callback week JSON</a>
         <a class="text-btn" href="/api/alerts/digest.json">Alert digest JSON</a>
         <a class="text-btn" href="/api/alerts/digest.csv">Alert digest CSV</a>
         <p class="live"><span class="dot" id="live-dot"></span><span id="live-state">tracking local state</span></p>
@@ -497,6 +596,20 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
       <div class="panel">
         <h2>Tech board</h2>
         <div id="tech">${renderTech(snapshot)}</div>
+      </div>
+    </section>
+    <section class="panel" style="margin-top:0.8rem" id="calls-board">
+      <h2>Calls</h2>
+      <div id="calls">${renderCalls(snapshot)}</div>
+    </section>
+    <section class="split">
+      <div class="panel" id="huddle-board">
+        <h2>Morning huddle</h2>
+        <div id="huddle">${renderHuddle(snapshot)}</div>
+      </div>
+      <div class="panel">
+        <h2>Callback week</h2>
+        <div id="callback-week">${renderCallbackWeek(snapshot)}</div>
       </div>
     </section>
     <section class="metrics" id="metrics">${renderMetrics(snapshot)}</section>
@@ -548,7 +661,7 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
       try { localStorage.setItem(THEME_KEY, next); } catch (error) {}
       applyTheme(next);
     });
-    const slots = ["banner", "rule-banner", "metrics", "charts", "scores", "alerts", "mission", "tech", "lanes", "fulfillment", "inbound"];
+    const slots = ["banner", "rule-banner", "metrics", "charts", "scores", "alerts", "mission", "tech", "calls", "huddle", "callback-week", "lanes", "fulfillment", "inbound"];
     function apply(view) {
       for (const slot of slots) {
         const node = document.getElementById(slot);
@@ -563,7 +676,7 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
       const state = document.getElementById("live-state");
       if (state) state.textContent = "static snapshot";
     } else {
-      const source = new EventSource("/api/events");
+      const source = new EventSource("/api/events" + window.location.search);
       source.addEventListener("snapshot", (event) => {
         apply(JSON.parse(event.data));
       });
@@ -609,6 +722,9 @@ export function renderDeskView(snapshot: OperatorSnapshot): Record<string, strin
     alerts: renderAlerts(snapshot),
     mission: renderMission(snapshot),
     tech: renderTech(snapshot),
+    calls: renderCalls(snapshot),
+    huddle: renderHuddle(snapshot),
+    "callback-week": renderCallbackWeek(snapshot),
     lanes: renderLanes(snapshot),
     fulfillment: renderFulfillment(snapshot),
     inbound: renderInbound(snapshot)

@@ -64,6 +64,19 @@ npm run health:local
 
 `pilot:prep` checks these folders, copies `local.json.example` and `alerts.json.example` when the local copies are missing, admits synthetic fixtures in a temp tree, boots the desk on `127.0.0.1`, and prints a receipt. `pilot_started` stays false. It does not start a company pilot, does not fill these folders with fixtures, and does not write to ServiceTitan, ProBooks, or a trades app.
 
+## Call reasons, week digest, and huddle (0.4.6)
+
+Receipt: [`specs/TR-HUDDLE-2026-09-26.txt`](../../specs/TR-HUDDLE-2026-09-26.txt).
+
+`npm run desk` still binds to `http://127.0.0.1:4174/`. Empty inbound folders use the in-repo multi-trade sample, so the call filters, the week digest, and the morning huddle are non-empty and labeled as a fixture.
+
+- `/?calls=callback`, `/?calls=warranty`, and `/?calls=not-classified` filter the call list. The same query works on `/api/snapshot`, `/api/view`, `/api/receipt`, and `/api/events`. Headline counts stay the full desk.
+- Each row prints the classify reason. A silent export stays not classified. Unknown is not a callback and is not warranty-covered.
+- `/api/calls/week.json` is the trailing 7-day callback rate by trade lane. Loopback only.
+- `/api/huddle` is the printable morning huddle. `/api/huddle.json` is the same board. Open jobs, late-risk count, callback share, warranty share, and capacity. Shares are not a skill score. Open slots stay blank when the export does not name them.
+
+`pilot_started` stays false. Nothing here writes to ServiceTitan or ProBooks.
+
 ## Calls, digest, and receipt (0.4.5)
 
 Receipt: [`specs/TR-CALLS-2026-09-26.txt`](../../specs/TR-CALLS-2026-09-26.txt).

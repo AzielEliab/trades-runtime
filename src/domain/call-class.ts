@@ -28,25 +28,121 @@ export interface CallClassCounts {
   warrantyUnknown: number;
 }
 
+export type DeskTradeLane = "hvac" | "plumbing" | "electrical" | "sewer" | "cross-trades";
+
+export interface SyntheticDeskTech {
+  id: string;
+  name: string;
+  lane: DeskTradeLane;
+  /** Known daily slots on the in-repo sample. Not a live capacity board. */
+  slots: number;
+}
+
+/** Fixture roster for the empty-folder desk. Not a company roster and not a skill ranking. */
+export const SYNTHETIC_DESK_TECHS: readonly SyntheticDeskTech[] = [
+  { id: "tech-maya", name: "Maya Chen", lane: "hvac", slots: 4 },
+  { id: "tech-luis", name: "Luis Ortega", lane: "plumbing", slots: 4 },
+  { id: "tech-priya", name: "Priya Shah", lane: "electrical", slots: 3 },
+  { id: "tech-andre", name: "Andre Cole", lane: "sewer", slots: 3 },
+  { id: "tech-sam", name: "Sam Okonkwo", lane: "cross-trades", slots: 3 }
+];
+
 export interface SyntheticDeskCall {
   id: string;
-  trade: "hvac" | "plumbing" | "electrical" | "sewer" | "cross-trades";
+  trade: DeskTradeLane;
+  /** Calendar day on the synthetic desk series. */
+  day: string;
+  technicianId: string;
+  status: string;
   raw: Record<string, unknown>;
 }
 
 /** In-repo multi-trade sample for the empty-folder desk. Fixture labels, not a company export. */
 export const SYNTHETIC_DESK_CALLS: readonly SyntheticDeskCall[] = [
-  { id: "SYN-DESK-HVAC-1", trade: "hvac", raw: { trade: "hvac", isCallback: true, isWarranty: false, jobType: "no cool" } },
-  { id: "SYN-DESK-HVAC-2", trade: "hvac", raw: { trade: "hvac", jobType: "warranty", callback: false } },
-  { id: "SYN-DESK-PL-1", trade: "plumbing", raw: { trade: "plumbing", tags: ["callback", "return-visit"] } },
-  { id: "SYN-DESK-PL-2", trade: "plumbing", raw: { trade: "plumbing", isWarranty: true, isCallback: false, jobType: "water heater" } },
-  { id: "SYN-DESK-EL-1", trade: "electrical", raw: { trade: "electrical", jobType: "callback", warrantyState: "NOT_COVERED" } },
-  { id: "SYN-DESK-EL-2", trade: "electrical", raw: { trade: "electrical", jobType: "service" } },
-  { id: "SYN-DESK-SW-1", trade: "sewer", raw: { trade: "sewer", isCallback: true, isWarranty: true } },
-  { id: "SYN-DESK-SW-2", trade: "sewer", raw: { trade: "sewer", warrantyState: "POSSIBLE" } },
-  { id: "SYN-DESK-XT-1", trade: "cross-trades", raw: { trade: "cross-trades", callback: "no", warranty: "no" } },
-  { id: "SYN-DESK-HVAC-3", trade: "hvac", raw: { trade: "hvac", tags: ["warranty"], isCallback: "no" } }
+  {
+    id: "SYN-DESK-HVAC-1",
+    trade: "hvac",
+    day: "2026-09-25",
+    technicianId: "tech-maya",
+    status: "scheduled",
+    raw: { trade: "hvac", isCallback: true, isWarranty: false, jobType: "no cool" }
+  },
+  {
+    id: "SYN-DESK-HVAC-2",
+    trade: "hvac",
+    day: "2026-09-24",
+    technicianId: "tech-maya",
+    status: "completed",
+    raw: { trade: "hvac", jobType: "warranty", callback: false }
+  },
+  {
+    id: "SYN-DESK-PL-1",
+    trade: "plumbing",
+    day: "2026-09-25",
+    technicianId: "tech-luis",
+    status: "scheduled",
+    raw: { trade: "plumbing", tags: ["callback", "return-visit"] }
+  },
+  {
+    id: "SYN-DESK-PL-2",
+    trade: "plumbing",
+    day: "2026-09-22",
+    technicianId: "tech-luis",
+    status: "completed",
+    raw: { trade: "plumbing", isWarranty: true, isCallback: false, jobType: "water heater" }
+  },
+  {
+    id: "SYN-DESK-EL-1",
+    trade: "electrical",
+    day: "2026-09-21",
+    technicianId: "tech-priya",
+    status: "scheduled",
+    raw: { trade: "electrical", jobType: "callback", warrantyState: "NOT_COVERED" }
+  },
+  {
+    id: "SYN-DESK-EL-2",
+    trade: "electrical",
+    day: "2026-09-20",
+    technicianId: "tech-priya",
+    status: "completed",
+    raw: { trade: "electrical", jobType: "service" }
+  },
+  {
+    id: "SYN-DESK-SW-1",
+    trade: "sewer",
+    day: "2026-09-25",
+    technicianId: "tech-andre",
+    status: "scheduled",
+    raw: { trade: "sewer", isCallback: true, isWarranty: true }
+  },
+  {
+    id: "SYN-DESK-SW-2",
+    trade: "sewer",
+    day: "2026-09-19",
+    technicianId: "tech-andre",
+    status: "completed",
+    raw: { trade: "sewer", warrantyState: "POSSIBLE" }
+  },
+  {
+    id: "SYN-DESK-XT-1",
+    trade: "cross-trades",
+    day: "2026-09-24",
+    technicianId: "tech-sam",
+    status: "scheduled",
+    raw: { trade: "cross-trades", callback: "no", warranty: "no" }
+  },
+  {
+    id: "SYN-DESK-HVAC-3",
+    trade: "hvac",
+    day: "2026-09-23",
+    technicianId: "tech-maya",
+    status: "completed",
+    raw: { trade: "hvac", tags: ["warranty"], isCallback: "no" }
+  }
 ];
+
+export const CALL_DESK_FILTERS = ["all", "callback", "warranty", "not-classified"] as const;
+export type CallDeskFilter = (typeof CALL_DESK_FILTERS)[number];
 
 const CALLBACK_KEYS = ["callback", "is_callback", "return_visit", "is_return_visit", "recall", "is_recall"];
 const WARRANTY_KEYS = ["warranty", "is_warranty", "warranty_covered", "under_warranty", "covered_by_warranty"];
@@ -246,6 +342,49 @@ export function classifyCall(raw: Record<string, unknown>): CallClassification {
 
 export function syntheticDeskCallClasses(): CallClassification[] {
   return SYNTHETIC_DESK_CALLS.map((row) => classifyCall(row.raw));
+}
+
+export function isNotClassified(row: Pick<CallClassification, "callback" | "warranty">): boolean {
+  return row.callback === "unknown" && row.warranty === "unknown";
+}
+
+/** Honest reason for one row. Silent exports stay not classified. Coverage is not invented. */
+export function describeCallReason(row: CallClassification): string {
+  if (isNotClassified(row)) {
+    const callbackSilent = row.callbackBasis.startsWith("No callback label");
+    const warrantySilent = row.warrantyBasis.startsWith("No warranty label");
+    if (callbackSilent && warrantySilent) {
+      return "Not classified. The export is silent on callback and on warranty. Unknown is not a callback and is not warranty-covered.";
+    }
+    return `Not classified. ${row.callbackBasis} ${row.warrantyBasis} Unknown is not a callback and is not warranty-covered.`;
+  }
+  return `${row.callbackBasis} ${row.warrantyBasis}`;
+}
+
+export function callFilterLabel(filter: CallDeskFilter): string {
+  if (filter === "callback") return "Callbacks only";
+  if (filter === "warranty") return "Warranty only";
+  if (filter === "not-classified") return "Not classified";
+  return "All calls";
+}
+
+/** Desk query `calls`. Unknown values stay on all calls. */
+export function parseCallDeskFilter(value: string | null | undefined): CallDeskFilter {
+  const token = (value ?? "").trim().toLowerCase();
+  if (token === "callback" || token === "callbacks" || token === "callbacks-only") return "callback";
+  if (token === "warranty" || token === "warranty-only") return "warranty";
+  if (token === "not-classified" || token === "not_classified" || token === "unclassified") return "not-classified";
+  return "all";
+}
+
+export function callMatchesFilter(
+  row: Pick<CallClassification, "callback" | "warranty">,
+  filter: CallDeskFilter
+): boolean {
+  if (filter === "callback") return row.callback === "yes";
+  if (filter === "warranty") return row.warranty === "yes";
+  if (filter === "not-classified") return isNotClassified(row);
+  return true;
 }
 
 export function emptyCallClassCounts(): CallClassCounts {

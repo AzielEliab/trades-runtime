@@ -4,6 +4,8 @@ These text extracts drive implementation. Original PDFs stay offline / in chat a
 
 Standing rule: every PDF becomes coded software (current, prior, future).
 
+[`TR-HUDDLE-2026-09-26`](TR-HUDDLE-2026-09-26.txt) is the 0.4.6 desk cut: a per-call classify reason, callbacks / warranty / not-classified filters, a loopback weekly callback rate by trade lane, and a tech morning huddle. It does not start the Option C pilot and does not deploy the Worker. Public Glama listing Version stays 0.3.4 / Latest pre-0.4.4. The Worker already deployed stays 0.4.5 until this source is deployed.
+
 [`TR-CALLS-2026-09-26`](TR-CALLS-2026-09-26.txt) is the 0.4.5 desk cut: callback and warranty counts on local calls, an exportable alert digest, plain-language score bands, and a booking-block lane on the printable receipt. It does not start the Option C pilot and does not deploy the Worker. Public Glama listing Version stays 0.3.4 / Latest pre-0.4.4.
 
 [`TR-DESK-POLISH-2026-09-25`](TR-DESK-POLISH-2026-09-25.txt) polishes the local operator desk (0.4.4): mission and tech boards, a capacity or known-trade lane (not a map), a light/dark theme in browser storage, and a printable local snapshot. It does not start the Option C pilot and does not deploy the Worker.

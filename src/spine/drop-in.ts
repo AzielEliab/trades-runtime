@@ -98,6 +98,9 @@ export interface AdmittedDropRecord {
   lane?: string;
   /** Present on job rows. Unknown means the export did not say. */
   callClass?: CallClassification;
+  /** Present on job rows when the export names a technician. Not inferred from prose. */
+  technicianId?: string;
+  technicianName?: string;
 }
 
 export interface DropInAdmit {
@@ -152,6 +155,42 @@ function normalizeTradeLane(value: string): string | undefined {
   const token = value.trim().toLowerCase().replace(/[\s_]+/g, "-");
   if (token === "cross-trade") return "cross-trades";
   return KNOWN_TRADE_LANES.has(token) ? token : undefined;
+}
+
+const TECH_ID_KEYS = [
+  "technicianId",
+  "technician_id",
+  "techId",
+  "tech_id",
+  "assignedTechnicianId",
+  "assigned_technician_id"
+];
+const TECH_NAME_KEYS = ["technicianName", "technician_name", "techName", "tech_name"];
+
+function slugTech(name: string): string {
+  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  return slug || "unnamed-tech";
+}
+
+/** Explicit technician fields only. Summary and description text is not a name. */
+export function knownTechnician(raw: Record<string, unknown>): { id: string; name: string } | undefined {
+  let id = firstText(raw, TECH_ID_KEYS);
+  let name = firstText(raw, TECH_NAME_KEYS);
+  const loose = raw.technician ?? raw.tech ?? raw.assignedTechnician ?? raw.assigned_technician;
+  if (isRecord(loose)) {
+    if (!id) id = firstText(loose, ["id", "technicianId", "technician_id", "techId", "tech_id"]);
+    if (!name) name = firstText(loose, ["name", "technicianName", "technician_name", "techName", "tech_name"]);
+  } else if (typeof loose === "string" && loose.trim()) {
+    const value = loose.trim();
+    if (/\s/.test(value)) {
+      if (!name) name = value;
+    } else if (!id) {
+      id = value;
+    }
+  }
+  if (!id && !name) return undefined;
+  const stable = id || slugTech(name);
+  return { id: stable, name: name || stable };
 }
 
 /** A lane is a known trade token on the row. City names and coordinates are not lanes. */
@@ -1045,10 +1084,15 @@ function admitRecord(
   vendorHint: string
 ): AdmittedDropRecord {
   const lane = knownTradeLane(record.raw);
+  const technician = knownTechnician(record.raw);
   const finish = (row: AdmittedDropRecord): AdmittedDropRecord => {
     const laned = lane ? { ...row, lane } : row;
     if (laned.entity !== "job") return laned;
-    return { ...laned, callClass: classifyCall(record.raw) };
+    return {
+      ...laned,
+      callClass: classifyCall(record.raw),
+      ...(technician ? { technicianId: technician.id, technicianName: technician.name } : {})
+    };
   };
   if (peerClass === "servicetitan") {
     const entity = isStEntity(record.entity) ? record.entity : "job";

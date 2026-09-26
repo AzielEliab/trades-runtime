@@ -87,6 +87,53 @@ export function renderPrintableSnapshot(snapshot: OperatorSnapshot): string {
         })
         .join("")
     : `<li>No local receipt lines on this path.</li>`;
+  const callRows = snapshot.visibleCalls.length
+    ? snapshot.visibleCalls
+        .map(
+          (row) => `<tr>
+            <td>${esc(row.id)}</td>
+            <td>${esc(row.lane ?? "unnamed")}</td>
+            <td>${esc(row.day)}</td>
+            <td>${esc(row.technicianName ?? "—")}</td>
+            <td>${esc(row.callback)}</td>
+            <td>${esc(row.warranty)}</td>
+            <td>${esc(row.reason)}</td>
+          </tr>`
+        )
+        .join("")
+    : `<tr><td colspan="7">No rows in this filter. The export was not relabeled.</td></tr>`;
+  const weekRows = snapshot.callbackWeek.lanes.length
+    ? snapshot.callbackWeek.lanes
+        .map((lane) => {
+          const fraction = lane.callbackRate.calls === 0 ? "—" : `${lane.callbacks}/${lane.calls}`;
+          return `<tr>
+            <td>${esc(lane.lane)}</td>
+            <td>${lane.calls}</td>
+            <td>${lane.callbacks}</td>
+            <td>${esc(fraction)}</td>
+            <td>${lane.warranty}</td>
+            <td>${lane.notClassified}</td>
+          </tr>`;
+        })
+        .join("")
+    : `<tr><td colspan="6">No calls in this week.</td></tr>`;
+  const huddleRows = snapshot.huddle.techs.length
+    ? snapshot.huddle.techs
+        .map((tech) => {
+          const open = tech.capacity.open == null ? "blank" : String(tech.capacity.open);
+          return `<tr>
+            <td>${esc(tech.name)}</td>
+            <td>${esc(tech.lane ?? "unnamed")}</td>
+            <td>${tech.openJobs}</td>
+            <td>${tech.lateRisk}</td>
+            <td>${esc(tech.callbackShare)}</td>
+            <td>${esc(tech.warrantyShare)}</td>
+            <td>${tech.capacity.booked}</td>
+            <td>${esc(open)}</td>
+          </tr>`;
+        })
+        .join("")
+    : `<tr><td colspan="8">No technicians on this desk.</td></tr>`;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -151,6 +198,23 @@ export function renderPrintableSnapshot(snapshot: OperatorSnapshot): string {
     </section>
     <h2>Callback and warranty</h2>
     <p>${esc(snapshot.callClass.note)}</p>
+    <p>${esc(snapshot.callFilter.label)}. Showing ${snapshot.callFilter.shown} of ${snapshot.callFilter.total}. The counts below stay the full desk. A silent export stays not classified. Unknown is not warranty-covered.</p>
+    <table>
+      <thead><tr><th>Call</th><th>Lane</th><th>Day</th><th>Tech</th><th>Callback</th><th>Warranty</th><th>Reason</th></tr></thead>
+      <tbody>${callRows}</tbody>
+    </table>
+    <h2>Callback rate by trade lane</h2>
+    <p>${esc(snapshot.callbackWeek.weekStart)} through ${esc(snapshot.callbackWeek.weekEnd)}. ${esc(snapshot.callbackWeek.note)}</p>
+    <table>
+      <thead><tr><th>Lane</th><th>Calls</th><th>Callbacks</th><th>Rate</th><th>Warranty</th><th>Not classified</th></tr></thead>
+      <tbody>${weekRows}</tbody>
+    </table>
+    <h2>Morning huddle</h2>
+    <p>${esc(snapshot.huddle.note)}</p>
+    <table>
+      <thead><tr><th>Tech</th><th>Lane</th><th>Open jobs</th><th>Late risk</th><th>Callback share</th><th>Warranty share</th><th>Booked</th><th>Open slots</th></tr></thead>
+      <tbody>${huddleRows}</tbody>
+    </table>
     <h2>Metrics</h2>
     <table>${metrics}</table>
     <h2>Mission board</h2>
@@ -181,6 +245,68 @@ export function renderPrintableSnapshot(snapshot: OperatorSnapshot): string {
       Human surface. Printed from local state on 127.0.0.1. Agent MCP does not carry this page.
       live_backends false. Writes refused. pilot_started false. Option D is not started.
     </footer>
+  </main>
+</body>
+</html>`;
+}
+
+/** Printable morning huddle. Sibling of the desk snapshot. Loopback only. */
+export function renderPrintableHuddle(snapshot: OperatorSnapshot): string {
+  const rows = snapshot.huddle.techs.length
+    ? snapshot.huddle.techs
+        .map((tech) => {
+          const open = tech.capacity.open == null ? "blank" : String(tech.capacity.open);
+          return `<article>
+            <h2>${esc(tech.name)}</h2>
+            <p>${esc(tech.lane ?? "lane unnamed")} · open jobs ${tech.openJobs} · late risk ${tech.lateRisk}</p>
+            <p>Callback share ${esc(tech.callbackShare)}. Warranty share ${esc(tech.warrantyShare)}. Booked ${tech.capacity.booked}. Open slots ${esc(open)}.</p>
+            <p>${esc(tech.lateRiskWhy)}</p>
+            <p>${esc(tech.callbackShareWhy)}</p>
+            <p>${esc(tech.warrantyShareWhy)}</p>
+            <p>${esc(tech.capacity.why)}</p>
+          </article>`;
+        })
+        .join("")
+    : `<p>No technicians on this desk. None were invented.</p>`;
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Morning huddle · Trades-Runtime</title>
+  <style>
+    :root { color-scheme: light; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f6f1e6; color: #1c1914; font-family: "Iowan Old Style", Palatino, Georgia, serif; line-height: 1.45; }
+    main { max-width: 820px; margin: 0 auto; padding: 1.5rem 1.2rem 2.5rem; }
+    h1 { font-weight: 500; font-size: 1.8rem; margin: 0.15rem 0 0.4rem; }
+    h2 { font-weight: 500; font-size: 1.15rem; margin: 1.1rem 0 0.3rem; }
+    p { font-family: "Segoe UI", Helvetica, Arial, sans-serif; font-size: 0.92rem; }
+    .kicker { letter-spacing: 0.08em; text-transform: uppercase; font-family: "Segoe UI", Helvetica, Arial, sans-serif; font-size: 0.72rem; color: #5e574c; margin: 0; }
+    .chips { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0.7rem 0; }
+    .chip { border: 1px solid #d5ccbc; border-radius: 999px; padding: 0.1rem 0.55rem; font-family: "Segoe UI", Helvetica, Arial, sans-serif; font-size: 0.75rem; }
+    button { font: inherit; border: 1px solid #1c1914; background: transparent; border-radius: 999px; padding: 0.3rem 0.75rem; cursor: pointer; }
+    footer { margin-top: 1.4rem; color: #5e574c; font-family: "Segoe UI", Helvetica, Arial, sans-serif; font-size: 0.82rem; }
+    @media print { body { background: #fff; } button { display: none; } main { padding: 0; } }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="kicker">Trades-Runtime ${esc(snapshot.version)} · ${esc(snapshot.author)} · morning huddle</p>
+    <h1>Morning huddle</h1>
+    <p>Mission day ${esc(snapshot.huddle.missionDay)}. Taken ${esc(snapshot.generatedAt)} from this machine. This page does not phone home.</p>
+    <p><button type="button" onclick="window.print()">Print or save as PDF</button></p>
+    <div class="chips">
+      <span class="chip">live_backends false</span>
+      <span class="chip">write false</span>
+      <span class="chip">pilot_started false</span>
+      <span class="chip">not a skill score</span>
+      <span class="chip">${esc(snapshot.dataLabel)}</span>
+    </div>
+    <p>${esc(snapshot.huddle.note)}</p>
+    ${rows}
+    <footer>Loopback only. Shares are call mix. Late risk is a count. Open slots stay blank when the export does not name them.</footer>
   </main>
 </body>
 </html>`;

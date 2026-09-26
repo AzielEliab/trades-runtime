@@ -4,12 +4,20 @@ import { describeConfidence, type ConfidenceSeparation } from "../core/confidenc
 import { requireReportMetadata, type ReportMetadata } from "../domain/analytics.js";
 import {
   aggregateCallClasses,
+  callFilterLabel,
+  callMatchesFilter,
   classifyCall,
   describeCallClass,
-  syntheticDeskCallClasses,
+  describeCallReason,
+  isNotClassified,
+  SYNTHETIC_DESK_CALLS,
+  SYNTHETIC_DESK_TECHS,
   type CallClassCounts,
-  type CallClassification
+  type CallClassification,
+  type CallDeskFilter
 } from "../domain/call-class.js";
+import { buildWeeklyCallbackDigest, type WeeklyCallbackDigest } from "./callback-week.js";
+import { buildHuddleBoard, jobCountsAsLate, jobOpenOnBoard, type HuddleBoard } from "../domain/huddle-board.js";
 import { emptyFulfillmentStream, fulfillmentTrail, runFulfillmentTo } from "../domain/fulfillment-machine.js";
 import { explainMissionPace, openMissionDay, type MissionDayBoard } from "../domain/mission-board.js";
 import { FULFILLMENT_STEPS, type FulfillmentStep, type StockRequest } from "../domain/truck-stock.js";
@@ -129,6 +137,32 @@ export interface DeskReceiptDigest {
   entries: DeskReceiptEntry[];
 }
 
+export interface DeskCallRow {
+  id: string;
+  lane: string | null;
+  day: string;
+  technicianId: string | null;
+  technicianName: string | null;
+  status: string | null;
+  open: boolean;
+  late: boolean;
+  callback: CallClassification["callback"];
+  warranty: CallClassification["warranty"];
+  callbackBasis: string;
+  warrantyBasis: string;
+  reason: string;
+  notClassified: boolean;
+  /** Reasons come from labels on the row. Coverage is not invented. */
+  invented: false;
+}
+
+export interface CallFilterState {
+  value: CallDeskFilter;
+  label: string;
+  shown: number;
+  total: number;
+}
+
 export interface OperatorSnapshot {
   product: "trades-runtime";
   version: string;
@@ -159,6 +193,13 @@ export interface OperatorSnapshot {
     note: string;
     counts: CallClassCounts;
   };
+  callFilter: CallFilterState;
+  /** Every call on this desk, with the classify reason. */
+  calls: DeskCallRow[];
+  /** Calls matching callFilter. Counts above stay the full desk. */
+  visibleCalls: DeskCallRow[];
+  callbackWeek: WeeklyCallbackDigest;
+  huddle: HuddleBoard;
   bookingReceipt: BookingBlockExplanation;
   series: DeskSeriesPoint[];
   capacity: DeskCapacityPoint[];
@@ -193,6 +234,7 @@ export interface DeskSnapshotOptions {
   alertConfig?: AlertConfig;
   alertStatePath?: string;
   persistAlertState?: boolean;
+  callFilter?: CallDeskFilter;
 }
 
 function isCompleted(status: string | undefined): boolean {
@@ -338,11 +380,14 @@ function endpointHints(config: LocalInboundConfig | undefined): string[] {
 
 interface CollectedRecord {
   entity: string;
+  externalId: string;
   status?: string;
   observedAt?: string;
   day: string;
   lane?: string;
   callClass?: CallClassification;
+  technicianId?: string;
+  technicianName?: string;
 }
 
 function collect(files: DropInFileResult[], receivedAt: string): {
@@ -374,11 +419,14 @@ function collect(files: DropInFileResult[], receivedAt: string): {
     for (const record of file.result.records) {
       records.push({
         entity: record.entity,
+        externalId: record.externalId,
         status: record.status,
         observedAt: record.observedAt,
         day: dayKey(record.observedAt) ?? dayKey(receivedAt) ?? receivedAt.slice(0, 10),
         lane: record.lane,
-        callClass: record.callClass
+        callClass: record.callClass,
+        technicianId: record.technicianId,
+        technicianName: record.technicianName
       });
     }
   }
@@ -460,6 +508,35 @@ function buildLanes(args: {
   return lanes;
 }
 
+function toDeskCall(args: {
+  id: string;
+  lane: string | null;
+  day: string;
+  technicianId: string | null;
+  technicianName: string | null;
+  status: string | null;
+  missionDay: string;
+  classified: CallClassification;
+}): DeskCallRow {
+  return {
+    id: args.id,
+    lane: args.lane,
+    day: args.day,
+    technicianId: args.technicianId,
+    technicianName: args.technicianName,
+    status: args.status,
+    open: jobOpenOnBoard(!isCompleted(args.status ?? undefined), args.day, args.missionDay),
+    late: false,
+    callback: args.classified.callback,
+    warranty: args.classified.warranty,
+    callbackBasis: args.classified.callbackBasis,
+    warrantyBasis: args.classified.warrantyBasis,
+    reason: describeCallReason(args.classified),
+    notClassified: isNotClassified(args.classified),
+    invented: false
+  };
+}
+
 function emptyFulfillment(): OperatorSnapshot["fulfillment"] {
   return {
     label: "none",
@@ -528,11 +605,34 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
     elapsedFraction: pace?.elapsedFraction ?? 0
   });
   const bookingBlock = bookingReceipt.block;
-  const callRows =
+  const draftedCalls: DeskCallRow[] =
     dataLabel === "synthetic-demo"
-      ? syntheticDeskCallClasses()
-      : jobEntities.map((record) => record.callClass ?? classifyCall({}));
-  const callCounts = aggregateCallClasses(callRows);
+      ? SYNTHETIC_DESK_CALLS.map((row) => {
+          const tech = SYNTHETIC_DESK_TECHS.find((item) => item.id === row.technicianId);
+          return toDeskCall({
+            id: row.id,
+            lane: row.trade,
+            day: row.day,
+            technicianId: row.technicianId,
+            technicianName: tech?.name ?? null,
+            status: row.status,
+            missionDay,
+            classified: classifyCall(row.raw)
+          });
+        })
+      : jobEntities.map((record) =>
+          toDeskCall({
+            id: record.externalId,
+            lane: record.lane ?? null,
+            day: record.day,
+            technicianId: record.technicianId ?? null,
+            technicianName: record.technicianName ?? null,
+            status: record.status ?? null,
+            missionDay,
+            classified: record.callClass ?? classifyCall({})
+          })
+        );
+  const callCounts = aggregateCallClasses(draftedCalls);
   const callSource = dataLabel === "synthetic-demo" ? "synthetic-sample" : "admitted-jobs";
   const callNote = describeCallClass(callCounts, callSource);
 
@@ -736,6 +836,45 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
   }
   for (const notice of applied.notices) alerts.push(notice);
 
+  const sameDayAt = resolvedAlerts.config.rules.lateJobs.sameDayElapsedFractionAtOrAbove;
+  const elapsed = pace?.elapsedFraction ?? 0;
+  const calls = draftedCalls.map((row) => ({
+    ...row,
+    late: jobCountsAsLate({
+      open: row.open,
+      day: row.day,
+      missionDay,
+      elapsedFraction: elapsed,
+      sameDayElapsedFractionAtOrAbove: sameDayAt
+    })
+  }));
+  const callFilterValue = options.callFilter ?? "all";
+  const visibleCalls = calls.filter((row) => callMatchesFilter(row, callFilterValue));
+  const callbackWeek = buildWeeklyCallbackDigest({
+    version: RUNTIME_MANIFEST.version,
+    generatedAt: now,
+    source: callSource,
+    missionDay,
+    calls
+  });
+  const huddle = buildHuddleBoard({
+    jobs: calls.map((row) => ({
+      technicianId: row.technicianId,
+      technicianName: row.technicianName,
+      lane: row.lane,
+      day: row.day,
+      open: row.open,
+      callback: row.callback,
+      warranty: row.warranty
+    })),
+    missionDay,
+    elapsedFraction: elapsed,
+    sameDayElapsedFractionAtOrAbove: sameDayAt,
+    source: callSource,
+    slotsById: new Map(dataLabel === "synthetic-demo" ? SYNTHETIC_DESK_TECHS.map((tech) => [tech.id, tech.slots]) : []),
+    namesById: new Map(dataLabel === "synthetic-demo" ? SYNTHETIC_DESK_TECHS.map((tech) => [tech.id, tech.name]) : [])
+  });
+
   const sampleHashes = collected.inbound.flatMap((row) => row.sampleHashes).slice(0, 6);
   const report = requireReportMetadata({
     scope: dataLabel === "synthetic-demo" ? "local-operator-desk:synthetic" : "local-operator-desk:byo",
@@ -747,7 +886,9 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
       "writes refused",
       "wrapper admission is not verification",
       "prediction confidence is withheld on BYO drops",
-      "callback and warranty counts are explicit labels; unknown stays not classified"
+      "callback and warranty counts are explicit labels; unknown stays not classified",
+      "per-call reasons repeat those labels; a silent export stays not classified",
+      "callback share and warranty share are call mix, not a technician skill score"
     ],
     confidenceNote:
       dataLabel === "synthetic-demo"
@@ -799,6 +940,16 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
       note: callNote,
       counts: callCounts
     },
+    callFilter: {
+      value: callFilterValue,
+      label: callFilterLabel(callFilterValue),
+      shown: visibleCalls.length,
+      total: calls.length
+    },
+    calls,
+    visibleCalls,
+    callbackWeek,
+    huddle,
     bookingReceipt,
     series,
     capacity,
