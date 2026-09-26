@@ -2,10 +2,18 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describeConfidence, type ConfidenceSeparation } from "../core/confidence.js";
 import { requireReportMetadata, type ReportMetadata } from "../domain/analytics.js";
+import {
+  aggregateCallClasses,
+  classifyCall,
+  describeCallClass,
+  syntheticDeskCallClasses,
+  type CallClassCounts,
+  type CallClassification
+} from "../domain/call-class.js";
 import { emptyFulfillmentStream, fulfillmentTrail, runFulfillmentTo } from "../domain/fulfillment-machine.js";
-import { openMissionDay, type MissionDayBoard } from "../domain/mission-board.js";
+import { explainMissionPace, openMissionDay, type MissionDayBoard } from "../domain/mission-board.js";
 import { FULFILLMENT_STEPS, type FulfillmentStep, type StockRequest } from "../domain/truck-stock.js";
-import { recommendBlock, type BookingBlock } from "../domain/workforce-capacity.js";
+import { explainBookingBlock, type BookingBlock, type BookingBlockExplanation } from "../domain/workforce-capacity.js";
 import { RUNTIME_MANIFEST } from "../manifest.js";
 import {
   admitDropInFolder,
@@ -59,7 +67,10 @@ export interface DeskScore {
   id: string;
   label: string;
   value: string;
+  /** Short human reason for this score or band. */
+  why: string;
   note: string;
+  band?: string;
   inventedAccuracy: false;
 }
 
@@ -139,7 +150,16 @@ export interface OperatorSnapshot {
     admittedPackets: number;
     receiptLines: number;
     unverified: number;
+    callbackCalls: number;
+    warrantyCalls: number;
+    callsNotClassified: number;
   };
+  callClass: {
+    source: "synthetic-sample" | "admitted-jobs";
+    note: string;
+    counts: CallClassCounts;
+  };
+  bookingReceipt: BookingBlockExplanation;
   series: DeskSeriesPoint[];
   capacity: DeskCapacityPoint[];
   capacityFormula: string;
@@ -322,6 +342,7 @@ interface CollectedRecord {
   observedAt?: string;
   day: string;
   lane?: string;
+  callClass?: CallClassification;
 }
 
 function collect(files: DropInFileResult[], receivedAt: string): {
@@ -356,7 +377,8 @@ function collect(files: DropInFileResult[], receivedAt: string): {
         status: record.status,
         observedAt: record.observedAt,
         day: dayKey(record.observedAt) ?? dayKey(receivedAt) ?? receivedAt.slice(0, 10),
-        lane: record.lane
+        lane: record.lane,
+        callClass: record.callClass
       });
     }
   }
@@ -495,8 +517,24 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
   });
 
   const pace = mission.goals[0];
+  const paceWhy = pace ? explainMissionPace(pace) : undefined;
   const demandSurge = Boolean(pace && pace.elapsedFraction > 0.6 && pace.actual < pace.expectedPace);
-  const bookingBlock = recommendBlock({ hardUnavailable: false, protectEmergency: false, demandSurge });
+  const bookingReceipt = explainBookingBlock({
+    hardUnavailable: false,
+    protectEmergency: false,
+    demandSurge,
+    actual: pace?.actual ?? 0,
+    expectedPace: pace?.expectedPace ?? 0,
+    elapsedFraction: pace?.elapsedFraction ?? 0
+  });
+  const bookingBlock = bookingReceipt.block;
+  const callRows =
+    dataLabel === "synthetic-demo"
+      ? syntheticDeskCallClasses()
+      : jobEntities.map((record) => record.callClass ?? classifyCall({}));
+  const callCounts = aggregateCallClasses(callRows);
+  const callSource = dataLabel === "synthetic-demo" ? "synthetic-sample" : "admitted-jobs";
+  const callNote = describeCallClass(callCounts, callSource);
 
   const capacity: DeskCapacityPoint[] =
     dataLabel === "synthetic-demo"
@@ -524,6 +562,8 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
       id: "verification",
       label: "Verification",
       value: "UNVERIFIED",
+      band: "UNVERIFIED",
+      why: "Why: these rows were admitted on this machine. Admission means the file was hashed and kept. It does not mean the rows were checked against the job.",
       note: "FragGate wrapper admission is not verification.",
       inventedAccuracy: false
     },
@@ -531,6 +571,10 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
       id: "evidence-trust",
       label: "Evidence trust",
       value: hasByo ? "MEDIUM" : "n/a",
+      band: hasByo ? "MEDIUM" : "n/a",
+      why: hasByo
+        ? "Why: the band is MEDIUM because a local ServiceTitan, ProBooks, or trades-app file was admitted. Medium trust means the wrapper looks like that kind of export. Trust is not truth."
+        : "Why: no local export is on this desk, so there is no trust band to show as a company score.",
       note: hasByo
         ? "Trust band on admitted ServiceTitan, ProBooks, and trades-app packets. Trust is not truth."
         : "No BYO packet is on this desk. Trust is not shown as a company score.",
@@ -540,6 +584,8 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
       id: "mission-pace",
       label: "Mission pace",
       value: pace ? `${pace.actual} actual / ${pace.expectedPace.toFixed(2)} expected` : "n/a",
+      band: paceWhy?.band,
+      why: paceWhy?.why ?? "Why: no mission goal is on this clock.",
       note: "openMissionDay pace from completions and the local clock. A pace gap is not a forecast accuracy.",
       inventedAccuracy: false
     },
@@ -547,6 +593,8 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
       id: "capacity-block",
       label: "Booking block",
       value: bookingBlock,
+      band: bookingBlock,
+      why: bookingReceipt.why,
       note: "recommendBlock from local load versus pace. A booking recommendation, not a prediction score.",
       inventedAccuracy: false
     }
@@ -557,6 +605,7 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
       id: "recorded-shadow-confidence",
       label: "Recorded shadow confidence",
       value: describeConfidence(RECORDED_SYNTHETIC_SHADOW_CONFIDENCE),
+      why: "Why: these words are copied from the in-repo synthetic shadow-day fixture. They are not a measured company score.",
       note: "Copied from the in-repo synthetic shadow-day fixture. Not measured accuracy. Not a live pilot.",
       inventedAccuracy: false
     });
@@ -565,6 +614,8 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
       id: "prediction-confidence",
       label: "Prediction confidence",
       value: "withheld",
+      band: "withheld",
+      why: "Why: a dropped file is not a sealed shadow day, so this desk does not invent a prediction percent.",
       note: "A drop-in file does not create a sealed shadow settlement. Prediction confidence stays withheld.",
       inventedAccuracy: false
     });
@@ -695,7 +746,8 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
       "live_backends false",
       "writes refused",
       "wrapper admission is not verification",
-      "prediction confidence is withheld on BYO drops"
+      "prediction confidence is withheld on BYO drops",
+      "callback and warranty counts are explicit labels; unknown stays not classified"
     ],
     confidenceNote:
       dataLabel === "synthetic-demo"
@@ -737,8 +789,17 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
       invoices: collected.records.filter((record) => record.entity === "invoice").length,
       admittedPackets,
       receiptLines: receiptDigest.lines,
-      unverified: admittedPackets
+      unverified: admittedPackets,
+      callbackCalls: callCounts.callback,
+      warrantyCalls: callCounts.warranty,
+      callsNotClassified: callCounts.notClassified
     },
+    callClass: {
+      source: callSource,
+      note: callNote,
+      counts: callCounts
+    },
+    bookingReceipt,
     series,
     capacity,
     capacityFormula,

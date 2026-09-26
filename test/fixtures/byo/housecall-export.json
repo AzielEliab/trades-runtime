@@ -6,6 +6,10 @@
   "jobs": [
     {
       "id": "SYN-HCP-1",
+      "trade": "plumbing",
+      "isWarranty": true,
+      "isCallback": false,
+      "jobType": "warranty",
       "work_status": "complete",
       "description": "Synthetic water heater flush",
       "customer": { "id": "SYN-CU-9", "name": "Synthetic Household" },

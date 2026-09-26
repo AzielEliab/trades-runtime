@@ -4,6 +4,8 @@ These text extracts drive implementation. Original PDFs stay offline / in chat a
 
 Standing rule: every PDF becomes coded software (current, prior, future).
 
+[`TR-CALLS-2026-09-26`](TR-CALLS-2026-09-26.txt) is the 0.4.5 desk cut: callback and warranty counts on local calls, an exportable alert digest, plain-language score bands, and a booking-block lane on the printable receipt. It does not start the Option C pilot and does not deploy the Worker. Public Glama listing Version stays 0.3.4 / Latest pre-0.4.4.
+
 [`TR-DESK-POLISH-2026-09-25`](TR-DESK-POLISH-2026-09-25.txt) polishes the local operator desk (0.4.4): mission and tech boards, a capacity or known-trade lane (not a map), a light/dark theme in browser storage, and a printable local snapshot. It does not start the Option C pilot and does not deploy the Worker.
 
 [`TR-OPTION-C-PREP-2026-09-25`](TR-OPTION-C-PREP-2026-09-25.txt) is the Option C BYO pilot prep checklist (0.4.3). It covers local install, inbound drop, synthetic admit, desk and alerts, SHADOW-SEALED expectations, refuse-write proof, and what not to do. `npm run pilot:prep` validates the operator box and prints a receipt with `pilot_started` false. It does not start a company pilot.

@@ -36,7 +36,8 @@ export { rankVans, assertGeographyNeverSoleWinner } from "./domain/call-fit.js";
 export { applyCrossTradeWeight, assertSecondaryOnly, buildPrimaryPool } from "./domain/cross-trade-matrix.js";
 export { reconcileJob, asSkillScore } from "./domain/job-economics.js";
 export { reconstructHandoff, systemBeforeBlame } from "./domain/chain-d.js";
-export { recommendBlock, scoreRescheduleRisk } from "./domain/workforce-capacity.js";
+export { explainBookingBlock, recommendBlock, scoreRescheduleRisk } from "./domain/workforce-capacity.js";
+export { aggregateCallClasses, classifyCall } from "./domain/call-class.js";
 export { reconcilePipelines, paretoFrontier } from "./domain/decision-fabric.js";
 export { requireReportMetadata } from "./domain/analytics.js";
 export {
@@ -51,6 +52,7 @@ export { fireRecognition, mayRecognize, rewardRawRevenueAlone, turnoverAttributi
 export {
   applyCompletion,
   forScope,
+  explainMissionPace,
   lockMissionGoal,
   missionBoard,
   openMissionDay,
@@ -173,6 +175,8 @@ export {
   acknowledgeAlert,
   applyDeskAlerts,
   assertLocalWebhook,
+  alertDigestCsv,
+  buildAlertDigest,
   defaultAlertConfig,
   dispatchLocalHooks,
   parseAlertConfig

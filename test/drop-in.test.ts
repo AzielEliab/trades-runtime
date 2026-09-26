@@ -183,6 +183,7 @@ describe("universal trades-app drop-in", () => {
     expect(csv.result.peerClass).toBe("trades-app");
     expect(csv.result.synthetic).toBe(true);
     expect(csv.result.records[0]?.externalId).toBe("SYN-CSV-1");
+    expect(csv.result.records[0]?.callClass).toMatchObject({ callback: "yes", warranty: "no" });
     expect(inboundDir("trades-app")).toBe(TRADES_APP_INBOUND_DIR);
     const config = parseLocalInboundConfig({
       instanceId: "desk-1",
@@ -261,6 +262,10 @@ describe("universal trades-app drop-in", () => {
       "FG-REFUSE-UNAUTHORIZED"
     ]);
     expect(proof.receiptTip).toHaveLength(64);
+    expect(proof.callClass.callback).toBeGreaterThan(0);
+    expect(proof.callClass.warranty).toBeGreaterThan(0);
+    expect(proof.callClass.notClassified).toBeGreaterThan(0);
+    expect(proof.callClass.calls).toBeGreaterThan(proof.callClass.callback);
     expect(proof.writeRefusals.some((line) => /trades-app/.test(line))).toBe(true);
   });
 

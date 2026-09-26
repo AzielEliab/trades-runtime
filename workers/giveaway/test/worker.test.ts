@@ -156,6 +156,10 @@ describe("giveaway Worker routes", () => {
     expect(cite.sameAs).toContain("https://x.com/AzielEliab");
     expect(cite.sameAs).toContain("https://www.azielcorpuslibrary.net/software");
     expect(cite.sameAs).not.toContain("https://glama.ai");
+    expect((cite as { glama_public_version?: string }).glama_public_version).toBe("0.3.4");
+    expect((cite as { glama_public_latest?: string }).glama_public_latest).toBe("pre-0.4.4");
+    expect((cite as { deployed_worker_version?: string }).deployed_worker_version).toBe("0.4.4");
+    expect(cite.version).not.toBe((cite as { glama_public_version?: string }).glama_public_version);
     expect(cite.keywords.join(" ")).toMatch(/trades-runtime/);
     expect(cite.keywords.join(" ")).toMatch(/HVAC/);
     expect(cite.how_to_cite).toMatch(/Eliab, Aziel/);

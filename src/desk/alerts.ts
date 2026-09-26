@@ -751,6 +751,116 @@ export function dispatchLocalHooks(options: {
   return { fileAppended, webhookCalled };
 }
 
+export interface AlertDigestHit {
+  id: string;
+  rule: AlertRuleKind;
+  severity: AlertSeverity;
+  title: string;
+  detail: string;
+  dataLabel: AlertDataLabel;
+  raisedAt: string;
+  lastSeenAt: string;
+  acknowledgedAt: string | null;
+  acknowledgedBy: string | null;
+  active: true;
+  inventedAccuracy: false;
+}
+
+export interface AlertDigest {
+  product: "trades-runtime";
+  version: string;
+  generatedAt: string;
+  dataLabel: AlertDataLabel;
+  live_backends: false;
+  writes: false;
+  phoneHome: false;
+  vendorWrite: false;
+  surface: "local-operator-desk";
+  hitCount: number;
+  hits: AlertDigestHit[];
+}
+
+/** Current firing rule hits. Loopback export only. Desk notes are not hits. */
+export function buildAlertDigest(input: {
+  version: string;
+  generatedAt: string;
+  dataLabel: AlertDataLabel;
+  hits: StoredAlert[];
+}): AlertDigest {
+  const hits: AlertDigestHit[] = input.hits
+    .filter((hit) => hit.active)
+    .map((hit) => ({
+      id: hit.id,
+      rule: hit.rule,
+      severity: hit.severity,
+      title: hit.title,
+      detail: hit.detail,
+      dataLabel: hit.dataLabel,
+      raisedAt: hit.raisedAt,
+      lastSeenAt: hit.lastSeenAt,
+      acknowledgedAt: hit.acknowledgedAt,
+      acknowledgedBy: hit.acknowledgedBy,
+      active: true as const,
+      inventedAccuracy: false as const
+    }));
+  return {
+    product: "trades-runtime",
+    version: input.version,
+    generatedAt: input.generatedAt,
+    dataLabel: input.dataLabel,
+    live_backends: false,
+    writes: false,
+    phoneHome: false,
+    vendorWrite: false,
+    surface: "local-operator-desk",
+    hitCount: hits.length,
+    hits
+  };
+}
+
+function csvCell(value: string): string {
+  const guarded = /^[=+\-@]/.test(value) ? `'${value}` : value;
+  if (/[",\n\r]/.test(guarded)) return `"${guarded.replaceAll('"', '""')}"`;
+  return guarded;
+}
+
+export function alertDigestCsv(digest: AlertDigest): string {
+  const header = [
+    "id",
+    "rule",
+    "severity",
+    "title",
+    "detail",
+    "dataLabel",
+    "raisedAt",
+    "lastSeenAt",
+    "acknowledgedAt",
+    "acknowledgedBy",
+    "active"
+  ];
+  const lines = [header.join(",")];
+  for (const hit of digest.hits) {
+    lines.push(
+      [
+        hit.id,
+        hit.rule,
+        hit.severity,
+        hit.title,
+        hit.detail,
+        hit.dataLabel,
+        hit.raisedAt,
+        hit.lastSeenAt,
+        hit.acknowledgedAt ?? "",
+        hit.acknowledgedBy ?? "",
+        "true"
+      ]
+        .map(csvCell)
+        .join(",")
+    );
+  }
+  return `${lines.join("\n")}\n`;
+}
+
 export function enabledRuleList(config: AlertConfig): AlertRuleKind[] {
   const enabled: AlertRuleKind[] = [];
   if (config.rules.capacity.enabled) enabled.push("capacity");

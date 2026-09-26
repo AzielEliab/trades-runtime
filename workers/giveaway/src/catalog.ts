@@ -5,6 +5,10 @@ import {
   HONESTY,
   IDENTITY,
   KEYWORDS,
+  DEPLOYED_WORKER_VERSION,
+  GLAMA_LISTING_NOTE,
+  GLAMA_PUBLIC_LATEST,
+  GLAMA_PUBLIC_VERSION,
   LICENSE,
   PERSON_ID,
   PERSON_URL,
@@ -90,6 +94,11 @@ export function citeBody(): Record<string, unknown> {
     live_backends: false,
     hosted_company_os: false,
     pages: "off",
+    glama_listing: false,
+    glama_public_version: GLAMA_PUBLIC_VERSION,
+    glama_public_latest: GLAMA_PUBLIC_LATEST,
+    deployed_worker_version: DEPLOYED_WORKER_VERSION,
+    glama_note: GLAMA_LISTING_NOTE,
     repository: REPOSITORY,
     worker: PUBLIC_ORIGIN,
     download: `${PUBLIC_ORIGIN}/download`,
@@ -122,7 +131,9 @@ export function llmsTxt(): string {
 > Shadow-first local BYO runtime for HVAC, plumbing, electrical, sewer, and cross-trades.
 > Author / identity: Aziel Eliab only. Person @id ${PERSON_ID}
 > X / Twitter: ${X_HANDLE} ${X_URL}
-> Version: ${VERSION}
+> Version: ${VERSION} (Worker source in this repo)
+> Deployed Worker until this source is deployed: ${DEPLOYED_WORKER_VERSION}
+> Public Glama listing: Version ${GLAMA_PUBLIC_VERSION} / Latest ${GLAMA_PUBLIC_LATEST}. Not this Worker version.
 > License: ${LICENSE}
 > Worker: ${PUBLIC_ORIGIN}
 
@@ -155,6 +166,7 @@ export function skillMarkdown(): string {
   return `# Trades-Runtime skill
 
 Product: Trades-Runtime ${VERSION}
+${GLAMA_LISTING_NOTE}
 Author / identity: Aziel Eliab only
 Person @id: ${PERSON_ID}
 X / Twitter: ${X_HANDLE} ${X_URL}

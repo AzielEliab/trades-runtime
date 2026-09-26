@@ -64,6 +64,12 @@ npm run health:local
 
 `pilot:prep` checks these folders, copies `local.json.example` and `alerts.json.example` when the local copies are missing, admits synthetic fixtures in a temp tree, boots the desk on `127.0.0.1`, and prints a receipt. `pilot_started` stays false. It does not start a company pilot, does not fill these folders with fixtures, and does not write to ServiceTitan, ProBooks, or a trades app.
 
+## Calls, digest, and receipt (0.4.5)
+
+Receipt: [`specs/TR-CALLS-2026-09-26.txt`](../../specs/TR-CALLS-2026-09-26.txt).
+
+The desk counts callback calls and warranty calls from explicit labels on admitted job rows (`callback`, `isCallback`, `warranty`, `isWarranty`, `jobType`, `tags`, and the same family). A row with no label stays in the not-classified bucket. Unknown is not warranty-covered and is not a callback. The empty inbound desk uses the in-repo multi-trade sample so the counts are non-zero and labeled as a fixture. `/api/alerts/digest.json` and `/api/alerts/digest.csv` download the current local rule hits. `/api/receipt` states what blocked booking. `pilot_started` stays false.
+
 ## Desk polish (0.4.4)
 
 Receipt: [`specs/TR-DESK-POLISH-2026-09-25.txt`](../../specs/TR-DESK-POLISH-2026-09-25.txt).

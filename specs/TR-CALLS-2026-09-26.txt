@@ -1,0 +1,48 @@
+TRADES-RUNTIME · CALLBACK, WARRANTY, DIGEST, RECEIPT                                                                          TR-CALLS-2026-09-26
+
+
+
+
+ Receipt ID TR-CALLS-2026-09-26 · 2026-09-26
+ Identity: Aziel Eliab only.
+ Amends the local desk of TR-DESK-POLISH-2026-09-25 and TR-ALERTS-2026-09-25. Does not amend the eight BYO laws.
+ live_backends remains false. Pages remain off. Option C pilot remains not started. Option D remains not started.
+ pilot_started remains false. This cut does not deploy the public Worker.
+ Public Glama listing Version remains 0.3.4. Latest remains pre-0.4.4.
+ The Worker already deployed remains 0.4.4 until this 0.4.5 source is deployed.
+ Those three surfaces are not the same number.
+
+
+ What changed
+ 0.4.5 is a local operator cut.
+
+ Callback and warranty counts
+    Calls                    Job rows already admitted by the drop-in. Service calls, jobs, and work orders
+                             in that model. Pricebook rows and invoices are not calls.
+    Callback                 Explicit labels only: callback, isCallback, return visit, recall, job type, tags.
+    Warranty                 Explicit labels only: warranty, isWarranty, job type, tags, warranty state.
+                             CONFIRMED counts as warranty. NOT_COVERED counts as not warranty.
+                             POSSIBLE, UNKNOWN, and LOOKUP_FAILED stay unknown. They are not coverage.
+    Not classified           Both labels unknown. Shown beside the counts. Unknown is not a callback and
+                             is not warranty-covered.
+    Prose                    Summary and description text is not scanned. A date gap is not an automatic callback.
+    Synthetic desk           Empty inbound folders use the in-repo multi-trade sample and say so.
+    Drop-in demo             Synthetic fixtures carry labels so the proof prints non-zero counts.
+
+ Score explanations
+ Each desk score and each mission pace band carries a short why. The number stays. The why says
+ what produced it. A pace gap is not a forecast percent.
+
+ Alert digest
+ GET /api/alerts/digest.json and GET /api/alerts/digest.csv on 127.0.0.1 download the current
+ firing rule hits. Desk notes are not hits. The file stays on this machine. No phone-home.
+
+ What blocked booking
+ GET /api/receipt prints a lane named What blocked booking. When recommendBlock is not OPEN,
+ the headline and the why say why. When it is OPEN, the lane says nothing is blocking new booking.
+ Writes stay refused.
+
+
+ Still refused
+ No ServiceTitan or ProBooks write client. No tenant data on the public Worker. No fake live GM pilot.
+ No Pages. No Horton or legal-name material. No Glama admin UI in this cut.

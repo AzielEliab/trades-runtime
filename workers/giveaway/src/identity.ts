@@ -1,6 +1,13 @@
 export const PRODUCT = "trades-runtime";
 export const PRODUCT_TITLE = "Trades-Runtime";
-export const VERSION = "0.4.4";
+export const VERSION = "0.4.5";
+/** Public Glama listing badge. Not this Worker package. Not glama.json. */
+export const GLAMA_PUBLIC_VERSION = "0.3.4";
+export const GLAMA_PUBLIC_LATEST = "pre-0.4.4";
+/** Worker already on workers.dev until this source is deployed. */
+export const DEPLOYED_WORKER_VERSION = "0.4.4";
+export const GLAMA_LISTING_NOTE =
+  "Public Glama listing Version is 0.3.4 and Latest is pre-0.4.4. This Worker package version is separate. The in-repo glama.json version is a claim file, not the live Glama Latest badge. The Worker already on workers.dev stays at 0.4.4 until this source is deployed.";
 export const AUTHOR = "Aziel Eliab";
 export const IDENTITY = "Aziel Eliab";
 export const LICENSE = "Apache-2.0";

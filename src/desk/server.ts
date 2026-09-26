@@ -1,6 +1,6 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { healthLocal } from "../spine/health-local.js";
-import { acknowledgeStoredAlert, defaultAlertStatePath } from "./alerts.js";
+import { acknowledgeStoredAlert, alertDigestCsv, buildAlertDigest, defaultAlertStatePath } from "./alerts.js";
 import { buildOperatorSnapshot, DESK_REFRESH_MS, type DeskSnapshotOptions, type OperatorSnapshot } from "./snapshot.js";
 import { renderPrintableSnapshot } from "./print.js";
 import { renderDeskPage, renderDeskView } from "./render.js";
@@ -17,11 +17,12 @@ export interface DeskServer {
   close(): Promise<void>;
 }
 
-function send(res: ServerResponse, status: number, body: string, type: string): void {
+function send(res: ServerResponse, status: number, body: string, type: string, extra?: Record<string, string>): void {
   res.writeHead(status, {
     "Content-Type": type,
     "Cache-Control": "no-store",
-    "X-Trades-Desk": "local"
+    "X-Trades-Desk": "local",
+    ...extra
   });
   res.end(body);
 }
@@ -45,7 +46,7 @@ function readBody(req: IncomingMessage): Promise<string> {
 }
 
 function snapshotFor(options: DeskSnapshotOptions): OperatorSnapshot {
-  return buildOperatorSnapshot({ ...options, now: new Date().toISOString() });
+  return buildOperatorSnapshot({ ...options, now: options.now ?? new Date().toISOString() });
 }
 
 export function startOperatorDesk(options: DeskServerOptions = {}): Promise<DeskServer> {
@@ -58,6 +59,7 @@ export function startOperatorDesk(options: DeskServerOptions = {}): Promise<Desk
   const instanceId = options.config?.instanceId ?? "local";
   const deskOptions: DeskSnapshotOptions = {
     cwd,
+    now: options.now,
     config: options.config,
     folders: options.folders,
     receiptPath: options.receiptPath,
@@ -120,6 +122,36 @@ export function startOperatorDesk(options: DeskServerOptions = {}): Promise<Desk
     }
     if (url.pathname === "/api/view") {
       send(res, 200, JSON.stringify(renderDeskView(snapshotFor(deskOptions))), "application/json; charset=utf-8");
+      return;
+    }
+    if (
+      url.pathname === "/api/alerts/digest" ||
+      url.pathname === "/api/alerts/digest.json" ||
+      url.pathname === "/api/alerts/digest.csv"
+    ) {
+      const snapshot = snapshotFor(deskOptions);
+      const digest = buildAlertDigest({
+        version: snapshot.version,
+        generatedAt: snapshot.generatedAt,
+        dataLabel: snapshot.dataLabel,
+        hits: snapshot.ruleAlerts
+      });
+      const csv =
+        url.pathname.endsWith(".csv") || url.searchParams.get("format") === "csv";
+      const filename = csv ? "trades-runtime-alert-digest.csv" : "trades-runtime-alert-digest.json";
+      const body = csv ? alertDigestCsv(digest) : JSON.stringify(digest);
+      const type = csv ? "text/csv; charset=utf-8" : "application/json; charset=utf-8";
+      if (req.method === "HEAD") {
+        res.writeHead(200, {
+          "Content-Type": type,
+          "Cache-Control": "no-store",
+          "Content-Disposition": `attachment; filename="${filename}"`,
+          "X-Trades-Desk": "local"
+        });
+        res.end();
+        return;
+      }
+      send(res, 200, body, type, { "Content-Disposition": `attachment; filename="${filename}"` });
       return;
     }
     if (url.pathname === "/api/receipt") {

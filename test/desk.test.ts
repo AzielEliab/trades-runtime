@@ -44,6 +44,12 @@ describe("local operator desk", () => {
     expect(snapshot.mission.goals[0]?.elapsedFraction).toBeLessThanOrEqual(1);
     expect(snapshot.fulfillment.steps.some((step) => step.reached && step.step === "READY")).toBe(true);
     expect(snapshot.scores.every((score) => score.inventedAccuracy === false)).toBe(true);
+    expect(snapshot.scores.every((score) => score.why.startsWith("Why:"))).toBe(true);
+    expect(snapshot.metrics.callbackCalls).toBeGreaterThan(0);
+    expect(snapshot.metrics.warrantyCalls).toBeGreaterThan(0);
+    expect(snapshot.metrics.callsNotClassified).toBeGreaterThan(0);
+    expect(snapshot.callClass.source).toBe("synthetic-sample");
+    expect(snapshot.callClass.note).toMatch(/not a company export/);
     const recorded = snapshot.scores.find((score) => score.id === "recorded-shadow-confidence");
     expect(recorded?.value).toBe(describeConfidence(RECORDED_SYNTHETIC_SHADOW_CONFIDENCE));
     expect(recorded?.note).toMatch(/Not measured accuracy/);
@@ -87,6 +93,11 @@ describe("local operator desk", () => {
     expect(html).toContain("Lane view");
     expect(html).toContain("Not a map");
     expect(html).toContain("Print snapshot");
+    expect(html).toContain("Alert digest JSON");
+    expect(html).toContain("Callback calls");
+    expect(html).toContain("Warranty calls");
+    expect(html).toContain("Not classified");
+    expect(html).toContain("Why:");
     expect(html).toContain("trades-desk-theme");
     expect(html).toContain('data-theme="dark"');
     expect(html).not.toContain("92%");
@@ -260,5 +271,52 @@ describe("local operator desk", () => {
     expect(page).not.toContain("Secret Household Name");
     expect(page).not.toContain("Chicago");
     expect(page).not.toContain("https://");
+  });
+
+  it("exports the local alert digest and prints a booking-block reason", async () => {
+    const root = mkdtempSync(join(tmpdir(), "tr-desk-digest-"));
+    const folders = emptyFolders(root);
+    const desk = await startOperatorDesk({
+      port: 0,
+      folders,
+      cwd: root,
+      now: "2026-09-25T20:00:00Z",
+      alertStatePath: join(root, "alert-state.json"),
+      alertConfig: defaultAlertConfig(),
+      persistAlertState: false
+    });
+    try {
+      const jsonRes = await fetch(`${desk.url}api/alerts/digest.json`);
+      expect(jsonRes.status).toBe(200);
+      expect(jsonRes.headers.get("content-disposition")).toMatch(/trades-runtime-alert-digest\.json/);
+      const digest = (await jsonRes.json()) as {
+        live_backends: boolean;
+        writes: boolean;
+        phoneHome: boolean;
+        hitCount: number;
+        hits: { rule: string; detail: string }[];
+      };
+      expect(digest.live_backends).toBe(false);
+      expect(digest.writes).toBe(false);
+      expect(digest.phoneHome).toBe(false);
+      expect(digest.hitCount).toBeGreaterThan(0);
+      expect(digest.hits.some((hit) => hit.rule === "booking-block")).toBe(true);
+      expect(JSON.stringify(digest)).not.toContain("https://");
+      const csvRes = await fetch(`${desk.url}api/alerts/digest.csv`);
+      expect(csvRes.status).toBe(200);
+      expect(csvRes.headers.get("content-type")).toMatch(/text\/csv/);
+      const csv = await csvRes.text();
+      expect(csv.split("\n")[0]).toBe("id,rule,severity,title,detail,dataLabel,raisedAt,lastSeenAt,acknowledgedAt,acknowledgedBy,active");
+      expect(csv).toContain("booking-block");
+      const receipt = await fetch(`${desk.url}api/receipt`);
+      const page = await receipt.text();
+      expect(page).toContain("What blocked booking");
+      expect(page).toContain("New booking is blocked");
+      expect(page).toContain("BLOCK_NEW_BOOKING");
+      expect(page).toContain("Callback");
+      expect(page).toContain("Warranty");
+    } finally {
+      await desk.close();
+    }
   });
 });

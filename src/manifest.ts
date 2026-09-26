@@ -1,6 +1,6 @@
 export const RUNTIME_MANIFEST = {
   product: "trades-runtime",
-  version: "0.4.4",
+  version: "0.4.5",
   author: "Aziel Eliab",
   identity: "Aziel Eliab",
   role: "trades-runtime",
@@ -8,7 +8,7 @@ export const RUNTIME_MANIFEST = {
   live_backends: false,
   pilot_started: false,
   field_launch: false,
-  honesty: "Pure/stub TypeScript runtime. BYO local ServiceTitan + ProBooks inbound, plus a read-only trades-app drop-in for the same class of field-service exports. Authoring node is not a data custodian. No central dump. No hosted uploader. No phone-home. No ServiceTitan or ProBooks write-back. live_backends false. Pages off (workflow deleted). Credentials local only. No production claim. Public giveaway Worker is UI + counted tarball only — not a hosted company OS and not a tenant host. The human operator desk runs on the operator machine. Local alert rules stay on that machine. Option C code-ready / pilot not started. Option C prep (TR-OPTION-C-PREP-2026-09-25) checks the operator box and prints a receipt with pilot_started false. It does not start the pilot. Option D not started. Not a live company pilot. Desk polish (TR-DESK-POLISH-2026-09-25) restyles the local operator desk only. It does not start the pilot.",
+  honesty: "Pure/stub TypeScript runtime. BYO local ServiceTitan + ProBooks inbound, plus a read-only trades-app drop-in for the same class of field-service exports. Authoring node is not a data custodian. No central dump. No hosted uploader. No phone-home. No ServiceTitan or ProBooks write-back. live_backends false. Pages off (workflow deleted). Credentials local only. No production claim. Public giveaway Worker is UI + counted tarball only — not a hosted company OS and not a tenant host. The human operator desk runs on the operator machine. Local alert rules stay on that machine. Option C code-ready / pilot not started. Option C prep (TR-OPTION-C-PREP-2026-09-25) checks the operator box and prints a receipt with pilot_started false. It does not start the pilot. Option D not started. Not a live company pilot. Desk polish (TR-DESK-POLISH-2026-09-25) restyles the local operator desk only. It does not start the pilot. 0.4.5 counts explicit callback and warranty labels on local calls, explains each score band, exports the local alert digest, and prints what blocked booking. Unknown labels stay not classified. It does not start the pilot. Public Glama listing Version remains 0.3.4 (Latest pre-0.4.4). The deployed Worker remains 0.4.4 until this source is deployed.",
   launch_options: {
     A: { name: "Merge-only", status: "done" },
     B: { name: "Local spine", status: "done-in-software" },
@@ -49,7 +49,8 @@ export const RUNTIME_MANIFEST = {
     { slug: "analytics", path: "src/domain/analytics.ts", status: "live-pure", summary: "Mandatory report metadata." },
     { slug: "communications", path: "src/domain/communications.ts", status: "live-pure", summary: "Teams-style channels on the canonical event stream." },
     { slug: "recognition", path: "src/domain/recognition.ts", status: "live-pure", summary: "Quality-gated recognition; never raw revenue alone." },
-    { slug: "mission-board", path: "src/domain/mission-board.ts", status: "live-pure", summary: "One branch, one day; KPIs from completions; human can lock a goal." },
+    { slug: "mission-board", path: "src/domain/mission-board.ts", status: "live-pure", summary: "One branch, one day; KPIs from completions; human can lock a goal. Each pace band has a plain-language why." },
+    { slug: "call-class", path: "src/domain/call-class.ts", status: "live-pure", summary: "Callback and warranty labels on admitted job rows. Unknown stays not classified. Not a coverage determination." },
     { slug: "fulfillment-machine", path: "src/domain/fulfillment-machine.ts", status: "live-pure", summary: "REQUESTED→RECONCILED on the canonical event stream." },
     { slug: "property-jobs", path: "src/domain/property-jobs.ts", status: "live-pure", summary: "Job attaches to address; completed work appends the improvement ledger." },
     { slug: "pricebook", path: "src/domain/pricebook.ts", status: "live-pure", summary: "ST shadow baseline; ACCEPT/OVERRIDE/LOCK with Chain C receipt." },
@@ -79,8 +80,8 @@ export const RUNTIME_MANIFEST = {
     { slug: "shadow-sealed-demo", path: "src/demo/shadow-sealed.ts", status: "live-pure", summary: "Synthetic N-day sealed settlement proof. Mode + hashes. Not a company pilot." },
     { slug: "trades-app-shadow", path: "src/spine/trades-app-shadow.ts", status: "live-pure", summary: "Read-only generic trades-app ingest + hash. MEDIUM trust. Unverified. Writes refused." },
     { slug: "drop-in", path: "src/spine/drop-in.ts", status: "live-pure", summary: "Schema sniff and mapping profiles for ServiceTitan, ProBooks, and trades-app exports (Jobber, Housecall Pro, Service Fusion, QuickBooks, ServiceM8, AccuLynx, SuccessWare, Xero, FieldEdge, ServiceTrade, generic CSV/JSON). Known profile when the fingerprint matches; generic sniff otherwise. Read-only." },
-    { slug: "operator-desk", path: "src/desk/server.ts", status: "live-pure", summary: "Local human operator desk. Charts, metrics, alert rules, scores, mission and tech boards, a capacity or trade lane (not a map), light/dark theme, and a printable local snapshot. SSE from local state. No tenant data leaves the machine." },
-    { slug: "alert-rules", path: "src/desk/alerts.ts", status: "live-pure", summary: "Local thresholds for capacity, late jobs, trust-band, booking block, and verification stall. In-desk banner, history, acknowledge. File and loopback webhook hooks. No phone-home. No accuracy percent." },
+    { slug: "operator-desk", path: "src/desk/server.ts", status: "live-pure", summary: "Local human operator desk. Charts, metrics, callback and warranty counts, alert rules, score explanations, mission and tech boards, a capacity or trade lane (not a map), light/dark theme, alert digest export, and a printable local snapshot with the booking-block reason. SSE from local state. No tenant data leaves the machine." },
+    { slug: "alert-rules", path: "src/desk/alerts.ts", status: "live-pure", summary: "Local thresholds for capacity, late jobs, trust-band, booking block, and verification stall. In-desk banner, history, acknowledge, and a loopback JSON/CSV digest of current hits. File and loopback webhook hooks. No phone-home. No accuracy percent." },
     { slug: "drop-in-demo", path: "src/demo/drop-in.ts", status: "live-pure", summary: "Synthetic multi-vendor drop-in proof. Wrapper is not VERIFIED. Writes throw." },
     { slug: "servicetitan-connector", path: "src/spine/servicetitan-shadow.ts", status: "stub", summary: "Live ServiceTitan writes stay refused." },
     { slug: "probooks-connector", path: "src/spine/probooks-shadow.ts", status: "stub", summary: "Live ProBooks writes stay refused." }

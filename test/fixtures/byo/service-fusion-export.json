@@ -11,6 +11,9 @@
       "customer_name": "Synthetic Plaza",
       "techs": [{ "id": "SYN-TECH-1" }],
       "category": "electrical",
+      "trade": "electrical",
+      "jobType": "warranty",
+      "isCallback": false,
       "scheduled_at": "2026-09-22T16:00:00Z"
     }
   ]

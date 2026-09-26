@@ -133,6 +133,43 @@ export function lockMissionGoal(
   };
 }
 
+export interface MissionPaceExplanation {
+  band: "not-started" | "behind" | "on-pace" | "ahead";
+  why: string;
+}
+
+/** Plain-language pace band. A gap is not a forecast accuracy percent. */
+export function explainMissionPace(
+  goal: Pick<MissionBoardRow, "measure" | "actual" | "target" | "expectedPace" | "elapsedFraction">
+): MissionPaceExplanation {
+  const measure = goal.measure;
+  if (goal.elapsedFraction <= 0) {
+    return {
+      band: "not-started",
+      why: `Why: the mission clock is still at the open of the day, so ${measure} has no pace band yet. Target is ${goal.target}. Actual is ${goal.actual}.`
+    };
+  }
+  const expected = goal.expectedPace.toFixed(2);
+  const clock = `at day fraction ${goal.elapsedFraction.toFixed(2)}`;
+  const slack = 0.05;
+  if (goal.actual + slack < goal.expectedPace) {
+    return {
+      band: "behind",
+      why: `Why: ${goal.actual} ${measure} are done and the clock expects about ${expected} ${clock}. The bar is actual against target ${goal.target}. The marker is that expected pace. A gap is not a forecast percent.`
+    };
+  }
+  if (goal.actual > goal.expectedPace + slack) {
+    return {
+      band: "ahead",
+      why: `Why: ${goal.actual} ${measure} are done, ahead of the clock's expected ${expected} ${clock}. Target is ${goal.target}. This is pace, not a forecast percent.`
+    };
+  }
+  return {
+    band: "on-pace",
+    why: `Why: ${goal.actual} ${measure} sit with the clock's expected ${expected} ${clock}. Target is ${goal.target}. This is pace, not a forecast percent.`
+  };
+}
+
 export function retargetGoal(board: MissionDayBoard, goalId: string, target: number): MissionDayBoard {
   if (board.lockedGoalIds.includes(goalId)) {
     throw new Error("locked mission goal cannot be retargeted");

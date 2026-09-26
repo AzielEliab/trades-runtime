@@ -2,8 +2,8 @@
   "$schema": "https://glama.ai/mcp/schemas/server.json",
   "maintainers": ["AzielEliab"],
   "name": "Trades Runtime",
-  "version": "0.4.4",
-  "description": "Trades Runtime 0.4.4 — local-first BYO field-trades runtime for HVAC, plumbing, electrical, sewer, and cross-trades. People bring their own ServiceTitan, ProBooks, and other trades-app exports. Public Worker MCP is read-only (health, stats, cite, skill). live_backends false. Author: Aziel Eliab only. Person @id https://www.azieleliab.com/#aziel",
+  "version": "0.4.5",
+  "description": "Trades Runtime 0.4.5 — local-first BYO field-trades runtime for HVAC, plumbing, electrical, sewer, and cross-trades. People bring their own ServiceTitan, ProBooks, and other trades-app exports. Public Worker MCP is read-only (health, stats, cite, skill). This version is the in-repo claim file. Public Glama listing Version remains 0.3.4 and Latest remains pre-0.4.4 until a Glama admin release. live_backends false. Author: Aziel Eliab only. Person @id https://www.azieleliab.com/#aziel",
   "keywords": [
     "mcp",
     "model-context-protocol",

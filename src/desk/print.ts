@@ -24,7 +24,10 @@ export function renderPrintableSnapshot(snapshot: OperatorSnapshot): string {
     ["Invoices", snapshot.metrics.invoices],
     ["Admitted packets", snapshot.metrics.admittedPackets],
     ["Unverified", snapshot.metrics.unverified],
-    ["Receipt lines", snapshot.metrics.receiptLines]
+    ["Receipt lines", snapshot.metrics.receiptLines],
+    ["Callback calls", snapshot.metrics.callbackCalls],
+    ["Warranty calls", snapshot.metrics.warrantyCalls],
+    ["Not classified", snapshot.metrics.callsNotClassified]
   ]
     .map(([label, value]) => `<tr><th>${esc(String(label))}</th><td>${value}</td></tr>`)
     .join("");
@@ -42,9 +45,10 @@ export function renderPrintableSnapshot(snapshot: OperatorSnapshot): string {
     .join("");
   const scores = snapshot.scores
     .map(
-      (score) => `<tr><th>${esc(score.label)}</th><td>${esc(score.value)}</td><td>${esc(score.note)}</td></tr>`
+      (score) => `<tr><th>${esc(score.label)}</th><td>${esc(score.value)}</td><td>${esc(score.why)} ${esc(score.note)}</td></tr>`
     )
     .join("");
+  const bookingClass = snapshot.bookingReceipt.blocked ? "block-lane" : "block-lane open";
   const lanes = snapshot.lanes
     .map(
       (lane) => `<tr>
@@ -114,6 +118,9 @@ export function renderPrintableSnapshot(snapshot: OperatorSnapshot): string {
     th { color: #5e574c; font-weight: 600; }
     code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.78rem; }
     button { font: inherit; border: 1px solid #1c1914; background: transparent; border-radius: 999px; padding: 0.3rem 0.75rem; cursor: pointer; }
+    .block-lane { border: 2px solid #9a5420; background: #fffdf8; padding: 0.75rem 0.9rem; margin-top: 1rem; }
+    .block-lane.open { border-color: #2f6f4e; }
+    .block-lane h2 { margin: 0 0 0.35rem; }
     footer { margin-top: 1.4rem; color: #5e574c; font-family: "Segoe UI", Helvetica, Arial, sans-serif; font-size: 0.82rem; }
     @media print {
       body { background: #fff; }
@@ -137,6 +144,13 @@ export function renderPrintableSnapshot(snapshot: OperatorSnapshot): string {
       <span class="chip">${esc(snapshot.dataLabel)}</span>
     </div>
     <p class="banner">${esc(snapshot.honesty)}</p>
+    <section class="${bookingClass}">
+      <h2>What blocked booking</h2>
+      <p><strong>${esc(snapshot.bookingReceipt.block)}</strong> — ${esc(snapshot.bookingReceipt.headline)}</p>
+      <p>${esc(snapshot.bookingReceipt.why)}</p>
+    </section>
+    <h2>Callback and warranty</h2>
+    <p>${esc(snapshot.callClass.note)}</p>
     <h2>Metrics</h2>
     <table>${metrics}</table>
     <h2>Mission board</h2>

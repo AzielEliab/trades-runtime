@@ -1,3 +1,4 @@
+import { explainMissionPace } from "../domain/mission-board.js";
 import { capacityChart, jobsChart } from "./charts.js";
 import type { OperatorSnapshot } from "./snapshot.js";
 
@@ -36,7 +37,10 @@ export function renderMetrics(snapshot: OperatorSnapshot): string {
     ["Invoices", snapshot.metrics.invoices],
     ["Admitted packets", snapshot.metrics.admittedPackets],
     ["Unverified", snapshot.metrics.unverified],
-    ["Receipt lines", snapshot.metrics.receiptLines]
+    ["Receipt lines", snapshot.metrics.receiptLines],
+    ["Callback calls", snapshot.metrics.callbackCalls],
+    ["Warranty calls", snapshot.metrics.warrantyCalls],
+    ["Not classified", snapshot.metrics.callsNotClassified]
   ];
   return cards
     .map(
@@ -63,9 +67,10 @@ export function renderCharts(snapshot: OperatorSnapshot): string {
 export function renderScores(snapshot: OperatorSnapshot): string {
   return snapshot.scores
     .map(
-      (score) => `<article class="score">
+      (score) => `<article class="score" data-score="${esc(score.id)}"${score.band ? ` data-band="${esc(score.band)}"` : ""}>
         <span>${esc(score.label)}</span>
         <strong>${esc(score.value)}</strong>
+        <p class="why">${esc(score.why)}</p>
         <p>${esc(score.note)}</p>
       </article>`
     )
@@ -112,7 +117,8 @@ export function renderAlerts(snapshot: OperatorSnapshot): string {
         )
         .join("")
     : `<li class="quiet">No alert history on this machine yet.</li>`;
-  return `<h3 class="subhead">Active rules</h3>
+  return `<p class="quiet">Export current rule hits on this machine: <a href="/api/alerts/digest.json">JSON</a> · <a href="/api/alerts/digest.csv">CSV</a></p>
+    <h3 class="subhead">Active rules</h3>
     <div class="rule-alerts">${active}</div>
     <h3 class="subhead">History</h3>
     <ul class="history">${history}</ul>
@@ -126,34 +132,43 @@ export function renderMission(snapshot: OperatorSnapshot): string {
       const target = goal.target > 0 ? goal.target : 0;
       const actualWidth = target > 0 ? Math.min(100, (goal.actual / target) * 100) : 0;
       const expectedLeft = Math.min(100, Math.max(0, goal.elapsedFraction * 100));
-      return `<article class="goal">
-        <header><h3>${esc(goal.measure)}</h3><span>${goal.actual} actual · ${goal.target} target</span></header>
-        <div class="pace" role="img" aria-label="${esc(goal.measure)} actual ${goal.actual} of ${goal.target}">
+      const pace = explainMissionPace(goal);
+      return `<article class="goal" data-band="${esc(pace.band)}">
+        <header><h3>${esc(goal.measure)}</h3><span>${goal.actual} actual · ${goal.target} target · ${esc(pace.band)}</span></header>
+        <div class="pace" role="img" aria-label="${esc(goal.measure)} ${esc(pace.band)}. ${esc(pace.why)}">
           <div class="pace-track">
             <div class="pace-actual" style="width:${actualWidth.toFixed(1)}%"></div>
             <i class="pace-expected" style="left:${expectedLeft.toFixed(1)}%"></i>
           </div>
           <p class="quiet">Bar is actual against target. Marker is expected pace at this clock.</p>
+          <p class="why">${esc(pace.why)}</p>
         </div>
       </article>`;
     })
     .join("");
   const goalRows = snapshot.mission.goals
-    .map(
-      (goal) => `<tr>
+    .map((goal) => {
+      const pace = explainMissionPace(goal);
+      return `<tr>
         <td>${esc(goal.measure)}</td>
         <td>${goal.target}</td>
         <td>${goal.actual}</td>
         <td>${goal.expectedPace.toFixed(2)}</td>
         <td>${goal.remainingGap.toFixed(2)}</td>
         <td>${goal.projectedFinish.toFixed(2)}</td>
-      </tr>`
-    )
+        <td data-band="${esc(pace.band)}">${esc(pace.band)}</td>
+      </tr>`;
+    })
     .join("");
+  const calls = snapshot.callClass.counts;
   return `<p class="quiet">Branch ${esc(snapshot.mission.branchId)} · day ${esc(snapshot.mission.day)} · clock ${esc(snapshot.mission.clock)}</p>
+    <p class="why" data-booking="${esc(snapshot.bookingBlock)}"><strong>${esc(snapshot.bookingReceipt.headline)}</strong> ${esc(snapshot.bookingReceipt.why)}</p>
     ${bars}
+    <h3 class="subhead">Callback and warranty</h3>
+    <p>Callback calls <strong>${calls.callback}</strong>. Warranty calls <strong>${calls.warranty}</strong>. Not classified <strong>${calls.notClassified}</strong>.</p>
+    <p class="quiet">${esc(snapshot.callClass.note)}</p>
     <table>
-      <thead><tr><th>Measure</th><th>Target</th><th>Actual</th><th>Expected pace</th><th>Gap</th><th>Projected</th></tr></thead>
+      <thead><tr><th>Measure</th><th>Target</th><th>Actual</th><th>Expected pace</th><th>Gap</th><th>Projected</th><th>Band</th></tr></thead>
       <tbody>${goalRows}</tbody>
     </table>`;
 }
@@ -165,6 +180,10 @@ export function renderTech(snapshot: OperatorSnapshot): string {
     ["Verification", "UNVERIFIED"],
     ["Evidence trust", trust],
     ["Booking block", snapshot.bookingBlock],
+    ["Booking why", snapshot.bookingReceipt.headline],
+    ["Callback calls", String(snapshot.metrics.callbackCalls)],
+    ["Warranty calls", String(snapshot.metrics.warrantyCalls)],
+    ["Not classified", String(snapshot.metrics.callsNotClassified)],
     ["Tracking", `${snapshot.tracking.transport} · ${snapshot.tracking.intervalMs}ms`],
     ["Receipt lines", String(snapshot.receiptDigest.lines)],
     ["Writes", "false"],
@@ -339,6 +358,8 @@ const DESK_STYLES = `
     }
     .banner-title { font-weight: 650; }
     .banner-detail, .alert p, .score p, .chart-card p, .quiet, .lane p { color: var(--muted); }
+    .why { color: var(--ink); margin: 0.35rem 0 0; }
+    .why-row td { color: var(--ink); font-size: 0.86rem; }
     .banner-detail { font-size: 0.92rem; }
     .subhead { margin: 0.95rem 0 0.25rem; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 650; }
     button.ack { margin-top: 0.5rem; background: transparent; }
@@ -452,6 +473,8 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
       <div class="actions">
         <button type="button" class="text-btn" id="theme-toggle">Light theme</button>
         <a class="text-btn" href="/api/receipt">Print snapshot</a>
+        <a class="text-btn" href="/api/alerts/digest.json">Alert digest JSON</a>
+        <a class="text-btn" href="/api/alerts/digest.csv">Alert digest CSV</a>
         <p class="live"><span class="dot" id="live-dot"></span><span id="live-state">tracking local state</span></p>
       </div>
     </header>
