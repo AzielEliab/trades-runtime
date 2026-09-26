@@ -9,6 +9,9 @@
       "number": "STR-900",
       "status": "scheduled",
       "serviceLine": "HVAC",
+      "trade": "hvac",
+      "isCallback": true,
+      "isWarranty": true,
       "location": { "id": "SYN-LOC-1", "name": "Synthetic Store", "storeNumber": "S-100" },
       "scheduledDate": "2026-09-25T18:00:00Z",
       "deficiencies": [{ "id": "SYN-DEF-1", "description": "Synthetic belt wear", "status": "open" }]

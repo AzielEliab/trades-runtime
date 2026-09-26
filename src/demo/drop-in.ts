@@ -1,6 +1,7 @@
 import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { aggregateCallClasses, type CallClassCounts, type CallClassification } from "../domain/call-class.js";
 import { admitDropInDocument, admitDropInFolder, type DropInPeerClass } from "../spine/drop-in.js";
 import { DurableReceiptStore } from "../spine/durable-receipts.js";
 import { sanitizeInstanceId } from "../spine/runtime-isolate.js";
@@ -60,6 +61,7 @@ export interface DropInDemoProof {
   files: DropInDemoFile[];
   refused: { file: string; code: string }[];
   receiptTip: string;
+  callClass: CallClassCounts;
   writesThrew: true;
   writeRefusals: string[];
   mayWriteServiceTitan: false;
@@ -158,6 +160,17 @@ export function runDropInDemo(options: DropInDemoOptions = {}): DropInDemoProof 
     throw new Error("ServiceTitan, ProBooks, and trades-app writes must stay refused");
   }
 
+  const classes: CallClassification[] = [];
+  for (const folder of folders) {
+    for (const file of folder.files) {
+      if (!file.result.ok) continue;
+      for (const record of file.result.records) {
+        if (record.entity === "job" && record.callClass) classes.push(record.callClass);
+      }
+    }
+  }
+  const callClass = aggregateCallClasses(classes);
+
   const store = new DurableReceiptStore(receiptPath);
   for (const file of files) {
     store.appendKind("evidence", `drop-in:${file.file}`, receivedAt, {
@@ -198,6 +211,7 @@ export function runDropInDemo(options: DropInDemoOptions = {}): DropInDemoProof 
       { file: "hosted-upload.json", code: upload.ok ? "UNEXPECTED" : upload.code }
     ],
     receiptTip: freeze.hash,
+    callClass,
     writesThrew: true,
     writeRefusals,
     mayWriteServiceTitan: false,

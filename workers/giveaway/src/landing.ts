@@ -2,6 +2,7 @@ import { homepageJsonLd } from "./crawl.js";
 import {
   AUTHOR,
   COMPATIBLE_AI_CLIENTS,
+  GLAMA_LISTING_NOTE,
   HONESTY,
   LICENSE,
   OG_DESCRIPTION,
@@ -119,6 +120,7 @@ export function renderLanding(views: number, downloads: number): string {
     <div class="panel">
       <h2>Honesty</h2>
       <p>${escapeHtml(HONESTY.product)}</p>
+      <p class="notice">${escapeHtml(GLAMA_LISTING_NOTE)}</p>
       <p class="notice">${escapeHtml(HONESTY.counters)}</p>
     </div>
 

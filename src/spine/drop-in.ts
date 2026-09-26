@@ -12,6 +12,7 @@ import {
   ingestServiceTitanShadow,
   type ServiceTitanShadowEntity
 } from "./servicetitan-shadow.js";
+import { classifyCall, type CallClassification } from "../domain/call-class.js";
 import {
   ingestTradesAppShadow,
   TRADES_APP_ENTITIES,
@@ -95,6 +96,8 @@ export interface AdmittedDropRecord {
   observedAt?: string;
   /** Known trade token from the export. Absent when the file does not name one. Not a coordinate. */
   lane?: string;
+  /** Present on job rows. Unknown means the export did not say. */
+  callClass?: CallClassification;
 }
 
 export interface DropInAdmit {
@@ -1042,7 +1045,11 @@ function admitRecord(
   vendorHint: string
 ): AdmittedDropRecord {
   const lane = knownTradeLane(record.raw);
-  const withLane = (row: AdmittedDropRecord): AdmittedDropRecord => (lane ? { ...row, lane } : row);
+  const finish = (row: AdmittedDropRecord): AdmittedDropRecord => {
+    const laned = lane ? { ...row, lane } : row;
+    if (laned.entity !== "job") return laned;
+    return { ...laned, callClass: classifyCall(record.raw) };
+  };
   if (peerClass === "servicetitan") {
     const entity = isStEntity(record.entity) ? record.entity : "job";
     const ingested = ingestServiceTitanShadow({
@@ -1051,7 +1058,7 @@ function admitRecord(
       receivedAt,
       payload: record.raw
     });
-    return withLane({
+    return finish({
       entity,
       externalId: record.externalId,
       sourceId: ingested.inbound.packet.sourceId,
@@ -1077,7 +1084,7 @@ function admitRecord(
           : entity === "vendor"
             ? ingestProBooksVendor(record.externalId, receivedAt, record.raw)
             : ingestProBooksItem(record.externalId, receivedAt, record.raw);
-    return withLane({
+    return finish({
       entity,
       externalId: record.externalId,
       sourceId: ingested.inbound.packet.sourceId,
@@ -1102,7 +1109,7 @@ function admitRecord(
     profileId,
     payload: record.raw
   });
-  return withLane({
+  return finish({
     entity,
     externalId: record.externalId,
     sourceId: ingested.inbound.packet.sourceId,

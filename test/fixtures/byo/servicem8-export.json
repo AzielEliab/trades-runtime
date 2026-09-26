@@ -12,6 +12,9 @@
       "company_uuid": "SYN-CO-1",
       "company_name": "Synthetic Co",
       "job_description": "Synthetic hot water service",
+      "trade": "plumbing",
+      "isCallback": false,
+      "isWarranty": false,
       "date": "2026-09-24"
     }
   ]

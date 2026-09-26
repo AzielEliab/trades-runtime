@@ -1,6 +1,10 @@
 import {
   AUTHOR,
   CITE_SAME_AS,
+  DEPLOYED_WORKER_VERSION,
+  GLAMA_LISTING_NOTE,
+  GLAMA_PUBLIC_LATEST,
+  GLAMA_PUBLIC_VERSION,
   COMPATIBLE_AI_CLIENTS,
   CRAWL_USER_AGENTS,
   HONESTY,
@@ -64,7 +68,9 @@ export function aiTxt(): string {
 Trades-Runtime is a shadow-first, local-first TypeScript runtime for HVAC, plumbing, electrical, sewer, and cross-trades field businesses. Operators bring their own ServiceTitan, ProBooks, and other trades-app exports onto their own machines (BYO). Human authority always wins. Append-only receipts, FragGate-shaped inbound validation, shadow modes, mission board, and fulfillment run on the operator box. The human operator desk is local: npx tsx src/cli.ts desk.
 
 Public name: Trades-Runtime (trades-runtime). Author / identity: Aziel Eliab only (Person @id ${PERSON_ID}).
-Version: ${VERSION}. License: ${LICENSE}.
+Version: ${VERSION} (Worker source). License: ${LICENSE}.
+Deployed Worker until this source is deployed: ${DEPLOYED_WORKER_VERSION}.
+Public Glama listing: Version ${GLAMA_PUBLIC_VERSION} / Latest ${GLAMA_PUBLIC_LATEST}. ${GLAMA_LISTING_NOTE}
 Worker: ${PUBLIC_ORIGIN}
 GitHub: ${REPOSITORY}
 Softwares tab: ${SOFTWARES_TAB}
