@@ -1,0 +1,47 @@
+TRADES-RUNTIME · COMMON COMMANDS                                                            TR-COMMANDS-2026-09-27
+
+
+
+
+ Receipt ID TR-COMMANDS-2026-09-27 · 2026-09-27
+ Identity: Aziel Eliab only.
+ Softwares desk feature freeze stays, except this common-commands cut.
+ live_backends remains false. Pages remain off. Option C pilot remains not started. Option D remains not started.
+ pilot_started remains false. No ServiceTitan or ProBooks write-back.
+ This cut does not deploy the public Worker and does not claim a Glama admin Deploy.
+ Public Glama listing Version remains 0.3.4. Latest remains pre-0.4.4.
+ The giveaway Worker version pin in this repo moves to 0.4.12 with the package, the manifest, and glama.json.
+ Those surfaces are the source pin. They are not the public Glama badge.
+
+
+ What changed
+ 0.4.12 adds familiar commands on the local CLI so a person or an agent can discover the product
+ without reading the whole README.
+
+    help            Prints the command list. Same text as running the CLI with no command.
+                    Aliases: --help, -h.
+    softwares       Lists Softwares modules from the runtime manifest in plain language:
+                    slug, status, and one line. Not a raw JSON dump.
+                    Alias: Softwares (any letter case on that command word).
+    version         Prints the product name and the version from the runtime manifest,
+                    plus one short honesty line: live_backends false, pilot_started false.
+                    Aliases: --version, -V.
+    health          Same local honesty card as health-local. health-local still works.
+
+ Existing commands stay: manifest, demo, byo-admit-demo, drop-in-demo, shadow-sealed-demo,
+ health-local, pilot-prep, desk.
+
+ An unknown command prints a short unknown-command line, then the help text, and exits non-zero.
+ No command still prints help and exits zero.
+
+
+ What this cut does not do
+    It does not start the Option C pilot.
+    It does not start Option D.
+    It does not turn on live_backends.
+    It does not add a ServiceTitan or ProBooks write client.
+    It does not publish Pages.
+    It does not bump the product to 1.0.0.
+    It does not change the desk feature set.
+    It does not claim the public Glama listing is 0.4.12.
+    It does not run a Glama admin Deploy.
