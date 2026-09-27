@@ -394,7 +394,7 @@ describe("0.4.7 truck stock counts", () => {
 
 describe("0.4.7 desk surfaces", () => {
   it("shows the four Softwares on the synthetic desk and the local stock route", async () => {
-    expect(RUNTIME_MANIFEST.version).toBe("0.4.8");
+    expect(RUNTIME_MANIFEST.version).toBe("0.4.9");
     expect(RUNTIME_MANIFEST.live_backends).toBe(false);
     expect(RUNTIME_MANIFEST.pilot_started).toBe(false);
     const root = mkdtempSync(join(tmpdir(), "tr-desk-047-"));

@@ -14,13 +14,13 @@ This repo ships:
 
 | File | Role |
 |------|------|
-| [`glama.json`](../glama.json) | Claim file. Schema requires `maintainers` (GitHub username `AzielEliab`). Listing `name` (`Trades Runtime`), claim-file version (`0.4.8`), designed-purpose `description` (local-first BYO field-trades; `live_backends` false), `keywords`, `homepage` (`https://glama.ai/mcp/servers/AzielEliab/trades-runtime`), and `documentation` (`https://github.com/AzielEliab/trades-runtime/blob/main/docs/GLAMA.md`) are additional properties. The claim-file version is not the public Glama badge. |
+| [`glama.json`](../glama.json) | Claim file. Schema requires `maintainers` (GitHub username `AzielEliab`). Listing `name` (`Trades Runtime`), claim-file version (`0.4.9`), designed-purpose `description` (local-first BYO field-trades; `live_backends` false), `keywords`, `homepage` (`https://glama.ai/mcp/servers/AzielEliab/trades-runtime`), and `documentation` (`https://github.com/AzielEliab/trades-runtime/blob/main/docs/GLAMA.md`) are additional properties. The claim-file version is not the public Glama badge. |
 | [`cli/mcp-stdio.mjs`](../cli/mcp-stdio.mjs) | Stdio MCP server. Bridges to the hosted Worker `/mcp` with `User-Agent: Mozilla/5.0`. |
 | [`Dockerfile`](../Dockerfile) | Local / “from Dockerfile” image. Glama admin often **generates** its own image from CMD args — still ship this file. |
 
 Do not invent Glama TDQS scores. Do not claim the listing or Install Server is already live.
 
-Public Glama listing Version is 0.3.4 and Latest is pre-0.4.4. Do not cite that badge as 0.4.8. The Worker source in this repo is 0.4.8. The Worker already deployed at `https://trades-runtime.vibelock.workers.dev` remains 0.4.5. A 0.4.7 redeploy is separately in flight. This source does not claim the public Worker is already 0.4.8. The claim-file version, the deployed Worker, and the Glama listing are three different surfaces.
+Public Glama listing Version is 0.3.4 and Latest is pre-0.4.4. Do not cite that badge as 0.4.9. The Worker source in this repo is 0.4.9. The Worker already deployed at `https://trades-runtime.vibelock.workers.dev` remains 0.4.5. A 0.4.7 redeploy is separately in flight. This source does not claim the public Worker is already 0.4.9. The claim-file version, the deployed Worker, and the Glama listing are three different surfaces.
 
 ## Honesty
 
