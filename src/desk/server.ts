@@ -188,6 +188,7 @@ export function startOperatorDesk(options: DeskServerOptions = {}): Promise<Desk
     persistAlertState: options.persistAlertState ?? true,
     stockCountPath: options.stockCountPath,
     driveMilesPath: options.driveMilesPath,
+    positionsPath: options.positionsPath,
     persistLocalReports: options.persistLocalReports ?? true
   };
 
@@ -300,6 +301,11 @@ export function startOperatorDesk(options: DeskServerOptions = {}): Promise<Desk
     if (url.pathname === "/api/alert-actions" || url.pathname === "/api/alert-actions.json") {
       const report = snapshotFor(deskOptions, url).alertActions;
       send(res, 200, JSON.stringify(report), "application/json; charset=utf-8");
+      return;
+    }
+    if (url.pathname === "/api/monitoring" || url.pathname === "/api/monitoring.json") {
+      const board = snapshotFor(deskOptions, url).monitoring;
+      send(res, 200, JSON.stringify(board), "application/json; charset=utf-8");
       return;
     }
     if (url.pathname === "/api/option-c-start-gate" || url.pathname === "/api/option-c-start-gate.json") {

@@ -48,10 +48,23 @@ TRADES-RUNTIME · INBOUND QUALITY, ALERT STUBS, OPTION C START GATE             
     This panel does not start a pilot.
     Option D is out of scope. No cutover automation.
 
+ 4. Monitoring view
+    One local desk panel. Not five new menus.
+    Pins for techs and trucks come from an optional positions file,
+    from coordinates on a local miles file, or from a labeled synthetic demo.
+    Mile totals still ignore coordinates. The address map stays undrawn.
+    Drive cards, tech score cards, a call board, and KPI charts
+    recompute when those local files change.
+    Not a live GPS feed. Not a telematics vendor. live_backends stays false.
+    Human Authority Rule stays on the panel. Monitoring only. No write-back.
+    Loopback: /api/monitoring
+    Example: data/runtime/positions.json.example
+
 
  What NOT to do
     No ServiceTitan write client. No ProBooks write client.
     No live_backends true. No tenant pull. No central dump.
+    No live GPS feed. No telematics vendor. No invented pin stream.
     No invented accuracy percent. No fake live GM pilot.
     No Option D. No cutover.
     No new vendor brands.
@@ -60,5 +73,6 @@ TRADES-RUNTIME · INBOUND QUALITY, ALERT STUBS, OPTION C START GATE             
 
 
  Changelog
-    0.4.9 — inbound quality report, alert-action stubs, Option C start-gate prep.
+    0.4.9 — inbound quality report, alert-action stubs, Option C start-gate prep,
+            plus one local Monitoring view (pins, scores, call board, KPI charts).
     Prior local miles, ranked board, work-together, and friction remain 0.4.8.

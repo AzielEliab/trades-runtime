@@ -20,6 +20,7 @@ import { buildWeeklyCallbackDigest, type WeeklyCallbackDigest } from "./callback
 import { collectDepartmentFlags, flagHandoffBehavior, type DepartmentBehaviorBoard } from "../domain/chain-d.js";
 import { flagCrossTradeBehavior } from "../domain/cross-trade-matrix.js";
 import { loadDrivePerformance, type DrivePerformance } from "../domain/drive-miles.js";
+import { loadLocalPositions } from "../domain/local-positions.js";
 import { buildInboundQualityReport, persistInboundQuality, type InboundQualityReport } from "../domain/inbound-quality.js";
 import { buildFriction, type FrictionBoard } from "../domain/friction.js";
 import {
@@ -80,6 +81,7 @@ import {
 } from "./alerts.js";
 import { buildAlertActionReport, persistAlertActions, type AlertActionReport } from "./alert-actions.js";
 import { optionCStartGate, type OptionCStartGate } from "../spine/option-c-start-gate.js";
+import { buildMonitoring, type MonitoringBoard } from "./monitoring.js";
 
 /** Recorded synthetic shadow-day confidence from src/demo/shadow-day.ts. A fixture, not measured accuracy. */
 export const RECORDED_SYNTHETIC_SHADOW_CONFIDENCE: ConfidenceSeparation = {
@@ -236,6 +238,7 @@ export interface OperatorSnapshot {
   callbackWeek: WeeklyCallbackDigest;
   huddle: HuddleBoard;
   drive: DrivePerformance;
+  monitoring: MonitoringBoard;
   inboundQuality: InboundQualityReport;
   alertActions: AlertActionReport;
   optionCStartGate: OptionCStartGate;
@@ -286,6 +289,8 @@ export interface DeskSnapshotOptions {
   callFilter?: CallDeskFilter;
   stockCountPath?: string;
   driveMilesPath?: string;
+  /** Optional local tech and truck pins. Not a live GPS feed. */
+  positionsPath?: string;
   /** Write the local quality report and alert-action stubs under data/runtime. */
   persistLocalReports?: boolean;
 }
@@ -1236,7 +1241,8 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
       "employee friction is a local aggregate of handoff failures, coordination flags, explicit callbacks, and delayed handoffs; a silent export stays unknown; it is not a hosted HR system and it does not set trainingNeeded",
       "inbound quality is a local checklist for ServiceTitan and ProBooks fragments already on this machine; it is not an accuracy percent and not a tenant pull",
       "alert action stubs are proposals only; write-back stays refused",
-      "the Option C start gate is prep only; every gate stays blocked-until; the pilot is not started"
+      "the Option C start gate is prep only; every gate stays blocked-until; the pilot is not started",
+      "monitoring pins come from an optional local file or a labeled synthetic demo; mile totals still ignore coordinates; no telematics vendor is claimed"
     ],
     confidenceNote:
       dataLabel === "synthetic-demo"
@@ -1318,13 +1324,36 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
     alertActions = persistAlertActions({ cwd, report: alertActions });
   }
   const startGate = optionCStartGate(now);
+  const positions = loadLocalPositions({
+    cwd,
+    instanceId,
+    allowSynthetic: dataLabel === "synthetic-demo",
+    explicitPath: options.positionsPath,
+    milesPath: options.driveMilesPath
+  });
+  const monitoring = buildMonitoring({
+    dataLabel,
+    positions,
+    drive,
+    performance,
+    friction,
+    inboundQuality,
+    calls: visibleCalls.map((call) => ({
+      id: call.id,
+      lane: call.lane,
+      day: call.day,
+      technicianId: call.technicianId,
+      technicianName: call.technicianName,
+      status: call.status
+    }))
+  });
 
   const honesty =
     dataLabel === "synthetic-demo"
-      ? "Synthetic demo on this machine. Not BYO company data. Not a live GM pilot. Miles, the ranked board, collaboration suggestions, and friction are a labeled fixture, not a telematics feed, not a company export, and not a hosted HR system. Inbound quality is a shadow checklist, not an accuracy percent and not a tenant pull. Alert actions are stubs. Option C remains prep."
+      ? "Synthetic demo on this machine. Not BYO company data. Not a live GM pilot. Miles, the ranked board, collaboration suggestions, and friction are a labeled fixture, not a telematics feed, not a company export, and not a hosted HR system. Inbound quality is a shadow checklist, not an accuracy percent and not a tenant pull. Alert actions are stubs. Option C remains prep. Monitoring is local pins, scores, a call board, and charts on this machine. Not a live GPS feed."
       : dataLabel === "byo-admitted-synthetic"
-        ? "BYO-admitted synthetic drill. Local files only. UNVERIFIED. Writes refused. Inbound quality stays on this machine. Alert actions are stubs. Option C remains prep."
-        : "BYO-admitted local export. UNVERIFIED. Writes refused. Authoring node is not a custodian of this desk. Inbound quality stays on this machine. Alert actions are stubs. Option C remains prep.";
+        ? "BYO-admitted synthetic drill. Local files only. UNVERIFIED. Writes refused. Inbound quality stays on this machine. Alert actions are stubs. Option C remains prep. Monitoring stays on this machine. Not a live GPS feed."
+        : "BYO-admitted local export. UNVERIFIED. Writes refused. Authoring node is not a custodian of this desk. Inbound quality stays on this machine. Alert actions are stubs. Option C remains prep. Monitoring stays on this machine. Not a live GPS feed.";
 
   return {
     product: "trades-runtime",
@@ -1371,6 +1400,7 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
     callbackWeek,
     huddle,
     drive,
+    monitoring,
     inboundQuality,
     alertActions,
     optionCStartGate: startGate,

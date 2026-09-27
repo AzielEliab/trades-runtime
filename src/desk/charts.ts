@@ -129,6 +129,47 @@ export function milesChart(points: { t: string; miles: number }[]): string {
   </svg>`;
 }
 
+export function positionMap(pins: { label: string; lat: number; lng: number }[]): string {
+  const width = 640;
+  const height = 280;
+  if (!pins.length) {
+    return emptyChart("Local positions", "No local positions. A live GPS feed is not connected.");
+  }
+  const lats = pins.map((pin) => pin.lat);
+  const lngs = pins.map((pin) => pin.lng);
+  let minLat = Math.min(...lats);
+  let maxLat = Math.max(...lats);
+  let minLng = Math.min(...lngs);
+  let maxLng = Math.max(...lngs);
+  if (maxLat - minLat < 0.02) {
+    minLat -= 0.02;
+    maxLat += 0.02;
+  }
+  if (maxLng - minLng < 0.02) {
+    minLng -= 0.02;
+    maxLng += 0.02;
+  }
+  const padL = 28;
+  const padR = 28;
+  const padT = 28;
+  const padB = 28;
+  const innerW = width - padL - padR;
+  const innerH = height - padT - padB;
+  const xAt = (lng: number) => padL + ((lng - minLng) / (maxLng - minLng)) * innerW;
+  const yAt = (lat: number) => padT + ((maxLat - lat) / (maxLat - minLat)) * innerH;
+  const dots = pins
+    .map((pin) => {
+      const x = xAt(pin.lng).toFixed(1);
+      const y = yAt(pin.lat).toFixed(1);
+      return `<circle class="series-jobs" cx="${x}" cy="${y}" r="6"/><text class="chart-label" x="${x}" y="${(yAt(pin.lat) - 10).toFixed(1)}" text-anchor="middle">${esc(pin.label)}</text>`;
+    })
+    .join("");
+  return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Local position pins. Not a live telematics map.">
+    <rect class="chart-bg" width="100%" height="100%" rx="12"/>
+    ${dots}
+  </svg>`;
+}
+
 export function countBars(rows: { label: string; value: number }[], aria: string, emptyMessage: string): string {
   const width = 640;
   const height = Math.max(160, 36 + Math.max(rows.length, 1) * 28);

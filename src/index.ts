@@ -67,6 +67,15 @@ export {
   summarizeDrive
 } from "./domain/drive-miles.js";
 export {
+  defaultPositionsPath,
+  inboundPositionsPath,
+  loadLocalPositions,
+  pinsFromMilesFile,
+  readPositionFile,
+  SYNTHETIC_POSITIONS
+} from "./domain/local-positions.js";
+export { buildMonitoring, callColumn } from "./desk/monitoring.js";
+export {
   buildInboundQualityReport,
   persistInboundQuality,
   readLocalPeerFragments,

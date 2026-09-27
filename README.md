@@ -62,6 +62,7 @@ CI (`.github/workflows/ci.yml`) runs `npm ci`, `npm run typecheck`, and `npm tes
 | Inbound quality report | `src/domain/inbound-quality.ts` | live-pure |
 | Alert action stubs | `src/desk/alert-actions.ts` | live-pure |
 | Option C start gate | `src/spine/option-c-start-gate.ts` | live-pure |
+| Local positions and Monitoring view | `src/domain/local-positions.ts` | live-pure |
 | Pricebook (ST shadow + current/last cost + LOCK) | `src/domain/pricebook.ts` | live-pure |
 | Truck stock counts / fulfillment | `src/domain/truck-stock.ts` | live-pure |
 | Weather / demand / lunar (experimental) | `src/domain/weather-demand.ts` | live-pure |
@@ -145,6 +146,8 @@ Copy [`data/runtime/alerts.json.example`](data/runtime/alerts.json.example) to `
 `/api/alert-actions` returns stubs only. A firing alert expands to a label, a rationale, the required human authority, and `refused: write-back`. The Human Authority Rule is on the panel. Stubs do not call ServiceTitan or ProBooks.
 
 `/api/option-c-start-gate` lists the start conditions. Every gate stays blocked-until. Option C remains prep until a human operator starts a real pilot. Option D is out of scope. There is no cutover. `pilot_started` stays false. `live_backends` stays false.
+
+`/api/monitoring` is one desk view: local or demo tech and truck pins, drive score cards, tech score cards, a dispatch-style call board, and KPI charts. Pins come from `data/runtime/<instanceId>/positions.json`, `data/inbound/positions.json`, or coordinates copied off a local miles file. Copy `data/runtime/positions.json.example`. An empty folder uses a labeled synthetic demo. A refused file is not replaced by that demo. Mile totals still ignore coordinates. The address map stays undrawn. This is not a live GPS feed and not a telematics vendor. The view recomputes when local files change. Monitoring only. The Human Authority Rule stays on the panel. Nothing writes back to ServiceTitan or ProBooks.
 
 The public Worker may cite `npx tsx src/cli.ts desk` and `/local-desk` as install notes. It does not host the desk, the alert hooks, or tenant metrics. This repo does not deploy the Worker.
 

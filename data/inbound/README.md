@@ -77,6 +77,8 @@ Receipt: [`specs/TR-QUALITY-2026-09-27.txt`](../../specs/TR-QUALITY-2026-09-27.t
 
 `pilot_started` stays false. `live_backends` stays false. Nothing here writes to ServiceTitan or ProBooks.
 
+The same desk has one Monitoring view at `/api/monitoring`. Copy [`../runtime/positions.json.example`](../runtime/positions.json.example) to `data/runtime/<instanceId>/positions.json` or to `data/inbound/positions.json` when you want local tech and truck pins. A missing file stays empty once a local export is admitted. The empty-folder desk shows a labeled synthetic demo. Coordinates on a miles file can move those pins, and mile totals still ignore them. Do not claim a live GPS feed or a telematics vendor. The call board, drive cards, tech scores, and KPI charts recompute from files already on this machine.
+
 ## Miles and ranked performance (0.4.8)
 
 Receipt: [`specs/TR-DRIVE-2026-09-27.txt`](../../specs/TR-DRIVE-2026-09-27.txt).
