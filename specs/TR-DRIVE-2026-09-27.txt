@@ -39,6 +39,26 @@ TRADES-RUNTIME · MILES DRIVEN AND RANKED PERFORMANCE                           
     It does not set trainingNeeded. Training stays the 0.4.7 procedure observation.
     A synthetic demo is not a company export.
     The desk, the printable snapshot, and GET /api/performance show the ranked board.
+    Friction rate sits on that same board. Friction rank 1 is the highest known friction, not the best performance.
+
+ Work together
+    Local Chain D, cross-trade, and recognition flags.
+    Positive collaboration is listed.
+    Suggestions name who or which lane should pair or hand off for service techs when needed and for install.
+    A role with no named person stays a role. People are not invented for a silent export.
+    Revenue alone does not create a suggestion. This is not a skill score.
+    The last person is not blamed.
+    GET /api/work-together on 127.0.0.1 returns the local board.
+
+ Employee friction rate
+    Local aggregate of handoff failures, coordination flags, explicit callbacks, and delayed handoffs.
+    Delayed handoffs are inside the negative count. They are not added twice.
+    Unknown callbacks stay out of the numerator.
+    A row with no flags and only unknown callbacks stays unknown. A missing export is not zero.
+    Highest known friction is listed first, beside the performance rank.
+    It does not set trainingNeeded.
+    It is not a hosted HR system.
+    GET /api/friction on 127.0.0.1 returns the local board.
 
 
  What this cut does not do
@@ -48,6 +68,9 @@ TRADES-RUNTIME · MILES DRIVEN AND RANKED PERFORMANCE                           
     It does not add a ServiceTitan or ProBooks write client.
     It does not claim a live telematics or GPS vendor.
     It does not turn revenue or contribution into trainingNeeded.
+    It does not turn collaboration suggestions or friction into a skill score or into trainingNeeded.
+    It does not host an HR system.
+    It does not invent pairs when the export is silent.
     It does not publish Pages.
     It does not change BYO wording.
     It does not claim the deployed Worker is already 0.4.8.

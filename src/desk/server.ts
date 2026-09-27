@@ -93,6 +93,46 @@ function driveJson(snapshot: OperatorSnapshot): string {
   });
 }
 
+function workTogetherJson(snapshot: OperatorSnapshot): string {
+  return JSON.stringify({
+    product: snapshot.product,
+    version: snapshot.version,
+    author: snapshot.author,
+    generatedAt: snapshot.generatedAt,
+    live_backends: false,
+    writes: false,
+    phoneHome: false,
+    pilot_started: false,
+    loopback: true,
+    dataLabel: snapshot.dataLabel,
+    hostedHr: false,
+    companyExport: false,
+    notASkillScore: true,
+    trainingSeparate: true,
+    workTogether: snapshot.workTogether
+  });
+}
+
+function frictionJson(snapshot: OperatorSnapshot): string {
+  return JSON.stringify({
+    product: snapshot.product,
+    version: snapshot.version,
+    author: snapshot.author,
+    generatedAt: snapshot.generatedAt,
+    live_backends: false,
+    writes: false,
+    phoneHome: false,
+    pilot_started: false,
+    loopback: true,
+    dataLabel: snapshot.dataLabel,
+    hostedHr: false,
+    companyExport: false,
+    notASkillScore: true,
+    trainingSeparate: true,
+    friction: snapshot.friction
+  });
+}
+
 function performanceJson(snapshot: OperatorSnapshot): string {
   return JSON.stringify({
     product: snapshot.product,
@@ -236,6 +276,16 @@ export function startOperatorDesk(options: DeskServerOptions = {}): Promise<Desk
     }
     if (url.pathname === "/api/performance" || url.pathname === "/api/performance.json") {
       const body = performanceJson(snapshotFor(deskOptions, url));
+      send(res, 200, body, "application/json; charset=utf-8");
+      return;
+    }
+    if (url.pathname === "/api/work-together" || url.pathname === "/api/work-together.json") {
+      const body = workTogetherJson(snapshotFor(deskOptions, url));
+      send(res, 200, body, "application/json; charset=utf-8");
+      return;
+    }
+    if (url.pathname === "/api/friction" || url.pathname === "/api/friction.json") {
+      const body = frictionJson(snapshotFor(deskOptions, url));
       send(res, 200, body, "application/json; charset=utf-8");
       return;
     }

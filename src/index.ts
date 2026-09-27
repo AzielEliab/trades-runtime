@@ -66,6 +66,15 @@ export {
   readDriveMilesFile,
   summarizeDrive
 } from "./domain/drive-miles.js";
+export {
+  buildWorkTogether,
+  nameCollaborations,
+  SYNTHETIC_COLLABORATION_ASSIGNMENTS,
+  syntheticDelayedHandoff,
+  syntheticInstallFlag,
+  workTogetherFromRevenue
+} from "./domain/work-together.js";
+export { buildFriction, frictionAsSkillScore, frictionAsTraining } from "./domain/friction.js";
 export { buildWeeklyCallbackDigest } from "./desk/callback-week.js";
 export { reconcilePipelines, paretoFrontier } from "./domain/decision-fabric.js";
 export { requireReportMetadata } from "./domain/analytics.js";

@@ -20,6 +20,15 @@ import { buildWeeklyCallbackDigest, type WeeklyCallbackDigest } from "./callback
 import { collectDepartmentFlags, flagHandoffBehavior, type DepartmentBehaviorBoard } from "../domain/chain-d.js";
 import { flagCrossTradeBehavior } from "../domain/cross-trade-matrix.js";
 import { loadDrivePerformance, type DrivePerformance } from "../domain/drive-miles.js";
+import { buildFriction, type FrictionBoard } from "../domain/friction.js";
+import {
+  buildWorkTogether,
+  nameCollaborations,
+  SYNTHETIC_COLLABORATION_ASSIGNMENTS,
+  syntheticDelayedHandoff,
+  syntheticInstallFlag,
+  type WorkTogetherBoard
+} from "../domain/work-together.js";
 import { buildHuddleBoard, jobCountsAsLate, jobOpenOnBoard, SYNTHETIC_HUDDLE_TRAINING, type HuddleBoard } from "../domain/huddle-board.js";
 import {
   buildPerformanceBoard,
@@ -225,6 +234,8 @@ export interface OperatorSnapshot {
   huddle: HuddleBoard;
   drive: DrivePerformance;
   performance: PerformanceBoard;
+  workTogether: WorkTogetherBoard;
+  friction: FrictionBoard;
   partCosts: DeskPartCosts;
   behavior: DeskBehavior;
   stock: DeskStock;
@@ -442,7 +453,9 @@ function syntheticBehavior(at: string): DeskBehavior {
     toRole: "warehouse",
     coordinationMiss: true
   });
-  const flags = [clean, missed, assist, unevidenced, recognized, qualityMiss].filter((flag): flag is NonNullable<typeof flag> => Boolean(flag));
+  const flags = [clean, missed, assist, unevidenced, recognized, qualityMiss, syntheticInstallFlag(at), syntheticDelayedHandoff()].filter(
+    (flag): flag is NonNullable<typeof flag> => Boolean(flag)
+  );
   return { source: "synthetic-sample", ...collectDepartmentFlags(flags) };
 }
 
@@ -1210,7 +1223,9 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
       "department flags list good handoffs and bad coordination; the last person is not blamed by default",
       "truck counts are a local file, not a hosted inventory ERP",
       "miles come from a local file or a labeled synthetic demo; a missing file stays unknown; no telematics vendor is claimed",
-      "the performance board rank is an operator order, not a skill score, and it does not set trainingNeeded"
+      "the performance board rank is an operator order, not a skill score, and it does not set trainingNeeded",
+      "collaboration suggestions come from Chain D, cross-trade, and recognition flags; revenue alone does not name a pair or a handoff",
+      "employee friction is a local aggregate of handoff failures, coordination flags, explicit callbacks, and delayed handoffs; a silent export stays unknown; it is not a hosted HR system and it does not set trainingNeeded"
     ],
     confidenceNote:
       dataLabel === "synthetic-demo"
@@ -1249,10 +1264,28 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
     jobs: performanceJobs,
     source: dataLabel === "synthetic-demo" ? "synthetic-demo" : "admitted-rows"
   });
+  const collaborations = nameCollaborations({
+    flags: [...behavior.positive, ...behavior.negative],
+    assignments: dataLabel === "synthetic-demo" ? SYNTHETIC_COLLABORATION_ASSIGNMENTS : undefined
+  });
+  const workTogether = buildWorkTogether({
+    source: dataLabel === "synthetic-demo" ? "synthetic-demo" : "local-flags",
+    collaborations
+  });
+  const friction = buildFriction({
+    source: dataLabel === "synthetic-demo" ? "synthetic-demo" : "admitted-rows",
+    jobs: performanceJobs.map((job) => ({
+      technicianId: job.technicianId,
+      technicianName: job.technicianName,
+      department: job.department,
+      callback: job.callback
+    })),
+    collaborations
+  });
 
   const honesty =
     dataLabel === "synthetic-demo"
-      ? "Synthetic demo on this machine. Not BYO company data. Not a live GM pilot. Miles and the ranked board are a labeled fixture, not a telematics feed and not a company export."
+      ? "Synthetic demo on this machine. Not BYO company data. Not a live GM pilot. Miles, the ranked board, collaboration suggestions, and friction are a labeled fixture, not a telematics feed, not a company export, and not a hosted HR system."
       : dataLabel === "byo-admitted-synthetic"
         ? "BYO-admitted synthetic drill. Local files only. UNVERIFIED. Writes refused."
         : "BYO-admitted local export. UNVERIFIED. Writes refused. Authoring node is not a custodian of this desk.";
@@ -1303,6 +1336,8 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
     huddle,
     drive,
     performance,
+    workTogether,
+    friction,
     partCosts,
     behavior,
     stock,
