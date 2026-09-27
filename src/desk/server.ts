@@ -187,7 +187,9 @@ export function startOperatorDesk(options: DeskServerOptions = {}): Promise<Desk
     alertStatePath: options.alertStatePath ?? defaultAlertStatePath(cwd, instanceId),
     persistAlertState: options.persistAlertState ?? true,
     stockCountPath: options.stockCountPath,
-    driveMilesPath: options.driveMilesPath
+    driveMilesPath: options.driveMilesPath,
+    positionsPath: options.positionsPath,
+    persistLocalReports: options.persistLocalReports ?? true
   };
 
   const server = createServer((req: IncomingMessage, res: ServerResponse) => {
@@ -282,6 +284,33 @@ export function startOperatorDesk(options: DeskServerOptions = {}): Promise<Desk
     if (url.pathname === "/api/work-together" || url.pathname === "/api/work-together.json") {
       const body = workTogetherJson(snapshotFor(deskOptions, url));
       send(res, 200, body, "application/json; charset=utf-8");
+      return;
+    }
+    if (url.pathname === "/api/inbound-quality.txt") {
+      const report = snapshotFor(deskOptions, url).inboundQuality;
+      send(res, 200, `${report.humanReport}\n`, "text/plain; charset=utf-8", {
+        "Content-Disposition": 'inline; filename="inbound-quality.txt"'
+      });
+      return;
+    }
+    if (url.pathname === "/api/inbound-quality" || url.pathname === "/api/inbound-quality.json") {
+      const report = snapshotFor(deskOptions, url).inboundQuality;
+      send(res, 200, JSON.stringify(report), "application/json; charset=utf-8");
+      return;
+    }
+    if (url.pathname === "/api/alert-actions" || url.pathname === "/api/alert-actions.json") {
+      const report = snapshotFor(deskOptions, url).alertActions;
+      send(res, 200, JSON.stringify(report), "application/json; charset=utf-8");
+      return;
+    }
+    if (url.pathname === "/api/monitoring" || url.pathname === "/api/monitoring.json") {
+      const board = snapshotFor(deskOptions, url).monitoring;
+      send(res, 200, JSON.stringify(board), "application/json; charset=utf-8");
+      return;
+    }
+    if (url.pathname === "/api/option-c-start-gate" || url.pathname === "/api/option-c-start-gate.json") {
+      const gate = snapshotFor(deskOptions, url).optionCStartGate;
+      send(res, 200, JSON.stringify(gate), "application/json; charset=utf-8");
       return;
     }
     if (url.pathname === "/api/friction" || url.pathname === "/api/friction.json") {

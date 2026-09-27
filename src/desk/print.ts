@@ -347,6 +347,14 @@ export function renderPrintableSnapshot(snapshot: OperatorSnapshot): string {
     <table>${scores}</table>
     <h2>Alerts</h2>
     <ul>${alerts || "<li>No alerts.</li>"}</ul>
+    <h2>Alert action stubs</h2>
+    <p>${esc(snapshot.alertActions.humanAuthorityRule)} refused: write-back. ${snapshot.alertActions.stubs.length} stub${snapshot.alertActions.stubs.length === 1 ? "" : "s"}. No tenant call. live_backends false.</p>
+    <h2>Monitoring</h2>
+    <p>${esc(snapshot.monitoring.note)} ${esc(snapshot.monitoring.humanAuthorityRule)} refused: write-back. Pins ${snapshot.monitoring.positions.pins.length}. Not a live GPS feed. live_backends false.</p>
+    <h2>Inbound quality</h2>
+    <p>${esc(snapshot.inboundQuality.note)} Mean checklist score ${snapshot.inboundQuality.meanScore == null ? "none" : snapshot.inboundQuality.meanScore}. Not an accuracy percent.</p>
+    <h2>Option C start gate</h2>
+    <p>${esc(snapshot.optionCStartGate.claim)} pilot_started false. Every gate is blocked-until.</p>
     <h2>Inbound</h2>
     <table>
       <thead><tr><th>File</th><th>Peer</th><th>Profile</th><th>Verification</th><th>Hash</th></tr></thead>

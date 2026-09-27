@@ -64,6 +64,21 @@ npm run health:local
 
 `pilot:prep` checks these folders, copies `local.json.example` and `alerts.json.example` when the local copies are missing, admits synthetic fixtures in a temp tree, boots the desk on `127.0.0.1`, and prints a receipt. `pilot_started` stays false. It does not start a company pilot, does not fill these folders with fixtures, and does not write to ServiceTitan, ProBooks, or a trades app.
 
+## Inbound quality, alert stubs, and Option C start gate (0.4.9)
+
+Receipt: [`specs/TR-QUALITY-2026-09-27.txt`](../../specs/TR-QUALITY-2026-09-27.txt).
+
+`npm run desk` still binds to `http://127.0.0.1:4174/`. Empty inbound folders use a labeled synthetic quality fixture. That fixture is not a company export and not a live tenant pull.
+
+- The report scores ServiceTitan and ProBooks fragments already on this machine: completeness, schema fit, stale or missing fields, conflicting keys, thin evidence, and refused writes. The checklist score is not an accuracy percent.
+- `/api/inbound-quality` is the machine JSON. `/api/inbound-quality.txt` is the human report. Both stay loopback. The desk also writes `data/runtime/<instanceId>/inbound-quality.json`, `.txt`, and `.jsonl`. Those copies are gitignored.
+- A firing alert lists proposed actions as stubs: a label, a rationale, the required human authority, and `refused: write-back`. `/api/alert-actions` returns stubs only. Nothing calls ServiceTitan or ProBooks.
+- The Option C start-gate panel lists what must be true before a real pilot may start. Every gate stays blocked-until. Option C remains prep until a human operator starts a real pilot. Option D is out of scope. There is no cutover.
+
+`pilot_started` stays false. `live_backends` stays false. Nothing here writes to ServiceTitan or ProBooks.
+
+The same desk has one Monitoring view at `/api/monitoring`. Copy [`../runtime/positions.json.example`](../runtime/positions.json.example) to `data/runtime/<instanceId>/positions.json` or to `data/inbound/positions.json` when you want local tech and truck pins. A missing file stays empty once a local export is admitted. The empty-folder desk shows a labeled synthetic demo. Coordinates on a miles file can move those pins, and mile totals still ignore them. Do not claim a live GPS feed or a telematics vendor. The call board, drive cards, tech scores, and KPI charts recompute from files already on this machine.
+
 ## Miles and ranked performance (0.4.8)
 
 Receipt: [`specs/TR-DRIVE-2026-09-27.txt`](../../specs/TR-DRIVE-2026-09-27.txt).

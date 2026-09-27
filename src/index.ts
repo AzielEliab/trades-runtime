@@ -67,6 +67,23 @@ export {
   summarizeDrive
 } from "./domain/drive-miles.js";
 export {
+  defaultPositionsPath,
+  inboundPositionsPath,
+  loadLocalPositions,
+  pinsFromMilesFile,
+  readPositionFile,
+  SYNTHETIC_POSITIONS
+} from "./domain/local-positions.js";
+export { buildMonitoring, callColumn } from "./desk/monitoring.js";
+export {
+  buildInboundQualityReport,
+  persistInboundQuality,
+  readLocalPeerFragments,
+  scoreInboundFragment,
+  SYNTHETIC_INBOUND_FRAGMENTS
+} from "./domain/inbound-quality.js";
+export { optionCStartGate } from "./spine/option-c-start-gate.js";
+export {
   buildWorkTogether,
   nameCollaborations,
   SYNTHETIC_COLLABORATION_ASSIGNMENTS,
@@ -235,6 +252,7 @@ export {
   dispatchLocalHooks,
   parseAlertConfig
 } from "./desk/alerts.js";
+export { buildAlertActionReport, persistAlertActions, proposeAlertActions, HUMAN_AUTHORITY_RULE } from "./desk/alert-actions.js";
 export {
   ingestTradesAppShadow,
   mayWriteTradesApp,

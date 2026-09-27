@@ -1,6 +1,6 @@
 import { callFilterLabel, type CallDeskFilter } from "../domain/call-class.js";
 import { explainMissionPace } from "../domain/mission-board.js";
-import { capacityChart, jobsChart, milesChart, rankedBars } from "./charts.js";
+import { capacityChart, countBars, jobsChart, milesChart, positionMap, rankedBars } from "./charts.js";
 import type { OperatorSnapshot } from "./snapshot.js";
 
 function esc(value: string): string {
@@ -78,25 +78,54 @@ export function renderScores(snapshot: OperatorSnapshot): string {
     .join("");
 }
 
-function renderRuleArticle(alert: OperatorSnapshot["ruleAlerts"][number], history: boolean): string {
+function renderStubList(stubs: OperatorSnapshot["alertActions"]["stubs"]): string {
+  if (!stubs.length) return "";
+  const rows = stubs
+    .map(
+      (stub) => `<article class="stub" data-refused="${esc(stub.refused)}">
+        <h4>${esc(stub.label)}</h4>
+        <p>${esc(stub.rationale)}</p>
+        <p>Required human authority: ${esc(stub.requiredHumanAuthority)}</p>
+        <p><code>refused: ${esc(stub.refused)}</code> · ServiceTitan write false · ProBooks write false · executed false</p>
+      </article>`
+    )
+    .join("");
+  return `<details class="stubs">
+      <summary>Proposed actions (stubs)</summary>
+      <p class="quiet">${esc(stubs[0]?.humanAuthorityRule ?? "")}</p>
+      ${rows}
+    </details>`;
+}
+
+function renderRuleArticle(alert: OperatorSnapshot["ruleAlerts"][number], history: boolean, stubs: OperatorSnapshot["alertActions"]["stubs"]): string {
   const ack = alert.acknowledgedAt
     ? `<p class="quiet">Acknowledged ${esc(alert.acknowledgedAt)}${alert.acknowledgedBy ? ` by ${esc(alert.acknowledgedBy)}` : ""}.</p>`
     : history
       ? ""
       : `<button type="button" class="ack" data-ack="${esc(alert.id)}">Acknowledge</button>`;
   const state = history ? (alert.active ? "active" : "cleared") : alert.acknowledgedAt ? "acknowledged" : "open";
+  const actions = history ? "" : renderStubList(stubs);
   return `<article class="alert ${esc(alert.severity)}" data-rule="${esc(alert.rule)}" data-state="${state}">
         <span>${esc(alert.severity)} · ${esc(alert.rule)} · ${esc(alert.dataLabel)}</span>
         <h3>${esc(alert.title)}</h3>
         <p>${esc(alert.detail)}</p>
         ${ack}
+        ${actions}
       </article>`;
 }
 
 export function renderAlerts(snapshot: OperatorSnapshot): string {
   const active = snapshot.ruleAlerts.length
-    ? snapshot.ruleAlerts.map((alert) => renderRuleArticle(alert, false)).join("")
-    : `<p class="quiet">No rule is firing on this clock.</p>`;
+    ? snapshot.ruleAlerts
+        .map((alert) =>
+          renderRuleArticle(
+            alert,
+            false,
+            snapshot.alertActions.stubs.filter((stub) => stub.alertId === alert.id)
+          )
+        )
+        .join("")
+    : `<p class="quiet">No rule is firing on this clock. No action stub is proposed.</p>`;
   const notices = snapshot.alerts
     .map(
       (alert) => `<article class="alert ${esc(alert.severity)}">
@@ -118,7 +147,9 @@ export function renderAlerts(snapshot: OperatorSnapshot): string {
         )
         .join("")
     : `<li class="quiet">No alert history on this machine yet.</li>`;
-  return `<p class="quiet">Export current rule hits on this machine: <a href="/api/alerts/digest.json">JSON</a> · <a href="/api/alerts/digest.csv">CSV</a></p>
+  return `<p class="quiet">${esc(snapshot.alertActions.note)}</p>
+    <p class="quiet">${esc(snapshot.alertActions.humanAuthorityRule)}</p>
+    <p class="quiet">Export current rule hits on this machine: <a href="/api/alerts/digest.json">JSON</a> · <a href="/api/alerts/digest.csv">CSV</a> · <a href="/api/alert-actions">Action stubs</a></p>
     <h3 class="subhead">Active rules</h3>
     <div class="rule-alerts">${active}</div>
     <h3 class="subhead">History</h3>
@@ -506,6 +537,154 @@ export function renderWorkTogether(snapshot: OperatorSnapshot): string {
     ${list("Install", board.suggestions.install)}`;
 }
 
+export function renderInboundQuality(snapshot: OperatorSnapshot): string {
+  const report = snapshot.inboundQuality;
+  const volume = countBars(
+    report.volumeBySourceKind.map((row) => ({ label: row.sourceKind, value: row.count })),
+    "Inbound volume by sourceKind",
+    "No ServiceTitan or ProBooks fragments on this machine."
+  );
+  const distribution = countBars(
+    report.scoreDistribution.map((row) => ({ label: row.band, value: row.count })),
+    "Quality score distribution",
+    "No checklist scores on this machine."
+  );
+  const defects = countBars(
+    report.topDefects.map((row) => ({ label: row.defect, value: row.count })),
+    "Top defect classes",
+    "No defect flags on this report."
+  );
+  const rows = report.fragments
+    .slice(0, 12)
+    .map((row) => {
+      const flags = row.flags.length ? row.flags.map((flag) => flag.defect).join(", ") : "none";
+      return `<tr><td>${esc(row.sourceKind)}</td><td><code>${esc(row.sourceId)}</code></td><td>${row.score}</td><td>${esc(flags)}</td></tr>`;
+    })
+    .join("");
+  const mean = report.meanScore == null ? "none" : String(report.meanScore);
+  return `<p class="quiet">${esc(report.note)}</p>
+    <p class="quiet">Source ${esc(report.source)}. Shadow / local. live_backends false. tenant pull false. checklist, not an accuracy percent. refused write-back.</p>
+    <p>Fragments <strong>${report.fragmentCount}</strong>. Mean checklist score <strong>${mean}</strong>.</p>
+    <div class="charts">
+      <section class="chart-card"><header><h3>Volume by sourceKind</h3></header>${volume}</section>
+      <section class="chart-card"><header><h3>Score distribution</h3></header>${distribution}</section>
+      <section class="chart-card"><header><h3>Top defect classes</h3></header>${defects}</section>
+    </div>
+    <table>
+      <thead><tr><th>Source</th><th>Fragment</th><th>Score</th><th>Flags</th></tr></thead>
+      <tbody>${rows || `<tr><td colspan="4">No peer fragments on this machine.</td></tr>`}</tbody>
+    </table>
+    <p class="quiet"><a href="/api/inbound-quality">Inbound quality JSON</a> · <a href="/api/inbound-quality.txt">Human report</a>. Files stay at <code>${esc(report.path)}</code>, <code>${esc(report.textPath)}</code>, and <code>${esc(report.auditPath)}</code>.</p>`;
+}
+
+export function renderMonitoring(snapshot: OperatorSnapshot): string {
+  const board = snapshot.monitoring;
+  const map = positionMap(
+    board.positions.pins.map((pin) => ({
+      label: pin.kind === "truck" ? `${pin.technicianName ?? pin.technicianId} · truck` : (pin.technicianName ?? pin.technicianId),
+      lat: pin.lat,
+      lng: pin.lng
+    }))
+  );
+  const cards = (rows: { id: string; label: string; value: string; note?: string }[]) =>
+    rows
+      .map(
+        (card) => `<article class="metric" data-kpi="${esc(card.id)}">
+          <span>${esc(card.label)}</span>
+          <strong>${esc(card.value)}</strong>
+          ${card.note ? `<p class="quiet">${esc(card.note)}</p>` : ""}
+        </article>`
+      )
+      .join("");
+  const tech = board.techCards
+    .map(
+      (card) => `<article class="score" data-tech="${esc(card.id)}">
+        <span>Rank ${card.rank}</span>
+        <strong>${esc(card.name)}</strong>
+        <p>Avg ticket ${esc(card.avgTicket)}</p>
+        <p class="quiet">Recall ${esc(card.recall)} · Friction ${esc(card.friction)}</p>
+      </article>`
+    )
+    .join("");
+  const columns = board.columns
+    .map((column) => {
+      const jobs = column.calls
+        .map(
+          (call) => `<article class="job-card">
+            <strong>${esc(call.id)}</strong>
+            <span>${esc(call.lane ?? "Lane open")} · ${esc(call.technicianName ?? call.technicianId ?? "Unassigned")}</span>
+            <span>${esc(call.status ?? "status open")} · ${esc(call.day)}</span>
+          </article>`
+        )
+        .join("");
+      return `<section class="call-col" data-column="${esc(column.id)}">
+        <h3>${esc(column.label)} <span>${column.calls.length}</span></h3>
+        ${jobs || `<p class="quiet">None on this board.</p>`}
+      </section>`;
+    })
+    .join("");
+  const quality = countBars(
+    snapshot.inboundQuality.scoreDistribution.map((row) => ({ label: row.band, value: row.count })),
+    "Inbound quality bands",
+    "No checklist scores on this machine."
+  );
+  const tickets = rankedBars(
+    snapshot.performance.employees.slice(0, 5).map((row) => ({ label: row.label, value: row.avgTicket ?? 0 })),
+    "Average ticket"
+  );
+  const friction = rankedBars(
+    [...snapshot.friction.employees]
+      .filter((row) => row.frictionRate != null && row.frictionRank != null)
+      .sort((a, b) => (a.frictionRank ?? 99) - (b.frictionRank ?? 99))
+      .slice(0, 5)
+      .map((row) => ({ label: row.label, value: Math.round((row.frictionRate ?? 0) * 100) })),
+    "Friction"
+  );
+  return `<p>${esc(board.humanAuthorityRule)}</p>
+    <p class="quiet">${esc(board.note)} Monitoring only. refused: ${esc(board.refused)}. ServiceTitan write false. ProBooks write false. live_backends false.</p>
+    <div class="monitor-top">
+      <section>
+        <h3>Positions</h3>
+        <p class="quiet">${esc(board.positions.note)}</p>
+        ${map}
+      </section>
+      <section>
+        <h3>Drive</h3>
+        <div class="kpis">${cards(board.driveCards)}</div>
+      </section>
+    </div>
+    <h3 class="subhead">Tech scores</h3>
+    <div class="tech-cards">${tech || `<p class="quiet">No ranked techs on this desk.</p>`}</div>
+    <h3 class="subhead">Call board</h3>
+    <div class="call-board">${columns}</div>
+    <h3 class="subhead">Today</h3>
+    <div class="kpis">${cards(board.kpis)}</div>
+    <div class="charts">
+      <section class="chart-card"><header><h3>Miles</h3></header>${milesChart(snapshot.drive.days)}</section>
+      <section class="chart-card"><header><h3>Inbound quality</h3><p>Checklist bands. Not an accuracy percent.</p></header>${quality}</section>
+      <section class="chart-card"><header><h3>Avg ticket</h3></header>${tickets}</section>
+      <section class="chart-card"><header><h3>Friction</h3></header>${friction}</section>
+    </div>
+    <p class="quiet"><a href="/api/monitoring">Monitoring JSON</a>. Pins refresh when the local file changes. Not a live GPS feed.</p>`;
+}
+
+export function renderOptionCStartGate(snapshot: OperatorSnapshot): string {
+  const gate = snapshot.optionCStartGate;
+  const items = gate.gates
+    .map(
+      (item) => `<li>
+        <span class="gate-state">${esc(item.state)}</span>
+        <h3>${esc(item.label)}</h3>
+        <p>${esc(item.detail)}</p>
+      </li>`
+    )
+    .join("");
+  return `<p class="quiet">${esc(gate.claim)}</p>
+    <p class="quiet">option C ${esc(gate.optionC)}. pilot ${esc(gate.pilot)}. pilot_started false. pilot may start false. option D ${esc(gate.optionD)}. cutover false. live_backends false. Pages ${esc(gate.pages)}.</p>
+    <ul class="gates">${items}</ul>
+    <p class="quiet"><a href="/api/option-c-start-gate">Start-gate JSON</a>. This panel does not start a pilot.</p>`;
+}
+
 export function renderInbound(snapshot: OperatorSnapshot): string {
   if (!snapshot.inbound.length && !snapshot.refused.length) {
     return `<p class="quiet">Inbound folders are empty. Drop a JSON or CSV export into data/inbound/servicetitan, data/inbound/probooks, or data/inbound/trades-app.</p>`;
@@ -705,6 +884,23 @@ const DESK_STYLES = `
     .alert.watch span { color: var(--watch); }
     .alert.hold span { color: var(--hold); }
     .alert p { margin: 0.25rem 0 0; }
+    details.stubs { margin-top: 0.45rem; }
+    details.stubs summary { cursor: pointer; color: var(--accent); }
+    .stub { margin: 0.45rem 0 0; padding-top: 0.35rem; border-top: 1px dashed var(--line); }
+    .stub h4 { margin: 0.15rem 0; font-size: 0.95rem; }
+    .gates { list-style: none; padding: 0; margin: 0.4rem 0 0; }
+    .monitor-top { display: grid; grid-template-columns: 1.4fr 0.8fr; gap: 0.8rem; margin-top: 0.7rem; }
+    .kpis, .tech-cards { display: grid; gap: 0.6rem; }
+    .kpis { grid-template-columns: repeat(4, 1fr); margin-top: 0.8rem; }
+    .tech-cards { grid-template-columns: repeat(5, 1fr); margin-top: 0.7rem; }
+    .call-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.7rem; margin-top: 0.7rem; }
+    .call-col h3 { display: flex; justify-content: space-between; gap: 0.6rem; align-items: baseline; }
+    .call-col h3 span { font-family: var(--mono); color: var(--muted); font-size: 0.85rem; }
+    .job-card { border: 1px solid var(--line); border-radius: 12px; padding: 0.55rem 0.7rem; margin-top: 0.45rem; background: var(--bg); }
+    .job-card strong { display: block; font-size: 0.92rem; }
+    .job-card span { color: var(--muted); font-size: 0.78rem; }
+    .gates li { border-top: 1px solid var(--line); padding: 0.55rem 0; }
+    .gate-state { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--hold); }
     table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin-top: 0.7rem; }
     th, td { text-align: left; padding: 0.4rem 0.35rem; border-bottom: 1px solid var(--line); vertical-align: top; }
     th { color: var(--muted); font-weight: 650; font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; }
@@ -716,10 +912,11 @@ const DESK_STYLES = `
     footer { color: var(--muted); margin-top: 1.5rem; font-size: 0.84rem; max-width: 68rem; }
     @media (max-width: 960px) {
       .metrics { grid-template-columns: 1fr 1fr; }
-      .charts, .board, .split { grid-template-columns: 1fr; }
+      .charts, .board, .split, .monitor-top { grid-template-columns: 1fr; }
+      .kpis, .tech-cards, .call-board { grid-template-columns: 1fr 1fr; }
     }
     @media (max-width: 560px) {
-      .metrics, .scores { grid-template-columns: 1fr; }
+      .metrics, .scores, .kpis, .tech-cards, .call-board { grid-template-columns: 1fr; }
       .wrap { padding-top: 1.1rem; }
     }
     @media print {
@@ -764,6 +961,10 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
         <a class="text-btn" href="/api/work-together">Work together JSON</a>
         <a class="text-btn" href="/api/friction">Friction JSON</a>
         <a class="text-btn" href="/api/calls/week.json">Callback week JSON</a>
+        <a class="text-btn" href="/api/inbound-quality">Inbound quality JSON</a>
+        <a class="text-btn" href="/api/alert-actions">Alert action stubs</a>
+        <a class="text-btn" href="/api/monitoring">Monitoring</a>
+        <a class="text-btn" href="/api/option-c-start-gate">Option C start gate</a>
         <a class="text-btn" href="/api/alerts/digest.json">Alert digest JSON</a>
         <a class="text-btn" href="/api/alerts/digest.csv">Alert digest CSV</a>
         <p class="live"><span class="dot" id="live-dot"></span><span id="live-state">tracking local state</span></p>
@@ -780,6 +981,10 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
     </div>
     <div class="banner-stack" id="banner">${renderBanner(snapshot)}</div>
     <div class="banner-stack" id="rule-banner">${renderRuleBanner(snapshot)}</div>
+    <section class="panel" style="margin-top:0.8rem" id="monitoring-board">
+      <h2>Monitoring</h2>
+      <div id="monitoring">${renderMonitoring(snapshot)}</div>
+    </section>
     <section class="board">
       <div class="panel" id="mission-board">
         <h2>Mission board</h2>
@@ -854,11 +1059,22 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
         <div id="inbound">${renderInbound(snapshot)}</div>
       </div>
     </section>
+    <section class="panel" style="margin-top:0.8rem" id="inbound-quality-board">
+      <h2>Inbound quality</h2>
+      <div id="inbound-quality">${renderInboundQuality(snapshot)}</div>
+    </section>
+    <section class="panel" style="margin-top:0.8rem" id="option-c-board">
+      <h2>Option C start gate</h2>
+      <div id="option-c">${renderOptionCStartGate(snapshot)}</div>
+    </section>
     <footer>
       Human surface. Agent MCP stays a separate read-only bridge and does not carry this desk.
       Drop folders: <code>data/inbound/servicetitan</code>, <code>data/inbound/probooks</code>, <code>data/inbound/trades-app</code>.
       Optional miles file: <code>data/runtime/&lt;instanceId&gt;/drive-miles.json</code> or <code>data/inbound/drive-miles.json</code>. Copy <code>data/runtime/drive-miles.json.example</code>. No GPS vendor.
+      Optional positions file: <code>data/runtime/&lt;instanceId&gt;/positions.json</code> or <code>data/inbound/positions.json</code>. Copy <code>data/runtime/positions.json.example</code>. Local or demo pins only. Not a live GPS vendor.
       Alert rules: copy <code>data/runtime/alerts.json.example</code> to <code>data/runtime/&lt;instanceId&gt;/alerts.json</code>.
+      Inbound quality and alert-action stubs write under <code>data/runtime/&lt;instanceId&gt;/</code> on this machine. They do not call a tenant.
+      Option C remains prep until a human operator starts a real pilot. Option D is out of scope. No cutover.
       Theme stays in this browser. Print snapshot stays on this machine.
       Refresh ${snapshot.tracking.intervalMs}ms from ${esc(snapshot.tracking.source)}.
     </footer>
@@ -878,7 +1094,7 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
       try { localStorage.setItem(THEME_KEY, next); } catch (error) {}
       applyTheme(next);
     });
-    const slots = ["banner", "rule-banner", "metrics", "charts", "scores", "alerts", "mission", "tech", "calls", "huddle", "callback-week", "lanes", "drive", "performance", "work-together", "part-cost", "behavior", "fulfillment", "inbound"];
+    const slots = ["banner", "rule-banner", "monitoring", "metrics", "charts", "scores", "alerts", "mission", "tech", "calls", "huddle", "callback-week", "lanes", "drive", "performance", "work-together", "part-cost", "behavior", "fulfillment", "inbound", "inbound-quality", "option-c"];
     function apply(view) {
       for (const slot of slots) {
         const node = document.getElementById(slot);
@@ -933,6 +1149,7 @@ export function renderDeskView(snapshot: OperatorSnapshot): Record<string, strin
     dataLabel: snapshot.dataLabel,
     banner: renderBanner(snapshot),
     "rule-banner": renderRuleBanner(snapshot),
+    monitoring: renderMonitoring(snapshot),
     metrics: renderMetrics(snapshot),
     charts: renderCharts(snapshot),
     scores: renderScores(snapshot),
@@ -949,6 +1166,8 @@ export function renderDeskView(snapshot: OperatorSnapshot): Record<string, strin
     "part-cost": renderPartCosts(snapshot),
     behavior: renderBehavior(snapshot),
     fulfillment: renderFulfillment(snapshot),
-    inbound: renderInbound(snapshot)
+    inbound: renderInbound(snapshot),
+    "inbound-quality": renderInboundQuality(snapshot),
+    "option-c": renderOptionCStartGate(snapshot)
   };
 }

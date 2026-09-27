@@ -1,0 +1,17 @@
+{
+  "liveTelematics": false,
+  "live_backends": false,
+  "telematicsVendor": null,
+  "source": "operator-file",
+  "note": "Optional local positions. Read-only. Copy to data/runtime/<instanceId>/positions.json or data/inbound/positions.json. Not a live GPS feed. Do not name a GPS vendor. Mile totals still ignore coordinates.",
+  "pins": [
+    {
+      "technicianId": "tech-local",
+      "technicianName": "Local Tech",
+      "kind": "tech",
+      "lat": 41.88,
+      "lng": -87.63,
+      "at": "2026-09-25T14:00:00Z"
+    }
+  ]
+}

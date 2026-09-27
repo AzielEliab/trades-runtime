@@ -1,0 +1,78 @@
+TRADES-RUNTIME · INBOUND QUALITY, ALERT STUBS, OPTION C START GATE                                      TR-QUALITY-2026-09-27
+
+
+
+
+ Receipt ID TR-QUALITY-2026-09-27 · 2026-09-27
+ Identity: Aziel Eliab only.
+ 0.4.9 is a local Softwares cut. No ServiceTitan or ProBooks write client.
+ live_backends remains false. Pages remain off. Option D remains out of scope.
+ Option C remains prep until a human operator starts a real pilot.
+ This cut does not start that pilot and does not deploy the public Worker.
+ Public Glama listing Version stays 0.3.4 / Latest pre-0.4.4.
+ The Worker already deployed remains 0.4.5. A 0.4.7 redeploy is separately in flight.
+ This source does not claim the public Worker is already 0.4.9.
+
+
+ What this is
+ Three local Softwares on the operator desk.
+
+ 1. Inbound quality report
+    ServiceTitan and ProBooks fragments already admitted as peer classes.
+    The desk reads files on this machine. It does not pull a tenant.
+    Flags: completeness, schema fit, stale or missing fields, conflicting keys,
+    thin evidence, and refused writes.
+    The checklist score is not an accuracy percent.
+    Human text and machine JSON:
+      data/runtime/<instanceId>/inbound-quality.txt
+      data/runtime/<instanceId>/inbound-quality.json
+      data/runtime/<instanceId>/inbound-quality.jsonl
+    Loopback: /api/inbound-quality and /api/inbound-quality.txt
+    Charts: volume by sourceKind, score distribution, top defect classes.
+    An empty folder shows a labeled synthetic demo. That demo is not a company export.
+
+ 2. Alert to action stubs
+    When a local alert rule is firing, the desk shows proposed actions.
+    Each stub has a label, a rationale, the required human authority,
+    and refused: write-back.
+    The Human Authority Rule is on the panel.
+    Stubs persist at data/runtime/<instanceId>/alert-actions.json
+    and alert-actions.jsonl.
+    Loopback: /api/alert-actions
+    Nothing calls ServiceTitan or ProBooks.
+
+ 3. Option C start gate
+    A checklist of what must be true before a real pilot may start.
+    Every gate stays blocked-until.
+    pilot_started stays false. pilot may start stays false.
+    This panel does not start a pilot.
+    Option D is out of scope. No cutover automation.
+
+ 4. Monitoring view
+    One local desk panel. Not five new menus.
+    Pins for techs and trucks come from an optional positions file,
+    from coordinates on a local miles file, or from a labeled synthetic demo.
+    Mile totals still ignore coordinates. The address map stays undrawn.
+    Drive cards, tech score cards, a call board, and KPI charts
+    recompute when those local files change.
+    Not a live GPS feed. Not a telematics vendor. live_backends stays false.
+    Human Authority Rule stays on the panel. Monitoring only. No write-back.
+    Loopback: /api/monitoring
+    Example: data/runtime/positions.json.example
+
+
+ What NOT to do
+    No ServiceTitan write client. No ProBooks write client.
+    No live_backends true. No tenant pull. No central dump.
+    No live GPS feed. No telematics vendor. No invented pin stream.
+    No invented accuracy percent. No fake live GM pilot.
+    No Option D. No cutover.
+    No new vendor brands.
+    Do not cite Glama Latest as this version.
+    GitHub Pages stays off.
+
+
+ Changelog
+    0.4.9 — inbound quality report, alert-action stubs, Option C start-gate prep,
+            plus one local Monitoring view (pins, scores, call board, KPI charts).
+    Prior local miles, ranked board, work-together, and friction remain 0.4.8.
