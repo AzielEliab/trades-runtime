@@ -193,7 +193,7 @@ describe("0.4.9 Option C start gate", () => {
 
 describe("0.4.9 desk surfaces", () => {
   it("shows the quality report, stub actions, and the start gate from local demo data", async () => {
-    expect(RUNTIME_MANIFEST.version).toBe("0.4.10");
+    expect(RUNTIME_MANIFEST.version).toBe("0.4.11");
     expect(RUNTIME_MANIFEST.live_backends).toBe(false);
     const root = mkdtempSync(join(tmpdir(), "tr-desk-049-"));
     const folders = emptyFolders(root);

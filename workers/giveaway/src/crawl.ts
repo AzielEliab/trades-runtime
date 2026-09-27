@@ -31,7 +31,7 @@ export function robotsTxt(): string {
 # Shadow-first local BYO runtime for HVAC, plumbing, electrical, sewer, and cross-trades.
 # Author / identity: Aziel Eliab only. Person @id ${PERSON_ID}.
 # Content-Signal opens search + AI input + AI train. No Disallow for GPTBot.
-# Dual-surface: MCP/OpenAPI for agents; human UI + counted /download.
+# Humans use the giveaway Worker UI on this VibeLock host without downloading first. Agents use MCP/OpenAPI. Optional counted pack: /download.
 
 User-agent: *
 Allow: /
@@ -85,9 +85,9 @@ Softwares tab: ${SOFTWARES_TAB}
 
 ## How to use
 
-1. Humans: open ${PUBLIC_ORIGIN}/ — complete UI + counted GET /download (${RELEASE_FILENAME})
+1. Humans: open ${PUBLIC_ORIGIN}/ — giveaway Worker UI on this VibeLock host (browser / PWA) without downloading first. Panels: honesty, cite, MCP, skill, stats. Install notes: ${PUBLIC_ORIGIN}/local-desk
 2. Agents: POST ${PUBLIC_ORIGIN}/mcp (read-only health/stats/cite/skill) or OpenAPI at ${PUBLIC_ORIGIN}/openapi.json
-3. Install: curl -fsSL ${PUBLIC_ORIGIN}/download -o ${RELEASE_FILENAME} && tar -xzf ${RELEASE_FILENAME}
+3. Optional pack: curl -fsSL ${PUBLIC_ORIGIN}/download -o ${RELEASE_FILENAME} && tar -xzf ${RELEASE_FILENAME}
 4. Softwares card: ${SOFTWARES_TAB}
 5. Local human desk, on the operator machine: npx tsx src/cli.ts desk — install notes at ${PUBLIC_ORIGIN}/local-desk. This Worker does not serve that desk or tenant metrics.
 
@@ -117,8 +117,8 @@ Person: ${PERSON_ID}
 /* SITE */
 Name: ${PRODUCT_TITLE}
 Purpose: Shadow-first local BYO runtime for HVAC, plumbing, electrical, sewer, and cross-trades.
-Human UI: ${PUBLIC_ORIGIN}/
-Counted download: ${PUBLIC_ORIGIN}/download
+Human UI: ${PUBLIC_ORIGIN}/ (browser / PWA on this VibeLock host, without downloading first)
+Optional counted pack: ${PUBLIC_ORIGIN}/download
 Softwares: ${SOFTWARES_TAB}
 Agents: ${PUBLIC_ORIGIN}/mcp · ${PUBLIC_ORIGIN}/openapi.json · ${PUBLIC_ORIGIN}/llms.txt
 `;

@@ -1,15 +1,15 @@
 export const PRODUCT = "trades-runtime";
 export const PRODUCT_TITLE = "Trades-Runtime";
-export const VERSION = "0.4.10";
+export const VERSION = "0.4.11";
 /** Public Glama listing badge. Not this Worker package. Not glama.json. Stale vs the live Worker. */
 export const GLAMA_PUBLIC_VERSION = "0.3.4";
 export const GLAMA_PUBLIC_LATEST = "pre-0.4.4";
-/** Checked 2026-09-27. Glama releaseVersion is still 0.3.4. Do not cite the listing as 0.4.10. */
+/** Checked 2026-09-27. Glama releaseVersion is still 0.3.4. Do not cite the listing as 0.4.11. */
 export const GLAMA_LISTING_STALE = true;
 /** Giveaway Worker version pin. Moves with this repo. Not the Glama listing. */
-export const DEPLOYED_WORKER_VERSION = "0.4.10";
+export const DEPLOYED_WORKER_VERSION = "0.4.11";
 export const GLAMA_LISTING_NOTE =
-  "Public Glama listing Version is 0.3.4 and Latest is pre-0.4.4. Checked 2026-09-27 on https://glama.ai/mcp/servers/AzielEliab/trades-runtime: the public badge is still releaseVersion 0.3.4 (tool updates v0.3.4, observedAt 2026-09-25). That listing is stale. It is not 0.4.10. The version field is this repo and the Worker source. glama.json version is the in-repo claim file, not the Glama Latest badge. The giveaway Worker version pin in this repo is 0.4.10. This cite does not claim the Glama listing is 0.4.10.";
+  "Public Glama listing Version is 0.3.4 and Latest is pre-0.4.4. Checked 2026-09-27 on https://glama.ai/mcp/servers/AzielEliab/trades-runtime: the public badge is still releaseVersion 0.3.4 (tool updates v0.3.4, observedAt 2026-09-25). That listing is stale. It is not 0.4.11. The version field is this repo and the Worker source. glama.json version is the in-repo claim file, not the Glama Latest badge. The giveaway Worker version pin in this repo is 0.4.11. This cite does not claim the Glama listing is 0.4.11.";
 export const AUTHOR = "Aziel Eliab";
 export const IDENTITY = "Aziel Eliab";
 export const LICENSE = "Apache-2.0";
@@ -29,10 +29,10 @@ export const X_HANDLE = "@AzielEliab";
 
 export const PAGE_TITLE = `${PRODUCT_TITLE} · public giveaway · ${VERSION}`;
 export const PAGE_DESCRIPTION =
-  "Trades-Runtime — shadow-first local BYO runtime for HVAC, plumbing, electrical, sewer, and cross-trades. Author Aziel Eliab. live_backends false.";
+  "Trades-Runtime — use the giveaway Worker UI on this VibeLock host without downloading first. Shadow-first local BYO runtime for HVAC, plumbing, electrical, sewer, and cross-trades. Author Aziel Eliab. live_backends false.";
 export const OG_TITLE = "Trades-Runtime by Aziel Eliab";
 export const OG_DESCRIPTION =
-  "Shadow-first local BYO field-trades runtime. HVAC, plumbing, electrical, sewer, cross-trades.";
+  "Use the giveaway UI on this VibeLock Worker. Local-first BYO field-trades runtime. The operator desk still installs on your machine.";
 
 export const COMPATIBLE_AI_CLIENTS = [
   "ChatGPT (GPT Actions / OpenAI)",
@@ -188,7 +188,7 @@ export const SITEMAP_PATHS = SITEMAP_ENTRIES.map((entry) => entry.path);
 
 export const HONESTY = {
   product:
-    "Local-first BYO runtime. People bring their own ServiceTitan and ProBooks. Trades-app drop-in and the operator desk run on the operator machine. No tenant data on this Worker. No ST/ProBooks write-back. live_backends false.",
+    "Local-first BYO runtime. People bring their own ServiceTitan and ProBooks. Humans use this giveaway Worker UI on the VibeLock host (browser / PWA) without downloading first. Agents use OpenAPI and MCP. The optional counted pack is GET /download. Trades-app drop-in and the operator desk run on the operator machine. No tenant data on this Worker. No ST/ProBooks write-back. live_backends false.",
   counters:
     "Honest Workers KV counts. views increments exactly once per successful GET / HTML homepage 200. Health-check user-agents and non-GET / requests are not counted. downloads increments exactly once per successful GET /download 200 after the release tarball is verified as gzip. Assets, /v1/health, /v1/stats, /openapi.json, /mcp, /cite.json, /llms.txt, /robots.txt, and /v1/skill do not increment. No sampling. No inflation. No estimated unique visitors. Start at 0. Each increment writes one unique COUNTS key (views:<uuid> or downloads:<uuid>) and also does value = (parseInt(await kv.get(name))||0)+1 with put on the name key. GET /v1/stats lists the unique keys (source of truth) and never seeds or rounds up. KV list is eventually consistent — a just-written key may take up to ~60s to appear in another colo. Failed downloads never increment."
 } as const;

@@ -99,7 +99,7 @@ function main(argv: string[]): void {
       "",
       "BYO local ServiceTitan, ProBooks, and trades-app inbound. No live writes. Credentials stay on this machine.",
       "Option C code-ready / pilot not started. Option D not started. Pages intentionally disabled.",
-      "Public get (if deployed): https://trades-runtime.vibelock.workers.dev — giveaway UI + counted tarball only.",
+      "Public get (if deployed): https://trades-runtime.vibelock.workers.dev — giveaway Worker UI without downloading first. Optional counted tarball at /download.",
       "The public Worker does not host this desk or tenant metrics.",
       ""
     ].join("\n")
