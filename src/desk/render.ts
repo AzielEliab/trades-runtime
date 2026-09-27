@@ -249,6 +249,8 @@ export function renderHuddle(snapshot: OperatorSnapshot): string {
         ${bar}
         <p class="why">${esc(tech.lateRiskWhy)}</p>
         <p>Callback share <strong>${esc(tech.callbackShare)}</strong>. Warranty share <strong>${esc(tech.warrantyShare)}</strong>. Capacity booked ${tech.capacity.booked}, open ${esc(openLabel)}.</p>
+        <p>Training needed <strong>${esc(tech.trainingNeeded.severity)}</strong>.</p>
+        <p class="why">${esc(tech.trainingNeeded.reason)}</p>
         <p class="why">${esc(tech.callbackShareWhy)}</p>
         <p class="why">${esc(tech.warrantyShareWhy)}</p>
         <p class="quiet">${esc(tech.capacity.why)}</p>
@@ -312,11 +314,63 @@ export function renderFulfillment(snapshot: OperatorSnapshot): string {
         `<li class="${step.reached ? "on" : "off"}"><span>${esc(step.step)}</span></li>`
     )
     .join("");
-  const note =
-    snapshot.fulfillment.label === "synthetic-demo"
-      ? "Synthetic fulfillment advanced REQUESTED to READY with the local state machine."
-      : "Fulfillment rail is empty. No local event stream is attached.";
-  return `<p class="quiet">${esc(note)}</p><ol class="rail">${steps}</ol>`;
+  const note = snapshot.fulfillment.countNote;
+  const stockRows = snapshot.stock.lines
+    .map((line) => {
+      const place = line.location === "ON_VAN" ? line.vanId ?? "van" : line.placeId ?? "place";
+      return `<tr><td>${esc(line.sku)}</td><td>${esc(line.location)}</td><td>${esc(place)}</td><td>${line.quantity}</td></tr>`;
+    })
+    .join("");
+  const request = snapshot.stock.sampleRequest
+    ? `<p>Count-backed request: ${esc(snapshot.stock.sampleRequest.sku)} short ${snapshot.stock.sampleRequest.quantity} from ${esc(snapshot.stock.sampleRequest.location)}. On-van ${snapshot.stock.sampleRequest.onVan}. Warehouse ${snapshot.stock.sampleRequest.warehouse}.</p>`
+    : "";
+  return `<p class="quiet">${esc(note)}</p>
+    <p class="quiet">Stock source ${esc(snapshot.stock.source)}. hosted inventory false. <a href="/api/stock">Stock JSON</a></p>
+    <table>
+      <thead><tr><th>SKU</th><th>Location</th><th>Place</th><th>Count</th></tr></thead>
+      <tbody>${stockRows || `<tr><td colspan="4">No counts on this desk.</td></tr>`}</tbody>
+    </table>
+    ${request}
+    <ol class="rail">${steps}</ol>`;
+}
+
+export function renderPartCosts(snapshot: OperatorSnapshot): string {
+  const rows = snapshot.partCosts.lines
+    .map(
+      (line) => `<tr>
+        <td>${esc(line.sku)}</td>
+        <td>${line.currentCost}</td>
+        <td>${line.lastCost}</td>
+        <td>${line.adaptedCost}</td>
+        <td>${line.marketWeight}</td>
+        <td>${line.weakened ? "weakened" : "supported"}</td>
+      </tr>`
+    )
+    .join("");
+  const totals =
+    snapshot.partCosts.adaptedParts == null
+      ? ""
+      : `<p>Adapted parts ${snapshot.partCosts.adaptedParts}. Current parts ${snapshot.partCosts.currentParts}. Last parts ${snapshot.partCosts.lastParts}. Not a skill score.</p>`;
+  return `<p class="quiet">${esc(snapshot.partCosts.note)}</p>
+    <p class="quiet">Subordinate to a human. Auto-applied false. Source ${esc(snapshot.partCosts.source)}.</p>
+    ${totals}
+    <table>
+      <thead><tr><th>SKU</th><th>Current</th><th>Last</th><th>Adapted</th><th>Market weight</th><th>Evidence</th></tr></thead>
+      <tbody>${rows || `<tr><td colspan="6">No part-cost lines.</td></tr>`}</tbody>
+    </table>`;
+}
+
+export function renderBehavior(snapshot: OperatorSnapshot): string {
+  const row = (flag: OperatorSnapshot["behavior"]["positive"][number]) =>
+    `<li><strong>${esc(flag.polarity)}</strong> ${esc(flag.source)} · ${esc(flag.kind)} · ${esc(flag.fromRole)} → ${esc(flag.toRole)}. ${esc(flag.summary)}</li>`;
+  const positive = snapshot.behavior.positive.map(row).join("");
+  const negative = snapshot.behavior.negative.map(row).join("");
+  return `<p>${esc(snapshot.behavior.note)}</p>
+    <p class="quiet">Source ${esc(snapshot.behavior.source)}. systemBeforeBlame true. Last person blamed by default: false.</p>
+    <h3>Good</h3>
+    <ul>${positive || "<li>No good-handoff flags on this desk.</li>"}</ul>
+    <h3>Bad coordination</h3>
+    <ul>${negative || "<li>No bad-coordination flags on this desk.</li>"}</ul>`;
 }
 
 export function renderInbound(snapshot: OperatorSnapshot): string {
@@ -571,6 +625,7 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
         <button type="button" class="text-btn" id="theme-toggle">Light theme</button>
         <a class="text-btn" href="${snapshot.callFilter.value === "all" ? "/api/receipt" : `/api/receipt?calls=${snapshot.callFilter.value}`}">Print snapshot</a>
         <a class="text-btn" href="/api/huddle">Print huddle</a>
+        <a class="text-btn" href="/api/stock">Stock JSON</a>
         <a class="text-btn" href="/api/calls/week.json">Callback week JSON</a>
         <a class="text-btn" href="/api/alerts/digest.json">Alert digest JSON</a>
         <a class="text-btn" href="/api/alerts/digest.csv">Alert digest CSV</a>
@@ -629,8 +684,18 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
       </div>
     </section>
     <section class="split">
+      <div class="panel" id="part-cost-board">
+        <h2>Part cost</h2>
+        <div id="part-cost">${renderPartCosts(snapshot)}</div>
+      </div>
+      <div class="panel" id="behavior-board">
+        <h2>Department behavior</h2>
+        <div id="behavior">${renderBehavior(snapshot)}</div>
+      </div>
+    </section>
+    <section class="split">
       <div class="panel">
-        <h2>Fulfillment</h2>
+        <h2>Fulfillment and truck counts</h2>
         <div id="fulfillment">${renderFulfillment(snapshot)}</div>
       </div>
       <div class="panel">
@@ -661,7 +726,7 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
       try { localStorage.setItem(THEME_KEY, next); } catch (error) {}
       applyTheme(next);
     });
-    const slots = ["banner", "rule-banner", "metrics", "charts", "scores", "alerts", "mission", "tech", "calls", "huddle", "callback-week", "lanes", "fulfillment", "inbound"];
+    const slots = ["banner", "rule-banner", "metrics", "charts", "scores", "alerts", "mission", "tech", "calls", "huddle", "callback-week", "lanes", "part-cost", "behavior", "fulfillment", "inbound"];
     function apply(view) {
       for (const slot of slots) {
         const node = document.getElementById(slot);
@@ -726,6 +791,8 @@ export function renderDeskView(snapshot: OperatorSnapshot): Record<string, strin
     huddle: renderHuddle(snapshot),
     "callback-week": renderCallbackWeek(snapshot),
     lanes: renderLanes(snapshot),
+    "part-cost": renderPartCosts(snapshot),
+    behavior: renderBehavior(snapshot),
     fulfillment: renderFulfillment(snapshot),
     inbound: renderInbound(snapshot)
   };

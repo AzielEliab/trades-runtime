@@ -77,9 +77,14 @@ export function hookWarehouse(patterns: NeighborhoodPattern[]): IntelligenceHook
   });
 }
 
-export function hookTraining(patterns: NeighborhoodPattern[]): IntelligenceHook<{ emergingClasses: string[] }> {
+export function hookTraining(patterns: NeighborhoodPattern[]): IntelligenceHook<{
+  emergingClasses: string[];
+  /** Neighborhood pattern classes. Per-tech trainingNeeded lives on the huddle, not here. */
+  perTechTrainingNeeded: false;
+}> {
   return hook("training", {
-    emergingClasses: patterns.filter((p) => p.kind === "ObservedNeighborhoodPattern").map((p) => p.patternClass)
+    emergingClasses: patterns.filter((p) => p.kind === "ObservedNeighborhoodPattern").map((p) => p.patternClass),
+    perTechTrainingNeeded: false
   });
 }
 

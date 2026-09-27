@@ -100,3 +100,15 @@ export function supportDistinction(input: {
 export function retirePattern(pattern: RegionalPattern): RegionalPattern {
   return { ...pattern, ladder: "RETIRED", weight: Math.min(pattern.weight, 0.05) };
 }
+
+/**
+ * How hard a broader market prior may pull a current cost.
+ * Thin, stale, conflicted, dissimilar, or stopped evidence stays at or under 0.15.
+ * Missing evidence does not invent a market.
+ */
+export function marketAdaptationWeight(evidence?: PatternEvidence): { weight: number; weakened: boolean } {
+  if (!evidence) return { weight: 0, weakened: true };
+  const raw = evidenceWeight(evidence);
+  const weakened = weakenOnThinEvidence(evidence);
+  return { weight: weakened ? Math.min(raw, 0.15) : raw, weakened };
+}

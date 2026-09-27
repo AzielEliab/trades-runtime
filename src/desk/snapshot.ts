@@ -17,10 +17,26 @@ import {
   type CallDeskFilter
 } from "../domain/call-class.js";
 import { buildWeeklyCallbackDigest, type WeeklyCallbackDigest } from "./callback-week.js";
-import { buildHuddleBoard, jobCountsAsLate, jobOpenOnBoard, type HuddleBoard } from "../domain/huddle-board.js";
+import { collectDepartmentFlags, flagHandoffBehavior, type DepartmentBehaviorBoard } from "../domain/chain-d.js";
+import { flagCrossTradeBehavior } from "../domain/cross-trade-matrix.js";
+import { buildHuddleBoard, jobCountsAsLate, jobOpenOnBoard, SYNTHETIC_HUDDLE_TRAINING, type HuddleBoard } from "../domain/huddle-board.js";
+import { rollupPartCosts } from "../domain/job-economics.js";
+import { adaptPartCost } from "../domain/pricebook.js";
+import { flagRecognitionBehavior } from "../domain/recognition.js";
+import { type PatternEvidence } from "../domain/regional-recalibration.js";
 import { emptyFulfillmentStream, fulfillmentTrail, runFulfillmentTo } from "../domain/fulfillment-machine.js";
 import { explainMissionPace, openMissionDay, type MissionDayBoard } from "../domain/mission-board.js";
-import { FULFILLMENT_STEPS, type FulfillmentStep, type StockRequest } from "../domain/truck-stock.js";
+import {
+  defaultStockCountPath,
+  emptyStockBook,
+  FULFILLMENT_STEPS,
+  fulfillmentQueueFromCounts,
+  readStockBook,
+  recordStockCount,
+  type FulfillmentStep,
+  type StockCountLine,
+  type StockRequest
+} from "../domain/truck-stock.js";
 import { explainBookingBlock, type BookingBlock, type BookingBlockExplanation } from "../domain/workforce-capacity.js";
 import { RUNTIME_MANIFEST } from "../manifest.js";
 import {
@@ -200,6 +216,9 @@ export interface OperatorSnapshot {
   visibleCalls: DeskCallRow[];
   callbackWeek: WeeklyCallbackDigest;
   huddle: HuddleBoard;
+  partCosts: DeskPartCosts;
+  behavior: DeskBehavior;
+  stock: DeskStock;
   bookingReceipt: BookingBlockExplanation;
   series: DeskSeriesPoint[];
   capacity: DeskCapacityPoint[];
@@ -209,7 +228,11 @@ export interface OperatorSnapshot {
   receiptDigest: DeskReceiptDigest;
   mission: MissionDayBoard;
   bookingBlock: BookingBlock;
-  fulfillment: { label: DeskDataLabel | "none"; steps: { step: FulfillmentStep; reached: boolean }[] };
+  fulfillment: {
+    label: DeskDataLabel | "none";
+    steps: { step: FulfillmentStep; reached: boolean }[];
+    countNote: string;
+  };
   scores: DeskScore[];
   alerts: DeskAlert[];
   ruleAlerts: StoredAlert[];
@@ -235,6 +258,267 @@ export interface DeskSnapshotOptions {
   alertStatePath?: string;
   persistAlertState?: boolean;
   callFilter?: CallDeskFilter;
+  stockCountPath?: string;
+}
+
+export interface DeskPartCostLine {
+  sku: string;
+  quantity: number;
+  currentCost: number;
+  lastCost: number;
+  averageCost: number;
+  adaptedCost: number;
+  costMove: number;
+  marketWeight: number;
+  weakened: boolean;
+  note: string;
+  subordinateToHuman: true;
+}
+
+export interface DeskPartCosts {
+  source: "synthetic-sample" | "none";
+  subordinateToHuman: true;
+  autoApplied: false;
+  weakened: boolean;
+  adaptedParts: number | null;
+  currentParts: number | null;
+  lastParts: number | null;
+  note: string;
+  lines: DeskPartCostLine[];
+}
+
+export interface DeskBehavior extends DepartmentBehaviorBoard {
+  source: "synthetic-sample" | "none";
+}
+
+export interface DeskStock {
+  source: "synthetic-sample" | "local-file" | "none";
+  hostedInventory: false;
+  liveErp: false;
+  path: string | null;
+  note: string;
+  lines: StockCountLine[];
+  sampleRequest: { sku: string; quantity: number; location: string; onVan: number; warehouse: number } | null;
+}
+
+const THIN_MARKET: PatternEvidence = {
+  sampleSize: 2,
+  geographicConcentration: 0.2,
+  constructionSimilarity: 0.2,
+  materialSimilarity: 0.2,
+  technicianConfirmations: 0,
+  outcomeConfirmations: 0,
+  recencyDays: 800,
+  crossBranchAgreement: 0.1,
+  conflicting: true,
+  stale: true,
+  cohortDissimilar: true,
+  stoppedRecurring: false
+};
+
+const STRONG_MARKET: PatternEvidence = {
+  sampleSize: 40,
+  geographicConcentration: 0.8,
+  constructionSimilarity: 0.85,
+  materialSimilarity: 0.9,
+  technicianConfirmations: 12,
+  outcomeConfirmations: 10,
+  recencyDays: 40,
+  crossBranchAgreement: 0.8,
+  conflicting: false,
+  stale: false,
+  cohortDissimilar: false,
+  stoppedRecurring: false
+};
+
+function emptyPartCosts(): DeskPartCosts {
+  return {
+    source: "none",
+    subordinateToHuman: true,
+    autoApplied: false,
+    weakened: true,
+    adaptedParts: null,
+    currentParts: null,
+    lastParts: null,
+    note: "No part-cost sample is on this desk. Current cost, last cost, and market adaptation are not invented from a silent export.",
+    lines: []
+  };
+}
+
+function syntheticPartCosts(): DeskPartCosts {
+  const inputs = [
+    { sku: "COND-14", quantity: 1, currentCost: 180, lastCost: 175, averageCost: 210, evidence: THIN_MARKET },
+    { sku: "TXV-9", quantity: 1, currentCost: 40, lastCost: 55, averageCost: 48, evidence: STRONG_MARKET }
+  ];
+  const rollup = rollupPartCosts(inputs);
+  const lines: DeskPartCostLine[] = inputs.map((line) => {
+    const signal = adaptPartCost(line, line.evidence);
+    return {
+      sku: line.sku,
+      quantity: line.quantity,
+      currentCost: signal.currentCost,
+      lastCost: signal.lastCost,
+      averageCost: signal.averageCost,
+      adaptedCost: signal.adaptedCost,
+      costMove: signal.costMove,
+      marketWeight: signal.marketWeight,
+      weakened: signal.weakened,
+      note: signal.note,
+      subordinateToHuman: true
+    };
+  });
+  return {
+    source: "synthetic-sample",
+    subordinateToHuman: true,
+    autoApplied: false,
+    weakened: rollup.weakened,
+    adaptedParts: rollup.adaptedParts,
+    currentParts: rollup.currentParts,
+    lastParts: rollup.lastParts,
+    note: `${rollup.note} Shadow recommendation only. Locked prices still refuse auto-recalibrate. Not a live price write.`,
+    lines
+  };
+}
+
+function emptyBehavior(): DeskBehavior {
+  return {
+    source: "none",
+    positive: [],
+    negative: [],
+    systemBeforeBlame: true,
+    lastPersonBlamedByDefault: false,
+    note: "No coordination sample is on this desk. Good and bad department flags are not invented."
+  };
+}
+
+function syntheticBehavior(at: string): DeskBehavior {
+  const clean = flagHandoffBehavior({
+    recordId: "syn-clean",
+    at,
+    fromRole: "warehouse",
+    toRole: "dispatch",
+    expectedAction: "stage-part",
+    actualAction: "stage-part",
+    acknowledged: true,
+    knowledgeAtOrigin: { ready: true },
+    knowledgeAtRecipient: { ready: true }
+  });
+  const missed = flagHandoffBehavior({
+    recordId: "syn-missed",
+    at,
+    fromRole: "warehouse",
+    toRole: "dispatch",
+    expectedAction: "ack-ready",
+    actualAction: "silent",
+    acknowledged: false,
+    knowledgeAtOrigin: { ready: true }
+  });
+  const assist = flagCrossTradeBehavior({
+    signal: { origin: "hvac", receiving: "electrical", evidenceSupported: true, weight: 0.1 }
+  });
+  const unevidenced = flagCrossTradeBehavior({
+    signal: { origin: "plumbing", receiving: "sewer", evidenceSupported: false, weight: 0.4 }
+  });
+  const recognized = flagRecognitionBehavior({
+    flagId: "syn-rec",
+    candidate: { kind: "successful-repair", revenue: 420, qualityOk: true, callbackAcceptable: true },
+    fromRole: "van",
+    toRole: "warehouse"
+  });
+  const qualityMiss = flagRecognitionBehavior({
+    flagId: "syn-quality",
+    candidate: { kind: "successful-repair", revenue: 420, qualityOk: false, callbackAcceptable: false },
+    fromRole: "dispatch",
+    toRole: "warehouse",
+    coordinationMiss: true
+  });
+  const flags = [clean, missed, assist, unevidenced, recognized, qualityMiss].filter((flag): flag is NonNullable<typeof flag> => Boolean(flag));
+  return { source: "synthetic-sample", ...collectDepartmentFlags(flags) };
+}
+
+function syntheticStock(at: string): DeskStock {
+  let book = emptyStockBook("synthetic", at);
+  book = recordStockCount(book, {
+    sku: "COND-14",
+    location: "ON_VAN",
+    vanId: "van-214",
+    quantity: 2,
+    countedAt: at,
+    countedBy: "fixture"
+  });
+  book = recordStockCount(book, {
+    sku: "COND-14",
+    location: "BRANCH_STOCK",
+    placeId: "branch-3",
+    quantity: 6,
+    countedAt: at,
+    countedBy: "fixture"
+  });
+  const queue = fulfillmentQueueFromCounts(
+    [
+      {
+        callId: "syn-desk-call",
+        vanId: "van-214",
+        partNumber: "COND-14",
+        quantity: 3,
+        location: "BRANCH_STOCK",
+        urgency: "same-day"
+      }
+    ],
+    book
+  );
+  const request = queue[0];
+  return {
+    source: "synthetic-sample",
+    hostedInventory: false,
+    liveErp: false,
+    path: null,
+    note: "Fixture counts on this machine. On-van COND-14 is 2. Branch stock is 6. A demand of 3 creates a short request of 1 from branch stock. Unknown counts are not treated as zero. Not a hosted inventory ERP.",
+    lines: book.counts,
+    sampleRequest: request
+      ? { sku: request.partNumber, quantity: request.quantity, location: request.location, onVan: 2, warehouse: 6 }
+      : null
+  };
+}
+
+function emptyStock(): DeskStock {
+  return {
+    source: "none",
+    hostedInventory: false,
+    liveErp: false,
+    path: null,
+    note: "No local stock count file. Counts are not invented.",
+    lines: [],
+    sampleRequest: null
+  };
+}
+
+function loadDeskStock(args: {
+  cwd: string;
+  instanceId: string;
+  now: string;
+  dataLabel: DeskDataLabel;
+  stockCountPath?: string;
+}): DeskStock {
+  const path = args.stockCountPath ?? join(args.cwd, defaultStockCountPath(args.instanceId));
+  if (existsSync(path)) {
+    try {
+      const book = readStockBook(path);
+      return {
+        source: "local-file",
+        hostedInventory: false,
+        liveErp: false,
+        path,
+        note: "Counts read from the local stock file on this machine. Not a hosted inventory ERP.",
+        lines: book.counts,
+        sampleRequest: null
+      };
+    } catch {
+      // A bad local file does not become a synthetic count.
+    }
+  }
+  if (args.dataLabel === "synthetic-demo") return syntheticStock(args.now);
+  return emptyStock();
 }
 
 function isCompleted(status: string | undefined): boolean {
@@ -459,7 +743,8 @@ function syntheticFulfillment(at: string): OperatorSnapshot["fulfillment"] {
   const reached = new Set<string>(["REQUESTED", ...fulfillmentTrail(ran.stream)]);
   return {
     label: "synthetic-demo",
-    steps: FULFILLMENT_STEPS.map((step) => ({ step, reached: reached.has(step) }))
+    steps: FULFILLMENT_STEPS.map((step) => ({ step, reached: reached.has(step) })),
+    countNote: "Synthetic fulfillment advanced REQUESTED to READY. Count-backed stock is listed beside this rail."
   };
 }
 
@@ -540,7 +825,8 @@ function toDeskCall(args: {
 function emptyFulfillment(): OperatorSnapshot["fulfillment"] {
   return {
     label: "none",
-    steps: FULFILLMENT_STEPS.map((step) => ({ step, reached: false }))
+    steps: FULFILLMENT_STEPS.map((step) => ({ step, reached: false })),
+    countNote: "Fulfillment rail is empty. No local event stream is attached."
   };
 }
 
@@ -872,8 +1158,22 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
     sameDayElapsedFractionAtOrAbove: sameDayAt,
     source: callSource,
     slotsById: new Map(dataLabel === "synthetic-demo" ? SYNTHETIC_DESK_TECHS.map((tech) => [tech.id, tech.slots]) : []),
-    namesById: new Map(dataLabel === "synthetic-demo" ? SYNTHETIC_DESK_TECHS.map((tech) => [tech.id, tech.name]) : [])
+    namesById: new Map(dataLabel === "synthetic-demo" ? SYNTHETIC_DESK_TECHS.map((tech) => [tech.id, tech.name]) : []),
+    trainingObservations: dataLabel === "synthetic-demo" ? SYNTHETIC_HUDDLE_TRAINING : []
   });
+  const partCosts = dataLabel === "synthetic-demo" ? syntheticPartCosts() : emptyPartCosts();
+  const behavior = dataLabel === "synthetic-demo" ? syntheticBehavior(now) : emptyBehavior();
+  const stock = loadDeskStock({
+    cwd,
+    instanceId,
+    now,
+    dataLabel,
+    stockCountPath: options.stockCountPath
+  });
+  const fulfillmentView = {
+    ...fulfillment,
+    countNote: stock.note
+  };
 
   const sampleHashes = collected.inbound.flatMap((row) => row.sampleHashes).slice(0, 6);
   const report = requireReportMetadata({
@@ -888,7 +1188,11 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
       "prediction confidence is withheld on BYO drops",
       "callback and warranty counts are explicit labels; unknown stays not classified",
       "per-call reasons repeat those labels; a silent export stays not classified",
-      "callback share and warranty share are call mix, not a technician skill score"
+      "callback share and warranty share are call mix, not a technician skill score",
+      "training needed is a procedure observation, not revenue, margin, or contribution per hour",
+      "part cost uses current and last cost; regional adaptation weakens on thin evidence",
+      "department flags list good handoffs and bad coordination; the last person is not blamed by default",
+      "truck counts are a local file, not a hosted inventory ERP"
     ],
     confidenceNote:
       dataLabel === "synthetic-demo"
@@ -950,6 +1254,9 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
     visibleCalls,
     callbackWeek,
     huddle,
+    partCosts,
+    behavior,
+    stock,
     bookingReceipt,
     series,
     capacity,
@@ -959,7 +1266,7 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
     receiptDigest,
     mission,
     bookingBlock,
-    fulfillment,
+    fulfillment: fulfillmentView,
     scores,
     alerts,
     ruleAlerts: applied.active,

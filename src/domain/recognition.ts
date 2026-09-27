@@ -1,3 +1,5 @@
+import type { DepartmentBehaviorFlag } from "./chain-d.js";
+
 export type RecognitionKind =
   | "successful-repair"
   | "turnover-closed"
@@ -52,6 +54,49 @@ export function fireRecognition(candidate: RecognitionCandidate, at: string): Re
     throw new Error("recognition refused: quality gates not satisfied");
   }
   return { kind: candidate.kind, revenue: candidate.revenue, fired: true, at };
+}
+
+/**
+ * Quality-gated collaboration flag. Raw revenue does not produce a flag.
+ * A quality miss is negative only when the caller marks a coordination miss.
+ * The last person is not blamed.
+ */
+export function flagRecognitionBehavior(input: {
+  flagId: string;
+  candidate: RecognitionCandidate;
+  fromRole: string;
+  toRole: string;
+  coordinationMiss?: boolean;
+}): DepartmentBehaviorFlag | undefined {
+  if (input.candidate.rawRevenueOnly) return undefined;
+  if (mayRecognize(input.candidate)) {
+    const shared = input.candidate.kind === "turnover-closed" || input.candidate.kind === "high-value-quality";
+    return {
+      flagId: input.flagId,
+      polarity: "positive",
+      source: "recognition",
+      fromRole: input.fromRole,
+      toRole: input.toRole,
+      kind: shared ? "shared-diagnosis" : "clean-handoff",
+      summary: `Quality gates passed for ${input.candidate.kind} between ${input.fromRole} and ${input.toRole}. Revenue alone did not fire this flag.`,
+      attribution: "unknown",
+      lastPersonBlamed: false,
+      systemBeforeBlame: true
+    };
+  }
+  if (!input.coordinationMiss) return undefined;
+  return {
+    flagId: input.flagId,
+    polarity: "negative",
+    source: "recognition",
+    fromRole: input.fromRole,
+    toRole: input.toRole,
+    kind: "quality-gate-miss",
+    summary: `Quality gates did not pass between ${input.fromRole} and ${input.toRole}. This is not a revenue miss. The last person is not the cause by default.`,
+    attribution: "system",
+    lastPersonBlamed: false,
+    systemBeforeBlame: true
+  };
 }
 
 /** Replacement turnovers preserve both the originating Van and the closing Comfort Advisor. */
