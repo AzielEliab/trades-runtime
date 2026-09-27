@@ -25,3 +25,4 @@ data/**
 !data/runtime/.gitkeep
 !data/runtime/alerts.json.example
 !data/runtime/drive-miles.json.example
+!data/runtime/field-flags.json.example

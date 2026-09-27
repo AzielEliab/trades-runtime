@@ -68,6 +68,7 @@ function main(argv: string[]): void {
             `trades-runtime operator desk ${desk.url} (local only, live_backends false, writes refused)`,
             "  /api/receipt  /api/huddle  /api/huddle.json  /api/stock  /api/drive  /api/performance  /api/work-together  /api/friction  /api/calls/week.json",
             "  filters: ?calls=callback | warranty | not-classified",
+            "  field flags: data/runtime/<instanceId>/field-flags/  (loopback POST /api/flags/raise)",
             ""
           ].join("\n")
         );
@@ -91,6 +92,7 @@ function main(argv: string[]): void {
       "                                    /api/receipt /api/huddle /api/stock /api/drive /api/performance /api/work-together /api/friction /api/calls/week.json",
       "                                    filters: ?calls=callback | warranty | not-classified",
       "                                    alert rules: data/runtime/alerts.json.example",
+      "                                    field flags: data/runtime/<instanceId>/field-flags/",
       "  npx tsx src/cli.ts shadow-sealed-demo    synthetic N-day sealed settlement (pilot not started)",
       "  npx tsx src/cli.ts health-local          local honesty card (pilot_started false)",
       "  npx tsx src/cli.ts pilot-prep            Option C box prep receipt (does not start the pilot)",

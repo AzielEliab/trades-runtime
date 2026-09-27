@@ -68,12 +68,16 @@ import {
   dispatchLocalHooks,
   emptyAlertState,
   enabledRuleList,
+  fieldFlagsDirectory,
   readAlertState,
+  readFieldFlagDirectory,
   resolveAlertConfig,
   writeAlertState,
   type AlertConfig,
+  type AlertNotice,
   type AlertRuleKind,
   type DeskRuleSignals,
+  type FieldFlag,
   type ResolvedAlertConfig,
   type StoredAlert
 } from "./alerts.js";
@@ -280,6 +284,8 @@ export interface DeskSnapshotOptions {
   callFilter?: CallDeskFilter;
   stockCountPath?: string;
   driveMilesPath?: string;
+  /** Isolate id for alert state and field flags. Defaults to local.json, then "local". */
+  instanceId?: string;
 }
 
 export interface DeskPartCostLine {
@@ -601,6 +607,12 @@ function resolveUnder(cwd: string, path: string): string {
   return join(cwd, path);
 }
 
+/** Same isolate the desk uses for alert state when the caller does not pass one. */
+export function resolveOperatorInstanceId(cwd: string, config?: LocalInboundConfig): string {
+  if (config?.instanceId) return config.instanceId;
+  return loadConfig(cwd).config.instanceId;
+}
+
 function loadConfig(cwd: string): { config: LocalInboundConfig; configAlert?: DeskAlert; inlineAlerts?: unknown } {
   const path = join(cwd, BYO_INBOUND_ROOT, "local.json");
   if (!existsSync(path)) return { config: defaultLocalInboundConfig() };
@@ -698,6 +710,8 @@ interface CollectedRecord {
   ticket?: number;
   sold?: number;
   revenue?: number;
+  fieldFlags?: FieldFlag[];
+  fieldFlagNotices?: AlertNotice[];
 }
 
 function collect(files: DropInFileResult[], receivedAt: string): {
@@ -739,7 +753,9 @@ function collect(files: DropInFileResult[], receivedAt: string): {
         technicianName: record.technicianName,
         ticket: record.ticket,
         sold: record.sold,
-        revenue: record.revenue
+        revenue: record.revenue,
+        fieldFlags: record.fieldFlags,
+        fieldFlagNotices: record.fieldFlagNotices
       });
     }
   }
@@ -1137,13 +1153,24 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
     missionActual: pace?.actual ?? 0,
     missionExpectedPace: pace?.expectedPace ?? 0
   };
-  const instanceId = config?.instanceId ?? "local";
+  const instanceId = options.instanceId ?? config?.instanceId ?? "local";
   const statePath = options.alertStatePath ?? defaultAlertStatePath(cwd, instanceId);
+  const fromFiles = readFieldFlagDirectory(fieldFlagsDirectory(cwd, instanceId));
+  for (const notice of fromFiles.notices) alerts.push(notice);
+  const inboundFlags = collected.records.flatMap((record) => record.fieldFlags ?? []);
+  for (const record of collected.records) {
+    for (const notice of record.fieldFlagNotices ?? []) alerts.push(notice);
+  }
+  const fieldFlags = new Map<string, FieldFlag>();
+  for (const flag of inboundFlags) fieldFlags.set(flag.flagId, flag);
+  for (const flag of fromFiles.flags) fieldFlags.set(flag.flagId, flag);
   const applied = applyDeskAlerts({
     signals,
     config: resolvedAlerts.config,
     state: options.persistAlertState ? readAlertState(statePath) : emptyAlertState(),
-    now
+    now,
+    fieldFlags: [...fieldFlags.values()],
+    retainFieldFlags: !fromFiles.readable
   });
   if (options.persistAlertState) {
     writeAlertState(statePath, applied.state);

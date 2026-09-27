@@ -1,0 +1,11 @@
+{
+  "flagId": "example-needs-parts",
+  "vanId": "van-example",
+  "jobId": "job-example",
+  "kind": "needsParts",
+  "severity": "watch",
+  "note": "Example only. Copy this shape into data/runtime/<instanceId>/field-flags/<flagId>.json on the operator machine. This file is not a live flag.",
+  "raisedAt": "2026-09-27T12:00:00Z",
+  "raisedBy": "example-tech",
+  "inventedAccuracy": false
+}
