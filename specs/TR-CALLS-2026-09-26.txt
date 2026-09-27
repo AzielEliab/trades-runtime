@@ -45,4 +45,4 @@ TRADES-RUNTIME · CALLBACK, WARRANTY, DIGEST, RECEIPT                           
 
  Still refused
  No ServiceTitan or ProBooks write client. No tenant data on the public Worker. No fake live GM pilot.
- No Pages. No Horton or legal-name material. No Glama admin UI in this cut.
+ No Pages. No former-surname or legal-name material. No Glama admin UI in this cut.

@@ -26,7 +26,7 @@ TRADES-RUNTIME · GROK / AZBOT STANDING BRIEF                                   
 
      Receipts                                Hash + path when a file is the deliverable. Prefer append-only narrative-light records.
 
-     Case boundary                           Horton v. Horton does not belong in this repo or this brief.
+     Case boundary                           Former-surname family-court captions do not belong in this repo or this brief.
 
      Next-cut discipline                     Do not add an addendum until the named next physical act is done.
 
