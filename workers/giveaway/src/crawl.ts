@@ -69,8 +69,8 @@ Trades-Runtime is a shadow-first, local-first TypeScript runtime for HVAC, plumb
 
 Public name: Trades-Runtime (trades-runtime). Author / identity: Aziel Eliab only (Person @id ${PERSON_ID}).
 Version: ${VERSION} (Worker source). License: ${LICENSE}.
-Deployed Worker remains ${DEPLOYED_WORKER_VERSION}. A 0.4.7 redeploy is separately in flight. This source does not claim the public Worker is already ${VERSION}.
-Public Glama listing: Version ${GLAMA_PUBLIC_VERSION} / Latest ${GLAMA_PUBLIC_LATEST}. ${GLAMA_LISTING_NOTE}
+Deployed Worker is ${DEPLOYED_WORKER_VERSION}. x-product-version and /v1/health match this tip.
+Public Glama listing: Version ${GLAMA_PUBLIC_VERSION} / Latest ${GLAMA_PUBLIC_LATEST}. Stale relative to the deployed Worker. Not ${VERSION}. ${GLAMA_LISTING_NOTE}
 Worker: ${PUBLIC_ORIGIN}
 GitHub: ${REPOSITORY}
 Softwares tab: ${SOFTWARES_TAB}

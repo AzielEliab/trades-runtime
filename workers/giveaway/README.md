@@ -6,7 +6,7 @@ Public dual-surface giveaway — human UI + counted download. Local-first BYO fi
 - **Worker name:** `trades-runtime`
 - **Intended URL:** https://trades-runtime.vibelock.workers.dev
 - **License:** Apache-2.0
-- **Product version:** 0.4.9 (Worker source). The Worker already deployed remains 0.4.5. A 0.4.7 redeploy is separately in flight. This source does not claim the public Worker is already 0.4.9. Public Glama listing Version is 0.3.4 and Latest is pre-0.4.4. Those are not this package version.
+- **Product version:** 0.4.9 (Worker source). The Worker already deployed is 0.4.9 (`x-product-version` and `/v1/health`). Public Glama listing Version is 0.3.4 and Latest is pre-0.4.4 (stale; checked 2026-09-27, releaseVersion still 0.3.4). Those Glama badges are not this package version. This cite interlock does not deploy.
 
 This Worker does not ingest ServiceTitan dumps, does not write to ServiceTitan or ProBooks, and does not store tenant data. `live_backends` is false.
 

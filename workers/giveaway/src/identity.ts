@@ -1,13 +1,15 @@
 export const PRODUCT = "trades-runtime";
 export const PRODUCT_TITLE = "Trades-Runtime";
 export const VERSION = "0.4.9";
-/** Public Glama listing badge. Not this Worker package. Not glama.json. */
+/** Public Glama listing badge. Not this Worker package. Not glama.json. Stale vs the live Worker. */
 export const GLAMA_PUBLIC_VERSION = "0.3.4";
 export const GLAMA_PUBLIC_LATEST = "pre-0.4.4";
-/** Worker already on workers.dev. A 0.4.7 redeploy is separately in flight. This source is not that deploy. */
-export const DEPLOYED_WORKER_VERSION = "0.4.5";
+/** Checked 2026-09-27. Glama releaseVersion is still 0.3.4. Do not cite the listing as 0.4.9. */
+export const GLAMA_LISTING_STALE = true;
+/** Live public Worker tip. Matches x-product-version and /v1/health. Not the Glama listing. */
+export const DEPLOYED_WORKER_VERSION = "0.4.9";
 export const GLAMA_LISTING_NOTE =
-  "Public Glama listing Version is 0.3.4 and Latest is pre-0.4.4. This Worker package version is separate. The in-repo glama.json version is a claim file, not the live Glama Latest badge. The Worker already on workers.dev remains 0.4.5. A 0.4.7 redeploy is separately in flight. This source does not claim the public Worker is already 0.4.9.";
+  "Public Glama listing Version is 0.3.4 and Latest is pre-0.4.4. Checked 2026-09-27 on https://glama.ai/mcp/servers/AzielEliab/trades-runtime: the public badge is still releaseVersion 0.3.4 (tool updates v0.3.4, observedAt 2026-09-25). That listing is stale. It is not 0.4.9. The version field is this repo and the Worker source. glama.json version is the in-repo claim file, not the Glama Latest badge. The Worker already deployed at the public origin is 0.4.9 (x-product-version and /v1/health). This cite matches that live tip.";
 export const AUTHOR = "Aziel Eliab";
 export const IDENTITY = "Aziel Eliab";
 export const LICENSE = "Apache-2.0";

@@ -20,7 +20,7 @@ This repo ships:
 
 Do not invent Glama TDQS scores. Do not claim the listing or Install Server is already live.
 
-Public Glama listing Version is 0.3.4 and Latest is pre-0.4.4. Do not cite that badge as 0.4.9. The Worker source in this repo is 0.4.9. The Worker already deployed at `https://trades-runtime.vibelock.workers.dev` remains 0.4.5. A 0.4.7 redeploy is separately in flight. This source does not claim the public Worker is already 0.4.9. The claim-file version, the deployed Worker, and the Glama listing are three different surfaces.
+Public Glama listing Version is 0.3.4 and Latest is pre-0.4.4. Checked 2026-09-27: that badge is still releaseVersion 0.3.4 (tool updates v0.3.4, observedAt 2026-09-25) and is stale. Do not cite that badge as 0.4.9. The Worker source in this repo is 0.4.9. The Worker already deployed at `https://trades-runtime.vibelock.workers.dev` is 0.4.9 (`x-product-version` and `/v1/health`). The claim-file version, the deployed Worker, and the Glama listing are three different surfaces. This cite interlock does not deploy.
 
 ## Honesty
 
