@@ -24,6 +24,125 @@ export interface HuddleCapacity {
   why: string;
 }
 
+export const TRAINING_SEVERITIES = ["none", "watch", "needed", "urgent"] as const;
+export type TrainingSeverity = (typeof TRAINING_SEVERITIES)[number];
+
+export const TRAINING_OBSERVATION_KINDS = [
+  "repeated-same-failure",
+  "procedure-gap",
+  "certification-gap",
+  "coaching-requested",
+  "handoff-pattern"
+] as const;
+
+export type TrainingObservationKind = (typeof TRAINING_OBSERVATION_KINDS)[number];
+
+/** A procedure observation. Revenue, margin, and contribution per hour are refused. */
+export interface TrainingObservation {
+  technicianId: string;
+  kind: TrainingObservationKind;
+  /** How many times this kind was observed. Defaults to 1. */
+  count?: number;
+  detail?: string;
+}
+
+export interface TrainingNeeded {
+  severity: TrainingSeverity;
+  reason: string;
+  fromEconomics: false;
+  notASkillScore: true;
+}
+
+const ECONOMICS_FIELDS = ["revenue", "margin", "marginPct", "contributionPerLaborHour", "realizedContribution"] as const;
+
+/** Job economics must not become a training flag or a skill score. */
+export function trainingFromJobEconomics(): never {
+  throw new Error("revenue, margin, and contribution/hour are not a training flag");
+}
+
+export function flagTraining(input: {
+  observations?: readonly TrainingObservation[];
+  revenue?: number;
+  margin?: number;
+  marginPct?: number | null;
+  contributionPerLaborHour?: number | null;
+  realizedContribution?: number;
+}): TrainingNeeded {
+  for (const field of ECONOMICS_FIELDS) {
+    if (input[field] != null) trainingFromJobEconomics();
+  }
+  return trainingNeeded(input.observations ?? []);
+}
+
+function observationScore(observation: TrainingObservation): number {
+  const count = Math.max(1, observation.count ?? 1);
+  if (observation.kind === "certification-gap") return 3 * count;
+  if (observation.kind === "repeated-same-failure") return 2 * count;
+  if (observation.kind === "procedure-gap") return 2 * Math.min(count, 3);
+  return count;
+}
+
+function severityFor(score: number): TrainingSeverity {
+  if (score >= 6) return "urgent";
+  if (score >= 3) return "needed";
+  if (score >= 1) return "watch";
+  return "none";
+}
+
+function kindLabel(kind: TrainingObservationKind): string {
+  if (kind === "repeated-same-failure") return "repeated same failure";
+  if (kind === "procedure-gap") return "procedure gap";
+  if (kind === "certification-gap") return "certification gap";
+  if (kind === "coaching-requested") return "coaching requested";
+  return "handoff pattern";
+}
+
+/** Per-tech training flag from procedure observations. Not a skill score. */
+export function trainingNeeded(observations: readonly TrainingObservation[]): TrainingNeeded {
+  if (observations.length === 0) {
+    return {
+      severity: "none",
+      reason: "No procedure observation is on file. Training is not inferred from revenue, margin, or contribution per hour.",
+      fromEconomics: false,
+      notASkillScore: true
+    };
+  }
+  const score = observations.reduce((sum, observation) => sum + observationScore(observation), 0);
+  const parts = observations.map((observation) => {
+    const count = Math.max(1, observation.count ?? 1);
+    const detail = observation.detail?.trim() ? ` (${observation.detail.trim()})` : "";
+    return `${count} ${kindLabel(observation.kind)}${detail}`;
+  });
+  return {
+    severity: severityFor(score),
+    reason: `Why: ${parts.join("; ")}. Severity is ${severityFor(score)}. This is a procedure observation, not a skill score from revenue, margin, or contribution per hour.`,
+    fromEconomics: false,
+    notASkillScore: true
+  };
+}
+
+/** In-repo fixture. Not a company roster and not derived from job economics. */
+export const SYNTHETIC_HUDDLE_TRAINING: readonly TrainingObservation[] = [
+  {
+    technicianId: "tech-priya",
+    kind: "repeated-same-failure",
+    count: 2,
+    detail: "same panel fault returned without a procedure note"
+  },
+  {
+    technicianId: "tech-luis",
+    kind: "coaching-requested",
+    count: 1,
+    detail: "asked for a second set of eyes on tankless venting"
+  },
+  {
+    technicianId: "tech-andre",
+    kind: "certification-gap",
+    count: 1,
+    detail: "sewer camera ticket names a cert the roster does not show"
+  }
+];
+
 export interface TechHuddleRow {
   id: string;
   name: string;
@@ -39,6 +158,7 @@ export interface TechHuddleRow {
   callbackShareWhy: string;
   warrantyShareWhy: string;
   capacity: HuddleCapacity;
+  trainingNeeded: TrainingNeeded;
   notASkillScore: true;
 }
 
@@ -134,6 +254,8 @@ export function buildHuddleBoard(args: {
   /** Known slots by technician id. Absent ids stay blank. */
   slotsById?: ReadonlyMap<string, number>;
   namesById?: ReadonlyMap<string, string>;
+  /** Procedure observations. Absent techs stay severity none. Economics are not accepted here. */
+  trainingObservations?: readonly TrainingObservation[];
 }): HuddleBoard {
   const groups = new Map<string, HuddleJob[]>();
   const names = new Map<string, string>();
@@ -146,6 +268,14 @@ export function buildHuddleBoard(args: {
   }
 
   const synthetic = args.source === "synthetic-sample";
+  const trainingById = new Map<string, TrainingObservation[]>();
+  for (const observation of args.trainingObservations ?? []) {
+    const id = observation.technicianId.trim();
+    if (!id) continue;
+    const list = trainingById.get(id) ?? [];
+    list.push(observation);
+    trainingById.set(id, list);
+  }
   const techs: TechHuddleRow[] = [...groups.entries()]
     .map(([id, jobs]) => {
       const prior = jobs.filter((job) => job.open && job.day < args.missionDay).length;
@@ -157,6 +287,15 @@ export function buildHuddleBoard(args: {
       const rosterName = args.namesById?.get(id);
       const name =
         id === UNASSIGNED_TECH_ID ? "Unassigned" : rosterName || names.get(id) || id;
+      const training: TrainingNeeded =
+        id === UNASSIGNED_TECH_ID
+          ? {
+              severity: "none",
+              reason: "Unassigned is not a person. Training is not invented for a blank row, and it is not a skill score.",
+              fromEconomics: false,
+              notASkillScore: true
+            }
+          : trainingNeeded(trainingById.get(id) ?? []);
       return {
         id,
         name,
@@ -181,6 +320,7 @@ export function buildHuddleBoard(args: {
           slots: id === UNASSIGNED_TECH_ID ? null : (args.slotsById?.get(id) ?? null),
           synthetic
         }),
+        trainingNeeded: training,
         notASkillScore: true as const
       };
     })
@@ -191,9 +331,9 @@ export function buildHuddleBoard(args: {
     });
 
   const note = synthetic
-    ? "Fixture names and slot counts from the in-repo sample. Not a company roster. Callback share and warranty share are call mix on these rows. They are not a skill score. Late risk is the same unfinished-job count the desk late-jobs rule uses. It is not a probability."
+    ? "Fixture names and slot counts from the in-repo sample. Not a company roster. Callback share and warranty share are call mix on these rows. They are not a skill score. Late risk is the same unfinished-job count the desk late-jobs rule uses. It is not a probability. Training needed is a procedure observation on the fixture, not a score from revenue, margin, or contribution per hour."
     : techs.length
-      ? "Built from technician labels on admitted job rows. A row with no technician stays on Unassigned. That row is not a person. Open slots stay blank when the export does not name a slot count. Shares are not a skill score. Late risk is a count, not a probability."
+      ? "Built from technician labels on admitted job rows. A row with no technician stays on Unassigned. That row is not a person. Open slots stay blank when the export does not name a slot count. Shares are not a skill score. Late risk is a count, not a probability. Training stays none unless a procedure observation is passed in. It is not inferred from margin."
       : "No job rows are on this desk, so no technician huddle is invented.";
 
   return {

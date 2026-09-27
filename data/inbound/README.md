@@ -64,6 +64,19 @@ npm run health:local
 
 `pilot:prep` checks these folders, copies `local.json.example` and `alerts.json.example` when the local copies are missing, admits synthetic fixtures in a temp tree, boots the desk on `127.0.0.1`, and prints a receipt. `pilot_started` stays false. It does not start a company pilot, does not fill these folders with fixtures, and does not write to ServiceTitan, ProBooks, or a trades app.
 
+## Part cost, training, behavior, and truck counts (0.4.7)
+
+Receipt: [`specs/TR-SOFTWARES-2026-09-27.txt`](../../specs/TR-SOFTWARES-2026-09-27.txt).
+
+`npm run desk` still binds to `http://127.0.0.1:4174/`. Empty inbound folders use the in-repo sample, so part cost, trainingNeeded, department behavior, and truck counts are visible and labeled as a fixture.
+
+- Part recommendations use current cost and last cost. Regional market adaptation weakens when evidence is thin, stale, or conflicted. The suggestion stays subordinate to a human. A locked price still refuses auto-recalibrate.
+- The morning huddle shows trainingNeeded (severity and reason) from procedure observations. Revenue, margin, and contribution per hour are not a training flag and are not a skill score.
+- Department behavior lists good handoffs and bad coordination from Chain D, cross-trade, and recognition. The last person is not blamed by default.
+- `/api/stock` reads on-van and warehouse counts. A local file may live at `data/runtime/<instanceId>/stock-counts.json` (gitignored). Unknown counts are not treated as zero. This is not a hosted inventory ERP.
+
+`pilot_started` stays false. Nothing here writes to ServiceTitan or ProBooks.
+
 ## Call reasons, week digest, and huddle (0.4.6)
 
 Receipt: [`specs/TR-HUDDLE-2026-09-26.txt`](../../specs/TR-HUDDLE-2026-09-26.txt).

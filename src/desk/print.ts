@@ -128,12 +128,13 @@ export function renderPrintableSnapshot(snapshot: OperatorSnapshot): string {
             <td>${tech.lateRisk}</td>
             <td>${esc(tech.callbackShare)}</td>
             <td>${esc(tech.warrantyShare)}</td>
+            <td>${esc(tech.trainingNeeded.severity)}</td>
             <td>${tech.capacity.booked}</td>
             <td>${esc(open)}</td>
           </tr>`;
         })
         .join("")
-    : `<tr><td colspan="8">No technicians on this desk.</td></tr>`;
+    : `<tr><td colspan="9">No technicians on this desk.</td></tr>`;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -212,8 +213,44 @@ export function renderPrintableSnapshot(snapshot: OperatorSnapshot): string {
     <h2>Morning huddle</h2>
     <p>${esc(snapshot.huddle.note)}</p>
     <table>
-      <thead><tr><th>Tech</th><th>Lane</th><th>Open jobs</th><th>Late risk</th><th>Callback share</th><th>Warranty share</th><th>Booked</th><th>Open slots</th></tr></thead>
+      <thead><tr><th>Tech</th><th>Lane</th><th>Open jobs</th><th>Late risk</th><th>Callback share</th><th>Warranty share</th><th>Training</th><th>Booked</th><th>Open slots</th></tr></thead>
       <tbody>${huddleRows}</tbody>
+    </table>
+    <h2>Part cost</h2>
+    <p>${esc(snapshot.partCosts.note)}</p>
+    <table>
+      <thead><tr><th>SKU</th><th>Current</th><th>Last</th><th>Adapted</th><th>Market weight</th><th>Weakened</th></tr></thead>
+      <tbody>${
+        snapshot.partCosts.lines.length
+          ? snapshot.partCosts.lines
+              .map(
+                (line) => `<tr><td>${esc(line.sku)}</td><td>${line.currentCost}</td><td>${line.lastCost}</td><td>${line.adaptedCost}</td><td>${line.marketWeight}</td><td>${line.weakened ? "yes" : "no"}</td></tr>`
+              )
+              .join("")
+          : `<tr><td colspan="6">No part-cost lines.</td></tr>`
+      }</tbody>
+    </table>
+    <h2>Department behavior</h2>
+    <p>${esc(snapshot.behavior.note)}</p>
+    <ul>${
+      [...snapshot.behavior.positive, ...snapshot.behavior.negative]
+        .map((flag) => `<li>${esc(flag.polarity)} · ${esc(flag.kind)} · ${esc(flag.fromRole)} to ${esc(flag.toRole)}. ${esc(flag.summary)}</li>`)
+        .join("") || "<li>No department flags.</li>"
+    }</ul>
+    <h2>Truck counts</h2>
+    <p>${esc(snapshot.stock.note)}</p>
+    <table>
+      <thead><tr><th>SKU</th><th>Location</th><th>Place</th><th>Count</th></tr></thead>
+      <tbody>${
+        snapshot.stock.lines.length
+          ? snapshot.stock.lines
+              .map((line) => {
+                const place = line.location === "ON_VAN" ? line.vanId ?? "" : line.placeId ?? "";
+                return `<tr><td>${esc(line.sku)}</td><td>${esc(line.location)}</td><td>${esc(place)}</td><td>${line.quantity}</td></tr>`;
+              })
+              .join("")
+          : `<tr><td colspan="4">No counts.</td></tr>`
+      }</tbody>
     </table>
     <h2>Metrics</h2>
     <table>${metrics}</table>
@@ -260,6 +297,7 @@ export function renderPrintableHuddle(snapshot: OperatorSnapshot): string {
             <h2>${esc(tech.name)}</h2>
             <p>${esc(tech.lane ?? "lane unnamed")} · open jobs ${tech.openJobs} · late risk ${tech.lateRisk}</p>
             <p>Callback share ${esc(tech.callbackShare)}. Warranty share ${esc(tech.warrantyShare)}. Booked ${tech.capacity.booked}. Open slots ${esc(open)}.</p>
+            <p>Training needed ${esc(tech.trainingNeeded.severity)}. ${esc(tech.trainingNeeded.reason)}</p>
             <p>${esc(tech.lateRiskWhy)}</p>
             <p>${esc(tech.callbackShareWhy)}</p>
             <p>${esc(tech.warrantyShareWhy)}</p>

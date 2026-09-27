@@ -33,9 +33,15 @@ export { appendReceipt, createLedger, verifyLedger } from "./inherited/receipt-l
 export { sealCounterfactual, settleShadow } from "./inherited/shadow-engine.js";
 export { openMorningPlan, rebaseFromActual } from "./inherited/trajectory-engine.js";
 export { rankVans, assertGeographyNeverSoleWinner } from "./domain/call-fit.js";
-export { applyCrossTradeWeight, assertSecondaryOnly, buildPrimaryPool } from "./domain/cross-trade-matrix.js";
-export { reconcileJob, asSkillScore } from "./domain/job-economics.js";
-export { reconstructHandoff, systemBeforeBlame } from "./domain/chain-d.js";
+export { applyCrossTradeWeight, assertSecondaryOnly, buildPrimaryPool, flagCrossTradeBehavior } from "./domain/cross-trade-matrix.js";
+export { reconcileJob, asSkillScore, reconcileJobWithPartCosts, rollupPartCosts } from "./domain/job-economics.js";
+export {
+  collectDepartmentFlags,
+  flagHandoffBehavior,
+  flagNamedFailure,
+  reconstructHandoff,
+  systemBeforeBlame
+} from "./domain/chain-d.js";
 export { explainBookingBlock, recommendBlock, scoreRescheduleRisk } from "./domain/workforce-capacity.js";
 export {
   aggregateCallClasses,
@@ -44,7 +50,7 @@ export {
   describeCallReason,
   parseCallDeskFilter
 } from "./domain/call-class.js";
-export { buildHuddleBoard } from "./domain/huddle-board.js";
+export { buildHuddleBoard, flagTraining, trainingFromJobEconomics, trainingNeeded } from "./domain/huddle-board.js";
 export { buildWeeklyCallbackDigest } from "./desk/callback-week.js";
 export { reconcilePipelines, paretoFrontier } from "./domain/decision-fabric.js";
 export { requireReportMetadata } from "./domain/analytics.js";
@@ -56,7 +62,13 @@ export {
   createManagedChannel,
   emitChannelEvent
 } from "./domain/communications.js";
-export { fireRecognition, mayRecognize, rewardRawRevenueAlone, turnoverAttribution } from "./domain/recognition.js";
+export {
+  fireRecognition,
+  flagRecognitionBehavior,
+  mayRecognize,
+  rewardRawRevenueAlone,
+  turnoverAttribution
+} from "./domain/recognition.js";
 export {
   applyCompletion,
   forScope,
@@ -67,7 +79,9 @@ export {
   retargetGoal
 } from "./domain/mission-board.js";
 export {
+  adaptPartCost,
   applyManagerDecision,
+  applyMarketAdaptation,
   applyShadowBaseline,
   collectEvidenceWhileLocked,
   recommendFromShadowBaseline,
@@ -75,10 +89,18 @@ export {
 } from "./domain/pricebook.js";
 export {
   applyLocationToEconomics,
+  countOnVan,
+  countWarehouse,
+  defaultStockCountPath,
   economicsForLocation,
+  emptyStockBook,
+  fulfillmentQueueFromCounts,
   fulfillmentQueueFromDemand,
+  persistStockCount,
+  readStockBook,
   recommendVanProfile,
-  recommendVanStock
+  recommendVanStock,
+  recordStockCount
 } from "./domain/truck-stock.js";
 export { runFulfillmentTo, transitionFulfillment } from "./domain/fulfillment-machine.js";
 export {
@@ -127,7 +149,7 @@ export {
   mayCallVerifiedSubjectDefect,
   neighborhoodPatternProvesSubjectDefect
 } from "./domain/neighborhood-failure-patterns.js";
-export { evidenceWeight, moreSpecificOutweighsBroader, promotePattern } from "./domain/regional-recalibration.js";
+export { evidenceWeight, marketAdaptationWeight, moreSpecificOutweighsBroader, promotePattern } from "./domain/regional-recalibration.js";
 export {
   hookCallFit,
   hookFieldAdvisor,

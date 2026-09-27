@@ -1,6 +1,6 @@
 export const PRODUCT = "trades-runtime";
 export const PRODUCT_TITLE = "Trades-Runtime";
-export const VERSION = "0.4.6";
+export const VERSION = "0.4.7";
 /** Public Glama listing badge. Not this Worker package. Not glama.json. */
 export const GLAMA_PUBLIC_VERSION = "0.3.4";
 export const GLAMA_PUBLIC_LATEST = "pre-0.4.4";

@@ -54,6 +54,27 @@ function snapshotFor(options: DeskSnapshotOptions, requestUrl: URL): OperatorSna
   });
 }
 
+function stockJson(snapshot: OperatorSnapshot): string {
+  return JSON.stringify({
+    product: snapshot.product,
+    version: snapshot.version,
+    author: snapshot.author,
+    generatedAt: snapshot.generatedAt,
+    live_backends: false,
+    writes: false,
+    phoneHome: false,
+    pilot_started: false,
+    hostedInventory: false,
+    liveErp: false,
+    loopback: true,
+    source: snapshot.stock.source,
+    path: snapshot.stock.path,
+    note: snapshot.stock.note,
+    lines: snapshot.stock.lines,
+    sampleRequest: snapshot.stock.sampleRequest
+  });
+}
+
 function huddleJson(snapshot: OperatorSnapshot): string {
   return JSON.stringify({
     product: snapshot.product,
@@ -162,6 +183,11 @@ export function startOperatorDesk(options: DeskServerOptions = {}): Promise<Desk
       send(res, 200, body, "application/json; charset=utf-8", {
         "Content-Disposition": 'attachment; filename="trades-runtime-callback-week.json"'
       });
+      return;
+    }
+    if (url.pathname === "/api/stock" || url.pathname === "/api/stock.json") {
+      const body = stockJson(snapshotFor(deskOptions, url));
+      send(res, 200, body, "application/json; charset=utf-8");
       return;
     }
     if (url.pathname === "/api/huddle.json" || (url.pathname === "/api/huddle" && url.searchParams.get("format") === "json")) {

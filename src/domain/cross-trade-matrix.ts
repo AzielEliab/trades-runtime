@@ -1,4 +1,5 @@
 import type { ScoredVan } from "./call-fit.js";
+import { flagHandoffBehavior, type DepartmentBehaviorFlag, type HandoffInput } from "./chain-d.js";
 
 export type Trade = "hvac" | "plumbing" | "electrical" | "sewer";
 
@@ -46,4 +47,53 @@ export function assertSecondaryOnly(allVans: ScoredVan[], pool: ScoredVan[], sig
 
 export function buildPrimaryPool(vans: ScoredVan[]): ScoredVan[] {
   return vans.filter((van) => van.qualifiedForPrimary);
+}
+
+/**
+ * Cross-trade collaboration is a positive flag when the handoff is clean and the signal is evidenced.
+ * A broken handoff or an unevidenced weight is a negative coordination flag.
+ * The last person is not blamed by default.
+ */
+export function flagCrossTradeBehavior(input: {
+  signal: CrossTradeSignal;
+  handoff?: HandoffInput;
+  flagId?: string;
+}): DepartmentBehaviorFlag {
+  if (input.handoff) {
+    const base = flagHandoffBehavior(input.handoff);
+    if (base.polarity === "negative") {
+      return {
+        ...base,
+        flagId: input.flagId ?? `x:${input.signal.origin}:${input.signal.receiving}:negative`,
+        source: "cross-trade",
+        summary: `Cross-trade ${input.signal.origin} to ${input.signal.receiving}: ${base.summary}`
+      };
+    }
+  }
+  if (!input.signal.evidenceSupported) {
+    return {
+      flagId: input.flagId ?? `x:${input.signal.origin}:${input.signal.receiving}:unevidenced`,
+      polarity: "negative",
+      source: "cross-trade",
+      fromRole: input.signal.origin,
+      toRole: input.signal.receiving,
+      kind: "unevidenced-cross-trade",
+      summary: `Cross-trade weight from ${input.signal.origin} to ${input.signal.receiving} has no evidence. The signal stays at zero. Nobody is blamed for the missing evidence.`,
+      attribution: "system",
+      lastPersonBlamed: false,
+      systemBeforeBlame: true
+    };
+  }
+  return {
+    flagId: input.flagId ?? `x:${input.signal.origin}:${input.signal.receiving}:assist`,
+    polarity: "positive",
+    source: "cross-trade",
+    fromRole: input.signal.origin,
+    toRole: input.signal.receiving,
+    kind: "cross-trade-assist",
+    summary: `Evidence-supported assist from ${input.signal.origin} to ${input.signal.receiving}. Secondary routing signal only. Not a skill score and not a blame flag.`,
+    attribution: "unknown",
+    lastPersonBlamed: false,
+    systemBeforeBlame: true
+  };
 }

@@ -41,6 +41,9 @@ export interface CoordinationRecord extends ChainRecordBase {
   actualAction?: string;
   acknowledged: boolean;
   failureType?: string;
+  /** Good handoff or bad coordination. Absent on older rows. */
+  polarity?: "positive" | "negative";
+  behaviorKind?: string;
   knowledgeAtOrigin: Record<string, unknown>;
   knowledgeAtRecipient?: Record<string, unknown>;
 }
