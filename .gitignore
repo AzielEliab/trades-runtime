@@ -26,3 +26,5 @@ data/**
 !data/runtime/alerts.json.example
 !data/runtime/drive-miles.json.example
 !data/runtime/positions.json.example
+!data/runtime/time-cards.json.example
+!data/runtime/coverage.json.example

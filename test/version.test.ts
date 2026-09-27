@@ -2,7 +2,7 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { RUNTIME_MANIFEST } from "../src/manifest.js";
 
-const PRODUCT = "0.4.9";
+const PRODUCT = "0.4.10";
 const IDENTITY = "Aziel Eliab";
 const PRODUCT_SURFACES = [
   "README.md",
@@ -25,7 +25,7 @@ const PRODUCT_SURFACES = [
 ];
 
 describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", () => {
-  it("keeps package, manifest, and catalog on 0.4.9", () => {
+  it("keeps package, manifest, and catalog on 0.4.10", () => {
     const pkg = JSON.parse(readFileSync("package.json", "utf8")) as {
       version: string;
       author: string;
@@ -89,14 +89,17 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
     expect(RUNTIME_MANIFEST.honesty).toMatch(/not an accuracy percent/);
     expect(RUNTIME_MANIFEST.honesty).toMatch(/Option C remains prep until a human operator starts a real pilot/);
     expect(RUNTIME_MANIFEST.honesty).toMatch(/Option D stays out of scope/);
-    expect(RUNTIME_MANIFEST.honesty).toMatch(/does not claim the Glama listing is 0\.4\.9/);
+    expect(RUNTIME_MANIFEST.honesty).toMatch(/0\.4\.10 adds local time tracking/);
+    expect(RUNTIME_MANIFEST.honesty).toMatch(/Suggestions are not a dispatch/);
+    expect(RUNTIME_MANIFEST.honesty).toMatch(/does not claim the Glama listing is 0\.4\.10/);
     expect(RUNTIME_MANIFEST.honesty).toMatch(/stale relative to the live Worker/);
     expect(RUNTIME_MANIFEST.honesty).not.toMatch(/0\.4\.7 redeploy is separately in flight/);
-    expect(runtime.honesty).toMatch(/The deployed Worker is 0\.4\.9/);
-    expect(runtime.honesty).toMatch(/does not claim the Glama listing is 0\.4\.9/);
+    expect(RUNTIME_MANIFEST.honesty).not.toMatch(/Glama Latest is 0\.4/);
+    expect(runtime.honesty).toMatch(/giveaway Worker version pin moves with this repo and is 0\.4\.10/);
+    expect(runtime.honesty).toMatch(/does not claim the Glama listing is 0\.4\.10/);
     expect(RUNTIME_MANIFEST.honesty).toMatch(/trainingNeeded/);
     expect(RUNTIME_MANIFEST.honesty).toMatch(/not a hosted inventory ERP/);
-    expect(RUNTIME_MANIFEST.honesty).toMatch(/The deployed Worker is 0\.4\.9/);
+    expect(RUNTIME_MANIFEST.honesty).toMatch(/The giveaway Worker version pin moves with this repo and is 0\.4\.10/);
     expect(RUNTIME_MANIFEST.honesty).toMatch(/Public Glama listing Version remains 0\.3\.4/);
     expect(runtime.honesty).toMatch(/BYO local ServiceTitan \+ ProBooks/);
     expect(runtime.honesty).toMatch(/Option C code-ready \/ pilot not started/);
@@ -111,7 +114,7 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
     expect(RUNTIME_MANIFEST.launch_options.C.pilot_started).toBe(false);
     expect(RUNTIME_MANIFEST.launch_options.C.prep).toBe("local-runbook");
     expect(RUNTIME_MANIFEST.launch_options.D.status).toBe("not-started");
-    expect(readFileSync("README.md", "utf8")).toMatch(/\*\*Version:\*\* 0\.4\.9/);
+    expect(readFileSync("README.md", "utf8")).toMatch(/\*\*Version:\*\* 0\.4\.10/);
     expect(readFileSync("README.md", "utf8")).toMatch(/TR-VENDOR-2026-09-25/);
     expect(readFileSync("README.md", "utf8")).toMatch(/TR-BOT-2026-09-17/);
     expect(readFileSync("README.md", "utf8")).toMatch(/TR-BYO-2026-09-17/);
@@ -140,7 +143,11 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
     expect(readFileSync("README.md", "utf8")).toMatch(/\/api\/calls\/week\.json/);
     expect(readFileSync("README.md", "utf8")).toMatch(/Version is \*\*0\.3\.4\*\*/);
     expect(readFileSync("README.md", "utf8")).toMatch(/Latest is \*\*pre-0\.4\.4\*\*/);
-    expect(readFileSync("README.md", "utf8")).toMatch(/Worker already deployed is 0\.4\.9/);
+    expect(readFileSync("README.md", "utf8")).toMatch(/giveaway Worker version pin is 0\.4\.10/);
+    expect(readFileSync("README.md", "utf8")).toMatch(/\/api\/time-tracking/);
+    expect(readFileSync("README.md", "utf8")).toMatch(/\/api\/coverage/);
+    expect(readFileSync("README.md", "utf8")).toMatch(/\/api\/right-tech/);
+    expect(readFileSync("README.md", "utf8")).toMatch(/TR-OPS-2026-09-27/);
     expect(readFileSync("README.md", "utf8")).toMatch(/TR-ALERTS-2026-09-25/);
     expect(readFileSync("README.md", "utf8")).toMatch(/TR-OPTION-C-PREP-2026-09-25/);
     expect(readFileSync("README.md", "utf8")).toMatch(/npm run pilot:prep/);
@@ -164,6 +171,9 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
     expect(RUNTIME_MANIFEST.modules.some((module) => module.slug === "work-together")).toBe(true);
     expect(RUNTIME_MANIFEST.modules.some((module) => module.slug === "friction-rate")).toBe(true);
     expect(RUNTIME_MANIFEST.modules.some((module) => module.slug === "inbound-quality")).toBe(true);
+    expect(RUNTIME_MANIFEST.modules.some((module) => module.slug === "time-tracking")).toBe(true);
+    expect(RUNTIME_MANIFEST.modules.some((module) => module.slug === "coverage-map")).toBe(true);
+    expect(RUNTIME_MANIFEST.modules.some((module) => module.slug === "right-tech")).toBe(true);
     expect(RUNTIME_MANIFEST.modules.some((module) => module.slug === "alert-actions")).toBe(true);
     expect(RUNTIME_MANIFEST.modules.some((module) => module.slug === "option-c-start-gate")).toBe(true);
     expect(RUNTIME_MANIFEST.modules.some((module) => module.slug === "callback-week")).toBe(true);
@@ -179,10 +189,10 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
     expect(workerPkg.author).toBe(IDENTITY);
     expect(workerWrangler).toMatch(/"name": "trades-runtime"/);
     expect(workerWrangler).toMatch(/"binding": "COUNTS"/);
-    expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/export const VERSION = "0\.4\.9"/);
+    expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/export const VERSION = "0\.4\.10"/);
     expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/GLAMA_PUBLIC_VERSION = "0\.3\.4"/);
     expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/GLAMA_PUBLIC_LATEST = "pre-0\.4\.4"/);
-    expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/DEPLOYED_WORKER_VERSION = "0\.4\.9"/);
+    expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/DEPLOYED_WORKER_VERSION = "0\.4\.10"/);
     expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/GLAMA_LISTING_STALE = true/);
     expect(readFileSync("README.md", "utf8")).toMatch(/Public giveaway Worker/);
     expect(readFileSync("README.md", "utf8")).toMatch(/glama\.ai\/mcp\/servers\/AzielEliab\/trades-runtime/);
@@ -213,7 +223,7 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
     expect(cite.glama_listing).toBe(false);
     expect(cite.glama_public_version).toBe("0.3.4");
     expect(cite.glama_public_latest).toBe("pre-0.4.4");
-    expect(cite.deployed_worker_version).toBe("0.4.9");
+    expect(cite.deployed_worker_version).toBe("0.4.10");
     expect(cite.glama_listing_stale).toBe(true);
     expect(cite.version).toBe(cite.deployed_worker_version);
     expect(pkg.scripts).toMatchObject({
@@ -227,7 +237,7 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
     expect(readFileSync("Dockerfile", "utf8")).toMatch(/npm install --omit=dev/);
     expect(readFileSync("Dockerfile", "utf8")).toMatch(/CMD \["node", "cli\/mcp-stdio\.mjs"\]/);
     expect(readFileSync("Dockerfile", "utf8")).toMatch(/Mozilla\/5\.0|TRADES_RUNTIME_URL/);
-    expect(glamaDocs).toMatch(/claim-file version \(`0\.4\.9`\)/);
+    expect(glamaDocs).toMatch(/claim-file version \(`0\.4\.10`\)/);
     expect(glamaDocs).toMatch(/Version is 0\.3\.4/);
     expect(glamaDocs).toMatch(/Latest is pre-0\.4\.4/);
     expect(glamaDocs).not.toMatch(/Glama Latest is 0\.4/);

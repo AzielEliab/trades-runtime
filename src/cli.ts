@@ -67,7 +67,7 @@ function main(argv: string[]): void {
           [
             `trades-runtime operator desk ${desk.url} (local only, live_backends false, writes refused)`,
             "  /api/receipt  /api/huddle  /api/huddle.json  /api/stock  /api/drive  /api/performance  /api/work-together  /api/friction  /api/calls/week.json",
-            "  /api/inbound-quality  /api/inbound-quality.txt  /api/alert-actions  /api/monitoring  /api/option-c-start-gate",
+            "  /api/inbound-quality  /api/inbound-quality.txt  /api/alert-actions  /api/monitoring  /api/time-tracking  /api/coverage  /api/right-tech  /api/option-c-start-gate",
             "  filters: ?calls=callback | warranty | not-classified",
             ""
           ].join("\n")
@@ -90,7 +90,7 @@ function main(argv: string[]): void {
       "  npx tsx src/cli.ts drop-in-demo          synthetic ST + ProBooks + trades-app drop-in proof",
       "  npx tsx src/cli.ts desk [--port 4174]    local human operator desk (127.0.0.1)",
       "                                    /api/receipt /api/huddle /api/stock /api/drive /api/performance /api/work-together /api/friction /api/calls/week.json",
-      "                                    /api/inbound-quality /api/alert-actions /api/monitoring /api/option-c-start-gate",
+      "                                    /api/inbound-quality /api/alert-actions /api/monitoring /api/time-tracking /api/coverage /api/right-tech /api/option-c-start-gate",
       "                                    filters: ?calls=callback | warranty | not-classified",
       "                                    alert rules: data/runtime/alerts.json.example",
       "  npx tsx src/cli.ts shadow-sealed-demo    synthetic N-day sealed settlement (pilot not started)",

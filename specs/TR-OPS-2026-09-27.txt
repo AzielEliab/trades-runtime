@@ -1,0 +1,48 @@
+TR-OPS-2026-09-27
+Softwares 0.4.10 — time, coverage, right tech
+Author: Aziel Eliab only
+Status: local desk. Pilot not started. Option C remains prep. Option D out of scope.
+
+0.4.10 is a local Softwares cut on the existing Monitoring surface.
+No ServiceTitan or ProBooks write client. live_backends false. Pages off.
+No fake live GM pilot. No invented accuracy percent.
+No invented vendor brand. Glama listing stays 0.3.4 / Latest pre-0.4.4.
+This source does not claim Glama Latest.
+
+1. Time tracking
+   Local cards for the current call: clocked, elapsed, estimated remaining,
+   idle and travel segments. Optional file at
+   data/runtime/<instanceId>/time-cards.json or data/inbound/time-cards.json.
+   Copy data/runtime/time-cards.json.example.
+   The desk recomputes from that file and the local clock.
+   It writes data/runtime/<instanceId>/time-tracking.json and time-tracking.jsonl.
+   Empty-folder desk shows a labeled synthetic demo.
+   A refused file is not replaced by that demo.
+   Not a live GPS feed. Not a telematics vendor.
+   GET /api/time-tracking
+
+2. Service coverage
+   Zip codes, counties, cities, and roads or highways.
+   Optional GeoJSON-ish file at data/runtime/<instanceId>/coverage.json
+   or data/inbound/coverage.json.
+   Copy data/runtime/coverage.json.example.
+   Human on/off switches persist in coverage-layers.json on this machine.
+   Breakdowns count places, jobs, and techs from the local file.
+   Empty-folder desk shows a labeled synthetic demo.
+   SVG on the Monitoring panel. The address map stays undrawn.
+   Not a live map-tile vendor. Not a live GPS feed.
+   GET /api/coverage
+   POST /api/coverage/layers is a local switch only. vendorWrite false.
+
+3. Right tech
+   Suggestions for an open or scheduled job from geolocation, estimated time
+   remaining on the current call, and skill fit.
+   Friction and heavy local drive minutes are flags, not a dispatch.
+   Geography is not the only factor.
+   Human Authority Rule: suggestions only. No auto-dispatch. No write-back.
+   GET /api/right-tech and GET /api/tech-fit. Optional ?job=
+
+The three sit on the Monitoring panel. They are not new desk menus.
+The giveaway Worker version pin in this repo moves to 0.4.10 with the package.
+Public Glama listing Version remains 0.3.4. This cut does not deploy the Worker.
+It does not start the Option C pilot.

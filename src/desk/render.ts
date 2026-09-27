@@ -1,6 +1,6 @@
 import { callFilterLabel, type CallDeskFilter } from "../domain/call-class.js";
 import { explainMissionPace } from "../domain/mission-board.js";
-import { capacityChart, countBars, jobsChart, milesChart, positionMap, rankedBars } from "./charts.js";
+import { capacityChart, countBars, coverageMap, jobsChart, milesChart, positionMap, rankedBars } from "./charts.js";
 import type { OperatorSnapshot } from "./snapshot.js";
 import { deskViewClientScript } from "./view-prefs.js";
 
@@ -655,6 +655,69 @@ export function renderMonitoring(snapshot: OperatorSnapshot): string {
       .map((row) => ({ label: row.label, value: Math.round((row.frictionRate ?? 0) * 100) })),
     "Friction"
   );
+  const time = board.timeTracking;
+  const timeCards = time.cards
+    .map((card) => {
+      const remaining = card.estimatedRemainingMinutes == null ? "unknown" : `${card.estimatedRemainingMinutes} min`;
+      const job = card.jobId ? `${card.jobLabel ?? card.jobId}${card.trade ? ` · ${card.trade}` : ""}` : "No current call";
+      return `<article class="score time-card" data-tech="${esc(card.technicianId)}" data-view="tech:${esc(card.technicianId)}" data-status="${esc(card.status)}">
+        <span>${esc(card.status)}</span>
+        <strong>${esc(card.technicianName ?? card.technicianId)}</strong>
+        <p>${esc(job)}</p>
+        <p>Elapsed ${card.elapsedMinutes} min · Remaining ${esc(remaining)}</p>
+        <p class="quiet">Clocked ${card.clockedMinutes} · Travel ${card.travelMinutes} · Idle ${card.idleMinutes}</p>
+      </article>`;
+    })
+    .join("");
+  const coverage = board.coverage;
+  const shapes = coverageMap({
+    features: coverage.features
+      .filter((feature) => coverage.layers[feature.layer])
+      .map((feature) => ({
+        id: feature.id,
+        name: feature.name,
+        layer: feature.layer,
+        kind: feature.kind,
+        coordinates: feature.coordinates
+      })),
+    pins: coverage.layers.zipcodes || coverage.layers.counties || coverage.layers.cities || coverage.layers.roads
+      ? board.positions.pins.map((pin) => ({
+          label: pin.technicianName ?? pin.technicianId,
+          lat: pin.lat,
+          lng: pin.lng
+        }))
+      : []
+  });
+  const switches = (["zipcodes", "counties", "cities", "roads"] as const)
+    .map((layer) => {
+      const row = coverage.breakdowns.find((item) => item.layer === layer);
+      const checked = coverage.layers[layer] ? " checked" : "";
+      return `<label><input type="checkbox" data-coverage-layer="${layer}"${checked}> ${esc(row?.label ?? layer)}</label>`;
+    })
+    .join("");
+  const breakdownRows = coverage.breakdowns
+    .map(
+      (row) => `<tr data-coverage="${esc(row.layer)}" data-enabled="${row.enabled ? "true" : "false"}">
+        <td>${esc(row.label)}</td>
+        <td>${row.enabled ? "on" : "off"}</td>
+        <td>${row.features}</td>
+        <td>${row.jobs}</td>
+        <td>${row.techs}</td>
+      </tr>`
+    )
+    .join("");
+  const right = board.rightTech;
+  const suggestions = right.suggestions
+    .map(
+      (row) => `<li data-tech="${esc(row.technicianId)}" data-view="tech:${esc(row.technicianId)}" data-rank="${row.rank}">
+        <strong>${row.rank}. ${esc(row.technicianName)}</strong>
+        <p>${row.reasons.map((reason) => esc(reason)).join(" ")}</p>
+      </li>`
+    )
+    .join("");
+  const jobLine = right.job
+    ? `${right.job.id}${right.job.trade ? ` · ${right.job.trade}` : ""}${right.job.label ? ` · ${right.job.label}` : ""}`
+    : "No open job";
   return `<p>${esc(board.humanAuthorityRule)}</p>
     <p class="quiet">${esc(board.note)} Monitoring only. refused: ${esc(board.refused)}. ServiceTitan write false. ProBooks write false. live_backends false.</p>
     <div class="monitor-top">
@@ -668,10 +731,31 @@ export function renderMonitoring(snapshot: OperatorSnapshot): string {
         <div class="kpis">${cards(board.driveCards)}</div>
       </section>
     </div>
+    <section data-view="chart:time">
+      <h3 class="subhead">Time</h3>
+      <p class="quiet">${esc(time.note)}</p>
+      <div class="time-cards">${timeCards || `<p class="quiet">No local time cards. Elapsed time is not invented.</p>`}</div>
+    </section>
+    <section data-view="chart:coverage">
+      <h3 class="subhead">Coverage</h3>
+      <p class="quiet">${esc(coverage.note)} Address map stays undrawn. Not a live map tile.</p>
+      <div class="layer-switches">${switches}</div>
+      ${shapes}
+      <div class="table-scroll"><table>
+        <thead><tr><th>Layer</th><th>Switch</th><th>Places</th><th>Jobs</th><th>Techs</th></tr></thead>
+        <tbody>${breakdownRows}</tbody>
+      </table></div>
+    </section>
     <h3 class="subhead">Tech scores</h3>
     <div class="tech-cards">${tech || `<p class="quiet">No ranked techs on this desk.</p>`}</div>
     <h3 class="subhead">Call board</h3>
     <div class="call-board">${columns}</div>
+    <section data-view="chart:right-tech">
+      <h3 class="subhead">Right tech</h3>
+      <p class="quiet">${esc(right.humanAuthorityRule)} ${esc(right.note)}</p>
+      <p>Job <strong>${esc(jobLine)}</strong>. Suggestions only. auto-dispatch false. write-back refused.</p>
+      <ol class="suggest">${suggestions || `<li>No suggestion on this desk.</li>`}</ol>
+    </section>
     <h3 class="subhead">Today</h3>
     <div class="kpis">${cards(board.kpis)}</div>
     <div class="charts">
@@ -679,8 +763,13 @@ export function renderMonitoring(snapshot: OperatorSnapshot): string {
       <section class="chart-card" data-view="chart:quality"><header><h3>Inbound quality</h3><p>Checklist bands. Not an accuracy percent.</p></header>${quality}</section>
       <section class="chart-card" data-view="chart:ticket"><header><h3>Avg ticket</h3></header>${tickets}</section>
       <section class="chart-card" data-view="chart:friction"><header><h3>Friction</h3></header>${friction}</section>
+      <section class="chart-card" data-view="chart:clocked"><header><h3>Clocked</h3><p>Minutes on the local time cards.</p></header>${countBars(
+        time.cards.map((card) => ({ label: card.technicianName ?? card.technicianId, value: card.clockedMinutes })),
+        "Clocked minutes",
+        "No local time cards."
+      )}</section>
     </div>
-    <p class="quiet"><a href="/api/monitoring">Monitoring JSON</a>. Pins refresh when the local file changes. Not a live GPS feed.</p>`;
+    <p class="quiet"><a href="/api/monitoring">Monitoring JSON</a> · <a href="/api/time-tracking">Time JSON</a> · <a href="/api/coverage">Coverage JSON</a> · <a href="/api/right-tech">Right tech JSON</a>. Pins, time cards, and coverage refresh when the local file changes. Not a live GPS feed.</p>`;
 }
 
 export function renderOptionCStartGate(snapshot: OperatorSnapshot): string {
@@ -756,6 +845,10 @@ const DESK_CHARTS: [string, string][] = [
   ["quality", "Inbound quality bands"],
   ["ticket", "Average ticket"],
   ["friction", "Friction"],
+  ["clocked", "Clocked minutes"],
+  ["time", "Time cards"],
+  ["coverage", "Coverage map"],
+  ["right-tech", "Right tech"],
   ["volume", "Volume by source"],
   ["distribution", "Score distribution"],
   ["defects", "Defect classes"]
@@ -1135,6 +1228,12 @@ const DESK_STYLES = `
     .stub h4 { margin: 0.15rem 0; font-size: 0.95rem; }
     .gates { list-style: none; padding: 0; margin: 0.4rem 0 0; }
     .monitor-top { display: grid; grid-template-columns: 1.4fr 0.8fr; gap: 0.8rem; margin-top: 0.7rem; }
+    .time-cards { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.6rem; margin-top: 0.7rem; }
+    .layer-switches { display: flex; flex-wrap: wrap; gap: 0.4rem 0.9rem; margin: 0.6rem 0; }
+    .layer-switches label { min-height: 44px; display: inline-flex; align-items: center; gap: 0.45rem; }
+    .layer-switches input { width: 1.15rem; height: 1.15rem; }
+    .suggest { list-style: none; padding: 0; margin: 0.6rem 0 0; display: grid; gap: 0.5rem; }
+    .suggest li { background: var(--bg-inset); border-radius: 12px; padding: 0.7rem 0.85rem; }
     .kpis, .tech-cards { display: grid; gap: 0.6rem; }
     .kpis { grid-template-columns: repeat(4, 1fr); margin-top: 0.8rem; }
     .tech-cards { grid-template-columns: repeat(5, 1fr); margin-top: 0.7rem; }
@@ -1161,7 +1260,7 @@ const DESK_STYLES = `
     @media (max-width: 960px) {
       .metrics { grid-template-columns: 1fr 1fr; }
       .charts, .board, .split, .monitor-top { grid-template-columns: 1fr; }
-      .kpis, .tech-cards, .call-board { grid-template-columns: 1fr 1fr; }
+      .kpis, .tech-cards, .call-board, .time-cards { grid-template-columns: 1fr 1fr; }
     }
     @media (max-width: 720px) {
       header.top { flex-direction: column; align-items: stretch; }
@@ -1182,7 +1281,7 @@ const DESK_STYLES = `
       .table-scroll table { min-width: 34rem; }
     }
     @media (max-width: 560px) {
-      .metrics, .scores, .kpis, .tech-cards, .call-board { grid-template-columns: 1fr; }
+      .metrics, .scores, .kpis, .tech-cards, .call-board, .time-cards { grid-template-columns: 1fr; }
       .wrap { padding-top: max(1.1rem, env(safe-area-inset-top)); }
     }
     @media print {
@@ -1361,6 +1460,9 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
       Drop folders: <code>data/inbound/servicetitan</code>, <code>data/inbound/probooks</code>, <code>data/inbound/trades-app</code>.
       Optional miles file: <code>data/runtime/&lt;instanceId&gt;/drive-miles.json</code> or <code>data/inbound/drive-miles.json</code>. Copy <code>data/runtime/drive-miles.json.example</code>. No GPS vendor.
       Optional positions file: <code>data/runtime/&lt;instanceId&gt;/positions.json</code> or <code>data/inbound/positions.json</code>. Copy <code>data/runtime/positions.json.example</code>. Local or demo pins only. Not a live GPS vendor.
+      Optional time cards: <code>data/runtime/&lt;instanceId&gt;/time-cards.json</code> or <code>data/inbound/time-cards.json</code>. Copy <code>data/runtime/time-cards.json.example</code>. The desk writes <code>time-tracking.json</code> and <code>time-tracking.jsonl</code> on this machine.
+      Optional coverage: <code>data/runtime/&lt;instanceId&gt;/coverage.json</code> or <code>data/inbound/coverage.json</code>. Copy <code>data/runtime/coverage.json.example</code>. Layer switches stay in <code>coverage-layers.json</code>. Not a live map tile. The address map stays undrawn.
+      Right tech suggestions stay on this Monitoring panel. They do not dispatch and they do not write back.
       Alert rules: copy <code>data/runtime/alerts.json.example</code> to <code>data/runtime/&lt;instanceId&gt;/alerts.json</code>.
       Inbound quality and alert-action stubs write under <code>data/runtime/&lt;instanceId&gt;/</code> on this machine. They do not call a tenant.
       Option C remains prep until a human operator starts a real pilot. Option D is out of scope. No cutover.
@@ -1416,6 +1518,19 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
         if (state) state.textContent = "reconnecting to local desk";
       };
     }
+    document.body.addEventListener("change", (event) => {
+      const input = event.target instanceof Element ? event.target.closest("[data-coverage-layer]") : null;
+      if (!(input instanceof HTMLInputElement)) return;
+      const layer = input.getAttribute("data-coverage-layer");
+      if (!layer) return;
+      fetch("/api/coverage/layers", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ layer: layer, enabled: input.checked })
+      }).catch(() => {
+        input.checked = !input.checked;
+      });
+    });
     document.body.addEventListener("click", (event) => {
       const button = event.target instanceof Element ? event.target.closest("[data-ack]") : null;
       if (!(button instanceof HTMLButtonElement)) return;

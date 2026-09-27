@@ -21,6 +21,9 @@ import { collectDepartmentFlags, flagHandoffBehavior, type DepartmentBehaviorBoa
 import { flagCrossTradeBehavior } from "../domain/cross-trade-matrix.js";
 import { loadDrivePerformance, type DrivePerformance } from "../domain/drive-miles.js";
 import { loadLocalPositions } from "../domain/local-positions.js";
+import { loadCoverage, type CoverageBoard } from "../domain/coverage-map.js";
+import { buildRightTech, type RightTechBoard } from "../domain/right-tech.js";
+import { loadTimeTracking, persistTimeTracking, type TimeTrackingBoard } from "../domain/time-tracking.js";
 import { buildInboundQualityReport, persistInboundQuality, type InboundQualityReport } from "../domain/inbound-quality.js";
 import { buildFriction, type FrictionBoard } from "../domain/friction.js";
 import {
@@ -239,6 +242,9 @@ export interface OperatorSnapshot {
   huddle: HuddleBoard;
   drive: DrivePerformance;
   monitoring: MonitoringBoard;
+  timeTracking: TimeTrackingBoard;
+  coverage: CoverageBoard;
+  rightTech: RightTechBoard;
   inboundQuality: InboundQualityReport;
   alertActions: AlertActionReport;
   optionCStartGate: OptionCStartGate;
@@ -291,6 +297,12 @@ export interface DeskSnapshotOptions {
   driveMilesPath?: string;
   /** Optional local tech and truck pins. Not a live GPS feed. */
   positionsPath?: string;
+  /** Optional local time cards. Not a live timeclock. */
+  timeCardsPath?: string;
+  /** Optional local coverage shapes. Not a live map tile. */
+  coveragePath?: string;
+  /** Open job id for right-tech suggestions. Suggestions only. */
+  rightTechJob?: string;
   /** Write the local quality report and alert-action stubs under data/runtime. */
   persistLocalReports?: boolean;
 }
@@ -1242,7 +1254,8 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
       "inbound quality is a local checklist for ServiceTitan and ProBooks fragments already on this machine; it is not an accuracy percent and not a tenant pull",
       "alert action stubs are proposals only; write-back stays refused",
       "the Option C start gate is prep only; every gate stays blocked-until; the pilot is not started",
-      "monitoring pins come from an optional local file or a labeled synthetic demo; mile totals still ignore coordinates; no telematics vendor is claimed"
+      "monitoring pins come from an optional local file or a labeled synthetic demo; mile totals still ignore coordinates; no telematics vendor is claimed",
+      "time cards, coverage shapes, and right-tech suggestions recompute from local files or a labeled synthetic demo; they are not a live GPS feed and suggestions are not a dispatch"
     ],
     confidenceNote:
       dataLabel === "synthetic-demo"
@@ -1331,6 +1344,38 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
     explicitPath: options.positionsPath,
     milesPath: options.driveMilesPath
   });
+  let timeTracking = loadTimeTracking({
+    cwd,
+    instanceId,
+    now,
+    allowSynthetic: dataLabel === "synthetic-demo",
+    explicitPath: options.timeCardsPath
+  });
+  if (options.persistLocalReports) {
+    timeTracking = persistTimeTracking({ cwd, report: timeTracking });
+  }
+  const coverage = loadCoverage({
+    cwd,
+    instanceId,
+    allowSynthetic: dataLabel === "synthetic-demo",
+    explicitPath: options.coveragePath,
+    pins: positions.pins
+  });
+  const rightTech = buildRightTech({
+    dataLabel,
+    calls: calls.map((call) => ({
+      id: call.id,
+      lane: call.lane,
+      status: call.status,
+      technicianName: call.technicianName
+    })),
+    time: timeTracking,
+    pins: positions.pins,
+    coverage,
+    friction,
+    drive,
+    jobId: options.rightTechJob
+  });
   const monitoring = buildMonitoring({
     dataLabel,
     positions,
@@ -1338,6 +1383,9 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
     performance,
     friction,
     inboundQuality,
+    timeTracking,
+    coverage,
+    rightTech,
     calls: visibleCalls.map((call) => ({
       id: call.id,
       lane: call.lane,
@@ -1350,10 +1398,10 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
 
   const honesty =
     dataLabel === "synthetic-demo"
-      ? "Synthetic demo on this machine. Not BYO company data. Not a live GM pilot. Miles, the ranked board, collaboration suggestions, and friction are a labeled fixture, not a telematics feed, not a company export, and not a hosted HR system. Inbound quality is a shadow checklist, not an accuracy percent and not a tenant pull. Alert actions are stubs. Option C remains prep. Monitoring is local pins, scores, a call board, and charts on this machine. Not a live GPS feed."
+      ? "Synthetic demo on this machine. Not BYO company data. Not a live GM pilot. Miles, the ranked board, collaboration suggestions, and friction are a labeled fixture, not a telematics feed, not a company export, and not a hosted HR system. Inbound quality is a shadow checklist, not an accuracy percent and not a tenant pull. Alert actions are stubs. Option C remains prep. Monitoring is local pins, time cards, coverage, right-tech suggestions, scores, a call board, and charts on this machine. Not a live GPS feed. Suggestions are not a dispatch."
       : dataLabel === "byo-admitted-synthetic"
-        ? "BYO-admitted synthetic drill. Local files only. UNVERIFIED. Writes refused. Inbound quality stays on this machine. Alert actions are stubs. Option C remains prep. Monitoring stays on this machine. Not a live GPS feed."
-        : "BYO-admitted local export. UNVERIFIED. Writes refused. Authoring node is not a custodian of this desk. Inbound quality stays on this machine. Alert actions are stubs. Option C remains prep. Monitoring stays on this machine. Not a live GPS feed.";
+        ? "BYO-admitted synthetic drill. Local files only. UNVERIFIED. Writes refused. Inbound quality stays on this machine. Alert actions are stubs. Option C remains prep. Monitoring stays on this machine. Not a live GPS feed. Suggestions are not a dispatch."
+        : "BYO-admitted local export. UNVERIFIED. Writes refused. Authoring node is not a custodian of this desk. Inbound quality stays on this machine. Alert actions are stubs. Option C remains prep. Monitoring stays on this machine. Not a live GPS feed. Suggestions are not a dispatch.";
 
   return {
     product: "trades-runtime",
@@ -1401,6 +1449,9 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
     huddle,
     drive,
     monitoring,
+    timeTracking,
+    coverage,
+    rightTech,
     inboundQuality,
     alertActions,
     optionCStartGate: startGate,

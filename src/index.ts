@@ -76,6 +76,32 @@ export {
 } from "./domain/local-positions.js";
 export { buildMonitoring, callColumn } from "./desk/monitoring.js";
 export {
+  defaultTimeCardsPath,
+  defaultTimeTrackingAuditPath,
+  defaultTimeTrackingPath,
+  inboundTimeCardsPath,
+  loadTimeTracking,
+  persistTimeTracking,
+  readTimeCardsFile,
+  recomputeTimeCard,
+  SYNTHETIC_TIME_INPUTS
+} from "./domain/time-tracking.js";
+export {
+  COVERAGE_LAYERS,
+  coverageLayerLabel,
+  defaultCoverageLayers,
+  defaultCoverageLayersPath,
+  defaultCoveragePath,
+  inboundCoveragePath,
+  loadCoverage,
+  normalizeCoverageLayer,
+  readCoverageFile,
+  readCoverageLayers,
+  SYNTHETIC_COVERAGE_FEATURES,
+  writeCoverageLayer
+} from "./domain/coverage-map.js";
+export { buildRightTech, milesBetween, RIGHT_TECH_AUTHORITY, skillFit } from "./domain/right-tech.js";
+export {
   buildInboundQualityReport,
   persistInboundQuality,
   readLocalPeerFragments,
