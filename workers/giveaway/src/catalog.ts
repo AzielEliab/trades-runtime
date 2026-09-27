@@ -142,8 +142,9 @@ export function llmsTxt(): string {
 ${HONESTY.product}
 
 ## Dual surface
-- Humans: ${PUBLIC_ORIGIN}/ (UI) + counted ${PUBLIC_ORIGIN}/download
+- Humans: ${PUBLIC_ORIGIN}/ — giveaway Worker UI on this VibeLock host (browser / PWA) without downloading first
 - Agents: POST ${PUBLIC_ORIGIN}/mcp · ${PUBLIC_ORIGIN}/openapi.json · ${PUBLIC_ORIGIN}/llms.txt · ${PUBLIC_ORIGIN}/ai.txt
+- Optional pack: counted GET ${PUBLIC_ORIGIN}/download (${RELEASE_FILENAME}). The operator desk with your own ServiceTitan and ProBooks installs locally from that pack.
 
 ## Discovery (Growth-ON)
 - robots.txt — full AI Allow + Content-Signal (search/ai-input/ai-train)
@@ -178,7 +179,7 @@ Worker: ${PUBLIC_ORIGIN}
 ## What it is
 
 Local-first BYO TypeScript runtime for HVAC, plumbing, electrical, sewer, and cross-trades.
-People bring their own ServiceTitan and ProBooks. Dual surface: human UI + counted download.
+People bring their own ServiceTitan and ProBooks. Humans use the giveaway Worker UI on this VibeLock host (browser / PWA) without downloading first. Agents use OpenAPI and MCP. The optional counted pack is GET /download. The operator desk still installs on the operator machine.
 Thin OpenAPI/MCP for health, stats, cite, and this skill.
 
 ## Honest counters
@@ -232,7 +233,7 @@ export function openApiSpec(): Record<string, unknown> {
       "/cite.json": { get: { summary: "Public cite. Does not increment counters." } },
       "/llms.txt": { get: { summary: "LLM-oriented product text." } },
       "/ai.txt": { get: { summary: "Honest trades product lead for agents and crawlers." } },
-      "/humans.txt": { get: { summary: "Short human pointer to / and /download." } },
+      "/humans.txt": { get: { summary: "Short human pointer to the Worker UI, with the optional counted pack at /download." } },
       "/robots.txt": { get: { summary: "Open crawl Allow list + Content-Signal." } },
       "/sitemap.xml": { get: { summary: "Absolute URLs for this Worker." } },
       "/person.jsonld": { get: { summary: "Person JSON-LD. Machine 15:20 disambiguation. No HTML chrome." } },

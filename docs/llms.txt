@@ -3,9 +3,9 @@
 > Local-first TypeScript operating system for field-trades companies.
 > Author / identity: Aziel Eliab only.
 X / Twitter: @AzielEliab https://x.com/AzielEliab
-> Version: 0.4.10 (repo and Worker source)
-> Deployed Worker is 0.4.10. x-product-version and /v1/health match this tip.
-> Public Glama listing: Version 0.3.4 / Latest pre-0.4.4. Stale relative to the deployed Worker. Not 0.4.10. glama.json version is the claim file, not the Glama Latest badge.
+> Version: 0.4.11 (repo and Worker source)
+> Deployed Worker is 0.4.11. x-product-version and /v1/health match this tip.
+> Public Glama listing: Version 0.3.4 / Latest pre-0.4.4. Stale relative to the deployed Worker. Not 0.4.11. glama.json version is the claim file, not the Glama Latest badge.
 > Status: live-pure core + stubs. BYO local ServiceTitan + ProBooks. Option C code-ready / pilot not started. Option D not started. No live backends. Pages off. Public get is the giveaway Worker.
 
 Product is src/. docs/ is a thin local UI. Implementer specs are at repo-root specs/. Public download: https://trades-runtime.vibelock.workers.dev/download
@@ -32,4 +32,4 @@ A Full-Day Trajectory · B Call-to-Call Ledger · C Human Override / Recalibrati
 
 ## Public surface
 
-https://trades-runtime.vibelock.workers.dev — human UI + counted tarball. Repo may stay private.
+https://trades-runtime.vibelock.workers.dev — giveaway Worker UI on this VibeLock host (browser / PWA) without downloading first. Optional counted tarball at /download. Repo may stay private.

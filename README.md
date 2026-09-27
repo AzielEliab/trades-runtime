@@ -3,13 +3,13 @@
 Private **TypeScript runtime** for a shadow-first AI operating system / company operating intelligence layer. Field trades: HVAC, plumbing, electrical, sewer, and cross-trades.
 
 **Author / identity:** Aziel Eliab only. See [`IDENTITY.md`](IDENTITY.md). No legal name, home, or county on exports.  
-**Version:** 0.4.10  
+**Version:** 0.4.11  
 **Role:** `trades-runtime`  
 **License:** Apache-2.0  
 **Visibility:** this repository stays **private**; public get is the giveaway Worker  
 **Public Worker (if deployed):** https://trades-runtime.vibelock.workers.dev  
-**Try on Glama (intended listing):** https://glama.ai/mcp/servers/AzielEliab/trades-runtime — pack is in-repo (`glama.json`, `Dockerfile`, `cli/mcp-stdio.mjs`). Do **not** treat Install Server as LIVE until a Glama admin Deploy + Make Release succeeds. Public Glama listing Version is **0.3.4** and Latest is **pre-0.4.4**. That badge is stale. It is not this repo's 0.4.10 and not the Glama Latest badge. See [`docs/GLAMA.md`](docs/GLAMA.md).  
-**Status:** 0.4.10 local time tracking, service-coverage switches, and right-tech suggestions on the Monitoring desk (**pilot not started**) — 0.4.9 local inbound quality report for ServiceTitan and ProBooks fragments, alert-to-action stubs with refused write-back, and an Option C start-gate prep panel (**pilot not started**) — 0.4.8 local miles driven and drive performance, a ranked employee and department performance board, work-together suggestions across departments, and an employee friction rate beside that board (**pilot not started**) — 0.4.7 part cost with regional market adaptation, per-tech trainingNeeded, good and bad department behavior flags, and local truck counts (**pilot not started**) — 0.4.6 per-call classify reasons, callback / warranty / not-classified filters, a loopback weekly callback-rate digest, and a tech morning huddle (**pilot not started**) — 0.4.5 local callback and warranty counts, alert-digest export, score explanations, and booking-block receipt (**pilot not started**) — 0.4.4 local operator desk polish (theme, lane view, printable snapshot; **pilot not started**) — 0.4.3 Option C BYO pilot prep (local runbook + `npm run pilot:prep`; **pilot not started**) — 0.4.2 local alert rules on the operator desk — 0.4.1 named trades-app vendor profiles on the 0.4.0 universal drop-in — lockstep with Property Intelligence v1.0 in-tree — live-pure core + honest stubs — **BYO** local ServiceTitan + ProBooks + trades-app inbound — **no** live writes, tenant data, ST/ProBooks write-back, phone-home, DOIs, hosted uploader, or production company-OS claim — **Option C code-ready / pilot not started** — **Option D not started**
+**Try on Glama (intended listing):** https://glama.ai/mcp/servers/AzielEliab/trades-runtime — pack is in-repo (`glama.json`, `Dockerfile`, `cli/mcp-stdio.mjs`). Do **not** treat Install Server as LIVE until a Glama admin Deploy + Make Release succeeds. Public Glama listing Version is **0.3.4** and Latest is **pre-0.4.4**. That badge is stale. It is not this repo's 0.4.11 and not the Glama Latest badge. See [`docs/GLAMA.md`](docs/GLAMA.md).  
+**Status:** 0.4.11 giveaway human UI on the VibeLock Worker (browser / PWA) without downloading first; optional counted pack; operator desk still local (**pilot not started**) — 0.4.10 local time tracking, service-coverage switches, and right-tech suggestions on the Monitoring desk (**pilot not started**) — 0.4.9 local inbound quality report for ServiceTitan and ProBooks fragments, alert-to-action stubs with refused write-back, and an Option C start-gate prep panel (**pilot not started**) — 0.4.8 local miles driven and drive performance, a ranked employee and department performance board, work-together suggestions across departments, and an employee friction rate beside that board (**pilot not started**) — 0.4.7 part cost with regional market adaptation, per-tech trainingNeeded, good and bad department behavior flags, and local truck counts (**pilot not started**) — 0.4.6 per-call classify reasons, callback / warranty / not-classified filters, a loopback weekly callback-rate digest, and a tech morning huddle (**pilot not started**) — 0.4.5 local callback and warranty counts, alert-digest export, score explanations, and booking-block receipt (**pilot not started**) — 0.4.4 local operator desk polish (theme, lane view, printable snapshot; **pilot not started**) — 0.4.3 Option C BYO pilot prep (local runbook + `npm run pilot:prep`; **pilot not started**) — 0.4.2 local alert rules on the operator desk — 0.4.1 named trades-app vendor profiles on the 0.4.0 universal drop-in — lockstep with Property Intelligence v1.0 in-tree — live-pure core + honest stubs — **BYO** local ServiceTitan + ProBooks + trades-app inbound — **no** live writes, tenant data, ST/ProBooks write-back, phone-home, DOIs, hosted uploader, or production company-OS claim — **Option C code-ready / pilot not started** — **Option D not started**
 
 The product is the software in `src/`. `docs/` is a thin local catalog/UI. GitHub Pages is **intentionally disabled** (`live_backends: false`). There is no Pages workflow. **PDFs are never published.** Implementer specs live at repo-root [`specs/`](specs/) (not under `docs/`).
 
@@ -192,7 +192,8 @@ Worker script name: `trades-runtime` (same `vibelock` workers.dev account patter
 
 What it is:
 
-- Human landing + counted Apache-2.0 tarball download
+- Human giveaway UI on this VibeLock host (browser / PWA): honesty, cite, MCP, skill, and stats, usable without downloading first
+- Optional counted Apache-2.0 tarball at `GET /download` (increments only after a verified gzip 200)
 - `/local-desk` cites the local `npx tsx src/cli.ts desk` install. It does not host tenant metrics or a live company board
 - Thin read-only `/openapi.json` and `POST /mcp` for AI clients (health / stats / cite / skill only)
 - Growth-ON crawl surfaces: `/robots.txt` (full Allow + Content-Signal), `/sitemap.xml`, `/ai.txt`, `/humans.txt`, `/.well-known/mcp.json`, `/person.jsonld`, `/graph.jsonld`
@@ -240,7 +241,7 @@ The listing URL is documented so agents and humans can find it. The Git pack (`g
 
 Do not invent Glama TDQS scores. Do not claim the listing is already live.
 
-Public Glama listing Version is 0.3.4 and Latest is pre-0.4.4. Checked 2026-09-27: that badge is still releaseVersion 0.3.4 and is stale. Do not cite that badge as 0.4.10. `glama.json` version is the in-repo claim file (0.4.10). The Worker source in this repo is 0.4.10. The giveaway Worker version pin is 0.4.10. The Glama listing is a separate surface. This cite interlock does not deploy.
+Public Glama listing Version is 0.3.4 and Latest is pre-0.4.4. Checked 2026-09-27: that badge is still releaseVersion 0.3.4 and is stale. Do not cite that badge as 0.4.11. `glama.json` version is the in-repo claim file (0.4.11). The Worker source in this repo is 0.4.11. The giveaway Worker version pin is 0.4.11. The Glama listing is a separate surface. This cite interlock does not deploy.
 
 Local / Docker:
 
@@ -256,7 +257,7 @@ docker run --rm -i trades-runtime-mcp
 
 GitHub Pages is **intentionally disabled**. There is no `.github/workflows/pages.yml`. Do not add a Pages deploy workflow. Do not enable Pages on the repository. Do not treat a github.io URL as a live product surface.
 
-Keep the repository private. Do not change visibility to public. Public get is the Worker download. Do not enable GitHub Pages. Do not add PDFs under `docs/`.
+Keep the repository private. Do not change visibility to public. Public get is the Worker UI on https://trades-runtime.vibelock.workers.dev. The counted tarball is optional. Do not enable GitHub Pages. Do not add PDFs under `docs/`.
 
 Local UI preview (Pages stay off):
 
