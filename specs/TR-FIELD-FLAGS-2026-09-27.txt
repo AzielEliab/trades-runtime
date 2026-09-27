@@ -1,0 +1,62 @@
+TRADES-RUNTIME · FIELD FLAGS ON THE LOCAL DESK                                                                    TR-FIELD-FLAGS-2026-09-27
+
+
+
+
+ Receipt ID TR-FIELD-FLAGS-2026-09-27 · 2026-09-27
+ Identity: Aziel Eliab only.
+ Extends the local alert rules of TR-ALERTS-2026-09-25. Does not amend the eight BYO laws.
+ live_backends remains false. Pages remain off. Option C pilot remains not started. Option D remains not started.
+ pilot_started remains false. This cut does not deploy the public Worker.
+ Public Glama listing Version remains 0.3.4. Latest remains pre-0.4.4.
+ The Worker already deployed remains 0.4.5. This source stays 0.4.8.
+ This cut does not retitle the 0.4.8 local Softwares desk and does not edit aziel-runtime Softwares.
+ The giveaway Worker is not an alert bus.
+ Those surfaces are not this desk.
+
+
+ What changed
+ Field techs can raise a flag that the office sees on the local operator desk.
+ The flag uses the banner, the alerts panel, history, acknowledge, and the alert digest
+ that TR-ALERTS already built. Capacity, late jobs, trust-band, booking block, and
+ verification stall stay.
+
+ Flag
+    flagId, vanId, jobId (optional), kind, severity, note, raisedAt, raisedBy.
+    kind is one of needsParts, safetyHold, customerEscalation, vanDown, callbackRisk.
+    severity is info, watch, or hold. The file states it. The desk does not invent one
+    for a file that omits it.
+    inventedAccuracy is false. A true value is refused. No accuracy percent is computed.
+
+ Where a flag lives
+    data/runtime/<instanceId>/field-flags/*.json
+    That directory is gitignored. The committed example is data/runtime/field-flags.json.example
+    and is not read as a live flag.
+    An admitted job row may also name the same labels (needsParts, safetyHold,
+    customerEscalation, vanDown, callbackRisk), or a labels array of those names,
+    or a fieldFlags array of the same object shape.
+    A row that names a label and does not name a van is not turned into a flag.
+    No van is invented. Job notes, descriptions, and tags are not scanned.
+    When the row does not state a severity, the desk uses a fixed label severity:
+    safetyHold and vanDown are hold; the other three are watch. That is a label, not a percent.
+
+ Desk
+    POST /api/flags/raise on 127.0.0.1 writes one local JSON file and nothing else.
+    The next desk read shows it with the other rules.
+    Acknowledge is the existing local POST. It does not text, push, or write ServiceTitan or ProBooks.
+    The digest includes field-flag hits. Hooks stay file-or-loopback, and stay off unless configured.
+    The public Worker page /local-desk may cite the install path. It does not receive flags.
+
+
+ Laws held
+    Law                         This cut
+
+    BYO, not central dump       Flag files stay on the operator machine.
+    Per-runtime isolate         Files sit under data/runtime/<instanceId>/field-flags/.
+    Wrapper ≠ verified          An inbound label is not verification and is not an accuracy percent.
+    Writes refused              Raise writes the local flag file only. No ST/ProBooks/trades-app client.
+    No phone-home               No SMS. No push. Webhook host must be loopback.
+    No tenant data on Worker    The public page cites the path. It is not an alert bus. COUNTS KV is not a flag store.
+    Softwares frozen            aziel-runtime Softwares are not edited and no Softwares row is added.
+    Pages off                   No Pages workflow.
+    Pilot not started           pilot_started stays false.

@@ -233,7 +233,9 @@ export {
   buildAlertDigest,
   defaultAlertConfig,
   dispatchLocalHooks,
-  parseAlertConfig
+  FIELD_FLAG_KINDS,
+  parseAlertConfig,
+  parseFieldFlag
 } from "./desk/alerts.js";
 export {
   ingestTradesAppShadow,

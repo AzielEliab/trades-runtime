@@ -118,7 +118,8 @@ export function renderAlerts(snapshot: OperatorSnapshot): string {
         )
         .join("")
     : `<li class="quiet">No alert history on this machine yet.</li>`;
-  return `<p class="quiet">Export current rule hits on this machine: <a href="/api/alerts/digest.json">JSON</a> · <a href="/api/alerts/digest.csv">CSV</a></p>
+  return `<p class="quiet">Export current rule hits on this machine: <a href="/api/alerts/digest.json">JSON</a> · <a href="/api/alerts/digest.csv">CSV</a>. Field flags use this same banner, panel, history, and digest.</p>
+    <p class="quiet">Field flags are files under <code>data/runtime/&lt;instanceId&gt;/field-flags/</code> on this machine. No SMS. No push.</p>
     <h3 class="subhead">Active rules</h3>
     <div class="rule-alerts">${active}</div>
     <h3 class="subhead">History</h3>
@@ -859,6 +860,7 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
       Drop folders: <code>data/inbound/servicetitan</code>, <code>data/inbound/probooks</code>, <code>data/inbound/trades-app</code>.
       Optional miles file: <code>data/runtime/&lt;instanceId&gt;/drive-miles.json</code> or <code>data/inbound/drive-miles.json</code>. Copy <code>data/runtime/drive-miles.json.example</code>. No GPS vendor.
       Alert rules: copy <code>data/runtime/alerts.json.example</code> to <code>data/runtime/&lt;instanceId&gt;/alerts.json</code>.
+      Field flags: <code>data/runtime/&lt;instanceId&gt;/field-flags/</code>.
       Theme stays in this browser. Print snapshot stays on this machine.
       Refresh ${snapshot.tracking.intervalMs}ms from ${esc(snapshot.tracking.source)}.
     </footer>

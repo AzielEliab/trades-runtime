@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -6,10 +6,15 @@ import { RUNTIME_MANIFEST } from "../src/manifest.js";
 import {
   acknowledgeAlert,
   applyDeskAlerts,
+  buildAlertDigest,
   defaultAlertConfig,
   dispatchLocalHooks,
   emptyAlertState,
+  fieldFlagsDirectory,
+  fieldFlagsFromInboundRow,
   parseAlertConfig,
+  parseFieldFlag,
+  readFieldFlagDirectory,
   type DeskRuleSignals
 } from "../src/desk/alerts.js";
 import { buildOperatorSnapshot } from "../src/desk/snapshot.js";
@@ -332,5 +337,266 @@ describe("local alert rules", () => {
     expect(snapshot.bookingBlock).toBe("BLOCK_NEW_BOOKING");
     expect(snapshot.ruleAlerts.some((alert) => alert.rule === "booking-block")).toBe(true);
     expect(snapshot.scores.find((score) => score.id === "capacity-block")?.value).toBe("BLOCK_NEW_BOOKING");
+  });
+
+  it("reads explicit field flags and does not invent a van or an accuracy percent", () => {
+    const example = parseFieldFlag(JSON.parse(readFileSync("data/runtime/field-flags.json.example", "utf8")) as unknown);
+    expect(example.kind).toBe("needsParts");
+    expect(example.inventedAccuracy).toBe(false);
+    expect(example.severity).toBe("watch");
+    expect(() => parseFieldFlag({ ...example, inventedAccuracy: true })).toThrow(/invented accuracy/);
+    expect(() => parseFieldFlag({ ...example, sms: true })).toThrow(/sms/);
+    expect(() => parseFieldFlag({ ...example, push: "device" })).toThrow(/push/);
+    expect(() => parseFieldFlag({ ...example, phoneHome: true })).toThrow(/phoneHome/);
+    expect(() => parseAlertConfig({ sms: true })).toThrow(/sms/);
+
+    const named = fieldFlagsFromInboundRow({
+      raw: {
+        needsParts: true,
+        vanId: "van-2",
+        labels: ["callbackRisk"],
+        tags: ["needsParts", "safetyHold"],
+        notes: "safetyHold on a van that is not named here"
+      },
+      jobId: "job-9",
+      now: NOW,
+      raisedBy: "tech"
+    });
+    expect(named.flags.map((flag) => flag.kind).sort()).toEqual(["callbackRisk", "needsParts"]);
+    expect(named.flags.every((flag) => flag.inventedAccuracy === false && flag.vanId === "van-2")).toBe(true);
+    expect(named.flags.find((flag) => flag.kind === "needsParts")?.severity).toBe("watch");
+    expect(named.flags.find((flag) => flag.kind === "callbackRisk")?.severity).toBe("watch");
+
+    const held = fieldFlagsFromInboundRow({
+      raw: { safetyHold: true, van_id: "van-3" },
+      jobId: "job-12",
+      now: NOW
+    });
+    expect(held.flags[0]?.severity).toBe("hold");
+    expect(held.flags[0]?.kind).toBe("safetyHold");
+
+    const noVan = fieldFlagsFromInboundRow({
+      raw: { safetyHold: true, notes: "van-9 is down" },
+      jobId: "job-10",
+      now: NOW
+    });
+    expect(noVan.flags).toEqual([]);
+    expect(noVan.notices[0]?.detail).toMatch(/No van was invented/);
+
+    const prose = fieldFlagsFromInboundRow({
+      raw: { description: "needsParts", tags: ["vanDown"] },
+      jobId: "job-11",
+      now: NOW
+    });
+    expect(prose.flags).toEqual([]);
+
+    const refusedDir = readFieldFlagDirectory("data/tenants/field-flags");
+    expect(refusedDir.readable).toBe(false);
+    expect(refusedDir.flags).toEqual([]);
+
+    const config = defaultAlertConfig();
+    const raised = applyDeskAlerts({
+      signals: signals(),
+      config,
+      state: null,
+      now: NOW,
+      fieldFlags: [example]
+    });
+    const flag = raised.active.find((alert) => alert.rule === "field-flag");
+    expect(flag?.severity).toBe("watch");
+    expect(flag?.title).toMatch(/Needs parts/);
+    expect(flag?.detail).toMatch(/Van van-example/);
+    expect(flag?.detail).not.toMatch(/\d+%/);
+    expect(flag?.inventedAccuracy).toBe(false);
+    expect(raised.active.some((alert) => alert.rule === "capacity")).toBe(false);
+
+    const digest = buildAlertDigest({
+      version: "0.4.6",
+      generatedAt: NOW,
+      dataLabel: "byo-admitted",
+      hits: raised.active
+    });
+    expect(digest.hits.map((hit) => hit.rule)).toEqual(["field-flag"]);
+    expect(digest.phoneHome).toBe(false);
+    expect(digest.vendorWrite).toBe(false);
+    expect(digest.hits[0]?.inventedAccuracy).toBe(false);
+
+    const acked = acknowledgeAlert(raised.state, flag!.id, "office", NOW);
+    expect(acked.found).toBe(true);
+    const still = applyDeskAlerts({
+      signals: signals(),
+      config,
+      state: acked.state,
+      now: "2026-09-27T12:05:00Z",
+      fieldFlags: [example]
+    });
+    expect(still.raised).toEqual([]);
+    expect(still.active.find((alert) => alert.id === flag!.id)?.acknowledgedAt).toBe(NOW);
+
+    const cleared = applyDeskAlerts({
+      signals: signals(),
+      config,
+      state: still.state,
+      now: "2026-09-27T13:00:00Z",
+      fieldFlags: []
+    });
+    expect(cleared.active.some((alert) => alert.rule === "field-flag")).toBe(false);
+    expect(cleared.history.some((alert) => alert.rule === "field-flag" && alert.active === false)).toBe(true);
+
+    const off = applyDeskAlerts({
+      signals: signals(),
+      config: { ...config, rules: { ...config.rules, fieldFlag: { enabled: false } } },
+      state: null,
+      now: NOW,
+      fieldFlags: [example]
+    });
+    expect(off.active.some((alert) => alert.rule === "field-flag")).toBe(false);
+    expect(off.notices.some((notice) => notice.title === "Field-flag rule off")).toBe(true);
+  });
+
+  it("shows an inbound field flag and a raised loopback flag on the desk", async () => {
+    const root = mkdtempSync(join(tmpdir(), "tr-field-flags-"));
+    for (const kind of ["servicetitan", "probooks", "trades-app"]) {
+      mkdirSync(join(root, "data", "inbound", kind), { recursive: true });
+    }
+    writeFileSync(
+      join(root, "data", "inbound", "trades-app", "flags.json"),
+      JSON.stringify({
+        synthetic: true,
+        exportedAt: NOW,
+        records: [
+          {
+            job_id: "SYN-FLAG-1",
+            customer: "Synthetic Mill",
+            status: "scheduled",
+            scheduled_at: "2026-09-27T15:00:00Z",
+            trade: "plumbing",
+            vanId: "van-7",
+            needsParts: true,
+            technicianName: "Luis Ortega"
+          },
+          {
+            job_id: "SYN-FLAG-2",
+            customer: "Synthetic Mill",
+            status: "scheduled",
+            scheduled_at: "2026-09-27T15:00:00Z",
+            trade: "hvac",
+            safetyHold: true
+          }
+        ]
+      })
+    );
+    const admitted = buildOperatorSnapshot({ cwd: root, now: NOW, alertConfig: defaultAlertConfig() });
+    const inboundFlags = admitted.ruleAlerts.filter((alert) => alert.rule === "field-flag");
+    expect(inboundFlags).toHaveLength(1);
+    expect(inboundFlags[0]?.detail).toMatch(/needsParts/);
+    expect(inboundFlags[0]?.detail).toMatch(/van-7/);
+    expect(inboundFlags[0]?.inventedAccuracy).toBe(false);
+    expect(inboundFlags[0]?.detail).not.toMatch(/\d+%/);
+    expect(admitted.alerts.some((alert) => alert.title === "Field flag waiting on a van")).toBe(true);
+    expect(admitted.pilot_started).toBe(false);
+    expect(admitted.writes).toBe(false);
+    expect(admitted.alertRules.enabled).toContain("field-flag");
+    expect(admitted.alertRules.enabled).toEqual(
+      expect.arrayContaining(["capacity", "late-jobs", "trust-band", "booking-block", "verification-stall", "field-flag"])
+    );
+
+    const desk = await startOperatorDesk({
+      port: 0,
+      cwd: root,
+      alertConfig: defaultAlertConfig()
+    });
+    try {
+      const denied = await fetch(`${desk.url}api/flags/raise`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          flagId: "van-down-1",
+          vanId: "van-7",
+          jobId: "SYN-FLAG-1",
+          kind: "vanDown",
+          severity: "hold",
+          note: "Example van is down.",
+          raisedAt: NOW,
+          raisedBy: "field-tech",
+          inventedAccuracy: true
+        })
+      });
+      expect(denied.status).toBe(400);
+      expect(existsSync(join(fieldFlagsDirectory(root, "local"), "van-down-1.json"))).toBe(false);
+
+      const sms = await fetch(`${desk.url}api/flags/raise`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ sms: true, flagId: "nope", kind: "vanDown" })
+      });
+      expect(sms.status).toBe(400);
+
+      const raised = await fetch(`${desk.url}api/flags/raise`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          flagId: "van-down-1",
+          vanId: "van-7",
+          jobId: "SYN-FLAG-1",
+          kind: "vanDown",
+          severity: "hold",
+          note: "Example van is down.",
+          raisedAt: NOW,
+          raisedBy: "field-tech",
+          inventedAccuracy: false
+        })
+      });
+      expect(raised.status).toBe(200);
+      const body = (await raised.json()) as {
+        ok: boolean;
+        kind: string;
+        inventedAccuracy: boolean;
+        vendorWrite: boolean;
+        phoneHome: boolean;
+        writes: boolean;
+      };
+      expect(body.ok).toBe(true);
+      expect(body.kind).toBe("vanDown");
+      expect(body.inventedAccuracy).toBe(false);
+      expect(body.vendorWrite).toBe(false);
+      expect(body.phoneHome).toBe(false);
+      expect(body.writes).toBe(false);
+
+      const view = (await (await fetch(`${desk.url}api/view`)).json()) as { "rule-banner": string; alerts: string };
+      expect(view["rule-banner"]).toContain('data-rule="field-flag"');
+      expect(view.alerts).toContain("field-flag");
+      expect(view.alerts).toContain("History");
+      const digest = (await (await fetch(`${desk.url}api/alerts/digest.json`)).json()) as {
+        phoneHome: boolean;
+        vendorWrite: boolean;
+        hits: { rule: string; inventedAccuracy: boolean }[];
+      };
+      expect(digest.phoneHome).toBe(false);
+      expect(digest.vendorWrite).toBe(false);
+      expect(digest.hits.some((hit) => hit.rule === "field-flag" && hit.inventedAccuracy === false)).toBe(true);
+      const snapshot = (await (await fetch(`${desk.url}api/snapshot`)).json()) as {
+        pilot_started: boolean;
+        writes: boolean;
+        ruleAlerts: { id: string; rule: string }[];
+      };
+      expect(snapshot.pilot_started).toBe(false);
+      expect(snapshot.writes).toBe(false);
+      const id = snapshot.ruleAlerts.find((alert) => alert.id === "field-flag:van-down-1")?.id;
+      if (!id) throw new Error("expected the raised field flag");
+      const ack = await fetch(`${desk.url}api/alerts/ack`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ id, by: "office" })
+      });
+      expect(ack.status).toBe(200);
+      const after = (await (await fetch(`${desk.url}api/view`)).json()) as { "rule-banner": string; alerts: string };
+      expect(after["rule-banner"]).not.toContain("Van down");
+      expect(after["rule-banner"]).toContain("Needs parts");
+      expect(after.alerts).toContain("Acknowledged");
+      expect(after.alerts).toContain("History");
+    } finally {
+      await desk.close();
+    }
   });
 });

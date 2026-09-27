@@ -14,6 +14,7 @@ import {
 } from "./servicetitan-shadow.js";
 import { classifyCall, type CallClassification } from "../domain/call-class.js";
 import { knownJobMoney } from "../domain/performance-board.js";
+import { fieldFlagsFromInboundRow, type AlertNotice, type FieldFlag } from "../desk/alerts.js";
 import {
   ingestTradesAppShadow,
   TRADES_APP_ENTITIES,
@@ -108,6 +109,9 @@ export interface AdmittedDropRecord {
   sold?: number;
   /** Explicit current revenue dollars. Absent when the row did not name one. */
   revenue?: number;
+  /** Explicit field labels on a job row. Absent when the row names none. */
+  fieldFlags?: FieldFlag[];
+  fieldFlagNotices?: AlertNotice[];
 }
 
 export interface DropInAdmit {
@@ -1096,13 +1100,22 @@ function admitRecord(
     const laned = lane ? { ...row, lane } : row;
     if (laned.entity !== "job") return laned;
     const money = knownJobMoney(record.raw);
+    const extracted = fieldFlagsFromInboundRow({
+      raw: record.raw,
+      jobId: laned.externalId,
+      observedAt: record.observedAt,
+      now: receivedAt,
+      raisedBy: technician?.name || technician?.id
+    });
     return {
       ...laned,
       callClass: classifyCall(record.raw),
       ...(technician ? { technicianId: technician.id, technicianName: technician.name } : {}),
       ...(money.ticket != null ? { ticket: money.ticket } : {}),
       ...(money.sold != null ? { sold: money.sold } : {}),
-      ...(money.revenue != null ? { revenue: money.revenue } : {})
+      ...(money.revenue != null ? { revenue: money.revenue } : {}),
+      ...(extracted.flags.length ? { fieldFlags: extracted.flags } : {}),
+      ...(extracted.notices.length ? { fieldFlagNotices: extracted.notices } : {})
     };
   };
   if (peerClass === "servicetitan") {

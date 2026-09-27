@@ -53,6 +53,16 @@ Copy [`../runtime/alerts.json.example`](../runtime/alerts.json.example) to `data
 
 Rules read desk scores already on the page: mission pace, evidence trust, verification, and booking block, plus the capacity series and unfinished jobs. They do not invent an accuracy percent. The in-desk banner, history, and acknowledge stay on this machine. A file hook is a local path. A webhook must be `127.0.0.1`, `localhost`, or `::1`. No phone-home.
 
+## Field flags (local desk)
+
+Receipt: [`specs/TR-FIELD-FLAGS-2026-09-27.txt`](../../specs/TR-FIELD-FLAGS-2026-09-27.txt).
+
+A field tech raises a flag the office sees on the same local banner, panel, history, acknowledge, and digest as the other alert rules. Kinds are `needsParts`, `safetyHold`, `customerEscalation`, `vanDown`, and `callbackRisk`. Severity is `info`, `watch`, or `hold`. `inventedAccuracy` is false.
+
+Copy [`../runtime/field-flags.json.example`](../runtime/field-flags.json.example) into `data/runtime/<instanceId>/field-flags/<flagId>.json` (gitignored). The example file itself is not a live flag. `POST /api/flags/raise` on `127.0.0.1` writes that file and nothing else. An admitted job row can name the same labels, or a `labels` array, or a `fieldFlags` array. A label without a van id is not a flag. Notes, descriptions, and tags are not scanned.
+
+No SMS. No push. No ServiceTitan or ProBooks write. The public Worker does not receive these flags.
+
 ## Option C prep (0.4.3)
 
 Receipt: [`specs/TR-OPTION-C-PREP-2026-09-25.txt`](../../specs/TR-OPTION-C-PREP-2026-09-25.txt).

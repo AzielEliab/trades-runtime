@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "note": "Local operator thresholds only. Copy to data/runtime/<instanceId>/alerts.json (gitignored). No phone-home. Webhook must be 127.0.0.1, localhost, or ::1. File hook is a local path. These rules read desk scores. They do not invent an accuracy percent.",
+  "note": "Local operator thresholds only. Copy to data/runtime/<instanceId>/alerts.json (gitignored). No phone-home. Webhook must be 127.0.0.1, localhost, or ::1. File hook is a local path. These rules read desk scores. They do not invent an accuracy percent. Field flags are separate files under data/runtime/<instanceId>/field-flags/. See field-flags.json.example. No SMS. No push.",
   "rules": {
     "capacity": {
       "enabled": true,
@@ -23,6 +23,9 @@
       "enabled": true,
       "whenStatus": ["UNVERIFIED", "CONFLICTED"],
       "stallMinutes": 720
+    },
+    "fieldFlag": {
+      "enabled": true
     }
   },
   "hooks": {

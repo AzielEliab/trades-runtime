@@ -35,6 +35,10 @@ describe("giveaway Worker routes", () => {
     expect(html).toContain("npx tsx src/cli.ts desk");
     expect(html).toContain("does not load company jobs");
     expect(html).toContain("Local alert rules stay on that machine");
+    expect(html).toContain("data/runtime/&lt;instanceId&gt;/field-flags/");
+    expect(html).toContain("field-flags.json.example");
+    expect(html).toContain("not an alert bus");
+    expect(html).not.toContain("/api/flags");
     expect(html).toContain("npm run pilot:prep");
     expect(html).toContain("pilot_started false");
     expect(html).toContain("does not start a company pilot");
@@ -42,6 +46,11 @@ describe("giveaway Worker routes", () => {
     expect(html).not.toContain("SYN-");
     const stats = (await (await hit(env, "/v1/stats")).json()) as FleetStats;
     expect(stats.views).toBe(0);
+    const raise = await hit(env, "/api/flags/raise", { method: "POST", body: "{}" });
+    expect(raise.status).toBe(404);
+    const after = (await (await hit(env, "/v1/stats")).json()) as FleetStats;
+    expect(after.views).toBe(0);
+    expect(after.downloads).toBe(0);
   });
 
   it("serves landing HTML and increments views once per 200", async () => {
