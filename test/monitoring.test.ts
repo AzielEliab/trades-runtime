@@ -39,8 +39,8 @@ describe("0.4.9 monitoring view", () => {
       persistAlertState: false,
       persistLocalReports: false
     });
-    expect(RUNTIME_MANIFEST.version).toBe("0.4.11");
-    expect(snapshot.version).toBe("0.4.11");
+    expect(RUNTIME_MANIFEST.version).toBe("0.4.12");
+    expect(snapshot.version).toBe("0.4.12");
     expect(snapshot.map).toEqual({
       drawn: false,
       reason: "No coordinates are stored on this desk. A map is not drawn."

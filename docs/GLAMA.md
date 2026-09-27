@@ -14,13 +14,13 @@ This repo ships:
 
 | File | Role |
 |------|------|
-| [`glama.json`](../glama.json) | Claim file. Schema requires `maintainers` (GitHub username `AzielEliab`). Listing `name` (`Trades Runtime`), claim-file version (`0.4.11`), designed-purpose `description` (local-first BYO field-trades; `live_backends` false), `keywords`, `homepage` (`https://glama.ai/mcp/servers/AzielEliab/trades-runtime`), and `documentation` (`https://github.com/AzielEliab/trades-runtime/blob/main/docs/GLAMA.md`) are additional properties. The claim-file version is not the public Glama badge. |
+| [`glama.json`](../glama.json) | Claim file. Schema requires `maintainers` (GitHub username `AzielEliab`). Listing `name` (`Trades Runtime`), claim-file version (`0.4.12`), designed-purpose `description` (local-first BYO field-trades; `live_backends` false), `keywords`, `homepage` (`https://glama.ai/mcp/servers/AzielEliab/trades-runtime`), and `documentation` (`https://github.com/AzielEliab/trades-runtime/blob/main/docs/GLAMA.md`) are additional properties. The claim-file version is not the public Glama badge. |
 | [`cli/mcp-stdio.mjs`](../cli/mcp-stdio.mjs) | Stdio MCP server. Bridges to the hosted Worker `/mcp` with `User-Agent: Mozilla/5.0`. |
 | [`Dockerfile`](../Dockerfile) | Local / “from Dockerfile” image. Glama admin often **generates** its own image from CMD args — still ship this file. |
 
 Do not invent Glama TDQS scores. Do not claim the listing or Install Server is already live.
 
-Public Glama listing Version is 0.3.4 and Latest is pre-0.4.4. Checked 2026-09-27: that badge is still releaseVersion 0.3.4 (tool updates v0.3.4, observedAt 2026-09-25) and is stale. Do not cite that badge as 0.4.11. The Worker source in this repo is 0.4.11. The giveaway Worker version pin in this repo is 0.4.11. The claim-file version, the Worker pin, and the Glama listing are three different surfaces. This cite interlock does not deploy.
+Public Glama listing Version is 0.3.4 and Latest is pre-0.4.4. Checked 2026-09-27: that badge is still releaseVersion 0.3.4 (tool updates v0.3.4, observedAt 2026-09-25) and is stale. Do not cite that badge as 0.4.12. The Worker source in this repo is 0.4.12. The giveaway Worker version pin in this repo is 0.4.12. The claim-file version, the Worker pin, and the Glama listing are three different surfaces. This cite interlock does not deploy.
 
 ## Honesty
 
