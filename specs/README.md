@@ -4,6 +4,8 @@ These text extracts drive implementation. Original PDFs stay offline / in chat a
 
 Standing rule: every PDF becomes coded software (current, prior, future).
 
+[`TR-DESK-VIEW-2026-09-27`](TR-DESK-VIEW-2026-09-27.txt) lets the operator turn desk boards, metrics, KPIs, techs, scores, charts, lanes, and alerts on or off. Choices stay in the browser under `trades-desk-view`. Everything starts on. Softwares card grids stay. It does not start the Option C pilot and does not deploy the Worker.
+
 [`TR-MOBILE-DESK-2026-09-27`](TR-MOBILE-DESK-2026-09-27.txt) makes the local operator desk usable at about 375px: domain nav, safe-area padding, 44px controls, and in-panel scroll for monitors and tables. Softwares card grids stay. The giveaway Worker cards are not edited. Version stays 0.4.9. It does not start the Option C pilot and does not deploy the Worker.
 
 [`TR-QUALITY-2026-09-27`](TR-QUALITY-2026-09-27.txt) is the 0.4.9 Softwares cut: a local inbound quality report for ServiceTitan and ProBooks fragments already on the operator machine, alert-to-action stubs that refuse write-back, an Option C start-gate panel that stays blocked-until, and one Monitoring view of local or demo pins, drive and tech scores, a call board, and KPI charts. Pins are not a live GPS feed. The quality score is a checklist, not an accuracy percent, and not a live tenant pull. Stubs do not call ServiceTitan or ProBooks. Option C remains prep until a human operator starts a real pilot. Option D stays out of scope. No cutover. It does not deploy the Worker. Public Glama listing Version stays 0.3.4 / Latest pre-0.4.4 and is stale relative to the live Worker. The Worker already deployed is 0.4.9. See docs/cite.json.

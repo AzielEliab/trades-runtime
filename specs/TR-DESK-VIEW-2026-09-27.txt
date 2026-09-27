@@ -1,0 +1,21 @@
+TR-DESK-VIEW-2026-09-27
+Local desk show and hide
+Author: Aziel Eliab
+Status: operator desk only. Version stays 0.4.9. Pilot not started. Worker not deployed.
+
+What this is
+  The operator can turn pieces of the local desk on or off, independently:
+  boards, metrics, KPIs, techs, scores, charts, lanes, alert rules,
+  call columns, and mission measures.
+  Every box starts checked. That is the current visible set.
+  An unchecked box is stored in this browser under trades-desk-view.
+  Refresh keeps the choice. A missing choice stays on.
+  The store is not a tenant write and does not phone home.
+  live_backends stays false. pilot_started stays false.
+
+What this is not
+  Not a Softwares card redesign. Wide-window metric, KPI, tech-card,
+  call-board, and chart grids stay as they are.
+  The giveaway Worker cards are not edited.
+  Not a new software count. Not a version bump. Not a deploy.
+  Not an Option C pilot start. Option D stays out of scope.

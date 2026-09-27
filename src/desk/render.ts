@@ -2,6 +2,7 @@ import { callFilterLabel, type CallDeskFilter } from "../domain/call-class.js";
 import { explainMissionPace } from "../domain/mission-board.js";
 import { capacityChart, countBars, jobsChart, milesChart, positionMap, rankedBars } from "./charts.js";
 import type { OperatorSnapshot } from "./snapshot.js";
+import { deskViewClientScript } from "./view-prefs.js";
 
 function esc(value: string): string {
   return value
@@ -20,7 +21,7 @@ export function renderRuleBanner(snapshot: OperatorSnapshot): string {
   if (!pending.length) return "";
   return pending
     .map(
-      (alert) => `<p class="rule-banner ${esc(alert.severity)}" data-rule="${esc(alert.rule)}" data-label="${esc(alert.dataLabel)}">
+      (alert) => `<p class="rule-banner ${esc(alert.severity)}" data-rule="${esc(alert.rule)}" data-view="alert:${esc(alert.rule)}" data-label="${esc(alert.dataLabel)}">
         <strong>${esc(alert.severity)} · ${esc(alert.rule)}</strong>
         <span class="banner-title">${esc(alert.title)}</span>
         <span class="banner-detail">${esc(alert.detail)}</span>
@@ -29,36 +30,48 @@ export function renderRuleBanner(snapshot: OperatorSnapshot): string {
     .join("");
 }
 
+const METRIC_CARDS: [string, string][] = [
+  ["jobs", "Jobs in view"],
+  ["appointments", "Appointments"],
+  ["customers", "Customers"],
+  ["pricebook", "Pricebook rows"],
+  ["invoices", "Invoices"],
+  ["admitted", "Admitted packets"],
+  ["unverified", "Unverified"],
+  ["receipts", "Receipt lines"],
+  ["callback-calls", "Callback calls"],
+  ["warranty-calls", "Warranty calls"],
+  ["not-classified", "Not classified"]
+];
+
 export function renderMetrics(snapshot: OperatorSnapshot): string {
-  const cards: [string, number][] = [
-    ["Jobs in view", snapshot.metrics.jobs],
-    ["Appointments", snapshot.metrics.appointments],
-    ["Customers", snapshot.metrics.customers],
-    ["Pricebook rows", snapshot.metrics.pricebookItems],
-    ["Invoices", snapshot.metrics.invoices],
-    ["Admitted packets", snapshot.metrics.admittedPackets],
-    ["Unverified", snapshot.metrics.unverified],
-    ["Receipt lines", snapshot.metrics.receiptLines],
-    ["Callback calls", snapshot.metrics.callbackCalls],
-    ["Warranty calls", snapshot.metrics.warrantyCalls],
-    ["Not classified", snapshot.metrics.callsNotClassified]
-  ];
-  return cards
-    .map(
-      ([label, value]) =>
-        `<article class="metric"><span>${esc(label)}</span><strong>${value}</strong></article>`
-    )
-    .join("");
+  const values: Record<string, number> = {
+    jobs: snapshot.metrics.jobs,
+    appointments: snapshot.metrics.appointments,
+    customers: snapshot.metrics.customers,
+    pricebook: snapshot.metrics.pricebookItems,
+    invoices: snapshot.metrics.invoices,
+    admitted: snapshot.metrics.admittedPackets,
+    unverified: snapshot.metrics.unverified,
+    receipts: snapshot.metrics.receiptLines,
+    "callback-calls": snapshot.metrics.callbackCalls,
+    "warranty-calls": snapshot.metrics.warrantyCalls,
+    "not-classified": snapshot.metrics.callsNotClassified
+  };
+  return METRIC_CARDS.map(
+    ([id, label]) =>
+      `<article class="metric" data-view="metric:${esc(id)}"><span>${esc(label)}</span><strong>${values[id] ?? 0}</strong></article>`
+  ).join("");
 }
 
 export function renderCharts(snapshot: OperatorSnapshot): string {
   const goal = snapshot.mission.goals[0];
-  return `<section class="chart-card">
+  return `<section class="chart-card" data-view="chart:jobs">
       <header><h2>Jobs and completions</h2><p>Amber is jobs. Green is completed. ${esc(snapshot.capacityFormula)}</p></header>
       ${jobsChart(snapshot.series)}
       <p class="legend"><i class="swatch jobs"></i> Jobs <i class="swatch done"></i> Completed</p>
     </section>
-    <section class="chart-card">
+    <section class="chart-card" data-view="chart:capacity">
       <header><h2>Capacity</h2><p>Booking block ${esc(snapshot.bookingBlock)}. ${goal ? `Today ${goal.actual} completed, gap ${goal.remainingGap.toFixed(2)}.` : ""}</p></header>
       ${capacityChart(snapshot.capacity)}
       <p class="legend"><i class="swatch jobs"></i> Booked <i class="swatch done"></i> Open lane, when the series has one</p>
@@ -68,7 +81,7 @@ export function renderCharts(snapshot: OperatorSnapshot): string {
 export function renderScores(snapshot: OperatorSnapshot): string {
   return snapshot.scores
     .map(
-      (score) => `<article class="score" data-score="${esc(score.id)}"${score.band ? ` data-band="${esc(score.band)}"` : ""}>
+      (score) => `<article class="score" data-score="${esc(score.id)}" data-view="score:${esc(score.id)}"${score.band ? ` data-band="${esc(score.band)}"` : ""}>
         <span>${esc(score.label)}</span>
         <strong>${esc(score.value)}</strong>
         <p class="why">${esc(score.why)}</p>
@@ -105,7 +118,7 @@ function renderRuleArticle(alert: OperatorSnapshot["ruleAlerts"][number], histor
       : `<button type="button" class="ack" data-ack="${esc(alert.id)}">Acknowledge</button>`;
   const state = history ? (alert.active ? "active" : "cleared") : alert.acknowledgedAt ? "acknowledged" : "open";
   const actions = history ? "" : renderStubList(stubs);
-  return `<article class="alert ${esc(alert.severity)}" data-rule="${esc(alert.rule)}" data-state="${state}">
+  return `<article class="alert ${esc(alert.severity)}" data-rule="${esc(alert.rule)}" data-view="alert:${esc(alert.rule)}" data-state="${state}">
         <span>${esc(alert.severity)} · ${esc(alert.rule)} · ${esc(alert.dataLabel)}</span>
         <h3>${esc(alert.title)}</h3>
         <p>${esc(alert.detail)}</p>
@@ -139,7 +152,7 @@ export function renderAlerts(snapshot: OperatorSnapshot): string {
     ? snapshot.alertHistory
         .slice(0, 12)
         .map(
-          (alert) => `<li data-state="${alert.active ? "active" : "cleared"}">
+          (alert) => `<li data-state="${alert.active ? "active" : "cleared"}" data-view="alert:${esc(alert.rule)}">
             <span>${esc(alert.severity)} · ${esc(alert.rule)}</span>
             ${esc(alert.title)}
             <em>${alert.active ? "active" : "cleared"}${alert.acknowledgedAt ? " · acknowledged" : ""}</em>
@@ -165,7 +178,7 @@ export function renderMission(snapshot: OperatorSnapshot): string {
       const actualWidth = target > 0 ? Math.min(100, (goal.actual / target) * 100) : 0;
       const expectedLeft = Math.min(100, Math.max(0, goal.elapsedFraction * 100));
       const pace = explainMissionPace(goal);
-      return `<article class="goal" data-band="${esc(pace.band)}">
+      return `<article class="goal" data-band="${esc(pace.band)}" data-view="goal:${esc(goal.measure)}">
         <header><h3>${esc(goal.measure)}</h3><span>${goal.actual} actual · ${goal.target} target · ${esc(pace.band)}</span></header>
         <div class="pace" role="img" aria-label="${esc(goal.measure)} ${esc(pace.band)}. ${esc(pace.why)}">
           <div class="pace-track">
@@ -181,7 +194,7 @@ export function renderMission(snapshot: OperatorSnapshot): string {
   const goalRows = snapshot.mission.goals
     .map((goal) => {
       const pace = explainMissionPace(goal);
-      return `<tr>
+      return `<tr data-view="goal:${esc(goal.measure)}">
         <td>${esc(goal.measure)}</td>
         <td>${goal.target}</td>
         <td>${goal.actual}</td>
@@ -275,7 +288,7 @@ export function renderHuddle(snapshot: OperatorSnapshot): string {
               <p class="quiet">Bar is booked on the mission day against known slots.</p>
             </div>`;
       const openLabel = tech.capacity.open == null ? "blank" : String(tech.capacity.open);
-      return `<article class="goal" data-tech="${esc(tech.id)}">
+      return `<article class="goal" data-tech="${esc(tech.id)}" data-view="tech:${esc(tech.id)}">
         <header><h3>${esc(tech.name)}</h3><span>${esc(tech.lane ?? "lane unnamed")} · open ${tech.openJobs} · late ${tech.lateRisk}</span></header>
         ${bar}
         <p class="why">${esc(tech.lateRiskWhy)}</p>
@@ -325,7 +338,7 @@ export function renderLanes(snapshot: OperatorSnapshot): string {
         ? `<div class="slots" aria-hidden="true">${Array.from({ length: total }, (_, index) => `<i class="slot ${index < lane.booked ? "booked" : "open"}"></i>`).join("")}</div>`
         : "";
       const openLabel = lane.open == null ? "open blank" : `${lane.open} open`;
-      return `<article class="lane" data-kind="${esc(lane.kind)}" data-geo="false">
+      return `<article class="lane" data-kind="${esc(lane.kind)}" data-lane="${esc(lane.id)}" data-geo="false" data-view="lane:${esc(lane.id)}">
         <header><h3>${esc(lane.label)}</h3><span>${lane.booked} booked · ${openLabel}</span></header>
         ${slots}
         <p>${esc(lane.note)}</p>
@@ -423,7 +436,7 @@ export function renderDrive(snapshot: OperatorSnapshot): string {
   const drive = snapshot.drive;
   const rows = drive.techs
     .map(
-      (tech) => `<tr>
+      (tech) => `<tr data-view="tech:${esc(tech.technicianId)}">
         <td>${esc(tech.technicianName ?? tech.technicianId)}</td>
         <td>${numOrUnknown(tech.miles)}</td>
         <td>${numOrUnknown(tech.driveMinutes)}</td>
@@ -452,11 +465,12 @@ function frictionLookup(rows: OperatorSnapshot["friction"]["employees"], id: str
 export function renderPerformance(snapshot: OperatorSnapshot): string {
   const board = snapshot.performance;
   const friction = snapshot.friction;
-  const table = (rows: typeof board.employees, frictionRows: typeof friction.employees, nameHeader: string) => {
+  const table = (rows: typeof board.employees, frictionRows: typeof friction.employees, nameHeader: string, viewKind: "tech" | "" = "") => {
     const body = rows
       .map((row) => {
         const side = frictionLookup(frictionRows, row.id);
-        return `<tr>
+        const view = viewKind ? ` data-view="${viewKind}:${esc(row.id)}"` : "";
+        return `<tr${view}>
           <td>${row.rank}</td>
           <td>${esc(row.label)}</td>
           <td>${moneyOrBlank(row.avgTicket)}</td>
@@ -473,18 +487,19 @@ export function renderPerformance(snapshot: OperatorSnapshot): string {
       <tbody>${body || `<tr><td colspan="8">No rows.</td></tr>`}</tbody>
     </table></div>`;
   };
-  const frictionTable = (rows: typeof friction.employees, nameHeader: string) => {
+  const frictionTable = (rows: typeof friction.employees, nameHeader: string, viewKind: "tech" | "" = "") => {
     const body = rows
-      .map(
-        (row) => `<tr>
+      .map((row) => {
+        const view = viewKind ? ` data-view="${viewKind}:${esc(row.id)}"` : "";
+        return `<tr${view}>
           <td>${row.frictionRank == null ? "unknown" : row.frictionRank}</td>
           <td>${esc(row.label)}</td>
           <td>${row.frictionRate == null ? "unknown" : rateOrBlank(row.frictionRate)}</td>
           <td>${row.negativeFlags}</td>
           <td>${row.delayedHandoffs}</td>
           <td>${row.callbacks}</td>
-        </tr>`
-      )
+        </tr>`;
+      })
       .join("");
     return `<div class="table-scroll"><table>
       <thead><tr><th>Friction rank</th><th>${esc(nameHeader)}</th><th>Friction rate</th><th>Negative flags</th><th>Delayed handoffs</th><th>Callbacks</th></tr></thead>
@@ -498,7 +513,7 @@ export function renderPerformance(snapshot: OperatorSnapshot): string {
       board.employees.map((row) => ({ label: row.label, value: row.boardOrder })),
       "Employee performance board, best to worst"
     )}
-    ${table(board.employees, friction.employees, "Employee")}
+    ${table(board.employees, friction.employees, "Employee", "tech")}
     <h3>Departments, best to worst</h3>
     ${rankedBars(
       board.departments.map((row) => ({ label: row.label, value: row.boardOrder })),
@@ -508,7 +523,7 @@ export function renderPerformance(snapshot: OperatorSnapshot): string {
     <h3>Friction, highest first</h3>
     <p class="quiet">${esc(friction.note)}</p>
     <p class="quiet">Source ${esc(friction.source)}. hosted HR false. Friction rank 1 is the highest known friction. It is not the performance rank. A silent export stays unknown. <a href="/api/friction">Friction JSON</a></p>
-    ${frictionTable(friction.employees, "Employee")}
+    ${frictionTable(friction.employees, "Employee", "tech")}
     ${frictionTable(friction.departments, "Department")}`;
 }
 
@@ -566,9 +581,9 @@ export function renderInboundQuality(snapshot: OperatorSnapshot): string {
     <p class="quiet">Source ${esc(report.source)}. Shadow / local. live_backends false. tenant pull false. checklist, not an accuracy percent. refused write-back.</p>
     <p>Fragments <strong>${report.fragmentCount}</strong>. Mean checklist score <strong>${mean}</strong>.</p>
     <div class="charts">
-      <section class="chart-card"><header><h3>Volume by sourceKind</h3></header>${volume}</section>
-      <section class="chart-card"><header><h3>Score distribution</h3></header>${distribution}</section>
-      <section class="chart-card"><header><h3>Top defect classes</h3></header>${defects}</section>
+      <section class="chart-card" data-view="chart:volume"><header><h3>Volume by sourceKind</h3></header>${volume}</section>
+      <section class="chart-card" data-view="chart:distribution"><header><h3>Score distribution</h3></header>${distribution}</section>
+      <section class="chart-card" data-view="chart:defects"><header><h3>Top defect classes</h3></header>${defects}</section>
     </div>
     <div class="table-scroll"><table>
       <thead><tr><th>Source</th><th>Fragment</th><th>Score</th><th>Flags</th></tr></thead>
@@ -589,7 +604,7 @@ export function renderMonitoring(snapshot: OperatorSnapshot): string {
   const cards = (rows: { id: string; label: string; value: string; note?: string }[]) =>
     rows
       .map(
-        (card) => `<article class="metric" data-kpi="${esc(card.id)}">
+        (card) => `<article class="metric" data-kpi="${esc(card.id)}" data-view="kpi:${esc(card.id)}">
           <span>${esc(card.label)}</span>
           <strong>${esc(card.value)}</strong>
           ${card.note ? `<p class="quiet">${esc(card.note)}</p>` : ""}
@@ -598,7 +613,7 @@ export function renderMonitoring(snapshot: OperatorSnapshot): string {
       .join("");
   const tech = board.techCards
     .map(
-      (card) => `<article class="score" data-tech="${esc(card.id)}">
+      (card) => `<article class="score" data-tech="${esc(card.id)}" data-view="tech:${esc(card.id)}">
         <span>Rank ${card.rank}</span>
         <strong>${esc(card.name)}</strong>
         <p>Avg ticket ${esc(card.avgTicket)}</p>
@@ -617,7 +632,7 @@ export function renderMonitoring(snapshot: OperatorSnapshot): string {
           </article>`
         )
         .join("");
-      return `<section class="call-col" data-column="${esc(column.id)}">
+      return `<section class="call-col" data-column="${esc(column.id)}" data-view="column:${esc(column.id)}">
         <h3>${esc(column.label)} <span>${column.calls.length}</span></h3>
         ${jobs || `<p class="quiet">None on this board.</p>`}
       </section>`;
@@ -643,7 +658,7 @@ export function renderMonitoring(snapshot: OperatorSnapshot): string {
   return `<p>${esc(board.humanAuthorityRule)}</p>
     <p class="quiet">${esc(board.note)} Monitoring only. refused: ${esc(board.refused)}. ServiceTitan write false. ProBooks write false. live_backends false.</p>
     <div class="monitor-top">
-      <section>
+      <section data-view="chart:positions">
         <h3>Positions</h3>
         <p class="quiet">${esc(board.positions.note)}</p>
         ${map}
@@ -660,10 +675,10 @@ export function renderMonitoring(snapshot: OperatorSnapshot): string {
     <h3 class="subhead">Today</h3>
     <div class="kpis">${cards(board.kpis)}</div>
     <div class="charts">
-      <section class="chart-card"><header><h3>Miles</h3></header>${milesChart(snapshot.drive.days)}</section>
-      <section class="chart-card"><header><h3>Inbound quality</h3><p>Checklist bands. Not an accuracy percent.</p></header>${quality}</section>
-      <section class="chart-card"><header><h3>Avg ticket</h3></header>${tickets}</section>
-      <section class="chart-card"><header><h3>Friction</h3></header>${friction}</section>
+      <section class="chart-card" data-view="chart:miles"><header><h3>Miles</h3></header>${milesChart(snapshot.drive.days)}</section>
+      <section class="chart-card" data-view="chart:quality"><header><h3>Inbound quality</h3><p>Checklist bands. Not an accuracy percent.</p></header>${quality}</section>
+      <section class="chart-card" data-view="chart:ticket"><header><h3>Avg ticket</h3></header>${tickets}</section>
+      <section class="chart-card" data-view="chart:friction"><header><h3>Friction</h3></header>${friction}</section>
     </div>
     <p class="quiet"><a href="/api/monitoring">Monitoring JSON</a>. Pins refresh when the local file changes. Not a live GPS feed.</p>`;
 }
@@ -710,6 +725,101 @@ export function renderInbound(snapshot: OperatorSnapshot): string {
     ${refused ? `<ul class="refused">${refused}</ul>` : ""}`;
 }
 
+const DESK_BOARDS: [string, string][] = [
+  ["monitoring-board", "Monitoring"],
+  ["mission-board", "Mission"],
+  ["tech-board", "Tech"],
+  ["calls-board", "Calls"],
+  ["huddle-board", "Huddle"],
+  ["callback-week-board", "Week"],
+  ["metrics", "Metrics"],
+  ["charts", "Charts"],
+  ["lanes-board", "Lanes"],
+  ["scores-board", "Scores"],
+  ["alerts-board", "Alerts"],
+  ["drive-board", "Drive"],
+  ["performance-board", "Performance"],
+  ["work-together-board", "Together"],
+  ["part-cost-board", "Parts"],
+  ["behavior-board", "Behavior"],
+  ["fulfillment-board", "Trucks"],
+  ["inbound-board", "Inbound"],
+  ["inbound-quality-board", "Quality"],
+  ["option-c-board", "Start gate"]
+];
+
+const DESK_CHARTS: [string, string][] = [
+  ["jobs", "Jobs and completions"],
+  ["capacity", "Capacity"],
+  ["positions", "Positions"],
+  ["miles", "Miles"],
+  ["quality", "Inbound quality bands"],
+  ["ticket", "Average ticket"],
+  ["friction", "Friction"],
+  ["volume", "Volume by source"],
+  ["distribution", "Score distribution"],
+  ["defects", "Defect classes"]
+];
+
+const DESK_ALERT_RULES = ["capacity", "late-jobs", "trust-band", "booking-block", "verification-stall"];
+
+function viewBox(id: string, label: string): string {
+  return `<label><input type="checkbox" data-toggle="${esc(id)}" checked> ${esc(label)}</label>`;
+}
+
+function viewSet(legend: string, boxes: string): string {
+  if (!boxes) return "";
+  return `<fieldset class="view-set"><legend>${esc(legend)}</legend>${boxes}</fieldset>`;
+}
+
+function uniquePairs(rows: { id: string; label: string }[]): { id: string; label: string }[] {
+  const seen = new Map<string, string>();
+  for (const row of rows) {
+    if (!row.id || seen.has(row.id)) continue;
+    seen.set(row.id, row.label);
+  }
+  return [...seen.entries()]
+    .map(([id, label]) => ({ id, label }))
+    .sort((a, b) => a.label.localeCompare(b.label));
+}
+
+export function renderDeskViewPanel(snapshot: OperatorSnapshot): string {
+  const techs = uniquePairs([
+    ...snapshot.huddle.techs.map((tech) => ({ id: tech.id, label: tech.name })),
+    ...snapshot.performance.employees.map((row) => ({ id: row.id, label: row.label })),
+    ...snapshot.monitoring.techCards.map((card) => ({ id: card.id, label: card.name })),
+    ...snapshot.drive.techs.map((tech) => ({ id: tech.technicianId, label: tech.technicianName ?? tech.technicianId })),
+    ...snapshot.friction.employees.map((row) => ({ id: row.id, label: row.label }))
+  ]);
+  const kpis = uniquePairs([
+    ...snapshot.monitoring.driveCards.map((card) => ({ id: card.id, label: card.label })),
+    ...snapshot.monitoring.kpis.map((card) => ({ id: card.id, label: card.label }))
+  ]);
+  const rules = uniquePairs([
+    ...DESK_ALERT_RULES.map((rule) => ({ id: rule, label: rule })),
+    ...snapshot.ruleAlerts.map((alert) => ({ id: alert.rule, label: alert.rule })),
+    ...snapshot.alertHistory.map((alert) => ({ id: alert.rule, label: alert.rule }))
+  ]);
+  const goals = uniquePairs(snapshot.mission.goals.map((goal) => ({ id: goal.measure, label: goal.measure })));
+  const columns = snapshot.monitoring.columns.map((column) => viewBox(`column:${column.id}`, column.label)).join("");
+  return `<details class="view-panel" id="desk-view" open>
+    <summary>Show on this desk</summary>
+    <p class="quiet">Each box starts on. A choice stays in this browser and survives refresh. It is not sent off this machine. live_backends stays false.</p>
+    <div class="view-groups">
+      ${viewSet("Metrics", METRIC_CARDS.map(([id, label]) => viewBox(`metric:${id}`, label)).join(""))}
+      ${viewSet("KPIs", kpis.map((row) => viewBox(`kpi:${row.id}`, row.label)).join(""))}
+      ${viewSet("Techs", techs.map((row) => viewBox(`tech:${row.id}`, row.label)).join(""))}
+      ${viewSet("Scores", snapshot.scores.map((score) => viewBox(`score:${score.id}`, score.label)).join(""))}
+      ${viewSet("Charts", DESK_CHARTS.map(([id, label]) => viewBox(`chart:${id}`, label)).join(""))}
+      ${viewSet("Lanes", snapshot.lanes.map((lane) => viewBox(`lane:${lane.id}`, lane.label)).join(""))}
+      ${viewSet("Alerts", rules.map((row) => viewBox(`alert:${row.id}`, row.label)).join(""))}
+      ${viewSet("Call columns", columns)}
+      ${viewSet("Mission measures", goals.map((row) => viewBox(`goal:${row.id}`, row.label)).join(""))}
+      ${viewSet("Boards", DESK_BOARDS.map(([id, label]) => viewBox(`section:${id}`, label)).join(""))}
+    </div>
+  </details>`;
+}
+
 const DESK_STYLES = `
     :root, html[data-theme="dark"] {
       --bg: #10130f;
@@ -747,6 +857,7 @@ const DESK_STYLES = `
       color-scheme: light;
     }
     * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
     body {
       margin: 0;
       background:
@@ -778,7 +889,9 @@ const DESK_STYLES = `
     header.top { display: flex; justify-content: space-between; gap: 1.2rem; align-items: flex-start; flex-wrap: wrap; }
     .kicker { letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); font-size: 0.72rem; margin: 0; }
     h1 { font-family: var(--display); font-weight: 500; font-size: clamp(2rem, 4vw, 3rem); margin: 0.15rem 0 0; line-height: 1.02; letter-spacing: -0.02em; }
-    h2 { font-family: var(--display); font-weight: 500; font-size: 1.35rem; margin: 0; letter-spacing: -0.01em; }
+    h2 { font-family: var(--display); font-weight: 500; font-size: 1.35rem; margin: 0; letter-spacing: -0.02em; }
+    .panel > h2 { padding-bottom: 0.45rem; margin-bottom: 0.7rem; border-bottom: 1px solid var(--line); }
+    .lift { margin-top: 1.05rem; }
     h3 { margin: 0.15rem 0; font-size: 1rem; font-weight: 600; }
     .actions { display: flex; flex-wrap: wrap; gap: 0.45rem; align-items: center; justify-content: flex-end; }
     .text-btn, button.ack, button {
@@ -835,6 +948,66 @@ const DESK_STYLES = `
       touch-action: manipulation;
     }
     .domain-nav a[aria-current="true"] { color: var(--ink); border-color: var(--accent); }
+    .view-panel {
+      margin: 0.15rem 0 1rem;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--bg-raised) 88%, transparent);
+      padding: 0.2rem 0.95rem 0.85rem;
+    }
+    .view-panel > summary {
+      min-height: 44px;
+      padding: 0.55rem 0.1rem;
+      cursor: pointer;
+      font-family: var(--display);
+      font-size: 1.2rem;
+      letter-spacing: -0.02em;
+      touch-action: manipulation;
+    }
+    .view-panel .quiet { margin: 0 0 0.65rem; }
+    .view-groups {
+      display: grid;
+      gap: 0.65rem;
+      max-height: min(52vh, 28rem);
+      overflow: auto;
+      padding-right: 0.15rem;
+    }
+    .view-set {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      margin: 0;
+      padding: 0.35rem 0.75rem 0.55rem;
+      min-width: 0;
+    }
+    .view-set legend {
+      padding: 0 0.35rem;
+      color: var(--muted);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 650;
+    }
+    .view-set label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      min-height: 44px;
+      margin: 0 0.55rem 0 0;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    .view-set input[type="checkbox"] {
+      width: 1.15rem;
+      height: 1.15rem;
+      min-height: 1.15rem;
+      margin: 0;
+      padding: 0;
+      accent-color: var(--accent);
+      flex: 0 0 auto;
+    }
+    @media (min-width: 900px) {
+      .view-groups { grid-template-columns: 1fr 1fr; }
+    }
     .banner-stack { display: grid; gap: 0.55rem; }
     .banner, .rule-banner {
       background: var(--banner);
@@ -1013,7 +1186,7 @@ const DESK_STYLES = `
       .wrap { padding-top: max(1.1rem, env(safe-area-inset-top)); }
     }
     @media print {
-      .domain-nav, .actions, .live, .dot { display: none; }
+      .domain-nav, .view-panel, .actions, .live, .dot { display: none; }
       body { background: #fff; color: #111; }
       .panel, .metric, .chart-card, .lane, .score { break-inside: avoid; }
     }
@@ -1073,112 +1246,113 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
       <span class="chip" id="clock">updated ${esc(snapshot.generatedAt)}</span>
     </div>
     <nav class="domain-nav" aria-label="Desk domains">
-      <a href="#monitoring-board">Monitoring</a>
-      <a href="#mission-board">Mission</a>
-      <a href="#tech-board">Tech</a>
-      <a href="#calls-board">Calls</a>
-      <a href="#huddle-board">Huddle</a>
-      <a href="#callback-week-board">Week</a>
-      <a href="#metrics">Metrics</a>
-      <a href="#charts">Charts</a>
-      <a href="#lanes-board">Lanes</a>
-      <a href="#scores-board">Scores</a>
-      <a href="#alerts-board">Alerts</a>
-      <a href="#drive-board">Drive</a>
-      <a href="#performance-board">Performance</a>
-      <a href="#work-together-board">Together</a>
-      <a href="#part-cost-board">Parts</a>
-      <a href="#behavior-board">Behavior</a>
-      <a href="#fulfillment-board">Trucks</a>
-      <a href="#inbound-board">Inbound</a>
-      <a href="#inbound-quality-board">Quality</a>
-      <a href="#option-c-board">Start gate</a>
+      <a href="#monitoring-board" data-view="section:monitoring-board">Monitoring</a>
+      <a href="#mission-board" data-view="section:mission-board">Mission</a>
+      <a href="#tech-board" data-view="section:tech-board">Tech</a>
+      <a href="#calls-board" data-view="section:calls-board">Calls</a>
+      <a href="#huddle-board" data-view="section:huddle-board">Huddle</a>
+      <a href="#callback-week-board" data-view="section:callback-week-board">Week</a>
+      <a href="#metrics" data-view="section:metrics">Metrics</a>
+      <a href="#charts" data-view="section:charts">Charts</a>
+      <a href="#lanes-board" data-view="section:lanes-board">Lanes</a>
+      <a href="#scores-board" data-view="section:scores-board">Scores</a>
+      <a href="#alerts-board" data-view="section:alerts-board">Alerts</a>
+      <a href="#drive-board" data-view="section:drive-board">Drive</a>
+      <a href="#performance-board" data-view="section:performance-board">Performance</a>
+      <a href="#work-together-board" data-view="section:work-together-board">Together</a>
+      <a href="#part-cost-board" data-view="section:part-cost-board">Parts</a>
+      <a href="#behavior-board" data-view="section:behavior-board">Behavior</a>
+      <a href="#fulfillment-board" data-view="section:fulfillment-board">Trucks</a>
+      <a href="#inbound-board" data-view="section:inbound-board">Inbound</a>
+      <a href="#inbound-quality-board" data-view="section:inbound-quality-board">Quality</a>
+      <a href="#option-c-board" data-view="section:option-c-board">Start gate</a>
     </nav>
+    ${renderDeskViewPanel(snapshot)}
     <div class="banner-stack" id="banner">${renderBanner(snapshot)}</div>
     <div class="banner-stack" id="rule-banner">${renderRuleBanner(snapshot)}</div>
-    <section class="panel" style="margin-top:0.8rem" id="monitoring-board">
+    <section class="panel lift" id="monitoring-board" data-view="section:monitoring-board">
       <h2>Monitoring</h2>
       <div id="monitoring">${renderMonitoring(snapshot)}</div>
     </section>
     <section class="board">
-      <div class="panel" id="mission-board">
+      <div class="panel" id="mission-board" data-view="section:mission-board">
         <h2>Mission board</h2>
         <div id="mission">${renderMission(snapshot)}</div>
       </div>
-      <div class="panel" id="tech-board">
+      <div class="panel" id="tech-board" data-view="section:tech-board">
         <h2>Tech board</h2>
         <div id="tech">${renderTech(snapshot)}</div>
       </div>
     </section>
-    <section class="panel" style="margin-top:0.8rem" id="calls-board">
+    <section class="panel lift" id="calls-board" data-view="section:calls-board">
       <h2>Calls</h2>
       <div id="calls">${renderCalls(snapshot)}</div>
     </section>
     <section class="split">
-      <div class="panel" id="huddle-board">
+      <div class="panel" id="huddle-board" data-view="section:huddle-board">
         <h2>Morning huddle</h2>
         <div id="huddle">${renderHuddle(snapshot)}</div>
       </div>
-      <div class="panel" id="callback-week-board">
+      <div class="panel" id="callback-week-board" data-view="section:callback-week-board">
         <h2>Callback week</h2>
         <div id="callback-week">${renderCallbackWeek(snapshot)}</div>
       </div>
     </section>
-    <section class="metrics" id="metrics">${renderMetrics(snapshot)}</section>
-    <section class="charts" id="charts">${renderCharts(snapshot)}</section>
-    <section class="panel" style="margin-top:0.8rem" id="lanes-board">
+    <section class="metrics" id="metrics" data-view="section:metrics">${renderMetrics(snapshot)}</section>
+    <section class="charts" id="charts" data-view="section:charts">${renderCharts(snapshot)}</section>
+    <section class="panel lift" id="lanes-board" data-view="section:lanes-board">
       <h2>Lane view</h2>
       <div class="lanes" id="lanes">${renderLanes(snapshot)}</div>
     </section>
     <section class="split">
-      <div class="panel" id="scores-board">
+      <div class="panel" id="scores-board" data-view="section:scores-board">
         <h2>Scores</h2>
         <div class="scores" id="scores">${renderScores(snapshot)}</div>
       </div>
-      <div class="panel" id="alerts-board">
+      <div class="panel" id="alerts-board" data-view="section:alerts-board">
         <h2>Alerts</h2>
         <div id="alerts">${renderAlerts(snapshot)}</div>
       </div>
     </section>
     <section class="split">
-      <div class="panel" id="drive-board">
+      <div class="panel" id="drive-board" data-view="section:drive-board">
         <h2>Miles and drive performance</h2>
         <div id="drive">${renderDrive(snapshot)}</div>
       </div>
-      <div class="panel" id="performance-board">
+      <div class="panel" id="performance-board" data-view="section:performance-board">
         <h2>Performance board</h2>
         <div id="performance">${renderPerformance(snapshot)}</div>
       </div>
     </section>
-    <section class="panel" style="margin-top:0.8rem" id="work-together-board">
+    <section class="panel lift" id="work-together-board" data-view="section:work-together-board">
       <h2>Work together</h2>
       <div id="work-together">${renderWorkTogether(snapshot)}</div>
     </section>
     <section class="split">
-      <div class="panel" id="part-cost-board">
+      <div class="panel" id="part-cost-board" data-view="section:part-cost-board">
         <h2>Part cost</h2>
         <div id="part-cost">${renderPartCosts(snapshot)}</div>
       </div>
-      <div class="panel" id="behavior-board">
+      <div class="panel" id="behavior-board" data-view="section:behavior-board">
         <h2>Department behavior</h2>
         <div id="behavior">${renderBehavior(snapshot)}</div>
       </div>
     </section>
     <section class="split">
-      <div class="panel" id="fulfillment-board">
+      <div class="panel" id="fulfillment-board" data-view="section:fulfillment-board">
         <h2>Fulfillment and truck counts</h2>
         <div id="fulfillment">${renderFulfillment(snapshot)}</div>
       </div>
-      <div class="panel" id="inbound-board">
+      <div class="panel" id="inbound-board" data-view="section:inbound-board">
         <h2>Inbound</h2>
         <div id="inbound">${renderInbound(snapshot)}</div>
       </div>
     </section>
-    <section class="panel" style="margin-top:0.8rem" id="inbound-quality-board">
+    <section class="panel lift" id="inbound-quality-board" data-view="section:inbound-quality-board">
       <h2>Inbound quality</h2>
       <div id="inbound-quality">${renderInboundQuality(snapshot)}</div>
     </section>
-    <section class="panel" style="margin-top:0.8rem" id="option-c-board">
+    <section class="panel lift" id="option-c-board" data-view="section:option-c-board">
       <h2>Option C start gate</h2>
       <div id="option-c">${renderOptionCStartGate(snapshot)}</div>
     </section>
@@ -1190,12 +1364,13 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
       Alert rules: copy <code>data/runtime/alerts.json.example</code> to <code>data/runtime/&lt;instanceId&gt;/alerts.json</code>.
       Inbound quality and alert-action stubs write under <code>data/runtime/&lt;instanceId&gt;/</code> on this machine. They do not call a tenant.
       Option C remains prep until a human operator starts a real pilot. Option D is out of scope. No cutover.
-      Theme stays in this browser. Print snapshot stays on this machine.
+      Theme stays in this browser under <code>trades-desk-theme</code>. Which boards, metrics, KPIs, techs, scores, charts, lanes, and alerts stay visible is stored in this browser under <code>trades-desk-view</code>. Both stay on this machine. Print snapshot stays on this machine.
       Refresh ${snapshot.tracking.intervalMs}ms from ${esc(snapshot.tracking.source)}.
     </footer>
   </main>
   <script id="desk-boot" type="application/json">${embedded}</script>
   <script>
+    ${deskViewClientScript()}
     const THEME_KEY = "trades-desk-theme";
     function applyTheme(theme) {
       const next = theme === "light" ? "light" : "dark";
@@ -1226,6 +1401,7 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
       if (clock && view.generatedAt) clock.textContent = "updated " + view.generatedAt;
       const state = document.getElementById("live-state");
       if (state) state.textContent = "live on this machine · " + (view.dataLabel || "");
+      if (typeof window.__applyDeskView === "function") window.__applyDeskView();
     }
     if (new URLSearchParams(location.search).has("static")) {
       const state = document.getElementById("live-state");
