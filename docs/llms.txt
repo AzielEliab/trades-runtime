@@ -4,8 +4,8 @@
 > Author / identity: Aziel Eliab only.
 X / Twitter: @AzielEliab https://x.com/AzielEliab
 > Version: 0.4.9 (repo and Worker source)
-> Deployed Worker remains 0.4.5. A 0.4.7 redeploy is separately in flight. This source does not claim the public Worker is already 0.4.9.
-> Public Glama listing: Version 0.3.4 / Latest pre-0.4.4. Not this version. glama.json version is the claim file, not the Glama Latest badge.
+> Deployed Worker is 0.4.9. x-product-version and /v1/health match this tip.
+> Public Glama listing: Version 0.3.4 / Latest pre-0.4.4. Stale relative to the deployed Worker. Not 0.4.9. glama.json version is the claim file, not the Glama Latest badge.
 > Status: live-pure core + stubs. BYO local ServiceTitan + ProBooks. Option C code-ready / pilot not started. Option D not started. No live backends. Pages off. Public get is the giveaway Worker.
 
 Product is src/. docs/ is a thin local UI. Implementer specs are at repo-root specs/. Public download: https://trades-runtime.vibelock.workers.dev/download

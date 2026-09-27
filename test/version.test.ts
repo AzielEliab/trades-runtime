@@ -55,6 +55,7 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
       glama_public_version?: string;
       glama_public_latest?: string;
       deployed_worker_version?: string;
+      glama_listing_stale?: boolean;
     };
 
     expect(pkg.version).toBe(PRODUCT);
@@ -88,11 +89,14 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
     expect(RUNTIME_MANIFEST.honesty).toMatch(/not an accuracy percent/);
     expect(RUNTIME_MANIFEST.honesty).toMatch(/Option C remains prep until a human operator starts a real pilot/);
     expect(RUNTIME_MANIFEST.honesty).toMatch(/Option D stays out of scope/);
-    expect(RUNTIME_MANIFEST.honesty).toMatch(/does not claim the public Worker is already 0\.4\.9/);
-    expect(RUNTIME_MANIFEST.honesty).toMatch(/0\.4\.7 redeploy is separately in flight/);
+    expect(RUNTIME_MANIFEST.honesty).toMatch(/does not claim the Glama listing is 0\.4\.9/);
+    expect(RUNTIME_MANIFEST.honesty).toMatch(/stale relative to the live Worker/);
+    expect(RUNTIME_MANIFEST.honesty).not.toMatch(/0\.4\.7 redeploy is separately in flight/);
+    expect(runtime.honesty).toMatch(/The deployed Worker is 0\.4\.9/);
+    expect(runtime.honesty).toMatch(/does not claim the Glama listing is 0\.4\.9/);
     expect(RUNTIME_MANIFEST.honesty).toMatch(/trainingNeeded/);
     expect(RUNTIME_MANIFEST.honesty).toMatch(/not a hosted inventory ERP/);
-    expect(RUNTIME_MANIFEST.honesty).toMatch(/The deployed Worker remains 0\.4\.5/);
+    expect(RUNTIME_MANIFEST.honesty).toMatch(/The deployed Worker is 0\.4\.9/);
     expect(RUNTIME_MANIFEST.honesty).toMatch(/Public Glama listing Version remains 0\.3\.4/);
     expect(runtime.honesty).toMatch(/BYO local ServiceTitan \+ ProBooks/);
     expect(runtime.honesty).toMatch(/Option C code-ready \/ pilot not started/);
@@ -136,7 +140,7 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
     expect(readFileSync("README.md", "utf8")).toMatch(/\/api\/calls\/week\.json/);
     expect(readFileSync("README.md", "utf8")).toMatch(/Version is \*\*0\.3\.4\*\*/);
     expect(readFileSync("README.md", "utf8")).toMatch(/Latest is \*\*pre-0\.4\.4\*\*/);
-    expect(readFileSync("README.md", "utf8")).toMatch(/Worker already deployed is 0\.4\.5/);
+    expect(readFileSync("README.md", "utf8")).toMatch(/Worker already deployed is 0\.4\.9/);
     expect(readFileSync("README.md", "utf8")).toMatch(/TR-ALERTS-2026-09-25/);
     expect(readFileSync("README.md", "utf8")).toMatch(/TR-OPTION-C-PREP-2026-09-25/);
     expect(readFileSync("README.md", "utf8")).toMatch(/npm run pilot:prep/);
@@ -178,7 +182,8 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
     expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/export const VERSION = "0\.4\.9"/);
     expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/GLAMA_PUBLIC_VERSION = "0\.3\.4"/);
     expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/GLAMA_PUBLIC_LATEST = "pre-0\.4\.4"/);
-    expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/DEPLOYED_WORKER_VERSION = "0\.4\.5"/);
+    expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/DEPLOYED_WORKER_VERSION = "0\.4\.9"/);
+    expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/GLAMA_LISTING_STALE = true/);
     expect(readFileSync("README.md", "utf8")).toMatch(/Public giveaway Worker/);
     expect(readFileSync("README.md", "utf8")).toMatch(/glama\.ai\/mcp\/servers\/AzielEliab\/trades-runtime/);
     expect(readFileSync("README.md", "utf8")).toMatch(/docs\/GLAMA\.md/);
@@ -208,7 +213,9 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
     expect(cite.glama_listing).toBe(false);
     expect(cite.glama_public_version).toBe("0.3.4");
     expect(cite.glama_public_latest).toBe("pre-0.4.4");
-    expect(cite.deployed_worker_version).toBe("0.4.5");
+    expect(cite.deployed_worker_version).toBe("0.4.9");
+    expect(cite.glama_listing_stale).toBe(true);
+    expect(cite.version).toBe(cite.deployed_worker_version);
     expect(pkg.scripts).toMatchObject({
       mcp: "node cli/mcp-stdio.mjs",
       "pilot:prep": "tsx src/cli.ts pilot-prep",

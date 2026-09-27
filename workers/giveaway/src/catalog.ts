@@ -7,6 +7,7 @@ import {
   KEYWORDS,
   DEPLOYED_WORKER_VERSION,
   GLAMA_LISTING_NOTE,
+  GLAMA_LISTING_STALE,
   GLAMA_PUBLIC_LATEST,
   GLAMA_PUBLIC_VERSION,
   LICENSE,
@@ -97,6 +98,7 @@ export function citeBody(): Record<string, unknown> {
     glama_listing: false,
     glama_public_version: GLAMA_PUBLIC_VERSION,
     glama_public_latest: GLAMA_PUBLIC_LATEST,
+    glama_listing_stale: GLAMA_LISTING_STALE,
     deployed_worker_version: DEPLOYED_WORKER_VERSION,
     glama_note: GLAMA_LISTING_NOTE,
     repository: REPOSITORY,
@@ -132,8 +134,8 @@ export function llmsTxt(): string {
 > Author / identity: Aziel Eliab only. Person @id ${PERSON_ID}
 > X / Twitter: ${X_HANDLE} ${X_URL}
 > Version: ${VERSION} (Worker source in this repo)
-> Deployed Worker remains ${DEPLOYED_WORKER_VERSION}. A 0.4.7 redeploy is separately in flight. This source does not claim the public Worker is already ${VERSION}.
-> Public Glama listing: Version ${GLAMA_PUBLIC_VERSION} / Latest ${GLAMA_PUBLIC_LATEST}. Not this Worker version.
+> Deployed Worker is ${DEPLOYED_WORKER_VERSION}. x-product-version and /v1/health match this tip.
+> Public Glama listing: Version ${GLAMA_PUBLIC_VERSION} / Latest ${GLAMA_PUBLIC_LATEST}. Stale relative to the deployed Worker. Not ${VERSION}.
 > License: ${LICENSE}
 > Worker: ${PUBLIC_ORIGIN}
 
