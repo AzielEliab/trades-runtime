@@ -1,0 +1,32 @@
+TR-MOBILE-DESK-2026-09-27
+Local human desk, phone width
+Author: Aziel Eliab
+Status: desk CSS and in-page nav only. Version stays 0.4.9. Pilot not started. Worker not deployed.
+
+What this is
+  The operator desk at npx tsx src/cli.ts desk is usable at about 375px wide.
+  Softwares cards keep their wide-window grids (metrics 4, charts split, KPIs 4,
+  tech cards 5, call board 4). This cut does not redesign those cards.
+  The giveaway Worker UI cards are not edited. aziel-runtime Softwares are not edited.
+  Field flags stay a separate draft. This cut does not add a flag form or a flag route.
+
+What changed
+  Viewport uses viewport-fit=cover. The page pads with safe-area insets.
+  A sticky domain nav jumps to Monitoring, mission, tech, calls, huddle, week,
+  metrics, charts, lanes, scores, alerts, drive, performance, together, parts,
+  behavior, trucks, inbound, quality, and the Option C start gate.
+  At 720px and under, header links scroll sideways instead of stacking off the screen.
+  Monitor charts and the position pin chart scroll inside their cards.
+  Wide tables scroll inside a table-scroll wrapper. The page itself does not grow sideways.
+  Theme, header links, call filters, acknowledge, the stub disclosure, and print buttons
+  are at least 44px tall. input, select, and textarea are full width, 16px type, and
+  at least 44px tall so a later local form does not zoom the phone or overflow.
+  The desk still has no tenant data-entry form. Acknowledge stays the local POST it was.
+  Print snapshot and the morning huddle page use the same viewport, safe area, and
+  44px print button.
+
+What this is not
+  Not a Softwares card redesign. Not a new software count. Not a version bump.
+  Not a live GPS map. Not a ServiceTitan or ProBooks write. Not a phone-home.
+  Not a deploy of the public Worker. pilot_started stays false.
+  Option C stays prep. Option D stays out of scope.

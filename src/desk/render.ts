@@ -200,10 +200,10 @@ export function renderMission(snapshot: OperatorSnapshot): string {
     <p>Callback calls <strong>${calls.callback}</strong>. Warranty calls <strong>${calls.warranty}</strong>. Not classified <strong>${calls.notClassified}</strong>.</p>
     <p class="quiet">${esc(snapshot.callClass.note)}</p>
     <p class="quiet">Per-call reasons and the callbacks, warranty, and not-classified filters are on the calls panel. Counts here stay the full desk.</p>
-    <table>
+    <div class="table-scroll"><table>
       <thead><tr><th>Measure</th><th>Target</th><th>Actual</th><th>Expected pace</th><th>Gap</th><th>Projected</th><th>Band</th></tr></thead>
       <tbody>${goalRows}</tbody>
-    </table>`;
+    </table></div>`;
 }
 
 function filterHref(filter: CallDeskFilter): string {
@@ -233,10 +233,10 @@ export function renderCalls(snapshot: OperatorSnapshot): string {
     .join("");
   return `<nav class="filters" aria-label="Call filters">${nav}</nav>
     <p class="quiet">${esc(snapshot.callFilter.label)}. Showing ${snapshot.callFilter.shown} of ${snapshot.callFilter.total}. Counts on the mission board stay the full desk. Unknown is not a callback and is not warranty-covered.</p>
-    <table>
+    <div class="table-scroll"><table>
       <thead><tr><th>Call</th><th>Lane</th><th>Day</th><th>Tech</th><th>Callback</th><th>Warranty</th><th>Reason</th></tr></thead>
       <tbody>${rows || `<tr><td colspan="7">No rows in this filter. The export was not relabeled.</td></tr>`}</tbody>
-    </table>`;
+    </table></div>`;
 }
 
 export function renderCallbackWeek(snapshot: OperatorSnapshot): string {
@@ -256,10 +256,10 @@ export function renderCallbackWeek(snapshot: OperatorSnapshot): string {
     .join("");
   return `<p class="quiet">${esc(week.weekStart)} through ${esc(week.weekEnd)}. <a href="/api/calls/week.json">Week JSON</a></p>
     <p>${esc(week.note)}</p>
-    <table>
+    <div class="table-scroll"><table>
       <thead><tr><th>Lane</th><th>Calls</th><th>Callbacks</th><th>Rate</th><th>Warranty</th><th>Not classified</th></tr></thead>
       <tbody>${rows || `<tr><td colspan="6">No calls in this week.</td></tr>`}</tbody>
-    </table>`;
+    </table></div>`;
 }
 
 export function renderHuddle(snapshot: OperatorSnapshot): string {
@@ -357,10 +357,10 @@ export function renderFulfillment(snapshot: OperatorSnapshot): string {
     : "";
   return `<p class="quiet">${esc(note)}</p>
     <p class="quiet">Stock source ${esc(snapshot.stock.source)}. hosted inventory false. <a href="/api/stock">Stock JSON</a></p>
-    <table>
+    <div class="table-scroll"><table>
       <thead><tr><th>SKU</th><th>Location</th><th>Place</th><th>Count</th></tr></thead>
       <tbody>${stockRows || `<tr><td colspan="4">No counts on this desk.</td></tr>`}</tbody>
-    </table>
+    </table></div>
     ${request}
     <ol class="rail">${steps}</ol>`;
 }
@@ -385,10 +385,10 @@ export function renderPartCosts(snapshot: OperatorSnapshot): string {
   return `<p class="quiet">${esc(snapshot.partCosts.note)}</p>
     <p class="quiet">Subordinate to a human. Auto-applied false. Source ${esc(snapshot.partCosts.source)}.</p>
     ${totals}
-    <table>
+    <div class="table-scroll"><table>
       <thead><tr><th>SKU</th><th>Current</th><th>Last</th><th>Adapted</th><th>Market weight</th><th>Evidence</th></tr></thead>
       <tbody>${rows || `<tr><td colspan="6">No part-cost lines.</td></tr>`}</tbody>
-    </table>`;
+    </table></div>`;
 }
 
 export function renderBehavior(snapshot: OperatorSnapshot): string {
@@ -437,10 +437,10 @@ export function renderDrive(snapshot: OperatorSnapshot): string {
     <p>Miles driven <strong>${numOrUnknown(drive.totalMiles)}</strong>. Miles per stop <strong>${numOrUnknown(drive.milesPerStop)}</strong>. Minutes per stop <strong>${numOrUnknown(drive.minutesPerStop)}</strong>. Miles per completed job <strong>${numOrUnknown(drive.milesPerCompletedJob)}</strong>.</p>
     ${milesChart(drive.days)}
     <p class="quiet"><a href="/api/drive">Drive JSON</a></p>
-    <table>
+    <div class="table-scroll"><table>
       <thead><tr><th>Tech</th><th>Miles</th><th>Drive minutes</th><th>Stops</th><th>Miles per stop</th></tr></thead>
       <tbody>${rows || `<tr><td colspan="5">No miles on this desk.</td></tr>`}</tbody>
-    </table>`;
+    </table></div>`;
 }
 
 function frictionLookup(rows: OperatorSnapshot["friction"]["employees"], id: string): { rate: string; rank: string } {
@@ -468,10 +468,10 @@ export function renderPerformance(snapshot: OperatorSnapshot): string {
         </tr>`;
       })
       .join("");
-    return `<table>
+    return `<div class="table-scroll"><table>
       <thead><tr><th>Rank</th><th>${esc(nameHeader)}</th><th>Avg ticket</th><th>Recall rate</th><th>Average sold</th><th>Current revenue</th><th>Friction rate</th><th>Friction rank</th></tr></thead>
       <tbody>${body || `<tr><td colspan="8">No rows.</td></tr>`}</tbody>
-    </table>`;
+    </table></div>`;
   };
   const frictionTable = (rows: typeof friction.employees, nameHeader: string) => {
     const body = rows
@@ -486,10 +486,10 @@ export function renderPerformance(snapshot: OperatorSnapshot): string {
         </tr>`
       )
       .join("");
-    return `<table>
+    return `<div class="table-scroll"><table>
       <thead><tr><th>Friction rank</th><th>${esc(nameHeader)}</th><th>Friction rate</th><th>Negative flags</th><th>Delayed handoffs</th><th>Callbacks</th></tr></thead>
       <tbody>${body || `<tr><td colspan="6">No rows.</td></tr>`}</tbody>
-    </table>`;
+    </table></div>`;
   };
   return `<p class="quiet">${esc(board.note)}</p>
     <p class="quiet">Source ${esc(board.source)}. company export false. not a skill score. trainingNeeded separate. <a href="/api/performance">Performance JSON</a></p>
@@ -529,10 +529,10 @@ export function renderWorkTogether(snapshot: OperatorSnapshot): string {
   return `<p class="quiet">${esc(board.note)}</p>
     <p class="quiet">Source ${esc(board.source)}. hosted HR false. company export false. not a skill score from revenue. trainingNeeded separate. Positive ${board.positiveCount}. Negative ${board.negativeCount}. <a href="/api/work-together">Work together JSON</a></p>
     <h3>Positive collaboration</h3>
-    <table>
+    <div class="table-scroll"><table>
       <thead><tr><th>Work</th><th>From</th><th>To</th><th>Kind</th></tr></thead>
       <tbody>${rows || `<tr><td colspan="4">No positive collaboration on this desk.</td></tr>`}</tbody>
-    </table>
+    </table></div>
     ${list("Service techs, when needed", board.suggestions.service)}
     ${list("Install", board.suggestions.install)}`;
 }
@@ -570,10 +570,10 @@ export function renderInboundQuality(snapshot: OperatorSnapshot): string {
       <section class="chart-card"><header><h3>Score distribution</h3></header>${distribution}</section>
       <section class="chart-card"><header><h3>Top defect classes</h3></header>${defects}</section>
     </div>
-    <table>
+    <div class="table-scroll"><table>
       <thead><tr><th>Source</th><th>Fragment</th><th>Score</th><th>Flags</th></tr></thead>
       <tbody>${rows || `<tr><td colspan="4">No peer fragments on this machine.</td></tr>`}</tbody>
-    </table>
+    </table></div>
     <p class="quiet"><a href="/api/inbound-quality">Inbound quality JSON</a> · <a href="/api/inbound-quality.txt">Human report</a>. Files stay at <code>${esc(report.path)}</code>, <code>${esc(report.textPath)}</code>, and <code>${esc(report.auditPath)}</code>.</p>`;
 }
 
@@ -706,7 +706,7 @@ export function renderInbound(snapshot: OperatorSnapshot): string {
   const refused = snapshot.refused
     .map((row) => `<li><code>${esc(row.file)}</code> ${esc(row.code)}</li>`)
     .join("");
-  return `${rows ? `<table><thead><tr><th>File</th><th>Peer</th><th>Profile</th><th>Vendor</th><th>Rows</th><th>Verification</th><th>Hash</th></tr></thead><tbody>${rows}</tbody></table>` : ""}
+  return `${rows ? `<div class="table-scroll"><table><thead><tr><th>File</th><th>Peer</th><th>Profile</th><th>Vendor</th><th>Rows</th><th>Verification</th><th>Hash</th></tr></thead><tbody>${rows}</tbody></table></div>` : ""}
     ${refused ? `<ul class="refused">${refused}</ul>` : ""}`;
 }
 
@@ -765,32 +765,76 @@ const DESK_STYLES = `
       padding: 0.35rem 0.7rem;
       border-radius: 8px;
     }
-    .skip:focus { top: 0.6rem; }
-    .wrap { max-width: 1180px; margin: 0 auto; padding: 1.5rem 1.15rem 3.2rem; }
+    .skip:focus { top: max(0.6rem, env(safe-area-inset-top)); z-index: 8; }
+    .wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding:
+        max(1.5rem, env(safe-area-inset-top))
+        max(1.15rem, env(safe-area-inset-right))
+        max(3.2rem, calc(2rem + env(safe-area-inset-bottom)))
+        max(1.15rem, env(safe-area-inset-left));
+    }
     header.top { display: flex; justify-content: space-between; gap: 1.2rem; align-items: flex-start; flex-wrap: wrap; }
     .kicker { letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); font-size: 0.72rem; margin: 0; }
     h1 { font-family: var(--display); font-weight: 500; font-size: clamp(2rem, 4vw, 3rem); margin: 0.15rem 0 0; line-height: 1.02; letter-spacing: -0.02em; }
     h2 { font-family: var(--display); font-weight: 500; font-size: 1.35rem; margin: 0; letter-spacing: -0.01em; }
     h3 { margin: 0.15rem 0; font-size: 1rem; font-weight: 600; }
     .actions { display: flex; flex-wrap: wrap; gap: 0.45rem; align-items: center; justify-content: flex-end; }
-    .text-btn, button.ack {
+    .text-btn, button.ack, button {
       appearance: none;
       background: var(--bg-raised);
       color: var(--ink);
       border: 1px solid var(--line);
       border-radius: 999px;
-      padding: 0.38rem 0.85rem;
+      padding: 0.45rem 0.9rem;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       font: inherit;
       font-size: 0.82rem;
       text-decoration: none;
       cursor: pointer;
+      touch-action: manipulation;
     }
-    .text-btn:hover, button.ack:hover, .text-btn:focus-visible, button.ack:focus-visible { border-color: var(--accent); outline: none; }
+    .text-btn:hover, button.ack:hover, .text-btn:focus-visible, button.ack:focus-visible, button:focus-visible { border-color: var(--accent); }
     .live { display: flex; align-items: center; gap: 0.45rem; color: var(--muted); font-family: var(--mono); font-size: 0.78rem; margin: 0; }
     .dot { width: 0.55rem; height: 0.55rem; border-radius: 99px; background: var(--good); box-shadow: 0 0 0 0 color-mix(in srgb, var(--good) 70%, transparent); animation: pulse 2s infinite; }
     @keyframes pulse { 70% { box-shadow: 0 0 0 8px transparent; } }
-    .chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 1rem 0 0.85rem; }
-    .chip { border: 1px solid var(--line); background: color-mix(in srgb, var(--bg-raised) 70%, transparent); border-radius: 999px; padding: 0.18rem 0.65rem; color: var(--muted); font-size: 0.75rem; letter-spacing: 0.01em; }
+    .chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 1rem 0 0.85rem; max-width: 100%; }
+    .chip { border: 1px solid var(--line); background: color-mix(in srgb, var(--bg-raised) 70%, transparent); border-radius: 999px; padding: 0.18rem 0.65rem; color: var(--muted); font-size: 0.75rem; letter-spacing: 0.01em; max-width: 100%; }
+    .domain-nav {
+      position: sticky;
+      top: env(safe-area-inset-top, 0px);
+      z-index: 6;
+      display: flex;
+      gap: 0.4rem;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x proximity;
+      margin: 0.35rem 0 0.85rem;
+      padding: 0.35rem 0;
+      background: color-mix(in srgb, var(--bg) 88%, transparent);
+      backdrop-filter: blur(10px);
+    }
+    .domain-nav a {
+      flex: 0 0 auto;
+      scroll-snap-align: start;
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      padding: 0 0.9rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--bg-raised);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.86rem;
+      touch-action: manipulation;
+    }
+    .domain-nav a[aria-current="true"] { color: var(--ink); border-color: var(--accent); }
     .banner-stack { display: grid; gap: 0.55rem; }
     .banner, .rule-banner {
       background: var(--banner);
@@ -815,14 +859,39 @@ const DESK_STYLES = `
     .why-row td { color: var(--ink); font-size: 0.86rem; }
     .banner-detail { font-size: 0.92rem; }
     .subhead { margin: 0.95rem 0 0.25rem; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 650; }
+    form {
+      display: grid;
+      gap: 0.7rem;
+      margin: 0.7rem 0 0;
+      max-width: 100%;
+    }
+    label { display: grid; gap: 0.35rem; color: var(--ink); font-size: 0.92rem; }
+    input, select, textarea {
+      font: inherit;
+      font-size: 1rem;
+      color: var(--ink);
+      background: var(--bg-inset);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 0.55rem 0.75rem;
+      min-height: 44px;
+      width: 100%;
+      max-width: 100%;
+    }
+    textarea { min-height: 7rem; resize: vertical; }
     .filters { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.55rem 0 0.2rem; }
     .filters a {
       border: 1px solid var(--line);
       border-radius: 999px;
-      padding: 0.18rem 0.65rem;
+      padding: 0 0.9rem;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
       color: var(--muted);
       text-decoration: none;
-      font-size: 0.78rem;
+      font-size: 0.86rem;
+      background: var(--bg);
+      touch-action: manipulation;
     }
     .filters a[aria-current="page"] { color: var(--ink); border-color: var(--accent); }
     button.ack { margin-top: 0.5rem; background: transparent; }
@@ -858,6 +927,9 @@ const DESK_STYLES = `
     .swatch { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 2px; margin-right: 0.28rem; }
     .swatch.jobs { background: var(--accent); }
     .swatch.done { background: var(--good); }
+    .board, .split, .charts, .metrics, .monitor-top, .call-board, .kpis, .tech-cards, .lanes { min-width: 0; }
+    .metric, .score, .chart-card, .panel, .lane, .job-card { min-width: 0; max-width: 100%; }
+    .panel, .metrics, .charts, .board, .split { scroll-margin-top: calc(3.75rem + env(safe-area-inset-top, 0px)); }
     .board, .split { display: grid; gap: 0.8rem; margin-top: 0.8rem; }
     .board { grid-template-columns: 1.25fr 0.75fr; }
     .split { grid-template-columns: 1.05fr 0.95fr; }
@@ -885,7 +957,7 @@ const DESK_STYLES = `
     .alert.hold span { color: var(--hold); }
     .alert p { margin: 0.25rem 0 0; }
     details.stubs { margin-top: 0.45rem; }
-    details.stubs summary { cursor: pointer; color: var(--accent); }
+    details.stubs summary { cursor: pointer; color: var(--accent); min-height: 44px; padding: 0.7rem 0; touch-action: manipulation; }
     .stub { margin: 0.45rem 0 0; padding-top: 0.35rem; border-top: 1px dashed var(--line); }
     .stub h4 { margin: 0.15rem 0; font-size: 0.95rem; }
     .gates { list-style: none; padding: 0; margin: 0.4rem 0 0; }
@@ -901,11 +973,14 @@ const DESK_STYLES = `
     .job-card span { color: var(--muted); font-size: 0.78rem; }
     .gates li { border-top: 1px solid var(--line); padding: 0.55rem 0; }
     .gate-state { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--hold); }
+    .table-scroll { overflow-x: auto; max-width: 100%; -webkit-overflow-scrolling: touch; }
     table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin-top: 0.7rem; }
     th, td { text-align: left; padding: 0.4rem 0.35rem; border-bottom: 1px solid var(--line); vertical-align: top; }
     th { color: var(--muted); font-weight: 650; font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; }
     td { font-variant-numeric: tabular-nums; }
     code { font-family: var(--mono); font-size: 0.78rem; }
+    .banner, .rule-banner, .alert, .history li, .job-card, footer, code, td, .quiet { overflow-wrap: anywhere; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     .rail { display: flex; flex-wrap: wrap; gap: 0.4rem; list-style: none; padding: 0; }
     .rail li { border: 1px solid var(--line); border-radius: 999px; padding: 0.22rem 0.6rem; color: var(--muted); font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.04em; }
     .rail li.on { color: var(--bg); background: var(--good); border-color: var(--good); }
@@ -915,12 +990,30 @@ const DESK_STYLES = `
       .charts, .board, .split, .monitor-top { grid-template-columns: 1fr; }
       .kpis, .tech-cards, .call-board { grid-template-columns: 1fr 1fr; }
     }
+    @media (max-width: 720px) {
+      header.top { flex-direction: column; align-items: stretch; }
+      .actions {
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        -webkit-overflow-scrolling: touch;
+        max-width: 100%;
+        padding-bottom: 0.2rem;
+      }
+      .actions > * { flex: 0 0 auto; }
+      .live { white-space: nowrap; }
+      .legend { flex-wrap: wrap; }
+      .chart-card, .monitor-top > section { overflow-x: auto; max-width: 100%; -webkit-overflow-scrolling: touch; }
+      .chart-card svg, .monitor-top svg { min-width: 34rem; width: 34rem; max-width: none; }
+      .table-scroll table { min-width: 34rem; }
+    }
     @media (max-width: 560px) {
       .metrics, .scores, .kpis, .tech-cards, .call-board { grid-template-columns: 1fr; }
-      .wrap { padding-top: 1.1rem; }
+      .wrap { padding-top: max(1.1rem, env(safe-area-inset-top)); }
     }
     @media print {
-      .actions, .live, .dot { display: none; }
+      .domain-nav, .actions, .live, .dot { display: none; }
       body { background: #fff; color: #111; }
       .panel, .metric, .chart-card, .lane, .score { break-inside: avoid; }
     }
@@ -932,7 +1025,7 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex">
   <title>Operator desk · Trades-Runtime</title>
   <style>${DESK_STYLES}</style>
@@ -979,6 +1072,28 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
       <span class="chip">pilot_started false</span>
       <span class="chip" id="clock">updated ${esc(snapshot.generatedAt)}</span>
     </div>
+    <nav class="domain-nav" aria-label="Desk domains">
+      <a href="#monitoring-board">Monitoring</a>
+      <a href="#mission-board">Mission</a>
+      <a href="#tech-board">Tech</a>
+      <a href="#calls-board">Calls</a>
+      <a href="#huddle-board">Huddle</a>
+      <a href="#callback-week-board">Week</a>
+      <a href="#metrics">Metrics</a>
+      <a href="#charts">Charts</a>
+      <a href="#lanes-board">Lanes</a>
+      <a href="#scores-board">Scores</a>
+      <a href="#alerts-board">Alerts</a>
+      <a href="#drive-board">Drive</a>
+      <a href="#performance-board">Performance</a>
+      <a href="#work-together-board">Together</a>
+      <a href="#part-cost-board">Parts</a>
+      <a href="#behavior-board">Behavior</a>
+      <a href="#fulfillment-board">Trucks</a>
+      <a href="#inbound-board">Inbound</a>
+      <a href="#inbound-quality-board">Quality</a>
+      <a href="#option-c-board">Start gate</a>
+    </nav>
     <div class="banner-stack" id="banner">${renderBanner(snapshot)}</div>
     <div class="banner-stack" id="rule-banner">${renderRuleBanner(snapshot)}</div>
     <section class="panel" style="margin-top:0.8rem" id="monitoring-board">
@@ -990,7 +1105,7 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
         <h2>Mission board</h2>
         <div id="mission">${renderMission(snapshot)}</div>
       </div>
-      <div class="panel">
+      <div class="panel" id="tech-board">
         <h2>Tech board</h2>
         <div id="tech">${renderTech(snapshot)}</div>
       </div>
@@ -1004,23 +1119,23 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
         <h2>Morning huddle</h2>
         <div id="huddle">${renderHuddle(snapshot)}</div>
       </div>
-      <div class="panel">
+      <div class="panel" id="callback-week-board">
         <h2>Callback week</h2>
         <div id="callback-week">${renderCallbackWeek(snapshot)}</div>
       </div>
     </section>
     <section class="metrics" id="metrics">${renderMetrics(snapshot)}</section>
     <section class="charts" id="charts">${renderCharts(snapshot)}</section>
-    <section class="panel" style="margin-top:0.8rem">
+    <section class="panel" style="margin-top:0.8rem" id="lanes-board">
       <h2>Lane view</h2>
       <div class="lanes" id="lanes">${renderLanes(snapshot)}</div>
     </section>
     <section class="split">
-      <div class="panel">
+      <div class="panel" id="scores-board">
         <h2>Scores</h2>
         <div class="scores" id="scores">${renderScores(snapshot)}</div>
       </div>
-      <div class="panel">
+      <div class="panel" id="alerts-board">
         <h2>Alerts</h2>
         <div id="alerts">${renderAlerts(snapshot)}</div>
       </div>
@@ -1050,11 +1165,11 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
       </div>
     </section>
     <section class="split">
-      <div class="panel">
+      <div class="panel" id="fulfillment-board">
         <h2>Fulfillment and truck counts</h2>
         <div id="fulfillment">${renderFulfillment(snapshot)}</div>
       </div>
-      <div class="panel">
+      <div class="panel" id="inbound-board">
         <h2>Inbound</h2>
         <div id="inbound">${renderInbound(snapshot)}</div>
       </div>
@@ -1093,6 +1208,13 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
       const next = document.documentElement.dataset.theme === "light" ? "dark" : "light";
       try { localStorage.setItem(THEME_KEY, next); } catch (error) {}
       applyTheme(next);
+    });
+    const domainNav = document.querySelector(".domain-nav");
+    domainNav?.addEventListener("click", (event) => {
+      const link = event.target instanceof Element ? event.target.closest("a") : null;
+      if (!(link instanceof HTMLAnchorElement) || !domainNav) return;
+      domainNav.querySelectorAll("a").forEach((node) => node.removeAttribute("aria-current"));
+      link.setAttribute("aria-current", "true");
     });
     const slots = ["banner", "rule-banner", "monitoring", "metrics", "charts", "scores", "alerts", "mission", "tech", "calls", "huddle", "callback-week", "lanes", "drive", "performance", "work-together", "part-cost", "behavior", "fulfillment", "inbound", "inbound-quality", "option-c"];
     function apply(view) {
