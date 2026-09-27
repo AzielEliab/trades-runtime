@@ -141,6 +141,6 @@ From the repo root, after `npm install`:
 npm run desk
 ```
 
-The desk listens on `http://127.0.0.1:4174/`. It reads these folders locally, draws charts from admitted rows or from the synthetic demo when the folders are empty, and labels which one you are seeing. It does not write back to ServiceTitan, ProBooks, or any trades app.
+The desk listens on `http://127.0.0.1:4174/`. It reads these folders locally, draws charts from admitted rows or from the synthetic demo when the folders are empty, and labels which one you are seeing. It does not write back to ServiceTitan, ProBooks, or any trades app. At about 375px the same page keeps its Softwares cards, adds a domain nav, and scrolls wide tables and monitor charts inside their panels. Receipt: [`specs/TR-MOBILE-DESK-2026-09-27.txt`](../../specs/TR-MOBILE-DESK-2026-09-27.txt).
 
 Synthetic (not customer) fixtures for `npm run drop-in:demo` and `npm run byo:admit-demo` live in `test/fixtures/byo/`. Those demos copy fixtures into a **temp** inbound dir. Do not commit real exports here.

@@ -140,7 +140,7 @@ export function renderPrintableSnapshot(snapshot: OperatorSnapshot): string {
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex">
   <title>Local desk snapshot · Trades-Runtime</title>
   <style>
@@ -153,7 +153,15 @@ export function renderPrintableSnapshot(snapshot: OperatorSnapshot): string {
       font-family: "Iowan Old Style", Palatino, Georgia, serif;
       line-height: 1.45;
     }
-    main { max-width: 820px; margin: 0 auto; padding: 1.5rem 1.2rem 2.5rem; }
+    main {
+      max-width: 820px;
+      margin: 0 auto;
+      padding:
+        max(1.5rem, env(safe-area-inset-top))
+        max(1.2rem, env(safe-area-inset-right))
+        max(2.5rem, calc(1.5rem + env(safe-area-inset-bottom)))
+        max(1.2rem, env(safe-area-inset-left));
+    }
     h1 { font-weight: 500; font-size: 1.8rem; margin: 0.15rem 0 0.4rem; }
     h2 { font-weight: 500; font-size: 1.15rem; margin: 1.3rem 0 0.4rem; }
     p, li { font-family: "Segoe UI", Helvetica, Arial, sans-serif; font-size: 0.92rem; }
@@ -165,7 +173,11 @@ export function renderPrintableSnapshot(snapshot: OperatorSnapshot): string {
     th, td { text-align: left; padding: 0.32rem 0.35rem; border-bottom: 1px solid #e4dccf; vertical-align: top; }
     th { color: #5e574c; font-weight: 600; }
     code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.78rem; }
-    button { font: inherit; border: 1px solid #1c1914; background: transparent; border-radius: 999px; padding: 0.3rem 0.75rem; cursor: pointer; }
+    button { font: inherit; border: 1px solid #1c1914; background: transparent; border-radius: 999px; padding: 0.55rem 1rem; min-height: 44px; cursor: pointer; touch-action: manipulation; }
+    code, td, p { overflow-wrap: anywhere; }
+    @media (max-width: 720px) {
+      table { display: block; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    }
     .block-lane { border: 2px solid #9a5420; background: #fffdf8; padding: 0.75rem 0.9rem; margin-top: 1rem; }
     .block-lane.open { border-color: #2f6f4e; }
     .block-lane h2 { margin: 0 0 0.35rem; }
@@ -395,21 +407,33 @@ export function renderPrintableHuddle(snapshot: OperatorSnapshot): string {
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex">
   <title>Morning huddle · Trades-Runtime</title>
   <style>
     :root { color-scheme: light; }
     * { box-sizing: border-box; }
     body { margin: 0; background: #f6f1e6; color: #1c1914; font-family: "Iowan Old Style", Palatino, Georgia, serif; line-height: 1.45; }
-    main { max-width: 820px; margin: 0 auto; padding: 1.5rem 1.2rem 2.5rem; }
+    main {
+      max-width: 820px;
+      margin: 0 auto;
+      padding:
+        max(1.5rem, env(safe-area-inset-top))
+        max(1.2rem, env(safe-area-inset-right))
+        max(2.5rem, calc(1.5rem + env(safe-area-inset-bottom)))
+        max(1.2rem, env(safe-area-inset-left));
+    }
     h1 { font-weight: 500; font-size: 1.8rem; margin: 0.15rem 0 0.4rem; }
     h2 { font-weight: 500; font-size: 1.15rem; margin: 1.1rem 0 0.3rem; }
     p { font-family: "Segoe UI", Helvetica, Arial, sans-serif; font-size: 0.92rem; }
     .kicker { letter-spacing: 0.08em; text-transform: uppercase; font-family: "Segoe UI", Helvetica, Arial, sans-serif; font-size: 0.72rem; color: #5e574c; margin: 0; }
     .chips { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0.7rem 0; }
     .chip { border: 1px solid #d5ccbc; border-radius: 999px; padding: 0.1rem 0.55rem; font-family: "Segoe UI", Helvetica, Arial, sans-serif; font-size: 0.75rem; }
-    button { font: inherit; border: 1px solid #1c1914; background: transparent; border-radius: 999px; padding: 0.3rem 0.75rem; cursor: pointer; }
+    button { font: inherit; border: 1px solid #1c1914; background: transparent; border-radius: 999px; padding: 0.55rem 1rem; min-height: 44px; cursor: pointer; touch-action: manipulation; }
+    code, td, p { overflow-wrap: anywhere; }
+    @media (max-width: 720px) {
+      table { display: block; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    }
     footer { margin-top: 1.4rem; color: #5e574c; font-family: "Segoe UI", Helvetica, Arial, sans-serif; font-size: 0.82rem; }
     @media print { body { background: #fff; } button { display: none; } main { padding: 0; } }
   </style>
