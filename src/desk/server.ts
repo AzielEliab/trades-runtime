@@ -75,6 +75,43 @@ function stockJson(snapshot: OperatorSnapshot): string {
   });
 }
 
+function driveJson(snapshot: OperatorSnapshot): string {
+  return JSON.stringify({
+    product: snapshot.product,
+    version: snapshot.version,
+    author: snapshot.author,
+    generatedAt: snapshot.generatedAt,
+    live_backends: false,
+    writes: false,
+    phoneHome: false,
+    pilot_started: false,
+    liveTelematics: false,
+    telematicsVendor: false,
+    loopback: true,
+    dataLabel: snapshot.dataLabel,
+    drive: snapshot.drive
+  });
+}
+
+function performanceJson(snapshot: OperatorSnapshot): string {
+  return JSON.stringify({
+    product: snapshot.product,
+    version: snapshot.version,
+    author: snapshot.author,
+    generatedAt: snapshot.generatedAt,
+    live_backends: false,
+    writes: false,
+    phoneHome: false,
+    pilot_started: false,
+    loopback: true,
+    dataLabel: snapshot.dataLabel,
+    companyExport: false,
+    notASkillScore: true,
+    trainingSeparate: true,
+    performance: snapshot.performance
+  });
+}
+
 function huddleJson(snapshot: OperatorSnapshot): string {
   return JSON.stringify({
     product: snapshot.product,
@@ -108,7 +145,9 @@ export function startOperatorDesk(options: DeskServerOptions = {}): Promise<Desk
     receiptPath: options.receiptPath,
     alertConfig: options.alertConfig,
     alertStatePath: options.alertStatePath ?? defaultAlertStatePath(cwd, instanceId),
-    persistAlertState: options.persistAlertState ?? true
+    persistAlertState: options.persistAlertState ?? true,
+    stockCountPath: options.stockCountPath,
+    driveMilesPath: options.driveMilesPath
   };
 
   const server = createServer((req: IncomingMessage, res: ServerResponse) => {
@@ -187,6 +226,16 @@ export function startOperatorDesk(options: DeskServerOptions = {}): Promise<Desk
     }
     if (url.pathname === "/api/stock" || url.pathname === "/api/stock.json") {
       const body = stockJson(snapshotFor(deskOptions, url));
+      send(res, 200, body, "application/json; charset=utf-8");
+      return;
+    }
+    if (url.pathname === "/api/drive" || url.pathname === "/api/drive.json") {
+      const body = driveJson(snapshotFor(deskOptions, url));
+      send(res, 200, body, "application/json; charset=utf-8");
+      return;
+    }
+    if (url.pathname === "/api/performance" || url.pathname === "/api/performance.json") {
+      const body = performanceJson(snapshotFor(deskOptions, url));
       send(res, 200, body, "application/json; charset=utf-8");
       return;
     }

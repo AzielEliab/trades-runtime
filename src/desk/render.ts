@@ -1,6 +1,6 @@
 import { callFilterLabel, type CallDeskFilter } from "../domain/call-class.js";
 import { explainMissionPace } from "../domain/mission-board.js";
-import { capacityChart, jobsChart } from "./charts.js";
+import { capacityChart, jobsChart, milesChart, rankedBars } from "./charts.js";
 import type { OperatorSnapshot } from "./snapshot.js";
 
 function esc(value: string): string {
@@ -373,6 +373,81 @@ export function renderBehavior(snapshot: OperatorSnapshot): string {
     <ul>${negative || "<li>No bad-coordination flags on this desk.</li>"}</ul>`;
 }
 
+function numOrUnknown(value: number | null, digits = 2): string {
+  if (value == null) return "unknown";
+  return value.toFixed(digits);
+}
+
+function moneyOrBlank(value: number | null): string {
+  if (value == null) return "—";
+  return value.toFixed(2);
+}
+
+function rateOrBlank(value: number | null): string {
+  if (value == null) return "—";
+  return `${(value * 100).toFixed(1)}%`;
+}
+
+export function renderDrive(snapshot: OperatorSnapshot): string {
+  const drive = snapshot.drive;
+  const rows = drive.techs
+    .map(
+      (tech) => `<tr>
+        <td>${esc(tech.technicianName ?? tech.technicianId)}</td>
+        <td>${numOrUnknown(tech.miles)}</td>
+        <td>${numOrUnknown(tech.driveMinutes)}</td>
+        <td>${tech.stops == null ? "unknown" : String(tech.stops)}</td>
+        <td>${numOrUnknown(tech.milesPerStop)}</td>
+      </tr>`
+    )
+    .join("");
+  return `<p class="quiet">${esc(drive.note)}</p>
+    <p class="quiet">Source ${esc(drive.source)}. live telematics false. telematics vendor false. GPS trace false.</p>
+    <p>Miles driven <strong>${numOrUnknown(drive.totalMiles)}</strong>. Miles per stop <strong>${numOrUnknown(drive.milesPerStop)}</strong>. Minutes per stop <strong>${numOrUnknown(drive.minutesPerStop)}</strong>. Miles per completed job <strong>${numOrUnknown(drive.milesPerCompletedJob)}</strong>.</p>
+    ${milesChart(drive.days)}
+    <p class="quiet"><a href="/api/drive">Drive JSON</a></p>
+    <table>
+      <thead><tr><th>Tech</th><th>Miles</th><th>Drive minutes</th><th>Stops</th><th>Miles per stop</th></tr></thead>
+      <tbody>${rows || `<tr><td colspan="5">No miles on this desk.</td></tr>`}</tbody>
+    </table>`;
+}
+
+export function renderPerformance(snapshot: OperatorSnapshot): string {
+  const board = snapshot.performance;
+  const table = (rows: typeof board.employees, nameHeader: string) => {
+    const body = rows
+      .map(
+        (row) => `<tr>
+          <td>${row.rank}</td>
+          <td>${esc(row.label)}</td>
+          <td>${moneyOrBlank(row.avgTicket)}</td>
+          <td>${rateOrBlank(row.recallRate)}</td>
+          <td>${moneyOrBlank(row.averageSold)}</td>
+          <td>${moneyOrBlank(row.currentRevenue)}</td>
+        </tr>`
+      )
+      .join("");
+    return `<table>
+      <thead><tr><th>Rank</th><th>${esc(nameHeader)}</th><th>Avg ticket</th><th>Recall rate</th><th>Average sold</th><th>Current revenue</th></tr></thead>
+      <tbody>${body || `<tr><td colspan="6">No rows.</td></tr>`}</tbody>
+    </table>`;
+  };
+  return `<p class="quiet">${esc(board.note)}</p>
+    <p class="quiet">Source ${esc(board.source)}. company export false. not a skill score. trainingNeeded separate. <a href="/api/performance">Performance JSON</a></p>
+    <h3>Employees, best to worst</h3>
+    ${rankedBars(
+      board.employees.map((row) => ({ label: row.label, value: row.boardOrder })),
+      "Employee performance board, best to worst"
+    )}
+    ${table(board.employees, "Employee")}
+    <h3>Departments, best to worst</h3>
+    ${rankedBars(
+      board.departments.map((row) => ({ label: row.label, value: row.boardOrder })),
+      "Department performance board, best to worst"
+    )}
+    ${table(board.departments, "Department")}`;
+}
+
 export function renderInbound(snapshot: OperatorSnapshot): string {
   if (!snapshot.inbound.length && !snapshot.refused.length) {
     return `<p class="quiet">Inbound folders are empty. Drop a JSON or CSV export into data/inbound/servicetitan, data/inbound/probooks, or data/inbound/trades-app.</p>`;
@@ -626,6 +701,8 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
         <a class="text-btn" href="${snapshot.callFilter.value === "all" ? "/api/receipt" : `/api/receipt?calls=${snapshot.callFilter.value}`}">Print snapshot</a>
         <a class="text-btn" href="/api/huddle">Print huddle</a>
         <a class="text-btn" href="/api/stock">Stock JSON</a>
+        <a class="text-btn" href="/api/drive">Drive JSON</a>
+        <a class="text-btn" href="/api/performance">Performance JSON</a>
         <a class="text-btn" href="/api/calls/week.json">Callback week JSON</a>
         <a class="text-btn" href="/api/alerts/digest.json">Alert digest JSON</a>
         <a class="text-btn" href="/api/alerts/digest.csv">Alert digest CSV</a>
@@ -684,6 +761,16 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
       </div>
     </section>
     <section class="split">
+      <div class="panel" id="drive-board">
+        <h2>Miles and drive performance</h2>
+        <div id="drive">${renderDrive(snapshot)}</div>
+      </div>
+      <div class="panel" id="performance-board">
+        <h2>Performance board</h2>
+        <div id="performance">${renderPerformance(snapshot)}</div>
+      </div>
+    </section>
+    <section class="split">
       <div class="panel" id="part-cost-board">
         <h2>Part cost</h2>
         <div id="part-cost">${renderPartCosts(snapshot)}</div>
@@ -706,6 +793,7 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
     <footer>
       Human surface. Agent MCP stays a separate read-only bridge and does not carry this desk.
       Drop folders: <code>data/inbound/servicetitan</code>, <code>data/inbound/probooks</code>, <code>data/inbound/trades-app</code>.
+      Optional miles file: <code>data/runtime/&lt;instanceId&gt;/drive-miles.json</code> or <code>data/inbound/drive-miles.json</code>. Copy <code>data/runtime/drive-miles.json.example</code>. No GPS vendor.
       Alert rules: copy <code>data/runtime/alerts.json.example</code> to <code>data/runtime/&lt;instanceId&gt;/alerts.json</code>.
       Theme stays in this browser. Print snapshot stays on this machine.
       Refresh ${snapshot.tracking.intervalMs}ms from ${esc(snapshot.tracking.source)}.
@@ -726,7 +814,7 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
       try { localStorage.setItem(THEME_KEY, next); } catch (error) {}
       applyTheme(next);
     });
-    const slots = ["banner", "rule-banner", "metrics", "charts", "scores", "alerts", "mission", "tech", "calls", "huddle", "callback-week", "lanes", "part-cost", "behavior", "fulfillment", "inbound"];
+    const slots = ["banner", "rule-banner", "metrics", "charts", "scores", "alerts", "mission", "tech", "calls", "huddle", "callback-week", "lanes", "drive", "performance", "part-cost", "behavior", "fulfillment", "inbound"];
     function apply(view) {
       for (const slot of slots) {
         const node = document.getElementById(slot);
@@ -791,6 +879,8 @@ export function renderDeskView(snapshot: OperatorSnapshot): Record<string, strin
     huddle: renderHuddle(snapshot),
     "callback-week": renderCallbackWeek(snapshot),
     lanes: renderLanes(snapshot),
+    drive: renderDrive(snapshot),
+    performance: renderPerformance(snapshot),
     "part-cost": renderPartCosts(snapshot),
     behavior: renderBehavior(snapshot),
     fulfillment: renderFulfillment(snapshot),

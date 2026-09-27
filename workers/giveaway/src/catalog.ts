@@ -132,7 +132,7 @@ export function llmsTxt(): string {
 > Author / identity: Aziel Eliab only. Person @id ${PERSON_ID}
 > X / Twitter: ${X_HANDLE} ${X_URL}
 > Version: ${VERSION} (Worker source in this repo)
-> Deployed Worker until this source is deployed: ${DEPLOYED_WORKER_VERSION}
+> Deployed Worker remains ${DEPLOYED_WORKER_VERSION}. A 0.4.7 redeploy is separately in flight. This source does not claim the public Worker is already ${VERSION}.
 > Public Glama listing: Version ${GLAMA_PUBLIC_VERSION} / Latest ${GLAMA_PUBLIC_LATEST}. Not this Worker version.
 > License: ${LICENSE}
 > Worker: ${PUBLIC_ORIGIN}

@@ -19,7 +19,14 @@ import {
 import { buildWeeklyCallbackDigest, type WeeklyCallbackDigest } from "./callback-week.js";
 import { collectDepartmentFlags, flagHandoffBehavior, type DepartmentBehaviorBoard } from "../domain/chain-d.js";
 import { flagCrossTradeBehavior } from "../domain/cross-trade-matrix.js";
+import { loadDrivePerformance, type DrivePerformance } from "../domain/drive-miles.js";
 import { buildHuddleBoard, jobCountsAsLate, jobOpenOnBoard, SYNTHETIC_HUDDLE_TRAINING, type HuddleBoard } from "../domain/huddle-board.js";
+import {
+  buildPerformanceBoard,
+  syntheticPerformanceJobs,
+  type PerformanceBoard,
+  type PerformanceJob
+} from "../domain/performance-board.js";
 import { rollupPartCosts } from "../domain/job-economics.js";
 import { adaptPartCost } from "../domain/pricebook.js";
 import { flagRecognitionBehavior } from "../domain/recognition.js";
@@ -216,6 +223,8 @@ export interface OperatorSnapshot {
   visibleCalls: DeskCallRow[];
   callbackWeek: WeeklyCallbackDigest;
   huddle: HuddleBoard;
+  drive: DrivePerformance;
+  performance: PerformanceBoard;
   partCosts: DeskPartCosts;
   behavior: DeskBehavior;
   stock: DeskStock;
@@ -259,6 +268,7 @@ export interface DeskSnapshotOptions {
   persistAlertState?: boolean;
   callFilter?: CallDeskFilter;
   stockCountPath?: string;
+  driveMilesPath?: string;
 }
 
 export interface DeskPartCostLine {
@@ -672,6 +682,9 @@ interface CollectedRecord {
   callClass?: CallClassification;
   technicianId?: string;
   technicianName?: string;
+  ticket?: number;
+  sold?: number;
+  revenue?: number;
 }
 
 function collect(files: DropInFileResult[], receivedAt: string): {
@@ -710,7 +723,10 @@ function collect(files: DropInFileResult[], receivedAt: string): {
         lane: record.lane,
         callClass: record.callClass,
         technicianId: record.technicianId,
-        technicianName: record.technicianName
+        technicianName: record.technicianName,
+        ticket: record.ticket,
+        sold: record.sold,
+        revenue: record.revenue
       });
     }
   }
@@ -1192,7 +1208,9 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
       "training needed is a procedure observation, not revenue, margin, or contribution per hour",
       "part cost uses current and last cost; regional adaptation weakens on thin evidence",
       "department flags list good handoffs and bad coordination; the last person is not blamed by default",
-      "truck counts are a local file, not a hosted inventory ERP"
+      "truck counts are a local file, not a hosted inventory ERP",
+      "miles come from a local file or a labeled synthetic demo; a missing file stays unknown; no telematics vendor is claimed",
+      "the performance board rank is an operator order, not a skill score, and it does not set trainingNeeded"
     ],
     confidenceNote:
       dataLabel === "synthetic-demo"
@@ -1203,9 +1221,38 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
     receiptRefs: sampleHashes.length ? sampleHashes : ["none"]
   });
 
+  const completedJobs =
+    dataLabel === "synthetic-demo"
+      ? SYNTHETIC_DESK_CALLS.filter((row) => isCompleted(row.status)).length
+      : jobEntities.filter((record) => isCompleted(record.status)).length;
+  const drive = loadDrivePerformance({
+    cwd,
+    instanceId,
+    explicitPath: options.driveMilesPath,
+    allowSynthetic: dataLabel === "synthetic-demo",
+    completedJobs
+  });
+  const performanceJobs: PerformanceJob[] =
+    dataLabel === "synthetic-demo"
+      ? syntheticPerformanceJobs()
+      : jobEntities.map((record) => ({
+          id: record.externalId,
+          technicianId: record.technicianId ?? null,
+          technicianName: record.technicianName ?? null,
+          department: record.lane ?? null,
+          callback: record.callClass?.callback ?? "unknown",
+          ticket: record.ticket ?? null,
+          sold: record.sold ?? null,
+          revenue: record.revenue ?? null
+        }));
+  const performance = buildPerformanceBoard({
+    jobs: performanceJobs,
+    source: dataLabel === "synthetic-demo" ? "synthetic-demo" : "admitted-rows"
+  });
+
   const honesty =
     dataLabel === "synthetic-demo"
-      ? "Synthetic demo on this machine. Not BYO company data. Not a live GM pilot."
+      ? "Synthetic demo on this machine. Not BYO company data. Not a live GM pilot. Miles and the ranked board are a labeled fixture, not a telematics feed and not a company export."
       : dataLabel === "byo-admitted-synthetic"
         ? "BYO-admitted synthetic drill. Local files only. UNVERIFIED. Writes refused."
         : "BYO-admitted local export. UNVERIFIED. Writes refused. Authoring node is not a custodian of this desk.";
@@ -1254,6 +1301,8 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
     visibleCalls,
     callbackWeek,
     huddle,
+    drive,
+    performance,
     partCosts,
     behavior,
     stock,

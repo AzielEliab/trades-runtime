@@ -252,6 +252,49 @@ export function renderPrintableSnapshot(snapshot: OperatorSnapshot): string {
           : `<tr><td colspan="4">No counts.</td></tr>`
       }</tbody>
     </table>
+    <h2>Miles and drive performance</h2>
+    <p>${esc(snapshot.drive.note)}</p>
+    <p>Source ${esc(snapshot.drive.source)}. live telematics false. Miles ${snapshot.drive.totalMiles == null ? "unknown" : snapshot.drive.totalMiles}. Miles per stop ${snapshot.drive.milesPerStop == null ? "unknown" : snapshot.drive.milesPerStop}. Miles per completed job ${snapshot.drive.milesPerCompletedJob == null ? "unknown" : snapshot.drive.milesPerCompletedJob}.</p>
+    <table>
+      <thead><tr><th>Tech</th><th>Miles</th><th>Drive minutes</th><th>Stops</th><th>Miles per stop</th></tr></thead>
+      <tbody>${
+        snapshot.drive.techs.length
+          ? snapshot.drive.techs
+              .map(
+                (tech) => `<tr><td>${esc(tech.technicianName ?? tech.technicianId)}</td><td>${tech.miles}</td><td>${tech.driveMinutes ?? "unknown"}</td><td>${tech.stops ?? "unknown"}</td><td>${tech.milesPerStop ?? "unknown"}</td></tr>`
+              )
+              .join("")
+          : `<tr><td colspan="5">No miles.</td></tr>`
+      }</tbody>
+    </table>
+    <h2>Performance board</h2>
+    <p>${esc(snapshot.performance.note)}</p>
+    <p>Employees, best to worst. Not a skill score. trainingNeeded stays separate. company export false.</p>
+    <table>
+      <thead><tr><th>Rank</th><th>Employee</th><th>Avg ticket</th><th>Recall</th><th>Average sold</th><th>Current revenue</th></tr></thead>
+      <tbody>${
+        snapshot.performance.employees.length
+          ? snapshot.performance.employees
+              .map(
+                (row) => `<tr><td>${row.rank}</td><td>${esc(row.label)}</td><td>${row.avgTicket ?? "—"}</td><td>${row.recallRate == null ? "—" : row.recallRate}</td><td>${row.averageSold ?? "—"}</td><td>${row.currentRevenue ?? "—"}</td></tr>`
+              )
+              .join("")
+          : `<tr><td colspan="6">No employees.</td></tr>`
+      }</tbody>
+    </table>
+    <p>Departments, best to worst.</p>
+    <table>
+      <thead><tr><th>Rank</th><th>Department</th><th>Avg ticket</th><th>Recall</th><th>Average sold</th><th>Current revenue</th></tr></thead>
+      <tbody>${
+        snapshot.performance.departments.length
+          ? snapshot.performance.departments
+              .map(
+                (row) => `<tr><td>${row.rank}</td><td>${esc(row.label)}</td><td>${row.avgTicket ?? "—"}</td><td>${row.recallRate == null ? "—" : row.recallRate}</td><td>${row.averageSold ?? "—"}</td><td>${row.currentRevenue ?? "—"}</td></tr>`
+              )
+              .join("")
+          : `<tr><td colspan="6">No departments.</td></tr>`
+      }</tbody>
+    </table>
     <h2>Metrics</h2>
     <table>${metrics}</table>
     <h2>Mission board</h2>

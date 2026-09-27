@@ -79,6 +79,74 @@ export function jobsChart(points: JobsPoint[]): string {
   </svg>`;
 }
 
+export function milesChart(points: { t: string; miles: number }[]): string {
+  const width = 640;
+  const height = 228;
+  const padL = 44;
+  const padR = 16;
+  const padT = 18;
+  const padB = 34;
+  if (!points.length) {
+    return emptyChart("Miles driven", "No local miles file. Miles stay unknown.");
+  }
+  const max = Math.max(1, ...points.map((point) => point.miles));
+  const innerW = width - padL - padR;
+  const innerH = height - padT - padB;
+  const xAt = (index: number) => padL + (points.length === 1 ? innerW / 2 : (index / (points.length - 1)) * innerW);
+  const yAt = (value: number) => padT + innerH - (value / max) * innerH;
+  const line = points
+    .map((point, index) => `${index === 0 ? "M" : "L"} ${xAt(index).toFixed(1)} ${yAt(point.miles).toFixed(1)}`)
+    .join(" ");
+  const base = yAt(0).toFixed(1);
+  const area = `${line} L ${xAt(points.length - 1).toFixed(1)} ${base} L ${xAt(0).toFixed(1)} ${base} Z`;
+  const grid = [0, 0.5, 1]
+    .map((fraction) => {
+      const y = yAt(max * fraction).toFixed(1);
+      return `<line class="grid" x1="${padL}" x2="${width - padR}" y1="${y}" y2="${y}"/>`;
+    })
+    .join("");
+  const labels = points
+    .map(
+      (point, index) =>
+        `<text class="chart-label" x="${xAt(index).toFixed(1)}" y="${height - 12}" text-anchor="middle">${esc(dayLabel(point.t))}</text>`
+    )
+    .join("");
+  const dots = points
+    .map(
+      (point, index) =>
+        `<circle class="series-jobs" cx="${xAt(index).toFixed(1)}" cy="${yAt(point.miles).toFixed(1)}" r="3.4"/>`
+    )
+    .join("");
+  return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Miles driven by day">
+    <rect class="chart-bg" width="100%" height="100%" rx="12"/>
+    ${grid}
+    <text class="chart-label" x="8" y="${(yAt(max) + 4).toFixed(1)}">${max}</text>
+    <text class="chart-label" x="8" y="${(yAt(0) - 2).toFixed(1)}">0</text>
+    <path class="area-jobs" d="${area}"/>
+    <path class="series-jobs" d="${line}" fill="none"/>
+    ${dots}
+    ${labels}
+  </svg>`;
+}
+
+export function rankedBars(rows: { label: string; value: number }[], aria: string): string {
+  const width = 640;
+  const height = Math.max(160, 36 + rows.length * 28);
+  if (!rows.length || rows.every((row) => row.value <= 0)) {
+    return emptyChart(aria, "No board spread to chart. The ranked table still lists 1 through N.");
+  }
+  const max = Math.max(...rows.map((row) => row.value), 0.01);
+  const labelW = 148;
+  const bars = rows
+    .map((row, index) => {
+      const y = 18 + index * 28;
+      const barW = ((width - labelW - 24) * row.value) / max;
+      return `<text class="chart-label" x="8" y="${y + 12}">${esc(`${index + 1}. ${row.label}`)}</text><rect class="bar-jobs" x="${labelW}" y="${y}" width="${Math.max(2, barW).toFixed(1)}" height="16" rx="3"/>`;
+    })
+    .join("");
+  return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(aria)}"><rect class="chart-bg" width="100%" height="100%" rx="12"/>${bars}</svg>`;
+}
+
 export function capacityChart(points: CapacityPoint[]): string {
   const width = 640;
   const height = 228;

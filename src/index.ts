@@ -51,6 +51,21 @@ export {
   parseCallDeskFilter
 } from "./domain/call-class.js";
 export { buildHuddleBoard, flagTraining, trainingFromJobEconomics, trainingNeeded } from "./domain/huddle-board.js";
+export {
+  buildPerformanceBoard,
+  formatRankedBoard,
+  knownJobMoney,
+  performanceAsSkillScore,
+  performanceAsTraining,
+  syntheticPerformanceJobs
+} from "./domain/performance-board.js";
+export {
+  defaultDriveMilesPath,
+  inboundDriveMilesPath,
+  loadDrivePerformance,
+  readDriveMilesFile,
+  summarizeDrive
+} from "./domain/drive-miles.js";
 export { buildWeeklyCallbackDigest } from "./desk/callback-week.js";
 export { reconcilePipelines, paretoFrontier } from "./domain/decision-fabric.js";
 export { requireReportMetadata } from "./domain/analytics.js";

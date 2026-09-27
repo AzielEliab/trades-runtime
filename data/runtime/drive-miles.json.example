@@ -1,0 +1,16 @@
+{
+  "liveTelematics": false,
+  "telematicsVendor": null,
+  "source": "operator-file",
+  "note": "Optional local miles. Read-only. Copy to data/runtime/<instanceId>/drive-miles.json or data/inbound/drive-miles.json. Do not name a GPS vendor. Coordinates are ignored. A missing file stays unknown.",
+  "rows": [
+    {
+      "day": "2026-09-25",
+      "technicianId": "tech-local",
+      "technicianName": "Local Tech",
+      "miles": 12.4,
+      "driveMinutes": 28,
+      "stops": 3
+    }
+  ]
+}
