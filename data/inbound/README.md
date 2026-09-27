@@ -64,6 +64,22 @@ npm run health:local
 
 `pilot:prep` checks these folders, copies `local.json.example` and `alerts.json.example` when the local copies are missing, admits synthetic fixtures in a temp tree, boots the desk on `127.0.0.1`, and prints a receipt. `pilot_started` stays false. It does not start a company pilot, does not fill these folders with fixtures, and does not write to ServiceTitan, ProBooks, or a trades app.
 
+## Miles and ranked performance (0.4.8)
+
+Receipt: [`specs/TR-DRIVE-2026-09-27.txt`](../../specs/TR-DRIVE-2026-09-27.txt).
+
+`npm run desk` still binds to `http://127.0.0.1:4174/`. Empty inbound folders use the in-repo sample, so miles and the ranked performance board are visible and labeled as a fixture. That fixture is not a company export and not a telematics feed.
+
+- Optional miles file: copy [`../runtime/drive-miles.json.example`](../runtime/drive-miles.json.example) to `data/runtime/<instanceId>/drive-miles.json` (gitignored) or to `data/inbound/drive-miles.json` at this inbound root. The desk reads it and does not write it. Do not put it inside a vendor folder.
+- A missing file stays unknown once a local export is admitted. Drive minutes or stops that the file does not name stay unknown. They are not treated as zero.
+- A file that claims a live telematics vendor is refused. Coordinates on a row are ignored. No GPS vendor is integrated.
+- `/api/drive` is the miles JSON. `/api/performance` is the ranked board JSON. `/api/receipt` prints both.
+- The performance board ranks employees and departments best to worst (1…N) from avg ticket, recall rate, average sold, and current revenue when the job row names those fields. Missing money stays blank. The rank is not a skill score and it does not set trainingNeeded.
+- Work together uses the same Chain D, cross-trade, and recognition flags. Positive collaboration is listed. Suggestions name who or which lane should pair or hand off for service techs when needed and for install. A silent export does not invent pairs or employee names. Revenue alone does not fire a suggestion. `/api/work-together` is the loopback JSON.
+- Employee friction rate sits beside that board and at `/api/friction`. It counts handoff failures, coordination flags, explicit callbacks, and delayed handoffs. Delayed handoffs are inside the negative count, not added twice. Friction rank 1 is the highest known friction, not the best performance. Unknown callbacks with no handoff flags stay unknown. This is not a hosted HR system and it does not set trainingNeeded.
+
+`pilot_started` stays false. Nothing here writes to ServiceTitan or ProBooks.
+
 ## Part cost, training, behavior, and truck counts (0.4.7)
 
 Receipt: [`specs/TR-SOFTWARES-2026-09-27.txt`](../../specs/TR-SOFTWARES-2026-09-27.txt).

@@ -252,6 +252,83 @@ export function renderPrintableSnapshot(snapshot: OperatorSnapshot): string {
           : `<tr><td colspan="4">No counts.</td></tr>`
       }</tbody>
     </table>
+    <h2>Miles and drive performance</h2>
+    <p>${esc(snapshot.drive.note)}</p>
+    <p>Source ${esc(snapshot.drive.source)}. live telematics false. Miles ${snapshot.drive.totalMiles == null ? "unknown" : snapshot.drive.totalMiles}. Miles per stop ${snapshot.drive.milesPerStop == null ? "unknown" : snapshot.drive.milesPerStop}. Miles per completed job ${snapshot.drive.milesPerCompletedJob == null ? "unknown" : snapshot.drive.milesPerCompletedJob}.</p>
+    <table>
+      <thead><tr><th>Tech</th><th>Miles</th><th>Drive minutes</th><th>Stops</th><th>Miles per stop</th></tr></thead>
+      <tbody>${
+        snapshot.drive.techs.length
+          ? snapshot.drive.techs
+              .map(
+                (tech) => `<tr><td>${esc(tech.technicianName ?? tech.technicianId)}</td><td>${tech.miles}</td><td>${tech.driveMinutes ?? "unknown"}</td><td>${tech.stops ?? "unknown"}</td><td>${tech.milesPerStop ?? "unknown"}</td></tr>`
+              )
+              .join("")
+          : `<tr><td colspan="5">No miles.</td></tr>`
+      }</tbody>
+    </table>
+    <h2>Performance board</h2>
+    <p>${esc(snapshot.performance.note)}</p>
+    <p>Employees, best to worst. Friction sits beside the rank. Friction rank 1 is the highest known friction, not the best performance. Not a skill score. trainingNeeded stays separate. company export false. hosted HR false.</p>
+    <table>
+      <thead><tr><th>Rank</th><th>Employee</th><th>Avg ticket</th><th>Recall</th><th>Average sold</th><th>Current revenue</th><th>Friction rate</th><th>Friction rank</th></tr></thead>
+      <tbody>${
+        snapshot.performance.employees.length
+          ? snapshot.performance.employees
+              .map((row) => {
+                const side = snapshot.friction.employees.find((item) => item.id === row.id);
+                const rate = side?.frictionRate == null ? "unknown" : side.frictionRate;
+                const frictionRank = side?.frictionRank == null ? "unknown" : side.frictionRank;
+                return `<tr><td>${row.rank}</td><td>${esc(row.label)}</td><td>${row.avgTicket ?? "—"}</td><td>${row.recallRate == null ? "—" : row.recallRate}</td><td>${row.averageSold ?? "—"}</td><td>${row.currentRevenue ?? "—"}</td><td>${rate}</td><td>${frictionRank}</td></tr>`;
+              })
+              .join("")
+          : `<tr><td colspan="8">No employees.</td></tr>`
+      }</tbody>
+    </table>
+    <p>Departments, best to worst.</p>
+    <table>
+      <thead><tr><th>Rank</th><th>Department</th><th>Avg ticket</th><th>Recall</th><th>Average sold</th><th>Current revenue</th><th>Friction rate</th><th>Friction rank</th></tr></thead>
+      <tbody>${
+        snapshot.performance.departments.length
+          ? snapshot.performance.departments
+              .map((row) => {
+                const side = snapshot.friction.departments.find((item) => item.id === row.id);
+                const rate = side?.frictionRate == null ? "unknown" : side.frictionRate;
+                const frictionRank = side?.frictionRank == null ? "unknown" : side.frictionRank;
+                return `<tr><td>${row.rank}</td><td>${esc(row.label)}</td><td>${row.avgTicket ?? "—"}</td><td>${row.recallRate == null ? "—" : row.recallRate}</td><td>${row.averageSold ?? "—"}</td><td>${row.currentRevenue ?? "—"}</td><td>${rate}</td><td>${frictionRank}</td></tr>`;
+              })
+              .join("")
+          : `<tr><td colspan="8">No departments.</td></tr>`
+      }</tbody>
+    </table>
+    <h2>Friction, highest first</h2>
+    <p>${esc(snapshot.friction.note)}</p>
+    <table>
+      <thead><tr><th>Friction rank</th><th>Employee</th><th>Friction rate</th><th>Negative flags</th><th>Delayed handoffs</th><th>Callbacks</th></tr></thead>
+      <tbody>${
+        snapshot.friction.employees.length
+          ? snapshot.friction.employees
+              .map(
+                (row) => `<tr><td>${row.frictionRank ?? "unknown"}</td><td>${esc(row.label)}</td><td>${row.frictionRate ?? "unknown"}</td><td>${row.negativeFlags}</td><td>${row.delayedHandoffs}</td><td>${row.callbacks}</td></tr>`
+              )
+              .join("")
+          : `<tr><td colspan="6">Friction unknown.</td></tr>`
+      }</tbody>
+    </table>
+    <h2>Work together</h2>
+    <p>${esc(snapshot.workTogether.note)}</p>
+    <p>Service suggestions</p>
+    <ul>${
+      snapshot.workTogether.suggestions.service.length
+        ? snapshot.workTogether.suggestions.service.map((row) => `<li>${esc(row.text)}</li>`).join("")
+        : `<li>No service suggestions.</li>`
+    }</ul>
+    <p>Install suggestions</p>
+    <ul>${
+      snapshot.workTogether.suggestions.install.length
+        ? snapshot.workTogether.suggestions.install.map((row) => `<li>${esc(row.text)}</li>`).join("")
+        : `<li>No install suggestions.</li>`
+    }</ul>
     <h2>Metrics</h2>
     <table>${metrics}</table>
     <h2>Mission board</h2>

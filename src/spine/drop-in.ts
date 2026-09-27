@@ -13,6 +13,7 @@ import {
   type ServiceTitanShadowEntity
 } from "./servicetitan-shadow.js";
 import { classifyCall, type CallClassification } from "../domain/call-class.js";
+import { knownJobMoney } from "../domain/performance-board.js";
 import {
   ingestTradesAppShadow,
   TRADES_APP_ENTITIES,
@@ -101,6 +102,12 @@ export interface AdmittedDropRecord {
   /** Present on job rows when the export names a technician. Not inferred from prose. */
   technicianId?: string;
   technicianName?: string;
+  /** Explicit ticket dollars. Absent when the row did not name one. Not copied from revenue. */
+  ticket?: number;
+  /** Explicit sold dollars. Absent when the row did not name one. */
+  sold?: number;
+  /** Explicit current revenue dollars. Absent when the row did not name one. */
+  revenue?: number;
 }
 
 export interface DropInAdmit {
@@ -1088,10 +1095,14 @@ function admitRecord(
   const finish = (row: AdmittedDropRecord): AdmittedDropRecord => {
     const laned = lane ? { ...row, lane } : row;
     if (laned.entity !== "job") return laned;
+    const money = knownJobMoney(record.raw);
     return {
       ...laned,
       callClass: classifyCall(record.raw),
-      ...(technician ? { technicianId: technician.id, technicianName: technician.name } : {})
+      ...(technician ? { technicianId: technician.id, technicianName: technician.name } : {}),
+      ...(money.ticket != null ? { ticket: money.ticket } : {}),
+      ...(money.sold != null ? { sold: money.sold } : {}),
+      ...(money.revenue != null ? { revenue: money.revenue } : {})
     };
   };
   if (peerClass === "servicetitan") {

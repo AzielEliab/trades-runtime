@@ -2,7 +2,7 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { RUNTIME_MANIFEST } from "../src/manifest.js";
 
-const PRODUCT = "0.4.7";
+const PRODUCT = "0.4.8";
 const IDENTITY = "Aziel Eliab";
 const PRODUCT_SURFACES = [
   "README.md",
@@ -25,7 +25,7 @@ const PRODUCT_SURFACES = [
 ];
 
 describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", () => {
-  it("keeps package, manifest, and catalog on 0.4.7", () => {
+  it("keeps package, manifest, and catalog on 0.4.8", () => {
     const pkg = JSON.parse(readFileSync("package.json", "utf8")) as {
       version: string;
       author: string;
@@ -76,6 +76,16 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
     expect(RUNTIME_MANIFEST.honesty).toMatch(/Option D not started/);
     expect(RUNTIME_MANIFEST.honesty).toMatch(/Not a live company pilot/);
     expect(RUNTIME_MANIFEST.honesty).toMatch(/0\.4\.7 uses current and last part cost/);
+    expect(RUNTIME_MANIFEST.honesty).toMatch(/0\.4\.8 adds miles driven/);
+    expect(RUNTIME_MANIFEST.honesty).toMatch(/tracks how employees work together/);
+    expect(RUNTIME_MANIFEST.honesty).toMatch(/not a skill score from revenue alone/);
+    expect(RUNTIME_MANIFEST.honesty).toMatch(/Employee friction rate/);
+    expect(RUNTIME_MANIFEST.honesty).toMatch(/A silent export stays unknown/);
+    expect(RUNTIME_MANIFEST.honesty).toMatch(/not a hosted HR system/);
+    expect(runtime.honesty).toMatch(/Employee friction rate/);
+    expect(runtime.honesty).toMatch(/not a hosted HR system/);
+    expect(RUNTIME_MANIFEST.honesty).toMatch(/does not claim the public Worker is already 0\.4\.8/);
+    expect(RUNTIME_MANIFEST.honesty).toMatch(/0\.4\.7 redeploy is separately in flight/);
     expect(RUNTIME_MANIFEST.honesty).toMatch(/trainingNeeded/);
     expect(RUNTIME_MANIFEST.honesty).toMatch(/not a hosted inventory ERP/);
     expect(RUNTIME_MANIFEST.honesty).toMatch(/The deployed Worker remains 0\.4\.5/);
@@ -93,7 +103,7 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
     expect(RUNTIME_MANIFEST.launch_options.C.pilot_started).toBe(false);
     expect(RUNTIME_MANIFEST.launch_options.C.prep).toBe("local-runbook");
     expect(RUNTIME_MANIFEST.launch_options.D.status).toBe("not-started");
-    expect(readFileSync("README.md", "utf8")).toMatch(/\*\*Version:\*\* 0\.4\.7/);
+    expect(readFileSync("README.md", "utf8")).toMatch(/\*\*Version:\*\* 0\.4\.8/);
     expect(readFileSync("README.md", "utf8")).toMatch(/TR-VENDOR-2026-09-25/);
     expect(readFileSync("README.md", "utf8")).toMatch(/TR-BOT-2026-09-17/);
     expect(readFileSync("README.md", "utf8")).toMatch(/TR-BYO-2026-09-17/);
@@ -108,6 +118,11 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
     expect(readFileSync("README.md", "utf8")).toMatch(/TR-CALLS-2026-09-26/);
     expect(readFileSync("README.md", "utf8")).toMatch(/TR-HUDDLE-2026-09-26/);
     expect(readFileSync("README.md", "utf8")).toMatch(/TR-SOFTWARES-2026-09-27/);
+    expect(readFileSync("README.md", "utf8")).toMatch(/TR-DRIVE-2026-09-27/);
+    expect(readFileSync("README.md", "utf8")).toMatch(/\/api\/drive/);
+    expect(readFileSync("README.md", "utf8")).toMatch(/\/api\/performance/);
+    expect(readFileSync("README.md", "utf8")).toMatch(/\/api\/work-together/);
+    expect(readFileSync("README.md", "utf8")).toMatch(/\/api\/friction/);
     expect(readFileSync("README.md", "utf8")).toMatch(/\/api\/stock/);
     expect(readFileSync("README.md", "utf8")).toMatch(/\/api\/huddle/);
     expect(readFileSync("README.md", "utf8")).toMatch(/\/api\/calls\/week\.json/);
@@ -132,6 +147,10 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
     expect(RUNTIME_MANIFEST.modules.some((module) => module.slug === "operator-desk")).toBe(true);
     expect(RUNTIME_MANIFEST.modules.some((module) => module.slug === "call-class")).toBe(true);
     expect(RUNTIME_MANIFEST.modules.some((module) => module.slug === "huddle-board")).toBe(true);
+    expect(RUNTIME_MANIFEST.modules.some((module) => module.slug === "drive-miles")).toBe(true);
+    expect(RUNTIME_MANIFEST.modules.some((module) => module.slug === "performance-board")).toBe(true);
+    expect(RUNTIME_MANIFEST.modules.some((module) => module.slug === "work-together")).toBe(true);
+    expect(RUNTIME_MANIFEST.modules.some((module) => module.slug === "friction-rate")).toBe(true);
     expect(RUNTIME_MANIFEST.modules.some((module) => module.slug === "callback-week")).toBe(true);
     expect(RUNTIME_MANIFEST.modules.some((module) => module.slug === "option-c-prep")).toBe(true);
     expect(RUNTIME_MANIFEST.modules.some((module) => module.slug === "health-local")).toBe(true);
@@ -145,7 +164,7 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
     expect(workerPkg.author).toBe(IDENTITY);
     expect(workerWrangler).toMatch(/"name": "trades-runtime"/);
     expect(workerWrangler).toMatch(/"binding": "COUNTS"/);
-    expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/export const VERSION = "0\.4\.7"/);
+    expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/export const VERSION = "0\.4\.8"/);
     expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/GLAMA_PUBLIC_VERSION = "0\.3\.4"/);
     expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/GLAMA_PUBLIC_LATEST = "pre-0\.4\.4"/);
     expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/DEPLOYED_WORKER_VERSION = "0\.4\.5"/);
@@ -190,7 +209,7 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
     expect(readFileSync("Dockerfile", "utf8")).toMatch(/npm install --omit=dev/);
     expect(readFileSync("Dockerfile", "utf8")).toMatch(/CMD \["node", "cli\/mcp-stdio\.mjs"\]/);
     expect(readFileSync("Dockerfile", "utf8")).toMatch(/Mozilla\/5\.0|TRADES_RUNTIME_URL/);
-    expect(glamaDocs).toMatch(/claim-file version \(`0\.4\.7`\)/);
+    expect(glamaDocs).toMatch(/claim-file version \(`0\.4\.8`\)/);
     expect(glamaDocs).toMatch(/Version is 0\.3\.4/);
     expect(glamaDocs).toMatch(/Latest is pre-0\.4\.4/);
     expect(glamaDocs).not.toMatch(/Glama Latest is 0\.4/);
