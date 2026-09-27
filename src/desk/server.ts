@@ -1,4 +1,6 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import { join } from "node:path";
+import { defaultCoverageLayersPath, writeCoverageLayer } from "../domain/coverage-map.js";
 import { parseCallDeskFilter } from "../domain/call-class.js";
 import { healthLocal } from "../spine/health-local.js";
 import { acknowledgeStoredAlert, alertDigestCsv, buildAlertDigest, defaultAlertStatePath } from "./alerts.js";
@@ -50,6 +52,7 @@ function snapshotFor(options: DeskSnapshotOptions, requestUrl: URL): OperatorSna
   return buildOperatorSnapshot({
     ...options,
     callFilter: parseCallDeskFilter(requestUrl.searchParams.get("calls")),
+    rightTechJob: requestUrl.searchParams.get("job") ?? options.rightTechJob,
     now: options.now ?? new Date().toISOString()
   });
 }
@@ -189,6 +192,9 @@ export function startOperatorDesk(options: DeskServerOptions = {}): Promise<Desk
     stockCountPath: options.stockCountPath,
     driveMilesPath: options.driveMilesPath,
     positionsPath: options.positionsPath,
+    timeCardsPath: options.timeCardsPath,
+    coveragePath: options.coveragePath,
+    rightTechJob: options.rightTechJob,
     persistLocalReports: options.persistLocalReports ?? true
   };
 
@@ -227,6 +233,47 @@ export function startOperatorDesk(options: DeskServerOptions = {}): Promise<Desk
           const message = error instanceof Error ? error.message : String(error);
           if (!res.headersSent) {
             send(res, 400, JSON.stringify({ error: message, writes: false, vendorWrite: false }), "application/json; charset=utf-8");
+          }
+        });
+      return;
+    }
+    if (req.method === "POST" && url.pathname === "/api/coverage/layers") {
+      void readBody(req)
+        .then((raw) => {
+          const body = raw ? (JSON.parse(raw) as { layer?: unknown; enabled?: unknown }) : {};
+          const layer = typeof body.layer === "string" ? body.layer.trim() : "";
+          if (!layer || typeof body.enabled !== "boolean") {
+            send(
+              res,
+              400,
+              JSON.stringify({ error: "layer and enabled required", writes: false, vendorWrite: false, autoDispatch: false }),
+              "application/json; charset=utf-8"
+            );
+            return;
+          }
+          writeCoverageLayer(join(cwd, defaultCoverageLayersPath(instanceId)), layer, body.enabled);
+          const coverage = snapshotFor(deskOptions, url).coverage;
+          send(
+            res,
+            200,
+            JSON.stringify({
+              ok: true,
+              layer,
+              enabled: body.enabled,
+              layers: coverage.layers,
+              writes: false,
+              vendorWrite: false,
+              phoneHome: false,
+              autoDispatch: false,
+              live_backends: false
+            }),
+            "application/json; charset=utf-8"
+          );
+        })
+        .catch((error: unknown) => {
+          const message = error instanceof Error ? error.message : String(error);
+          if (!res.headersSent) {
+            send(res, 400, JSON.stringify({ error: message, writes: false, vendorWrite: false, autoDispatch: false }), "application/json; charset=utf-8");
           }
         });
       return;
@@ -305,6 +352,26 @@ export function startOperatorDesk(options: DeskServerOptions = {}): Promise<Desk
     }
     if (url.pathname === "/api/monitoring" || url.pathname === "/api/monitoring.json") {
       const board = snapshotFor(deskOptions, url).monitoring;
+      send(res, 200, JSON.stringify(board), "application/json; charset=utf-8");
+      return;
+    }
+    if (url.pathname === "/api/time-tracking" || url.pathname === "/api/time-tracking.json") {
+      const board = snapshotFor(deskOptions, url).timeTracking;
+      send(res, 200, JSON.stringify(board), "application/json; charset=utf-8");
+      return;
+    }
+    if (url.pathname === "/api/coverage" || url.pathname === "/api/coverage.json") {
+      const board = snapshotFor(deskOptions, url).coverage;
+      send(res, 200, JSON.stringify(board), "application/json; charset=utf-8");
+      return;
+    }
+    if (
+      url.pathname === "/api/right-tech" ||
+      url.pathname === "/api/right-tech.json" ||
+      url.pathname === "/api/tech-fit" ||
+      url.pathname === "/api/tech-fit.json"
+    ) {
+      const board = snapshotFor(deskOptions, url).rightTech;
       send(res, 200, JSON.stringify(board), "application/json; charset=utf-8");
       return;
     }

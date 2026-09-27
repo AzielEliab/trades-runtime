@@ -64,6 +64,16 @@ npm run health:local
 
 `pilot:prep` checks these folders, copies `local.json.example` and `alerts.json.example` when the local copies are missing, admits synthetic fixtures in a temp tree, boots the desk on `127.0.0.1`, and prints a receipt. `pilot_started` stays false. It does not start a company pilot, does not fill these folders with fixtures, and does not write to ServiceTitan, ProBooks, or a trades app.
 
+## Time, coverage, and right tech (0.4.10)
+
+Receipt: [`specs/TR-OPS-2026-09-27.txt`](../../specs/TR-OPS-2026-09-27.txt).
+
+These stay on the Monitoring panel. `live_backends` stays false. Nothing writes to ServiceTitan or ProBooks. Suggestions do not dispatch.
+
+- Time cards: copy [`../runtime/time-cards.json.example`](../runtime/time-cards.json.example) to `data/runtime/<instanceId>/time-cards.json` or to `data/inbound/time-cards.json`. `/api/time-tracking` recomputes elapsed and remaining. The desk also writes `time-tracking.json` and `time-tracking.jsonl` under `data/runtime/<instanceId>/`. Those copies are gitignored. A missing file stays empty once a local export is admitted. The empty-folder desk uses a labeled synthetic demo. Not a live GPS feed.
+- Coverage: copy [`../runtime/coverage.json.example`](../runtime/coverage.json.example) to `data/runtime/<instanceId>/coverage.json` or to `data/inbound/coverage.json`. `/api/coverage` returns layer state and breakdowns for zip codes, counties, cities, and roads or highways. Switches persist in `coverage-layers.json` (`POST /api/coverage/layers`). Not a live map tile. The address map stays undrawn.
+- Right tech: `/api/right-tech` and `/api/tech-fit` suggest a tech for an open or scheduled job (`?job=` optional). Reasons name distance, time remaining, skill fit, and friction flags. Suggestions only. No auto-dispatch. No write-back.
+
 ## Inbound quality, alert stubs, and Option C start gate (0.4.9)
 
 Receipt: [`specs/TR-QUALITY-2026-09-27.txt`](../../specs/TR-QUALITY-2026-09-27.txt).

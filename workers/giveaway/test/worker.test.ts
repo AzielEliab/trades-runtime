@@ -158,7 +158,7 @@ describe("giveaway Worker routes", () => {
     expect(cite.sameAs).not.toContain("https://glama.ai");
     expect((cite as { glama_public_version?: string }).glama_public_version).toBe("0.3.4");
     expect((cite as { glama_public_latest?: string }).glama_public_latest).toBe("pre-0.4.4");
-    expect((cite as { deployed_worker_version?: string }).deployed_worker_version).toBe("0.4.9");
+    expect((cite as { deployed_worker_version?: string }).deployed_worker_version).toBe("0.4.10");
     expect((cite as { glama_listing_stale?: boolean }).glama_listing_stale).toBe(true);
     expect(cite.version).toBe((cite as { deployed_worker_version?: string }).deployed_worker_version);
     expect(cite.version).not.toBe((cite as { glama_public_version?: string }).glama_public_version);
@@ -335,10 +335,10 @@ describe("giveaway Worker routes", () => {
     expect(visible).not.toMatch(/15:20/);
 
     const llms = await (await hit(env, "/llms.txt")).text();
-    expect(llms).toContain("Deployed Worker is 0.4.9");
+    expect(llms).toContain("Deployed Worker is 0.4.10");
     expect(llms).toContain("Stale relative to the deployed Worker");
     expect(llms).not.toMatch(/does not claim the public Worker is already/);
-    expect(ai).toContain("Deployed Worker is 0.4.9");
+    expect(ai).toContain("Deployed Worker is 0.4.10");
     expect(ai).not.toMatch(/does not claim the public Worker is already/);
     expect(llms).toContain("/ai.txt");
     expect(llms).toContain("sitemap.xml");

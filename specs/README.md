@@ -4,6 +4,8 @@ These text extracts drive implementation. Original PDFs stay offline / in chat a
 
 Standing rule: every PDF becomes coded software (current, prior, future).
 
+[`TR-OPS-2026-09-27`](TR-OPS-2026-09-27.txt) is the 0.4.10 Softwares cut: local time tracking, a service-coverage livemap with zip, county, city, and road switches, and right-tech suggestions on the existing Monitoring panel. Data is a local file or a labeled synthetic demo. Not a live GPS feed and not a live map tile. Suggestions do not dispatch and do not write back. The address map stays undrawn. Option C remains prep. Option D stays out of scope. It does not start the pilot and does not deploy the Worker. Public Glama listing Version stays 0.3.4 / Latest pre-0.4.4. The giveaway Worker version pin in this repo is 0.4.10.
+
 [`TR-DESK-VIEW-2026-09-27`](TR-DESK-VIEW-2026-09-27.txt) lets the operator turn desk boards, metrics, KPIs, techs, scores, charts, lanes, and alerts on or off. Choices stay in the browser under `trades-desk-view`. Everything starts on. Softwares card grids stay. It does not start the Option C pilot and does not deploy the Worker.
 
 [`TR-MOBILE-DESK-2026-09-27`](TR-MOBILE-DESK-2026-09-27.txt) makes the local operator desk usable at about 375px: domain nav, safe-area padding, 44px controls, and in-panel scroll for monitors and tables. Softwares card grids stay. The giveaway Worker cards are not edited. Version stays 0.4.9. It does not start the Option C pilot and does not deploy the Worker.

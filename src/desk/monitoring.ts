@@ -1,8 +1,11 @@
+import type { CoverageBoard } from "../domain/coverage-map.js";
 import type { DrivePerformance } from "../domain/drive-miles.js";
 import type { FrictionBoard } from "../domain/friction.js";
 import type { InboundQualityReport } from "../domain/inbound-quality.js";
 import type { LocalPositionBoard } from "../domain/local-positions.js";
 import type { PerformanceBoard } from "../domain/performance-board.js";
+import type { RightTechBoard } from "../domain/right-tech.js";
+import type { TimeTrackingBoard } from "../domain/time-tracking.js";
 import { HUMAN_AUTHORITY_RULE } from "./alert-actions.js";
 
 /**
@@ -37,6 +40,9 @@ export interface MonitoringBoard {
   dataLabel: string;
   note: string;
   positions: LocalPositionBoard;
+  timeTracking: TimeTrackingBoard;
+  coverage: CoverageBoard;
+  rightTech: RightTechBoard;
   driveCards: { id: string; label: string; value: string }[];
   techCards: { id: string; rank: number; name: string; avgTicket: string; recall: string; friction: string }[];
   kpis: { id: string; label: string; value: string; note: string }[];
@@ -67,6 +73,21 @@ export function callColumn(status: string | null): CallColumnId {
   return "other";
 }
 
+function monitoringNote(
+  positions: "synthetic-demo" | "local-file" | "unknown",
+  time: "synthetic-demo" | "local-file" | "unknown",
+  coverage: "synthetic-demo" | "local-file" | "unknown"
+): string {
+  const sources = [positions, time, coverage];
+  if (sources.includes("local-file")) {
+    return "Monitoring on this machine. BYO drop-in positions, time cards, or coverage, and local scores. Not a live GPS feed. Not a map-tile vendor. Not a tenant pull. Refreshes when local files change.";
+  }
+  if (sources.includes("synthetic-demo")) {
+    return "Monitoring on this machine. Synthetic demo positions, time cards, coverage, and calls. Not a live GPS feed. Not a map-tile vendor. Not a tenant pull. Refreshes when local files change.";
+  }
+  return "Monitoring on this machine. No local positions yet. Scores and calls still come from the local desk. Not a live GPS feed.";
+}
+
 const COLUMN_LABELS: Record<CallColumnId, string> = {
   scheduled: "Scheduled",
   "on-the-job": "On the job",
@@ -81,6 +102,9 @@ export function buildMonitoring(args: {
   performance: PerformanceBoard;
   friction: FrictionBoard;
   inboundQuality: InboundQualityReport;
+  timeTracking: TimeTrackingBoard;
+  coverage: CoverageBoard;
+  rightTech: RightTechBoard;
   calls: readonly MonitoringCall[];
 }): MonitoringBoard {
   const drive = args.drive;
@@ -110,13 +134,11 @@ export function buildMonitoring(args: {
     probooksWrite: false,
     humanAuthorityRule: HUMAN_AUTHORITY_RULE,
     dataLabel: args.dataLabel,
-    note:
-      args.positions.source === "synthetic-demo"
-        ? "Monitoring on this machine. Synthetic demo positions, scores, and calls. Not a live GPS feed. Not a tenant pull. Refreshes when local files change."
-        : args.positions.source === "local-file"
-          ? "Monitoring on this machine. BYO drop-in positions and local scores. Not a live GPS feed. Not a tenant pull. Refreshes when local files change."
-          : "Monitoring on this machine. No local positions yet. Scores and calls still come from the local desk. Not a live GPS feed.",
+    note: monitoringNote(args.positions.source, args.timeTracking.source, args.coverage.source),
     positions: args.positions,
+    timeTracking: args.timeTracking,
+    coverage: args.coverage,
+    rightTech: args.rightTech,
     driveCards: [
       { id: "miles", label: "Miles", value: num(drive.totalMiles) },
       { id: "miles-per-stop", label: "Miles / stop", value: num(drive.milesPerStop) },

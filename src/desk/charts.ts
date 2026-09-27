@@ -129,6 +129,66 @@ export function milesChart(points: { t: string; miles: number }[]): string {
   </svg>`;
 }
 
+export function coverageMap(args: {
+  features: { id: string; name: string; layer: string; kind: "polygon" | "line"; coordinates: number[][] }[];
+  pins: { label: string; lat: number; lng: number }[];
+}): string {
+  const width = 640;
+  const height = 300;
+  const points: { lng: number; lat: number }[] = [];
+  for (const feature of args.features) {
+    for (const pair of feature.coordinates) points.push({ lng: pair[0] ?? 0, lat: pair[1] ?? 0 });
+  }
+  for (const pin of args.pins) points.push(pin);
+  if (!points.length) {
+    return emptyChart("Service coverage", "No local coverage shapes. A live map tile is not connected.");
+  }
+  let minLat = Math.min(...points.map((point) => point.lat));
+  let maxLat = Math.max(...points.map((point) => point.lat));
+  let minLng = Math.min(...points.map((point) => point.lng));
+  let maxLng = Math.max(...points.map((point) => point.lng));
+  if (maxLat - minLat < 0.02) {
+    minLat -= 0.02;
+    maxLat += 0.02;
+  }
+  if (maxLng - minLng < 0.02) {
+    minLng -= 0.02;
+    maxLng += 0.02;
+  }
+  const padL = 28;
+  const padR = 28;
+  const padT = 28;
+  const padB = 28;
+  const innerW = width - padL - padR;
+  const innerH = height - padT - padB;
+  const xAt = (lng: number) => padL + ((lng - minLng) / (maxLng - minLng)) * innerW;
+  const yAt = (lat: number) => padT + ((maxLat - lat) / (maxLat - minLat)) * innerH;
+  const order = ["counties", "cities", "zipcodes", "roads"];
+  const shapes = [...args.features]
+    .sort((a, b) => order.indexOf(a.layer) - order.indexOf(b.layer))
+    .map((feature) => {
+      const path = feature.coordinates
+        .map((pair, index) => `${index === 0 ? "M" : "L"} ${xAt(pair[0] ?? 0).toFixed(1)} ${yAt(pair[1] ?? 0).toFixed(1)}`)
+        .join(" ");
+      const closed = feature.kind === "polygon" ? `${path} Z` : path;
+      const cls = feature.layer === "roads" ? "series-jobs" : feature.layer === "cities" ? "series-done" : feature.layer === "counties" ? "area-done" : "area-jobs";
+      return `<path data-layer="${esc(feature.layer)}" data-place="${esc(feature.id)}" class="${cls}" d="${closed}"/>`;
+    })
+    .join("");
+  const dots = args.pins
+    .map((pin) => {
+      const x = xAt(pin.lng).toFixed(1);
+      const y = yAt(pin.lat).toFixed(1);
+      return `<circle class="series-jobs" cx="${x}" cy="${y}" r="5"/><text class="chart-label" x="${x}" y="${(yAt(pin.lat) - 8).toFixed(1)}" text-anchor="middle">${esc(pin.label)}</text>`;
+    })
+    .join("");
+  return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Service coverage from local fixtures. Not a live map tile.">
+    <rect class="chart-bg" width="100%" height="100%" rx="12"/>
+    ${shapes}
+    ${dots}
+  </svg>`;
+}
+
 export function positionMap(pins: { label: string; lat: number; lng: number }[]): string {
   const width = 640;
   const height = 280;

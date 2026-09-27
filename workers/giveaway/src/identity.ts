@@ -1,15 +1,15 @@
 export const PRODUCT = "trades-runtime";
 export const PRODUCT_TITLE = "Trades-Runtime";
-export const VERSION = "0.4.9";
+export const VERSION = "0.4.10";
 /** Public Glama listing badge. Not this Worker package. Not glama.json. Stale vs the live Worker. */
 export const GLAMA_PUBLIC_VERSION = "0.3.4";
 export const GLAMA_PUBLIC_LATEST = "pre-0.4.4";
-/** Checked 2026-09-27. Glama releaseVersion is still 0.3.4. Do not cite the listing as 0.4.9. */
+/** Checked 2026-09-27. Glama releaseVersion is still 0.3.4. Do not cite the listing as 0.4.10. */
 export const GLAMA_LISTING_STALE = true;
-/** Live public Worker tip. Matches x-product-version and /v1/health. Not the Glama listing. */
-export const DEPLOYED_WORKER_VERSION = "0.4.9";
+/** Giveaway Worker version pin. Moves with this repo. Not the Glama listing. */
+export const DEPLOYED_WORKER_VERSION = "0.4.10";
 export const GLAMA_LISTING_NOTE =
-  "Public Glama listing Version is 0.3.4 and Latest is pre-0.4.4. Checked 2026-09-27 on https://glama.ai/mcp/servers/AzielEliab/trades-runtime: the public badge is still releaseVersion 0.3.4 (tool updates v0.3.4, observedAt 2026-09-25). That listing is stale. It is not 0.4.9. The version field is this repo and the Worker source. glama.json version is the in-repo claim file, not the Glama Latest badge. The Worker already deployed at the public origin is 0.4.9 (x-product-version and /v1/health). This cite matches that live tip.";
+  "Public Glama listing Version is 0.3.4 and Latest is pre-0.4.4. Checked 2026-09-27 on https://glama.ai/mcp/servers/AzielEliab/trades-runtime: the public badge is still releaseVersion 0.3.4 (tool updates v0.3.4, observedAt 2026-09-25). That listing is stale. It is not 0.4.10. The version field is this repo and the Worker source. glama.json version is the in-repo claim file, not the Glama Latest badge. The giveaway Worker version pin in this repo is 0.4.10. This cite does not claim the Glama listing is 0.4.10.";
 export const AUTHOR = "Aziel Eliab";
 export const IDENTITY = "Aziel Eliab";
 export const LICENSE = "Apache-2.0";

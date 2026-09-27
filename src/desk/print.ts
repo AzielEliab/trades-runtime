@@ -362,7 +362,7 @@ export function renderPrintableSnapshot(snapshot: OperatorSnapshot): string {
     <h2>Alert action stubs</h2>
     <p>${esc(snapshot.alertActions.humanAuthorityRule)} refused: write-back. ${snapshot.alertActions.stubs.length} stub${snapshot.alertActions.stubs.length === 1 ? "" : "s"}. No tenant call. live_backends false.</p>
     <h2>Monitoring</h2>
-    <p>${esc(snapshot.monitoring.note)} ${esc(snapshot.monitoring.humanAuthorityRule)} refused: write-back. Pins ${snapshot.monitoring.positions.pins.length}. Not a live GPS feed. live_backends false.</p>
+    <p>${esc(snapshot.monitoring.note)} ${esc(snapshot.monitoring.humanAuthorityRule)} refused: write-back. Pins ${snapshot.monitoring.positions.pins.length}. Time cards ${snapshot.timeTracking.cards.length}. Coverage places ${snapshot.coverage.totals.features}. Right-tech suggestions ${snapshot.rightTech.suggestions.length}. Suggestions only. Not a live GPS feed. live_backends false.</p>
     <h2>Inbound quality</h2>
     <p>${esc(snapshot.inboundQuality.note)} Mean checklist score ${snapshot.inboundQuality.meanScore == null ? "none" : snapshot.inboundQuality.meanScore}. Not an accuracy percent.</p>
     <h2>Option C start gate</h2>
