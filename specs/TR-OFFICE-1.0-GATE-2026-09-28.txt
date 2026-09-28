@@ -1,0 +1,214 @@
+TRADES-RUNTIME · OFFICE SOFTWARES 1.0 GATE                                                                                      TR-OFFICE-1.0-GATE-2026-09-28
+
+
+
+
+ Receipt ID TR-OFFICE-1.0-GATE-2026-09-28 · 2026-09-28
+ Identity: Aziel Eliab only.
+ Office Softwares 1.0. The local operator desk. Not company OS live.
+ This paper is the product law for that claim, then the green / open / blocked checklist.
+ The claim is not made here. It stays blocked until a real Option C pilot.
+ live_backends remains false. pilot_started remains false. Pages remain off.
+ No ServiceTitan or ProBooks live writes. No Make Release. This paper does not deploy the Worker.
+ This paper does not bump the package, the manifest, glama.json, or the Worker source pin.
+ Local Softwares 1.0 (Track L, 1.0.0-local) is already shipped. This paper does not re-ship it.
+
+
+ Product law (verbatim)
+
+OFFICE — Office Softwares 1.0 after a real Option C pilot on the local desk
+- Goal: claimable Office Softwares 1.0 after a real Option C pilot on the local desk (npm run desk → 127.0.0.1:4174).
+- BLOCKED until pilot_started true with real Option C. Same shared gate as Field.
+- KEEP: live_backends=false; no ST/ProBooks live writes; Pages off; Glama parked (no Make Release).
+- Messaging: Office Softwares 1.0 (local / pilot) — never Field 1.0, never company OS live.
+- Do NOT flip pilot_started or live_backends in this paper or in code.
+- Do NOT mix Field flags, Field 1.0, or other Track F waves into an Office PR.
+
+FIELD stays a separate paper
+- Field Softwares 1.0 is TR-FIELD-1.0-GATE-2026-09-28.
+- Draft field flags are open PR #23 on cursor/field-flags-34af. Do not merge that PR from an Office cut.
+- Local Softwares 1.0 alone is not an Office 1.0 claim and it is not a Field 1.0 claim.
+
+Ladder today: A done, B done-in-software, C code-ready / pilot not started, D not started.
+
+
+ Version
+    Package, manifest, glama.json claim file, and the giveaway Worker source pin stay 1.0.0-local.
+    The product label already shipped is Local Softwares 1.0 (installable). That label is Track L.
+    Office Softwares 1.0 is not that label.
+    TR-1.0-GATE-2026-09-28 recorded the already-running Worker as 0.4.12 at that cut's check.
+    This paper does not rewrite that check and does not deploy.
+    A read of https://trades-runtime.vibelock.workers.dev/v1/health on 2026-09-28
+    returned version 1.0.0-local, product_label Local Softwares 1.0,
+    pilot_started false, live_backends false.
+    That read is Local Softwares 1.0 on the giveaway Worker. It is not an Office 1.0 claim
+    and it is not a version bump.
+    Public Glama listing stays the Track L parked check: Version 0.3.4, Latest pre-0.4.4
+    (checked 2026-09-27). This paper does not Make Release and does not publish a new badge number.
+    glama.json version is the in-repo claim file, not that badge.
+
+
+ Checklist
+
+ GREEN desk
+    npm run desk binds the local human operator desk to 127.0.0.1:4174.
+    The public Worker may cite the install path. It does not serve this desk.
+    Drop folders stay data/inbound/servicetitan, data/inbound/probooks, and data/inbound/trades-app.
+
+ GREEN monitoring
+    One Monitoring panel: local or labeled-demo pins, drive cards, tech score cards,
+    a call board, and KPI charts.
+    Loopback: /api/monitoring.
+    Not a live GPS feed. Not a telematics vendor. The address map stays undrawn.
+
+ GREEN time-coverage-right-tech
+    Local time cards, coverage switches (zip, county, city, road), and right-tech suggestions
+    sit on that same Monitoring panel (0.4.10 ops cut).
+    Loopback: /api/time-tracking, /api/coverage, /api/right-tech.
+    Suggestions only. No auto-dispatch. No write-back.
+    Empty-folder rows stay a labeled synthetic demo. A refused file is not replaced by that demo.
+    Field may reuse these APIs under pilot files later. That reuse is not this Office claim.
+
+ GREEN call-board
+    The calls board, callback and warranty counts, an exportable alert digest,
+    plain-language score bands, and a booking-block lane on the printable receipt.
+    Loopback only.
+
+ GREEN huddle
+    Morning huddle per tech: open jobs, late risk, callback share, warranty share, capacity.
+    Per-call classify reason. Callback, warranty, and not-classified filters.
+    Weekly callback rate by trade lane. Unknown is not a callback. A city name is not a lane.
+    Loopback: /api/huddle and /api/calls/week.
+
+ GREEN quality
+    Inbound quality report for ServiceTitan and ProBooks fragments already on the machine.
+    Completeness, schema fit, stale or missing fields, conflicting keys, thin evidence, refused writes.
+    The checklist score is not an accuracy percent.
+    An empty folder stays a labeled synthetic demo. That demo is not a company export.
+    Loopback: /api/inbound-quality.
+
+ GREEN alert-stubs
+    Local alert rules: capacity, late jobs, trust-band, booking block, verification stall.
+    Alert-to-action stubs carry a label, a rationale, the Human Authority Rule, and refused: write-back.
+    The Human Authority Rule is on the panel: a person decides. A stub is not an order, a ticket, or a dispatch write.
+    Stubs do not call ServiceTitan or ProBooks.
+    Loopback: /api/alert-actions. Acknowledge stays local. Hooks stay file or loopback.
+
+ GREEN desk-polish
+    Mission and tech boards, a capacity or known-trade lane (not a map), light and dark theme
+    in browser storage (trades-desk-theme), a printable local snapshot, and show or hide
+    under trades-desk-view. Everything starts on. Choices stay in this browser.
+    The same desk is usable at about 375px (safe area, domain nav, 44px controls, in-panel scroll).
+    That phone-width layout is the local desk. It is not a Field 1.0 claim.
+
+ GREEN option-c-prep
+    npm run pilot:prep checks the operator box and prints a receipt with pilot_started false.
+    It does not start the pilot.
+    The Option C start-gate panel lists every condition as blocked-until.
+    pilotMayStart stays false. Option D stays out of scope. No cutover.
+    Ladder: A done, B done-in-software, C code-ready / pilot not started, D not started.
+
+ GREEN local-softwares-shipped
+    Track L Local Softwares 1.0 is already the installable label at 1.0.0-local.
+    Common commands (help, softwares, version, health) stay.
+    This Office paper does not bump that pin and does not treat Track L as Office 1.0.
+
+ GREEN honesty-flags
+    live_backends false. pilot_started false. field_launch false. Pages off.
+    ServiceTitan and ProBooks writes stay refused.
+    No fake telematics and no hosted analytics.
+
+ GREEN pages-off
+    No Pages workflow. docs/ remains a local catalog. PDFs stay offline.
+
+ GREEN glama-parked
+    No Make Release. The public badge is not an Office Softwares 1.0 label.
+
+ OPEN office-messaging
+    The words, once a real pilot is underway: Office Softwares 1.0 (local / pilot).
+    Never Field 1.0. Never company OS live.
+    Today the shipped label remains Local Softwares 1.0. This paper does not retitle the desk.
+
+ OPEN byo-labeled-boards
+    Under a pilot, a board that reads an operator drop stays labeled as that BYO file.
+    A synthetic demo stays labeled synthetic. It is not company actuals.
+    Empty inbound folders stay empty. This paper does not place a company drop.
+
+ OPEN start-gate-in-pilot
+    Today every start-gate row is blocked-until.
+    After a human starts a real Option C pilot, those rows are what moves to in-pilot.
+    This paper does not edit the gate module and does not flip pilot_started.
+
+ OPEN settlement-fields
+    When a human compares a sealed day to actuals, the settlement receipt still requires
+    plannedAction, contemporaneousEvidenceHash, prediction_confidence, evidence_strength,
+    source_quality, cross_source_agreement, verification_status, humanOverride,
+    actualOutcome, and timeToSettleMs.
+    Hindsight must not rewrite the sealed recommendation. Human authority wins.
+    The harness is already in tree. This paper does not open a sealed day against company actuals.
+    Using those fields on a real sealed day is later work, with Option D still a separate wave.
+
+ OPEN cite-after-health
+    Cite lockstep only after the suite cite matches /v1/health.
+    Checked 2026-09-28: GET https://aziel-runtime.vibelock.workers.dev/v1/software
+    still cites sister trades-runtime at 0.4.9 (version_source named as that health URL).
+    software_tab false. fraggate_call false. FragGate door is none.
+    The same-day /v1/health read is 1.0.0-local. Those two numbers do not match.
+    Do not cite the suite row as lockstep.
+
+ OPEN azinterface-suite-row
+    docs/azinterface-suite-card.json and the Worker route /suite-card.json
+    are a suite shell entry for this separate package.
+    A live AZInterface suite row is optional. It stays open until that shell reads this card
+    and the cite matches health. fraggate_call does not execute this product.
+
+ BLOCKED option-c-pilot
+    Option C pilot has not started.
+    Office Softwares 1.0 stays blocked until an operator starts a real pilot
+    (pilot_started true with real Option C). Same shared gate as Field.
+    This checklist does not flip pilot_started.
+
+ BLOCKED option-d
+    Option D has not started.
+    Settlement against a live advise-lock, and Option D, stay later separate waves.
+
+ BLOCKED live-backends
+    live_backends stays false. This paper does not flip it.
+    No hosted company OS. No live tenant pull from this desk.
+
+ BLOCKED writes
+    No ServiceTitan write client. No ProBooks write client.
+    POST, PUT, and PATCH to those peers still throw.
+    A visible checklist is not a write client.
+
+ BLOCKED pages
+    GitHub Pages stays off. No Pages workflow.
+
+ BLOCKED glama-make-release
+    No Glama admin Deploy. No Make Release.
+    The parked public badge is not moved by this paper.
+
+ BLOCKED field-in-office
+    Field flags and Field 1.0 stay out of Office PRs.
+    Draft field flags (needs-parts, safety, escalation, van-down, callback-risk)
+    are open PR #23 on branch cursor/field-flags-34af
+    (draft paper TR-FIELD-FLAGS-2026-09-27 on that branch; kinds needsParts,
+    safetyHold, customerEscalation, vanDown, callbackRisk).
+    This paper does not merge that PR and does not copy those flags onto the desk.
+
+
+ What this cut does not do
+    It does not start the Option C pilot.
+    It does not start Option D.
+    It does not turn on live_backends.
+    It does not flip pilot_started.
+    It does not add a ServiceTitan or ProBooks write client.
+    It does not publish Pages.
+    It does not run a Glama admin Deploy or Make Release.
+    It does not bump the package, the manifest, glama.json, or the Worker source pin.
+    It does not deploy the Worker.
+    It does not claim Office Softwares 1.0 is live today.
+    It does not claim Field 1.0.
+    It does not claim a live company OS.
+    It does not merge PR #23.
+    It does not invent GPS, telematics, or an accuracy percent.
