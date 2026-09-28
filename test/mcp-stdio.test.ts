@@ -109,7 +109,8 @@ describe("stdio MCP bridge", () => {
     const tools = lines.find((line) => line.id === 2);
     expect(init?.result?.serverInfo?.name).toBe("trades-runtime");
     // Deployed Worker version follows the last operator deploy and can lag this repo.
-    expect(init?.result?.serverInfo?.version).toMatch(/^\d+\.\d+\.\d+$/);
+    // Local Softwares pin style is x.y.z or x.y.z-suffix (for example 1.0.0-local).
+    expect(init?.result?.serverInfo?.version).toMatch(/^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$/);
     const names = (tools?.result?.tools ?? []).map((tool) => tool.name).sort();
     expect(names).toEqual([
       "trades_runtime_cite",
