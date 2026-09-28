@@ -34,8 +34,8 @@ describe("0.4.10 time, coverage, and right tech", () => {
       persistAlertState: false,
       persistLocalReports: true
     });
-    expect(RUNTIME_MANIFEST.version).toBe("0.4.12");
-    expect(snapshot.version).toBe("0.4.12");
+    expect(RUNTIME_MANIFEST.version).toBe("1.0.0-local");
+    expect(snapshot.version).toBe("1.0.0-local");
     expect(snapshot.live_backends).toBe(false);
     expect(snapshot.map).toEqual({
       drawn: false,

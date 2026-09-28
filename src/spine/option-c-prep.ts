@@ -11,6 +11,7 @@ import { admitDropInFile } from "./drop-in.js";
 import { DurableReceiptStore } from "./durable-receipts.js";
 import { recordEngagementDrop } from "./engagement-receipt.js";
 import { healthLocal, type HealthLocal } from "./health-local.js";
+import { LOCAL_SOFTWARES_LABEL, LOCAL_SOFTWARES_TRACK, localSoftwaresGate } from "./local-softwares-gate.js";
 import { BYO_INBOUND_ROOT, HOSTED_TENANT_LAYOUT, isHostedTenantLayout } from "./inbound-layout.js";
 import { parseLocalInboundConfig } from "./local-inbound-config.js";
 import { mayWriteProBooks, refuseProBooksWrite, refuseProBooksWriteMethod } from "./probooks-shadow.js";
@@ -50,6 +51,10 @@ export interface OptionCPrepReceipt {
   author: "Aziel Eliab";
   identity: "Aziel Eliab";
   version: string;
+  product_label: typeof LOCAL_SOFTWARES_LABEL;
+  track: typeof LOCAL_SOFTWARES_TRACK;
+  field_claim: false;
+  company_os_live: false;
   surface: "health-local";
   pilot_started: false;
   pilot: "not-started";
@@ -157,6 +162,10 @@ function baseReceipt(at: string, checks: OptionCPrepCheck[]): OptionCPrepReceipt
     author: "Aziel Eliab",
     identity: "Aziel Eliab",
     version: RUNTIME_MANIFEST.version,
+    product_label: LOCAL_SOFTWARES_LABEL,
+    track: LOCAL_SOFTWARES_TRACK,
+    field_claim: false,
+    company_os_live: false,
     surface: "health-local",
     pilot_started: false,
     pilot: "not-started",
@@ -244,6 +253,25 @@ export async function runOptionCPrep(options: OptionCPrepOptions = {}): Promise<
       receipt.health.writes === false &&
       receipt.health.pages === "off",
     "manifest and health-local keep live_backends false and pilot_started false"
+  );
+
+  const trackGate = localSoftwaresGate();
+  const prepGreen = trackGate.items.some((item) => item.id === "option-c-prep" && item.state === "green");
+  const pilotBlocked = trackGate.items.some((item) => item.id === "option-c-pilot" && item.state === "blocked");
+  const fieldBlocked = trackGate.items.some((item) => item.id === "field-1-0" && item.state === "blocked");
+  check(
+    checks,
+    "track-l-gate",
+    trackGate.product_label === LOCAL_SOFTWARES_LABEL &&
+      trackGate.version === RUNTIME_MANIFEST.version &&
+      trackGate.live_backends === false &&
+      trackGate.pilot_started === false &&
+      trackGate.field_claim === false &&
+      trackGate.company_os_live === false &&
+      prepGreen &&
+      pilotBlocked &&
+      fieldBlocked,
+    "Track L gate keeps Option C prep green and leaves the pilot and Field 1.0 blocked"
   );
 
   const pagesWorkflow = join(cwd, ".github", "workflows", "pages.yml");

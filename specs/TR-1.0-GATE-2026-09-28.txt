@@ -1,0 +1,120 @@
+TRADES-RUNTIME · LOCAL SOFTWARES 1.0 GATE                                                                                              TR-1.0-GATE-2026-09-28
+
+
+
+
+ Receipt ID TR-1.0-GATE-2026-09-28 · 2026-09-28
+ Identity: Aziel Eliab only.
+ Track L. Installable Local Softwares 1.0. Version pin 1.0.0-local.
+ This paper is the product law for this cut, then the green / open / blocked checklist.
+ live_backends remains false. pilot_started remains false. Pages remain off.
+ No ServiceTitan or ProBooks live writes. No Make Release. This cut does not deploy the Worker.
+
+
+ Product law (verbatim)
+
+TRACK L — Local Softwares 1.0 first
+- Goal: installable local product at 1.0 feel: common commands already in 0.4.12 (help/softwares/version/health); plain Softwares list; Option C prep green; cite lockstep package/manifest/Worker; AZInterface suite card when ready.
+- KEEP: live_backends=false; pilot_started=false; no ST/ProBooks live writes; Pages off; Glama parked (no Make Release).
+- Messaging: Local Softwares 1.0 / installable — never “company OS live” or Field 1.0 claims.
+- Do NOT flip pilot_started or live_backends for a version bump.
+
+TRACK F — Field 1.0 ONLY after a real Option C pilot
+- Blocked until operator starts a real pilot (pilot_started true with real Option C).
+- Then: settlement path, Option D as scoped — separate Softwares waves, not mixed into Track L PRs.
+
+Ladder today: A done, B done-in-software, C code-ready / pilot not started, D not started.
+
+
+ Version
+    Package, manifest, glama.json claim file, and the giveaway Worker source pin are 1.0.0-local.
+    Product label is Local Softwares 1.0 (installable).
+    That label is not a Field 1.0 claim and it is not a live company OS.
+    Checked 2026-09-28: the already-running Worker at
+    https://trades-runtime.vibelock.workers.dev/v1/health is still 0.4.12.
+    This cut does not deploy. Do not cite that live Worker as 1.0.0-local.
+    Public Glama listing Version remains 0.3.4. Latest remains pre-0.4.4.
+    Checked 2026-09-27. Parked. No Make Release.
+    glama.json version is the in-repo claim file, not that badge.
+
+
+ Checklist
+
+ GREEN common-commands
+    help, softwares, version, and health (an alias of health-local) are on the local CLI.
+
+ GREEN plain-softwares-list
+    softwares prints slug, status, and one line.
+    The lead matches the VibeLock-first giveaway: humans use the Worker UI without downloading first.
+    The operator desk still installs on this machine.
+
+ GREEN vibelock-worker-ui
+    The public giveaway leads with the Worker UI on the VibeLock host.
+    The counted pack is optional.
+
+ GREEN option-c-prep
+    npm run pilot:prep checks the operator box and prints a receipt with pilot_started false.
+    It does not start the pilot.
+    Ladder: A done, B done-in-software, C code-ready / pilot not started, D not started.
+
+ GREEN cite-lockstep
+    package.json, the runtime manifest, glama.json, and the Worker source pin share 1.0.0-local.
+
+ GREEN honesty-flags
+    live_backends false. pilot_started false. field_launch false. Pages off.
+    ServiceTitan and ProBooks writes stay refused.
+    No fake telematics and no hosted analytics.
+
+ GREEN desk-kept
+    Prior desk features stay. This cut does not freeze-break into Track F.
+
+ GREEN suite-card
+    docs/azinterface-suite-card.json and the Worker route /suite-card.json
+    are a suite shell entry for this separate package.
+    FragGate door is none. fraggate_call does not execute this product.
+
+ GREEN glama-parked
+    No Make Release. The claim-file pin moves with the repo.
+    The public badge is not treated as this version.
+
+ GREEN pages-off
+    No Pages workflow. docs/ remains a local catalog.
+
+ OPEN live-worker-deploy
+    The already-running Worker is still 0.4.12 (checked 2026-09-28).
+    This cut does not deploy.
+
+ OPEN glama-public-badge
+    Public Glama listing Version is 0.3.4 and Latest is pre-0.4.4.
+    Parked. No Make Release.
+
+ OPEN azinterface-live-shell
+    The card is in this package.
+    Checked 2026-09-28: GET https://aziel-runtime.vibelock.workers.dev/v1/software
+    does not list trades-runtime as a suite row. Its sister cite was still 0.4.9.
+    Open until that shell reads this card.
+
+ BLOCKED option-c-pilot
+    Option C pilot has not started.
+    Blocked until an operator starts a real pilot.
+    This checklist does not flip pilot_started.
+
+ BLOCKED option-d
+    Option D has not started.
+    Settlement path and Option D are separate Softwares waves.
+
+ BLOCKED field-1-0
+    Track F Field 1.0 waits on a real Option C pilot.
+    It is not mixed into this Track L cut.
+
+
+ What this cut does not do
+    It does not start the Option C pilot.
+    It does not start Option D.
+    It does not turn on live_backends.
+    It does not add a ServiceTitan or ProBooks write client.
+    It does not publish Pages.
+    It does not run a Glama admin Deploy or Make Release.
+    It does not claim the already-running Worker is 1.0.0-local.
+    It does not claim Field 1.0.
+    It does not claim a live company OS.

@@ -1,5 +1,6 @@
 import { engagementNotice } from "../core/engagement-rules.js";
 import { RUNTIME_MANIFEST } from "../manifest.js";
+import { LOCAL_SOFTWARES_LABEL, LOCAL_SOFTWARES_TRACK } from "./local-softwares-gate.js";
 
 /**
  * Local honesty card for the operator box.
@@ -8,7 +9,11 @@ import { RUNTIME_MANIFEST } from "../manifest.js";
 export interface HealthLocal {
   ok: true;
   product: "trades-runtime";
+  product_label: typeof LOCAL_SOFTWARES_LABEL;
+  track: typeof LOCAL_SOFTWARES_TRACK;
   version: string;
+  field_claim: false;
+  company_os_live: false;
   author: "Aziel Eliab";
   identity: "Aziel Eliab";
   surface: "health-local";
@@ -33,7 +38,11 @@ export function healthLocal(): HealthLocal {
   return {
     ok: true,
     product: "trades-runtime",
+    product_label: LOCAL_SOFTWARES_LABEL,
+    track: LOCAL_SOFTWARES_TRACK,
     version: RUNTIME_MANIFEST.version,
+    field_claim: false,
+    company_os_live: false,
     author: "Aziel Eliab",
     identity: "Aziel Eliab",
     surface: "health-local",

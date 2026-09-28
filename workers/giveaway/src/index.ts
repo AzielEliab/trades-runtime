@@ -1,4 +1,5 @@
 import { citeBody, healthBody, json, jsonLd, llmsTxt, openApiSpec, skillMarkdown, statsBody, text } from "./catalog.js";
+import { suiteCardBody } from "./suite-card.js";
 import {
   aiTxt,
   graphJsonLd,
@@ -65,6 +66,7 @@ export async function handleRequest(request: Request, env: Env, _ctx?: WorkerCon
   }
 
   if (pathname === "/cite.json") return json(citeBody());
+  if (pathname === "/suite-card.json") return json(suiteCardBody());
   if (pathname === "/llms.txt") return text(llmsTxt(), "text/plain; charset=utf-8");
   if (pathname === "/ai.txt") return text(aiTxt(), "text/plain; charset=utf-8");
   if (pathname === "/humans.txt") return text(humansTxt(), "text/plain; charset=utf-8");

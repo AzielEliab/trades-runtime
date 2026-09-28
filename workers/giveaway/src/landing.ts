@@ -9,6 +9,7 @@ import {
   OG_TITLE,
   PAGE_DESCRIPTION,
   PAGE_TITLE,
+  PRODUCT_LABEL,
   PRODUCT_TITLE,
   PUBLIC_ORIGIN,
   RELEASE_FILENAME,
@@ -203,8 +204,26 @@ export function renderLanding(views: number, downloads: number): string {
       <span class="badge">Aziel Eliab only</span>
       <span class="badge">BYO inbound</span>
       <span class="badge">live_backends false</span>
+      <span class="badge">pilot_started false</span>
+      <span class="badge">${escapeHtml(PRODUCT_LABEL)}</span>
       <span class="badge">${escapeHtml(LICENSE)}</span>
     </p>
+
+    <section class="panel" id="softwares">
+      <h2>Local Softwares</h2>
+      <p>
+        ${escapeHtml(PRODUCT_LABEL)} is the installable product on your machine.
+        This page is the VibeLock Worker UI. You can use it without downloading first.
+        The plain command list is help, softwares, version, and health.
+        pilot_started is false. live_backends is false.
+        Field 1.0 is a later track.
+      </p>
+      <pre>npx tsx src/cli.ts help
+npx tsx src/cli.ts softwares
+npx tsx src/cli.ts version
+npx tsx src/cli.ts health</pre>
+      <p class="notice">Suite shell entry for this separate package: <a href="/suite-card.json">/suite-card.json</a>.</p>
+    </section>
 
     <section id="workspace">
       <div class="panel" id="honesty">
