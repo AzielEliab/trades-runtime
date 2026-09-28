@@ -1,4 +1,5 @@
 import { RUNTIME_MANIFEST } from "../manifest.js";
+import { LOCAL_SOFTWARES_LABEL, LOCAL_SOFTWARES_TRACK } from "./local-softwares-gate.js";
 
 /**
  * Option C start-gate conditions for the local desk.
@@ -7,7 +8,7 @@ import { RUNTIME_MANIFEST } from "../manifest.js";
  */
 
 export const OPTION_C_START_CLAIM =
-  "Option C remains prep until a human operator starts a real pilot. This panel does not start it. Option D is out of scope. No cutover automation is on this desk.";
+  "Option C remains prep until a human operator starts a real pilot. This panel does not start it. Option D is out of scope. No cutover automation is on this desk. Local Softwares 1.0 prep stays green and does not flip this gate.";
 
 export interface OptionCStartGateItem {
   id: string;
@@ -19,8 +20,12 @@ export interface OptionCStartGateItem {
 
 export interface OptionCStartGate {
   product: "trades-runtime";
+  product_label: typeof LOCAL_SOFTWARES_LABEL;
+  track: typeof LOCAL_SOFTWARES_TRACK;
   author: "Aziel Eliab";
   version: string;
+  field_claim: false;
+  company_os_live: false;
   generatedAt: string;
   live_backends: false;
   writes: false;
@@ -97,8 +102,12 @@ const GATE_COPY: readonly Omit<OptionCStartGateItem, "state" | "required">[] = [
 export function optionCStartGate(now: string): OptionCStartGate {
   return {
     product: "trades-runtime",
+    product_label: LOCAL_SOFTWARES_LABEL,
+    track: LOCAL_SOFTWARES_TRACK,
     author: "Aziel Eliab",
     version: RUNTIME_MANIFEST.version,
+    field_claim: false,
+    company_os_live: false,
     generatedAt: now,
     live_backends: false,
     writes: false,

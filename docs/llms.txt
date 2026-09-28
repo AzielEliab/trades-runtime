@@ -3,15 +3,18 @@
 > Local-first TypeScript operating system for field-trades companies.
 > Author / identity: Aziel Eliab only.
 X / Twitter: @AzielEliab https://x.com/AzielEliab
-> Version: 0.4.12 (repo and Worker source)
-> Deployed Worker is 0.4.12. x-product-version and /v1/health match this tip.
-> Public Glama listing: Version 0.3.4 / Latest pre-0.4.4. Stale relative to the deployed Worker. Not 0.4.12. glama.json version is the claim file, not the Glama Latest badge.
+> Version: 1.0.0-local (repo and Worker source)
+> Product label: Local Softwares 1.0 (installable). pilot_started false. live_backends false. Field 1.0 is a later track.
+> Worker source pin is 1.0.0-local. x-product-version and /v1/health in this source match that pin.
+> Already-running Worker checked 2026-09-28 is 0.4.12. This source does not deploy.
+> Public Glama listing: Version 0.3.4 / Latest pre-0.4.4. Stale and parked. Not 1.0.0-local. glama.json version is the claim file, not the Glama Latest badge. No Make Release.
 > Status: live-pure core + stubs. BYO local ServiceTitan + ProBooks. Option C code-ready / pilot not started. Option D not started. No live backends. Pages off. Public get is the giveaway Worker.
 
 Product is src/. docs/ is a thin local UI. Implementer specs are at repo-root specs/. Public download: https://trades-runtime.vibelock.workers.dev/download
 
 ## Software
 
+- Local Softwares 1.0 plain list: help, softwares, version, health
 - npx tsx src/cli.ts help — command list (--help, -h)
 - npx tsx src/cli.ts softwares — module slug, status, and one line (Softwares in any letter case)
 - npx tsx src/cli.ts version — product name and version, plus live_backends false / pilot_started false (--version, -V)

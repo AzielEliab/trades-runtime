@@ -109,6 +109,8 @@ export {
   SYNTHETIC_INBOUND_FRAGMENTS
 } from "./domain/inbound-quality.js";
 export { optionCStartGate } from "./spine/option-c-start-gate.js";
+export { azInterfaceSuiteCard } from "./spine/azinterface-suite-card.js";
+export { localSoftwaresGate, plainSoftwaresLead } from "./spine/local-softwares-gate.js";
 export {
   buildWorkTogether,
   nameCollaborations,

@@ -213,7 +213,7 @@ describe("0.4.8 ranked performance board", () => {
 
 describe("0.4.8 desk surfaces", () => {
   it("shows both Softwares on the synthetic desk and on the loopback routes", async () => {
-    expect(RUNTIME_MANIFEST.version).toBe("0.4.12");
+    expect(RUNTIME_MANIFEST.version).toBe("1.0.0-local");
     expect(RUNTIME_MANIFEST.live_backends).toBe(false);
     expect(RUNTIME_MANIFEST.pilot_started).toBe(false);
     const root = mkdtempSync(join(tmpdir(), "tr-desk-048-"));

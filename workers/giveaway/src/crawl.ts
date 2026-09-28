@@ -1,7 +1,6 @@
 import {
   AUTHOR,
   CITE_SAME_AS,
-  DEPLOYED_WORKER_VERSION,
   GLAMA_LISTING_NOTE,
   GLAMA_PUBLIC_LATEST,
   GLAMA_PUBLIC_VERSION,
@@ -10,6 +9,9 @@ import {
   HONESTY,
   IDENTITY,
   LICENSE,
+  OBSERVED_LIVE_WORKER_CHECKED,
+  OBSERVED_LIVE_WORKER_VERSION,
+  PRODUCT_LABEL,
   PERSON_ID,
   PERSON_SAME_AS,
   PERSON_URL,
@@ -69,7 +71,9 @@ Trades-Runtime is a shadow-first, local-first TypeScript runtime for HVAC, plumb
 
 Public name: Trades-Runtime (trades-runtime). Author / identity: Aziel Eliab only (Person @id ${PERSON_ID}).
 Version: ${VERSION} (Worker source). License: ${LICENSE}.
-Deployed Worker is ${DEPLOYED_WORKER_VERSION}. x-product-version and /v1/health match this tip.
+Product label: ${PRODUCT_LABEL} (installable). pilot_started false. Field 1.0 is a later track.
+Worker source pin is ${VERSION}. x-product-version and /v1/health in this source match that pin.
+Already-running Worker checked ${OBSERVED_LIVE_WORKER_CHECKED} is ${OBSERVED_LIVE_WORKER_VERSION}. This source does not deploy.
 Public Glama listing: Version ${GLAMA_PUBLIC_VERSION} / Latest ${GLAMA_PUBLIC_LATEST}. Stale relative to the deployed Worker. Not ${VERSION}. ${GLAMA_LISTING_NOTE}
 Worker: ${PUBLIC_ORIGIN}
 GitHub: ${REPOSITORY}

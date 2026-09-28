@@ -1,3 +1,4 @@
+import { RUNTIME_MANIFEST } from "../manifest.js";
 import type { OperatorSnapshot } from "./snapshot.js";
 
 function esc(value: string): string {
@@ -191,7 +192,7 @@ export function renderPrintableSnapshot(snapshot: OperatorSnapshot): string {
 </head>
 <body>
   <main>
-    <p class="kicker">Trades-Runtime ${esc(snapshot.version)} · ${esc(snapshot.author)} · local snapshot</p>
+    <p class="kicker">Trades-Runtime ${esc(snapshot.version)} · ${esc(RUNTIME_MANIFEST.product_label)} · ${esc(snapshot.author)} · local snapshot</p>
     <h1>Desk snapshot</h1>
     <p>Taken ${esc(snapshot.generatedAt)} from this machine. This page does not phone home.</p>
     <p><button type="button" onclick="window.print()">Print or save as PDF</button></p>
@@ -440,7 +441,7 @@ export function renderPrintableHuddle(snapshot: OperatorSnapshot): string {
 </head>
 <body>
   <main>
-    <p class="kicker">Trades-Runtime ${esc(snapshot.version)} · ${esc(snapshot.author)} · morning huddle</p>
+    <p class="kicker">Trades-Runtime ${esc(snapshot.version)} · ${esc(RUNTIME_MANIFEST.product_label)} · ${esc(snapshot.author)} · morning huddle</p>
     <h1>Morning huddle</h1>
     <p>Mission day ${esc(snapshot.huddle.missionDay)}. Taken ${esc(snapshot.generatedAt)} from this machine. This page does not phone home.</p>
     <p><button type="button" onclick="window.print()">Print or save as PDF</button></p>

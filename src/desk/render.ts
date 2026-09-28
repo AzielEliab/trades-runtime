@@ -1,4 +1,5 @@
 import { callFilterLabel, type CallDeskFilter } from "../domain/call-class.js";
+import { RUNTIME_MANIFEST } from "../manifest.js";
 import { explainMissionPace } from "../domain/mission-board.js";
 import { capacityChart, countBars, coverageMap, jobsChart, milesChart, positionMap, rankedBars } from "./charts.js";
 import type { OperatorSnapshot } from "./snapshot.js";
@@ -1313,7 +1314,7 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
   <main class="wrap">
     <header class="top">
       <div>
-        <p class="kicker">Trades-Runtime ${esc(snapshot.version)} · ${esc(snapshot.author)} · local operator desk</p>
+        <p class="kicker">Trades-Runtime ${esc(snapshot.version)} · ${esc(RUNTIME_MANIFEST.product_label)} · ${esc(snapshot.author)} · local operator desk</p>
         <h1>The day, on this machine.</h1>
       </div>
       <div class="actions">

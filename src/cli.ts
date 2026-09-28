@@ -7,6 +7,7 @@ import { printDropInDemo } from "./demo/drop-in.js";
 import { printSealedShadowDemo } from "./demo/shadow-sealed.js";
 import { startOperatorDesk } from "./desk/server.js";
 import { healthLocal } from "./spine/health-local.js";
+import { plainSoftwaresLead } from "./spine/local-softwares-gate.js";
 import { runOptionCPrep } from "./spine/option-c-prep.js";
 
 function flagValue(argv: string[], name: string): string | undefined {
@@ -17,7 +18,9 @@ function flagValue(argv: string[], name: string): string | undefined {
 
 export function helpText(): string {
   return [
-    "trades-runtime — local-first TypeScript runtime (Aziel Eliab)",
+    "trades-runtime — Local Softwares 1.0 (installable)",
+    "local-first TypeScript runtime (Aziel Eliab)",
+    "Humans use the giveaway Worker UI on the VibeLock host without downloading first.",
     "",
     "  npx tsx src/cli.ts help                  print this help (--help, -h)",
     "  npx tsx src/cli.ts softwares             list Softwares modules (slug, status, one line)",
@@ -38,6 +41,7 @@ export function helpText(): string {
     "",
     "softwares also accepts Softwares in any letter case.",
     "BYO local ServiceTitan, ProBooks, and trades-app inbound. No live writes. Credentials stay on this machine.",
+    "Local Softwares 1.0 is not a Field 1.0 claim and it is not a live company OS.",
     "Option C code-ready / pilot not started. Option D not started. Pages intentionally disabled.",
     "Public get (if deployed): https://trades-runtime.vibelock.workers.dev — giveaway Worker UI without downloading first. Optional counted tarball at /download.",
     "The public Worker does not host this desk or tenant metrics.",
@@ -49,8 +53,8 @@ export function softwaresText(): string {
   const live = RUNTIME_MANIFEST.live_backends ? "true" : "false";
   const pilot = RUNTIME_MANIFEST.pilot_started ? "true" : "false";
   const lines = [
-    `${RUNTIME_MANIFEST.product} Softwares`,
-    `Author: ${RUNTIME_MANIFEST.author}`,
+    plainSoftwaresLead(),
+    "",
     "Each module is a slug, a status, and one line about what it does.",
     `live_backends ${live}. pilot_started ${pilot}.`,
     ""
@@ -69,6 +73,7 @@ export function versionText(): string {
   const pilot = RUNTIME_MANIFEST.pilot_started ? "true" : "false";
   return [
     `${RUNTIME_MANIFEST.product} ${RUNTIME_MANIFEST.version}`,
+    `${RUNTIME_MANIFEST.product_label} (installable). Not a Field 1.0 claim. Not a live company OS.`,
     `live_backends ${live}. pilot_started ${pilot}.`,
     ""
   ].join("\n");

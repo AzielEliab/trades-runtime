@@ -6,7 +6,7 @@ Public giveaway. Humans use the Worker UI on this VibeLock host (browser / PWA) 
 - **Worker name:** `trades-runtime`
 - **Intended URL:** https://trades-runtime.vibelock.workers.dev
 - **License:** Apache-2.0
-- **Product version:** 0.4.12 (Worker source). The giveaway Worker version pin is 0.4.12 (`x-product-version` and `/v1/health` in this source). Public Glama listing Version is 0.3.4 and Latest is pre-0.4.4 (stale; checked 2026-09-27, releaseVersion still 0.3.4). Those Glama badges are not this package version. This cite interlock does not deploy.
+- **Product version:** 1.0.0-local (Worker source). Product label: Local Softwares 1.0 (installable). The giveaway Worker source pin is 1.0.0-local (`x-product-version` and `/v1/health` in this source). Public Glama listing Version is 0.3.4 and Latest is pre-0.4.4 (stale; checked 2026-09-27, releaseVersion still 0.3.4). Those Glama badges are not this package version. Parked. No Make Release. Checked 2026-09-28: the already-running Worker is still 0.4.12. This cite does not deploy. pilot_started false. live_backends false. Field 1.0 is a later track.
 
 This Worker does not ingest ServiceTitan dumps, does not write to ServiceTitan or ProBooks, and does not store tenant data. `live_backends` is false.
 
@@ -84,7 +84,7 @@ npx wrangler kv namespace create COUNTS
 # paste the id into wrangler.jsonc → kv_namespaces[0].id
 # (replace the placeholder 00000000000000000000000000000000)
 
-npm run pack          # builds release/trades-runtime-0.4.12.tgz via npm pack
+npm run pack          # builds release/trades-runtime-1.0.0-local.tgz via npm pack
 npx wrangler deploy   # Worker name trades-runtime → trades-runtime.vibelock.workers.dev
 # COUNTS KV is already bound (id in wrangler.jsonc). Do not recreate unless the namespace is gone.
 ```

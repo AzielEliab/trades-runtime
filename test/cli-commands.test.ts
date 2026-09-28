@@ -37,7 +37,8 @@ describe("common CLI commands", () => {
 
   it("lists Softwares modules in plain language", () => {
     const text = softwaresText();
-    expect(text).toMatch(/trades-runtime Softwares/);
+    expect(text).toMatch(/Local Softwares 1\.0 \(installable\)/);
+    expect(text).toMatch(/without downloading first/);
     expect(text).toMatch(/Author: Aziel Eliab/);
     expect(text).not.toMatch(/^\s*\{/m);
     expect(text).not.toMatch(/"slug"/);
@@ -52,7 +53,8 @@ describe("common CLI commands", () => {
   it("prints the product version and the honesty line", () => {
     const text = versionText();
     expect(text).toContain(`${RUNTIME_MANIFEST.product} ${RUNTIME_MANIFEST.version}`);
-    expect(text).toContain("0.4.12");
+    expect(text).toContain("1.0.0-local");
+    expect(text).toContain("Local Softwares 1.0");
     expect(text).toMatch(/live_backends false\. pilot_started false\./);
     expect(planCli(["node", "cli.ts", "version"]).text).toBe(text);
     expect(planCli(["node", "cli.ts", "--version"]).text).toBe(text);
@@ -103,7 +105,7 @@ describe("common CLI commands", () => {
 
     const version = runCli(["version"]);
     expect(version.status).toBe(0);
-    expect(version.stdout).toContain("trades-runtime 0.4.12");
+    expect(version.stdout).toContain("trades-runtime 1.0.0-local");
     expect(version.stdout).toMatch(/live_backends false\. pilot_started false\./);
 
     const health = runCli(["health"]);

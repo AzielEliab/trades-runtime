@@ -1,15 +1,19 @@
 export const PRODUCT = "trades-runtime";
 export const PRODUCT_TITLE = "Trades-Runtime";
-export const VERSION = "0.4.12";
-/** Public Glama listing badge. Not this Worker package. Not glama.json. Stale vs the live Worker. */
+export const VERSION = "1.0.0-local";
+export const PRODUCT_LABEL = "Local Softwares 1.0";
+/** Public Glama listing badge. Not this Worker package. Not glama.json. Stale vs the Worker source pin. */
 export const GLAMA_PUBLIC_VERSION = "0.3.4";
 export const GLAMA_PUBLIC_LATEST = "pre-0.4.4";
-/** Checked 2026-09-27. Glama releaseVersion is still 0.3.4. Do not cite the listing as 0.4.12. */
+/** Checked 2026-09-27. Glama releaseVersion is still 0.3.4. Do not cite the listing as 1.0.0-local. */
 export const GLAMA_LISTING_STALE = true;
-/** Giveaway Worker version pin. Moves with this repo. Not the Glama listing. */
-export const DEPLOYED_WORKER_VERSION = "0.4.12";
+/** Giveaway Worker source pin. Moves with this repo. Not the Glama listing and not a deploy claim. */
+export const DEPLOYED_WORKER_VERSION = "1.0.0-local";
+/** Already-running Worker /v1/health. Checked 2026-09-28. This source does not deploy. */
+export const OBSERVED_LIVE_WORKER_VERSION = "0.4.12";
+export const OBSERVED_LIVE_WORKER_CHECKED = "2026-09-28";
 export const GLAMA_LISTING_NOTE =
-  "Public Glama listing Version is 0.3.4 and Latest is pre-0.4.4. Checked 2026-09-27 on https://glama.ai/mcp/servers/AzielEliab/trades-runtime: the public badge is still releaseVersion 0.3.4 (tool updates v0.3.4, observedAt 2026-09-25). That listing is stale. It is not 0.4.12. The version field is this repo and the Worker source. glama.json version is the in-repo claim file, not the Glama Latest badge. The giveaway Worker version pin in this repo is 0.4.12. This cite does not claim the Glama listing is 0.4.12.";
+  "Public Glama listing Version is 0.3.4 and Latest is pre-0.4.4. Checked 2026-09-27 on https://glama.ai/mcp/servers/AzielEliab/trades-runtime: the public badge is still releaseVersion 0.3.4 (tool updates v0.3.4, observedAt 2026-09-25). That listing is stale and parked. No Make Release in this cut. It is not 1.0.0-local. The version field is this repo and the Worker source. glama.json version is the in-repo claim file, not the Glama Latest badge. The giveaway Worker source pin in this repo is 1.0.0-local and matches the package and the manifest. Checked 2026-09-28: the already-running Worker /v1/health is still 0.4.12. This cite does not deploy and does not claim the Glama listing is 1.0.0-local. Product label: Local Softwares 1.0 (installable). pilot_started false. live_backends false. Field 1.0 is a later track.";
 export const AUTHOR = "Aziel Eliab";
 export const IDENTITY = "Aziel Eliab";
 export const LICENSE = "Apache-2.0";
@@ -29,7 +33,7 @@ export const X_HANDLE = "@AzielEliab";
 
 export const PAGE_TITLE = `${PRODUCT_TITLE} · public giveaway · ${VERSION}`;
 export const PAGE_DESCRIPTION =
-  "Trades-Runtime — use the giveaway Worker UI on this VibeLock host without downloading first. Shadow-first local BYO runtime for HVAC, plumbing, electrical, sewer, and cross-trades. Author Aziel Eliab. live_backends false.";
+  "Trades-Runtime — Local Softwares 1.0 (installable). Use the giveaway Worker UI on this VibeLock host without downloading first. Shadow-first local BYO runtime for HVAC, plumbing, electrical, sewer, and cross-trades. Author Aziel Eliab. live_backends false. pilot_started false.";
 export const OG_TITLE = "Trades-Runtime by Aziel Eliab";
 export const OG_DESCRIPTION =
   "Use the giveaway UI on this VibeLock Worker. Local-first BYO field-trades runtime. The operator desk still installs on your machine.";
@@ -168,6 +172,7 @@ export const SITEMAP_ENTRIES = [
   { path: "/download", changefreq: "daily", priority: "0.95" },
   { path: "/local-desk", changefreq: "weekly", priority: "0.8" },
   { path: "/cite.json", changefreq: "daily", priority: "0.9" },
+  { path: "/suite-card.json", changefreq: "daily", priority: "0.85" },
   { path: "/llms.txt", changefreq: "daily", priority: "0.9" },
   { path: "/ai.txt", changefreq: "daily", priority: "0.9" },
   { path: "/humans.txt", changefreq: "weekly", priority: "0.7" },

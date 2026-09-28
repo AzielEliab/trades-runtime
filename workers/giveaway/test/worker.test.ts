@@ -60,6 +60,9 @@ describe("giveaway Worker routes", () => {
     expect(html).toContain(AUTHOR);
     expect(html).toContain("BYO");
     expect(html).toContain("Use Trades-Runtime on this VibeLock Worker.");
+    expect(html).toContain("Local Softwares 1.0");
+    expect(html).toContain("npx tsx src/cli.ts softwares");
+    expect(html).toContain("pilot_started false");
     expect(html).toContain("without downloading first");
     expect(html).toContain("local-first");
     expect(html).toContain("your machine");
@@ -194,7 +197,10 @@ describe("giveaway Worker routes", () => {
     expect(cite.sameAs).not.toContain("https://glama.ai");
     expect((cite as { glama_public_version?: string }).glama_public_version).toBe("0.3.4");
     expect((cite as { glama_public_latest?: string }).glama_public_latest).toBe("pre-0.4.4");
-    expect((cite as { deployed_worker_version?: string }).deployed_worker_version).toBe("0.4.12");
+    expect((cite as { deployed_worker_version?: string }).deployed_worker_version).toBe("1.0.0-local");
+    expect((cite as { observed_live_worker_version?: string }).observed_live_worker_version).toBe("0.4.12");
+    expect((cite as { product_label?: string }).product_label).toBe("Local Softwares 1.0");
+    expect((cite as { pilot_started?: boolean }).pilot_started).toBe(false);
     expect((cite as { glama_listing_stale?: boolean }).glama_listing_stale).toBe(true);
     expect(cite.version).toBe((cite as { deployed_worker_version?: string }).deployed_worker_version);
     expect(cite.version).not.toBe((cite as { glama_public_version?: string }).glama_public_version);
@@ -204,6 +210,28 @@ describe("giveaway Worker routes", () => {
     expect(cite.compatible_ai_clients).toEqual([...COMPATIBLE_AI_CLIENTS]);
     expect(cite.honesty).toMatch(/Local-first BYO runtime/);
     expect(cite.not).toBeUndefined();
+    const suite = await (await hit(env, "/suite-card.json")).json() as {
+      kind: string;
+      separate_package: boolean;
+      fraggate_engine: boolean;
+      fraggate_call: boolean;
+      pilot_started: boolean;
+      live_backends: boolean;
+      product_label: string;
+      version: string;
+      door: string;
+      ui_cmd: string;
+    };
+    expect(suite.kind).toBe("azinterface-suite-card");
+    expect(suite.separate_package).toBe(true);
+    expect(suite.fraggate_engine).toBe(false);
+    expect(suite.fraggate_call).toBe(false);
+    expect(suite.pilot_started).toBe(false);
+    expect(suite.live_backends).toBe(false);
+    expect(suite.product_label).toBe("Local Softwares 1.0");
+    expect(suite.version).toBe(VERSION);
+    expect(suite.door).toBe("none");
+    expect(suite.ui_cmd).toBe("npx tsx src/cli.ts desk");
     expect(JSON.stringify(cite)).not.toMatch(/Not aziel-runtime/);
     expect(JSON.stringify(cite)).not.toMatch(/Not a FragGate/);
     expect(JSON.stringify(cite)).not.toMatch(/Zenodo/);
@@ -298,6 +326,7 @@ describe("giveaway Worker routes", () => {
       "/download",
       "/local-desk",
       "/cite.json",
+      "/suite-card.json",
       "/llms.txt",
       "/ai.txt",
       "/humans.txt",
@@ -372,11 +401,13 @@ describe("giveaway Worker routes", () => {
     expect(visible).not.toMatch(/15:20/);
 
     const llms = await (await hit(env, "/llms.txt")).text();
-    expect(llms).toContain("Deployed Worker is 0.4.12");
+    expect(llms).toContain("Worker source pin is 1.0.0-local");
+    expect(llms).toContain("Already-running Worker checked 2026-09-28 is 0.4.12");
     expect(llms).toContain("without downloading first");
-    expect(llms).toContain("Stale relative to the deployed Worker");
+    expect(llms).toContain("Stale and parked");
     expect(llms).not.toMatch(/does not claim the public Worker is already/);
-    expect(ai).toContain("Deployed Worker is 0.4.12");
+    expect(ai).toContain("Worker source pin is 1.0.0-local");
+    expect(ai).toContain("Already-running Worker checked 2026-09-28 is 0.4.12");
     expect(ai).toContain("without downloading first");
     expect(ai).not.toMatch(/does not claim the public Worker is already/);
     expect(llms).toContain("/ai.txt");

@@ -2,7 +2,12 @@
   "product": "trades-runtime",
   "name": "Trades-Runtime",
   "title": "Trades-Runtime",
-  "version": "0.4.12",
+  "version": "1.0.0-local",
+  "product_label": "Local Softwares 1.0",
+  "track": "L",
+  "pilot_started": false,
+  "field_claim": false,
+  "company_os_live": false,
   "author": "Aziel Eliab",
   "identity": "Aziel Eliab",
   "person_id": "https://www.azieleliab.com/#aziel",
@@ -17,8 +22,11 @@
   "glama_public_version": "0.3.4",
   "glama_public_latest": "pre-0.4.4",
   "glama_listing_stale": true,
-  "deployed_worker_version": "0.4.12",
-  "glama_note": "Public Glama listing Version is 0.3.4 and Latest is pre-0.4.4. Checked 2026-09-27 on https://glama.ai/mcp/servers/AzielEliab/trades-runtime: the public badge is still releaseVersion 0.3.4 (tool updates v0.3.4, observedAt 2026-09-25). That listing is stale. It is not 0.4.12. The version field above is this repo and the Worker source. It is not the Glama Latest badge. glama.json version is the in-repo claim file, not the Glama Latest badge. The giveaway Worker version pin in this repo is 0.4.12. This cite does not claim the Glama listing is 0.4.12.",
+  "deployed_worker_version": "1.0.0-local",
+  "observed_live_worker_version": "0.4.12",
+  "observed_live_worker_checked": "2026-09-28",
+  "suite_card": "https://trades-runtime.vibelock.workers.dev/suite-card.json",
+  "glama_note": "Public Glama listing Version is 0.3.4 and Latest is pre-0.4.4. Checked 2026-09-27 on https://glama.ai/mcp/servers/AzielEliab/trades-runtime: the public badge is still releaseVersion 0.3.4 (tool updates v0.3.4, observedAt 2026-09-25). That listing is stale and parked. No Make Release in this cut. It is not 1.0.0-local. The version field above is this repo and the Worker source. It is not the Glama Latest badge. glama.json version is the in-repo claim file, not the Glama Latest badge. The giveaway Worker source pin in this repo is 1.0.0-local. Checked 2026-09-28: the already-running Worker /v1/health is still 0.4.12. This cite does not deploy and does not claim the Glama listing is 1.0.0-local. Product label: Local Softwares 1.0 (installable). pilot_started false. live_backends false. Field 1.0 is a later track.",
   "doi": null,
   "repository": "https://github.com/AzielEliab/trades-runtime",
   "public_surface": "https://trades-runtime.vibelock.workers.dev",
@@ -47,6 +55,6 @@
     "ProBooks",
     "Aziel Eliab"
   ],
-  "how_to_cite": "Aziel Eliab, Trades-Runtime 0.4.12, https://trades-runtime.vibelock.workers.dev/cite.json (Person @id https://www.azieleliab.com/#aziel)",
-  "description": "Local-first TypeScript runtime for shadow-first field-trades operating intelligence. BYO local ServiceTitan + ProBooks inbound. Pages off. Humans use the giveaway Worker UI on the VibeLock host without downloading first. The counted tarball is optional."
+  "how_to_cite": "Aziel Eliab, Trades-Runtime 1.0.0-local (Local Softwares 1.0), https://trades-runtime.vibelock.workers.dev/cite.json (Person @id https://www.azieleliab.com/#aziel)",
+  "description": "Installable Local Softwares 1.0. Local-first TypeScript runtime for shadow-first field-trades operating intelligence. BYO local ServiceTitan + ProBooks inbound. Pages off. Humans use the giveaway Worker UI on the VibeLock host without downloading first. The counted tarball is optional. pilot_started false. live_backends false. Field 1.0 is a later track."
 }

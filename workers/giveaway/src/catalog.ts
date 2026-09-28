@@ -7,6 +7,9 @@ import {
   KEYWORDS,
   DEPLOYED_WORKER_VERSION,
   GLAMA_LISTING_NOTE,
+  OBSERVED_LIVE_WORKER_CHECKED,
+  OBSERVED_LIVE_WORKER_VERSION,
+  PRODUCT_LABEL,
   GLAMA_LISTING_STALE,
   GLAMA_PUBLIC_LATEST,
   GLAMA_PUBLIC_VERSION,
@@ -63,10 +66,13 @@ export function healthBody(releaseReady: boolean, releaseBytes: number | null): 
     product: PRODUCT,
     title: PRODUCT_TITLE,
     version: VERSION,
+    product_label: PRODUCT_LABEL,
     author: AUTHOR,
     identity: IDENTITY,
     license: LICENSE,
     live_backends: false,
+    pilot_started: false,
+    field_claim: false,
     hosted_company_os: false,
     tenant_data: false,
     servicetitan_write: false,
@@ -88,11 +94,15 @@ export function citeBody(): Record<string, unknown> {
     name: PRODUCT_TITLE,
     title: PRODUCT_TITLE,
     version: VERSION,
+    product_label: PRODUCT_LABEL,
+    track: "L",
     author: AUTHOR,
     identity: IDENTITY,
     person_id: PERSON_ID,
     license: LICENSE,
     live_backends: false,
+    pilot_started: false,
+    field_claim: false,
     hosted_company_os: false,
     pages: "off",
     glama_listing: false,
@@ -100,6 +110,9 @@ export function citeBody(): Record<string, unknown> {
     glama_public_latest: GLAMA_PUBLIC_LATEST,
     glama_listing_stale: GLAMA_LISTING_STALE,
     deployed_worker_version: DEPLOYED_WORKER_VERSION,
+    observed_live_worker_version: OBSERVED_LIVE_WORKER_VERSION,
+    observed_live_worker_checked: OBSERVED_LIVE_WORKER_CHECKED,
+    suite_card: `${PUBLIC_ORIGIN}/suite-card.json`,
     glama_note: GLAMA_LISTING_NOTE,
     repository: REPOSITORY,
     worker: PUBLIC_ORIGIN,
@@ -134,8 +147,10 @@ export function llmsTxt(): string {
 > Author / identity: Aziel Eliab only. Person @id ${PERSON_ID}
 > X / Twitter: ${X_HANDLE} ${X_URL}
 > Version: ${VERSION} (Worker source in this repo)
-> Deployed Worker is ${DEPLOYED_WORKER_VERSION}. x-product-version and /v1/health match this tip.
-> Public Glama listing: Version ${GLAMA_PUBLIC_VERSION} / Latest ${GLAMA_PUBLIC_LATEST}. Stale relative to the deployed Worker. Not ${VERSION}.
+> Product label: ${PRODUCT_LABEL} (installable). pilot_started false. live_backends false. Field 1.0 is a later track.
+> Worker source pin is ${VERSION}. x-product-version and /v1/health in this source match that pin.
+> Already-running Worker checked ${OBSERVED_LIVE_WORKER_CHECKED} is ${OBSERVED_LIVE_WORKER_VERSION}. This source does not deploy.
+> Public Glama listing: Version ${GLAMA_PUBLIC_VERSION} / Latest ${GLAMA_PUBLIC_LATEST}. Stale and parked. Not ${VERSION}. No Make Release.
 > License: ${LICENSE}
 > Worker: ${PUBLIC_ORIGIN}
 
@@ -143,6 +158,8 @@ ${HONESTY.product}
 
 ## Dual surface
 - Humans: ${PUBLIC_ORIGIN}/ — giveaway Worker UI on this VibeLock host (browser / PWA) without downloading first
+- Plain commands on the installed package: help, softwares, version, health
+- Suite shell card: ${PUBLIC_ORIGIN}/suite-card.json
 - Agents: POST ${PUBLIC_ORIGIN}/mcp · ${PUBLIC_ORIGIN}/openapi.json · ${PUBLIC_ORIGIN}/llms.txt · ${PUBLIC_ORIGIN}/ai.txt
 - Optional pack: counted GET ${PUBLIC_ORIGIN}/download (${RELEASE_FILENAME}). The operator desk with your own ServiceTitan and ProBooks installs locally from that pack.
 
@@ -231,6 +248,11 @@ export function openApiSpec(): Record<string, unknown> {
       "/stats": { get: { summary: "Alias of /v1/stats." } },
       "/count": { get: { summary: "Alias of /v1/stats (fleet download-tracker shape)." } },
       "/cite.json": { get: { summary: "Public cite. Does not increment counters." } },
+      "/suite-card.json": {
+        get: {
+          summary: "AZInterface suite shell entry for this separate package. Does not increment counters."
+        }
+      },
       "/llms.txt": { get: { summary: "LLM-oriented product text." } },
       "/ai.txt": { get: { summary: "Honest trades product lead for agents and crawlers." } },
       "/humans.txt": { get: { summary: "Short human pointer to the Worker UI, with the optional counted pack at /download." } },
