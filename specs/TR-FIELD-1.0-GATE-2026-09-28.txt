@@ -1,0 +1,179 @@
+TRADES-RUNTIME · FIELD SOFTWARES 1.0 GATE                                                                                        TR-FIELD-1.0-GATE-2026-09-28
+
+
+
+
+ Receipt ID TR-FIELD-1.0-GATE-2026-09-28 · 2026-09-28
+ Identity: Aziel Eliab only.
+ Track F. Field Softwares 1.0. Local / pilot. Not company OS live.
+ This paper is the product law for that claim, then the green / open / blocked checklist.
+ The claim is not made here. It stays blocked until a real Option C pilot.
+ live_backends remains false. pilot_started remains false. Pages remain off.
+ No ServiceTitan or ProBooks live writes. No Make Release. This paper does not deploy the Worker.
+ This paper does not bump the package, the manifest, glama.json, or the Worker source pin.
+ Local Softwares 1.0 (Track L, 1.0.0-local) is already shipped. That label is not Field 1.0.
+ Do not claim Field 1.0 off Local Softwares 1.0 alone.
+
+
+ Product law (verbatim)
+
+TRACK F — Field Softwares 1.0 ONLY after a real Option C pilot
+- BLOCKED until the operator starts a real pilot (pilot_started true with real Option C).
+- Same shared gate as Office. Office Softwares 1.0 is TR-OFFICE-1.0-GATE-2026-09-28.
+- Do not mix Field flags into Office PRs. Do not mix Field waves into Track L PRs.
+- Then, as separate Softwares waves, not one mixed cut:
+  1. Field flags: needs-parts, safety, escalation, van-down, callback-risk.
+     Draft only. Open PR #23 on branch cursor/field-flags-34af. Do not merge it here.
+  2. Field time, coverage, and right-tech under pilot files.
+     The local APIs already exist in the 0.4.10 ops cut. Pilot files are not this paper.
+  3. Phone-width mobile desk as the field surface. The layout is already local.
+  4. Settlement path, then Option D, as later separate waves.
+- Messaging: Field Softwares 1.0 (local / pilot) — never company OS live.
+- No fake GPS. No fake telematics. No accuracy percent.
+- KEEP: live_backends=false; no ST/ProBooks live writes; Pages off; Glama parked (no Make Release).
+- Do NOT flip pilot_started or live_backends in this paper or in code.
+
+Ladder today: A done, B done-in-software, C code-ready / pilot not started, D not started.
+
+
+ Version
+    Package, manifest, glama.json claim file, and the giveaway Worker source pin stay 1.0.0-local.
+    The product label already shipped is Local Softwares 1.0 (installable). That label is Track L.
+    Field Softwares 1.0 is not that label.
+    TR-1.0-GATE-2026-09-28 recorded the already-running Worker as 0.4.12 at that cut's check.
+    This paper does not rewrite that check and does not deploy.
+    A read of https://trades-runtime.vibelock.workers.dev/v1/health on 2026-09-28
+    returned version 1.0.0-local, product_label Local Softwares 1.0,
+    pilot_started false, live_backends false, field_claim false.
+    That read is Local Softwares 1.0 on the giveaway Worker. It is not a Field 1.0 claim
+    and it is not a version bump.
+    Public Glama listing stays the Track L parked check: Version 0.3.4, Latest pre-0.4.4
+    (checked 2026-09-27). This paper does not Make Release and does not publish a new badge number.
+    glama.json version is the in-repo claim file, not that badge.
+
+
+ Checklist
+
+ GREEN mobile-desk
+    The local operator desk is usable at about 375px.
+    Viewport-fit cover, safe-area padding, a sticky domain nav, 44px controls,
+    and in-panel scroll for monitors and tables.
+    npm run desk still binds 127.0.0.1:4174. There is no tenant data-entry form on that page.
+    This layout is what a later field surface reuses. It is not Field 1.0 by itself.
+    Paper: TR-MOBILE-DESK-2026-09-27. That cut did not add a flag form or a flag route.
+
+ GREEN time-coverage-right-tech
+    Local APIs already on the Monitoring panel from the 0.4.10 ops cut.
+    GET /api/time-tracking reads local time cards (clocked, elapsed, estimated remaining,
+    idle and travel). Not a live GPS feed. Not a telematics vendor.
+    GET /api/coverage counts zip, county, city, and road from a local file.
+    Layer switches are a local POST. vendorWrite false. Not a live map tile.
+    GET /api/right-tech and GET /api/tech-fit suggest from geolocation, time remaining, and skill fit.
+    Friction and heavy local drive minutes are flags, not a dispatch. Geography is not the only factor.
+    A later field wave may point these at pilot files. This paper does not place those files.
+
+ GREEN human-authority
+    The Human Authority Rule is on Monitoring and on alert-action stubs.
+    A suggestion is not an order, a ticket, or a dispatch write.
+    ServiceTitan and ProBooks stay read-only. Human authority wins.
+    invented accuracy stays off the desk. A checklist score is not an accuracy percent.
+
+ GREEN local-softwares-base
+    Track L Local Softwares 1.0 is the installable base Field will sit on.
+    Common commands, the plain Softwares list, Option C prep, and the local desk stay.
+    That base does not make a Field 1.0 claim. field_launch stays false. field_claim stays false.
+
+ GREEN option-c-prep
+    npm run pilot:prep checks the operator box and prints a receipt with pilot_started false.
+    It does not start the pilot.
+    The start-gate panel keeps every row blocked-until.
+    Ladder: A done, B done-in-software, C code-ready / pilot not started, D not started.
+
+ GREEN honesty-flags
+    live_backends false. pilot_started false. Pages off.
+    ServiceTitan and ProBooks writes stay refused.
+    No fake GPS, no fake telematics, and no hosted analytics.
+
+ OPEN field-1-0-gate
+    Field Softwares 1.0 (local / pilot) is the messaging once a real Option C pilot is underway.
+    The gate opens only when pilot_started is true with real Option C.
+    Today the shipped label remains Local Softwares 1.0.
+    Never company OS live. This paper does not retitle the product.
+
+ OPEN field-flags-wave
+    The field-flags Softwares wave is draft, not on this tree.
+    Open PR #23, branch cursor/field-flags-34af, draft paper TR-FIELD-FLAGS-2026-09-27
+    on that branch only.
+    Kinds named there: needsParts, safetyHold, customerEscalation, vanDown, callbackRisk.
+    Those are needs-parts, safety, escalation, van-down, and callback-risk.
+    Severity on that draft is info, watch, or hold. inventedAccuracy false. No accuracy percent.
+    Flags would live under data/runtime/<instanceId>/field-flags/ and raise on loopback only.
+    This paper does not merge PR #23, does not copy that code, and does not add the route.
+    The wave waits until the Option C pilot has started, then lands as its own Softwares cut.
+
+ OPEN pilot-data-labels
+    Under a pilot, time cards, coverage, positions, and miles that a human placed
+    stay labeled as that operator file.
+    A synthetic demo stays labeled synthetic. It is not a van, a route, or company actuals.
+    A label without a van id does not invent a van. Job notes are not scanned into a flag.
+    Empty folders stay empty. This paper does not place a company drop.
+
+ OPEN cite-after-health
+    Cite only after the suite cite matches /v1/health.
+    Checked 2026-09-28: GET https://aziel-runtime.vibelock.workers.dev/v1/software
+    still cites sister trades-runtime at 0.4.9.
+    software_tab false. fraggate_call false.
+    The same-day /v1/health read is 1.0.0-local. Those two numbers do not match.
+    Do not cite the suite row, the Glama badge, or a sister how-to line as Field 1.0.
+
+ BLOCKED option-c-pilot
+    Option C pilot has not started. This is the block today.
+    Field Softwares 1.0 stays blocked until an operator starts a real pilot
+    (pilot_started true with real Option C). Same shared gate as Office.
+    This checklist does not flip pilot_started.
+
+ BLOCKED option-d
+    Option D has not started.
+    The settlement path and Option D are later separate waves, after the pilot,
+    and they are not mixed into the field-flags wave.
+
+ BLOCKED live-backends
+    live_backends stays false. This paper does not flip it.
+    No hosted company OS. No live tenant pull. No live GPS feed.
+
+ BLOCKED writes
+    No ServiceTitan write client. No ProBooks write client. No trades-app write client.
+    A field flag, when that wave exists, writes a local file only.
+
+ BLOCKED pages
+    GitHub Pages stays off. No Pages workflow. PDFs stay offline.
+
+ BLOCKED glama-make-release
+    No Glama admin Deploy. No Make Release.
+    The parked public badge (Version 0.3.4 / Latest pre-0.4.4, checked 2026-09-27)
+    is not a Field 1.0 badge.
+
+ BLOCKED mix-into-other-prs
+    Do not mix Field flags into Office PRs.
+    Do not mix Field 1.0 into Track L PRs.
+    Do not claim Field 1.0 off Local Softwares 1.0 alone.
+    PR #23 stays a draft until a human merges it on its own, after the pilot gate is open.
+    This paper does not merge it.
+
+
+ What this cut does not do
+    It does not start the Option C pilot.
+    It does not start Option D.
+    It does not turn on live_backends.
+    It does not flip pilot_started.
+    It does not add a ServiceTitan or ProBooks write client.
+    It does not publish Pages.
+    It does not run a Glama admin Deploy or Make Release.
+    It does not bump the package, the manifest, glama.json, or the Worker source pin.
+    It does not deploy the Worker.
+    It does not claim Field Softwares 1.0 is live today.
+    It does not claim a live company OS.
+    It does not claim GPS, telematics, or an accuracy percent.
+    It does not merge PR #23.
+    It does not add field flags to the Office desk.
+    It does not treat Local Softwares 1.0 as Field 1.0.
