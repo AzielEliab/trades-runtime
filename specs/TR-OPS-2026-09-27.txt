@@ -6,8 +6,8 @@ Status: local desk. Pilot not started. Option C remains prep. Option D out of sc
 0.4.10 is a local Softwares cut on the existing Monitoring surface.
 No ServiceTitan or ProBooks write client. live_backends false. Pages off.
 No fake live GM pilot. No invented accuracy percent.
-No invented vendor brand. Glama listing stays 0.3.4 / Latest pre-0.4.4.
-This source does not claim Glama Latest.
+No invented vendor brand. Checked 2026-10-02: Glama Latest/releaseVersion is 1.0.0-local. The badge matches the Softwares cite tip.
+The badge matches the Softwares cite tip 1.0.0-local. This 0.4.10 cut is not that badge.
 
 1. Time tracking
    Local cards for the current call: clocked, elapsed, estimated remaining,
@@ -44,5 +44,5 @@ This source does not claim Glama Latest.
 
 The three sit on the Monitoring panel. They are not new desk menus.
 The giveaway Worker version pin in this repo moves to 0.4.10 with the package.
-Public Glama listing Version remains 0.3.4. This cut does not deploy the Worker.
+Checked 2026-10-02: Glama Latest/releaseVersion is 1.0.0-local. The badge matches the Softwares cite tip. This cut does not deploy the Worker.
 It does not start the Option C pilot.

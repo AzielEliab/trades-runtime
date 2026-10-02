@@ -102,10 +102,18 @@ const ITEMS: readonly LocalSoftwaresGateItem[] = [
       "The card is a suite shell entry for this separate package. FragGate door is none. fraggate_call does not execute this product. The live AZInterface catalog is a different surface."
   },
   {
-    id: "glama-parked",
+    id: "glama-latest-match",
     state: "green",
-    label: "Glama stays parked",
-    detail: "No Make Release in this cut. The claim-file pin moves with the repo. The public badge is not treated as this version."
+    label: "Glama Latest matches the cite tip",
+    detail:
+      "Checked 2026-10-02: Glama Latest/releaseVersion is 1.0.0-local. The badge matches the Softwares cite tip and the Worker source pin. Local Softwares 1.0. Not a Field 1.0 claim. Not Office Softwares 1.0. This cut does not Make Release and does not deploy."
+  },
+  {
+    id: "glama-public-badge",
+    state: "green",
+    label: "Public Glama Latest is 1.0.0-local",
+    detail:
+      "Checked 2026-10-02: https://glama.ai/mcp/servers/@AzielEliab/trades-runtime latestRelease.version is 1.0.0-local. pilot_started false. live_backends false."
   },
   {
     id: "pages-off",
@@ -119,13 +127,6 @@ const ITEMS: readonly LocalSoftwaresGateItem[] = [
     label: "Already-running Worker is still the previous pin",
     detail:
       "Checked 2026-09-28: https://trades-runtime.vibelock.workers.dev/v1/health is still 0.4.12. This cut does not deploy. Do not cite that live Worker as 1.0.0-local."
-  },
-  {
-    id: "glama-public-badge",
-    state: "open",
-    label: "Public Glama badge is still stale",
-    detail:
-      "Checked 2026-09-27: public Glama listing Version is 0.3.4 and Latest is pre-0.4.4 (releaseVersion 0.3.4). Parked. No Make Release."
   },
   {
     id: "azinterface-live-shell",

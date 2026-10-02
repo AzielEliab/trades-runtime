@@ -19,7 +19,7 @@ TRADES-RUNTIME · OFFICE SOFTWARES 1.0 GATE                                     
 OFFICE — Office Softwares 1.0 after a real Option C pilot on the local desk
 - Goal: claimable Office Softwares 1.0 after a real Option C pilot on the local desk (npm run desk → 127.0.0.1:4174).
 - BLOCKED until pilot_started true with real Option C. Same shared gate as Field.
-- KEEP: live_backends=false; no ST/ProBooks live writes; Pages off; Glama parked (no Make Release).
+- KEEP: live_backends=false; no ST/ProBooks live writes; Pages off; Glama Latest 1.0.0-local matches the Softwares tip (this paper does not Make Release).
 - Messaging: Office Softwares 1.0 (local / pilot) — never Field 1.0, never company OS live.
 - Do NOT flip pilot_started or live_backends in this paper or in code.
 - Do NOT mix Field flags, Field 1.0, or other Track F waves into an Office PR.
@@ -43,9 +43,10 @@ Ladder today: A done, B done-in-software, C code-ready / pilot not started, D no
     pilot_started false, live_backends false.
     That read is Local Softwares 1.0 on the giveaway Worker. It is not an Office 1.0 claim
     and it is not a version bump.
-    Public Glama listing stays the Track L parked check: Version 0.3.4, Latest pre-0.4.4
-    (checked 2026-09-27). This paper does not Make Release and does not publish a new badge number.
-    glama.json version is the in-repo claim file, not that badge.
+    Checked 2026-10-02: Glama Latest/releaseVersion is 1.0.0-local.
+    The badge matches the Softwares cite tip. Local Softwares 1.0.
+    This paper does not Make Release and does not deploy.
+    glama.json version is the in-repo claim file and matches that badge.
 
 
  Checklist
@@ -121,8 +122,10 @@ Ladder today: A done, B done-in-software, C code-ready / pilot not started, D no
  GREEN pages-off
     No Pages workflow. docs/ remains a local catalog. PDFs stay offline.
 
- GREEN glama-parked
-    No Make Release. The public badge is not an Office Softwares 1.0 label.
+ GREEN glama-latest-match
+    Checked 2026-10-02: Glama Latest/releaseVersion is 1.0.0-local.
+    The badge matches the Softwares cite tip. It is not an Office Softwares 1.0 label.
+    This paper does not Make Release.
 
  OPEN office-messaging
     The words, once a real pilot is underway: Office Softwares 1.0 (local / pilot).
@@ -186,7 +189,7 @@ Ladder today: A done, B done-in-software, C code-ready / pilot not started, D no
 
  BLOCKED glama-make-release
     No Glama admin Deploy. No Make Release.
-    The parked public badge is not moved by this paper.
+    This paper does not move Glama. Latest/releaseVersion 1.0.0-local matches the Softwares cite tip and is not an Office Softwares 1.0 label.
 
  BLOCKED field-in-office
     Field flags and Field 1.0 stay out of Office PRs.

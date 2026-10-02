@@ -36,12 +36,12 @@ describe("Track L Local Softwares 1.0 gate", () => {
       "honesty-flags",
       "desk-kept",
       "suite-card",
-      "glama-parked",
+      "glama-latest-match",
+      "glama-public-badge",
       "pages-off"
     ]);
     expect(gate.items.filter((item) => item.state === "open").map((item) => item.id)).toEqual([
       "live-worker-deploy",
-      "glama-public-badge",
       "azinterface-live-shell"
     ]);
     expect(gate.items.filter((item) => item.state === "blocked").map((item) => item.id)).toEqual([

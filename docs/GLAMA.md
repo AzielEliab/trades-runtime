@@ -4,7 +4,7 @@ Public identity: **Aziel Eliab** only. Person `@id` https://www.azieleliab.com/#
 
 Glama is one of the compatible AI clients (ChatGPT, Grok, Venice, Claude, Cursor, Glama, Perplexity, Copilot, Gemini, Mistral, Meta AI, Apple Intelligence, Amazon Q, DuckAssist, You.com, Cohere, plus other MCP/OpenAPI-capable assistants). This page is the practical Install Server / stdio path.
 
-Intended listing (document the URL; do **not** treat Install Server as LIVE until a Glama admin Deploy + Make Release succeeds):
+Intended listing (document the URL; do **not** treat Install Server as LIVE from this git tree alone):
 
 [glama.ai/mcp/servers/AzielEliab/trades-runtime](https://glama.ai/mcp/servers/AzielEliab/trades-runtime)
 
@@ -14,13 +14,13 @@ This repo ships:
 
 | File | Role |
 |------|------|
-| [`glama.json`](../glama.json) | Claim file. Schema requires `maintainers` (GitHub username `AzielEliab`). Listing `name` (`Trades Runtime`), claim-file version (`1.0.0-local`), designed-purpose `description` (local-first BYO field-trades; `live_backends` false), `keywords`, `homepage` (`https://glama.ai/mcp/servers/AzielEliab/trades-runtime`), and `documentation` (`https://github.com/AzielEliab/trades-runtime/blob/main/docs/GLAMA.md`) are additional properties. The claim-file version is not the public Glama badge. |
+| [`glama.json`](../glama.json) | Claim file. Schema requires `maintainers` (GitHub username `AzielEliab`). Listing `name` (`Trades Runtime`), claim-file version (`1.0.0-local`), designed-purpose `description` (local-first BYO field-trades; `live_backends` false), `keywords`, `homepage` (`https://glama.ai/mcp/servers/AzielEliab/trades-runtime`), and `documentation` (`https://github.com/AzielEliab/trades-runtime/blob/main/docs/GLAMA.md`) are additional properties. The claim-file version matches the public Glama Latest badge. |
 | [`cli/mcp-stdio.mjs`](../cli/mcp-stdio.mjs) | Stdio MCP server. Bridges to the hosted Worker `/mcp` with `User-Agent: Mozilla/5.0`. |
 | [`Dockerfile`](../Dockerfile) | Local / “from Dockerfile” image. Glama admin often **generates** its own image from CMD args — still ship this file. |
 
 Do not invent Glama TDQS scores. Do not claim the listing or Install Server is already live.
 
-Public Glama listing Version is 0.3.4 and Latest is pre-0.4.4. Checked 2026-09-27: that badge is still releaseVersion 0.3.4 (tool updates v0.3.4, observedAt 2026-09-25) and is stale. Do not cite that badge as 1.0.0-local. The Worker source in this repo is 1.0.0-local. The giveaway Worker version pin in this repo is 1.0.0-local. Checked 2026-09-28: the already-running Worker is still 0.4.12. This cut does not deploy. The claim-file version, the Worker source pin, and the Glama listing are three different surfaces. Glama stays parked (no Make Release). Product label: Local Softwares 1.0 (installable). pilot_started false. Field 1.0 is a later track.
+Checked 2026-10-02: the listing machine payload `latestRelease.version` is 1.0.0-local, so Glama Latest/releaseVersion is 1.0.0-local. The badge matches the Softwares cite tip. Local Softwares 1.0. That match is not a Field 1.0 claim and not Office Softwares 1.0. The Worker source in this repo is 1.0.0-local. The giveaway Worker version pin in this repo is 1.0.0-local. Checked 2026-09-28: the already-running Worker is still 0.4.12. This cut does not deploy and does not Make Release. Product label: Local Softwares 1.0 (installable). pilot_started false. live_backends false. Author: Aziel Eliab only.
 
 ## Honesty
 
