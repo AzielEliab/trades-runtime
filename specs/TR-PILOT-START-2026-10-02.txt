@@ -5,8 +5,8 @@ TRADES-RUNTIME · OPTION C HUMAN PILOT START                                    
 
  Receipt ID TR-PILOT-START-2026-10-02 · 2026-10-02
  Identity: Aziel Eliab only.
- This cut closes the OPEN start command named in TR-OPTION-C-PILOT-RUNBOOK-2026-10-02.
- It adds the human command. It does not start a pilot by itself.
+ This cut shipped the human start command. TR-OPTION-C-PILOT-RUNBOOK-2026-10-02 documents how to run it.
+ It does not start a pilot by itself.
  A person must run the command on the operator box.
  live_backends remains false. Pages remain off. Option D remains not started.
  This cut does not deploy the public Worker. No tenant data is placed on the Worker.

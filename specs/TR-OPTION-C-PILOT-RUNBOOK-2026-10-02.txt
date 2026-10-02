@@ -6,26 +6,40 @@ TRADES-RUNTIME · OPTION C HUMAN PILOT RUNBOOK                                  
  Receipt ID TR-OPTION-C-PILOT-RUNBOOK-2026-10-02 · 2026-10-02
  Identity: Aziel Eliab only.
  Human steps to START a real Option C pilot on an operator box after prep is green.
- This paper is the start path. Prep already exists. Option D stays a separate wave.
- This paper does not start that pilot. It does not flip pilot_started.
+ The start command is shipped. This paper tells the operator how to run it.
+ Prep already exists. Option D stays a separate wave.
+ This paper does not run the command. Merging this paper does not start a pilot.
+ A human must run it on a real prep-ready branch on their isolate.
+ It does not flip pilot_started in the shipped catalog or in default health.
  live_backends remains false. Pages remain off. Option D remains not started.
  This paper does not deploy the public Worker. No tenant data is placed on the Worker.
  This paper does not bump the package, the manifest, glama.json, or the Worker source pin.
  Local Softwares 1.0 (Track L, 1.0.0-local) stays the shipped label.
+ It does not claim Field Softwares 1.0, Office Softwares 1.0, or a hosted company OS.
 
 
  What this is
  Prep is TR-OPTION-C-PREP-2026-09-25. The command is npm run pilot:prep.
- A green prep receipt means the box can host a future shadow.
+ A green prep receipt means the box can host a shadow.
  It does not mean a company, a GM, or a field pilot is underway.
- This paper is the human start path that comes after that receipt.
+ The start command shipped in TR-PILOT-START-2026-10-02.
+ It is the only software path that sets pilot_started true, and only on the operator isolate:
+
+   npm run pilot:start -- --branch <branchId>
+
+ The CLI name is pilot-start:
+
+   npx tsx src/cli.ts pilot-start --branch <branchId>
+
+ This paper is the operator runbook for that command.
  It is not a second prep. It is not Option D. It is not Office 1.0 and it is not Field 1.0.
  Office Softwares 1.0 is TR-OFFICE-1.0-GATE-2026-09-28.
  Field Softwares 1.0 is TR-FIELD-1.0-GATE-2026-09-28.
  Track L is TR-1.0-GATE-2026-09-28.
- Ladder today: A done, B done-in-software, C code-ready / pilot not started, D not started.
- Checked on this tree 2026-10-02: no command sets pilot_started true.
- That gap is OPEN software work. This paper does not close it.
+ Ladder today: A done, B done-in-software, C code-ready until a human runs pilot:start, D not started.
+ The shipped catalog, default health, and this paper stay pilot_started false.
+ A human must run the command on their box against one real prep-ready branch.
+ Merging this paper does not start a pilot.
 
 
  Version
@@ -61,9 +75,13 @@ TRADES-RUNTIME · OPTION C HUMAN PILOT RUNBOOK                                  
     ready true means the box passed the checks.
     pilot_started is false on that receipt. The CLI exits 1 when ready is false,
     and it also exits 1 when pilot_started is not false.
-    health:local is src/spine/health-local.ts. The card says pilot_started false,
+    health:local is src/spine/health-local.ts.
+    With no isolate pilot file, the card says pilot_started false,
     live_backends false, writes false, mode SHADOW-SEALED.
-    Claim on that card: Option C prep only. Pilot not started. Not a live company pilot.
+    Claim on that default card: Option C prep only. Pilot not started. Not a live company pilot.
+    Default health, and health with no operator root, stays pilot_started false.
+    After a successful pilot:start on this root, the same card reads
+    data/runtime/<instanceId>/pilot.json and reports pilot_started true for that isolate only.
 
     Inbound stays empty until a human places their own files.
     Empty folders and .gitkeep markers are the honest state after prep.
@@ -96,7 +114,10 @@ TRADES-RUNTIME · OPTION C HUMAN PILOT RUNBOOK                                  
     Copying a fixture into data/inbound and calling it the company drop is a false start.
 
  3. Explicit human start checklist
-    These are the human acts on the operator box. None of them flip the flag.
+    These are the human acts on the operator box.
+    Steps 3.1 through 3.5 do not flip the flag.
+    Step 3.6 is the only software path that does, and only on this isolate,
+    and only because a human typed the command.
 
     3.1 Name one branch.
         One branch inside that company. The id is a non-empty string.
@@ -131,6 +152,8 @@ TRADES-RUNTIME · OPTION C HUMAN PILOT RUNBOOK                                  
         /api/health on that desk is health-local.
         /api/option-c-start-gate is src/spine/option-c-start-gate.ts.
         Every gate on that panel stays blocked-until. pilotMayStart stays false.
+        The panel does not run pilot:start and does not flip the flag.
+        When this root already has an isolate pilot file, the panel reports that file.
         The public Worker may cite the install path. It does not serve this desk.
 
     3.5 Engagement rules stay in force.
@@ -145,36 +168,54 @@ TRADES-RUNTIME · OPTION C HUMAN PILOT RUNBOOK                                  
         Human authority wins. A recommendation is not a ticket, a booking, or a dispatch write.
 
     3.6 What actually sets pilot_started true.
-        Nothing in this tree. Checked 2026-10-02.
-        package.json has "pilot:prep": "tsx src/cli.ts pilot-prep". It has no pilot:start.
-        src/cli.ts accepts pilot-prep. It does not accept pilot-start.
-        An unknown command prints Unknown command and exits non-zero.
-        src/manifest.ts keeps pilot_started false, and launch_options.C.pilot_started false,
-        with status code-ready-pilot-not-started.
-        src/spine/health-local.ts types pilot_started as false and returns false.
-        src/spine/option-c-prep.ts types the prep receipt's pilot_started as false.
-        src/spine/option-c-start-gate.ts returns pilot_started false and pilotMayStart false.
-        Gate id human-starts-pilot says this software does not flip the gate.
-        src/core/shadow-branch.ts types pilotStarted as false on every return.
-        src/spine/local-softwares-gate.ts keeps option-c-pilot blocked and does not flip the flag.
-        src/spine/engagement-receipt.ts writes pilot_started false.
-
-        OPEN. A follow-up Softwares cut has to add the human command.
-        The intended command, not present in this tree, is:
+        One command, on the operator isolate, because a human typed it
+        after prep is ready true:
 
           npm run pilot:start -- --branch <branchId>
 
-        That is npx tsx src/cli.ts pilot-start --branch <branchId> once the script exists.
-        It does not exist today. Do not invent it by editing the manifest, health-local,
-        the start-gate, or shadow-branch in silence.
-        When that cut lands, the command is the only flip, and only because a human typed it
-        on this box after prep is ready true, one branch is named, the mode is SHADOW-SEALED,
-        refuse-write is still true, and the files in the drop are theirs.
-        That cut must keep live_backends false, Pages off, and writes refused.
-        It must refuse a flip that comes from prep, from booting the desk, from a mode change,
-        from copying test/fixtures/byo, or from this paper.
-        Until that command exists, finishing this checklist leaves pilot_started false.
-        Do not tell a GM the pilot has begun.
+        package.json script: "pilot:start": "tsx src/cli.ts pilot-start".
+        The CLI form is:
+
+          npx tsx src/cli.ts pilot-start --branch <branchId>
+
+        src/cli.ts accepts pilot-start. An unknown command still prints Unknown command
+        and exits non-zero. Implemented by runOptionCPilotStart
+        in src/spine/option-c-pilot-start.ts.
+        It is the only software path that writes pilot_started true.
+        It reuses the same checks as npm run pilot:prep (runOptionCPrep).
+        It refuses when --branch is missing, blank, repeated, or split with a comma.
+        It refuses the prep branch id tr:branch:option-c-prep.
+        It refuses when prep would not be ready: ready is not true, or the prep receipt
+        does not keep pilot_started false. The refusal text is "prep is not ready".
+        It refuses --claim-company when inbound is empty or only synthetic fixtures.
+        The refusal text is "synthetic or empty inbound cannot be claimed as a company".
+        A synthetic file is not their books. An empty folder is not a company drop.
+        It refuses a second branch when this isolate is already started for a different branch.
+        Prep, desk boot, an explicit shadow mode change, copying test/fixtures/byo,
+        and this paper do not call that command and do not flip the flag.
+        requestShadowModeChange still returns pilotStarted false.
+        src/manifest.ts keeps pilot_started false, and launch_options.C.pilot_started false,
+        with status code-ready-pilot-not-started.
+        Default health-local, with no isolate pilot file, stays pilot_started false.
+        src/spine/option-c-prep.ts keeps the prep receipt's pilot_started false.
+        src/spine/option-c-start-gate.ts does not flip the gate. pilotMayStart stays false.
+        Gate id human-starts-pilot names this command and says the panel does not flip the gate.
+        src/core/shadow-branch.ts returns pilotStarted false. A mode change is not a start.
+        src/spine/local-softwares-gate.ts does not flip the catalog flag.
+        src/spine/engagement-receipt.ts writes pilot_started false.
+        Do not invent a start by editing the manifest, default health, the start-gate,
+        or shadow-branch. The command is the only flip.
+        Success writes data/runtime/<instanceId>/pilot.json for that instance only
+        and appends a lifecycle line to data/runtime/<instanceId>/receipts.jsonl.
+        Mode stays SHADOW-SEALED. autoPromote stays false. field_launch stays false.
+        live_backends stays false. Pages stay off. Writes stay refused.
+        The receipt says this is not a company OS live claim, not Field 1.0,
+        and not Office Softwares 1.0.
+        health-local and the Option C start gate read that isolate file when given the operator root.
+        Running the command on a checkout that is not prep-ready does not start a pilot.
+        Merging this runbook does not start a pilot.
+        A human must run it on their box against one real prep-ready branch.
+        Do not tell a GM the pilot has begun because this paper merged.
 
  4. After start — next Softwares waves
     These waves wait until pilot_started is true with a real Option C.
@@ -250,28 +291,34 @@ TRADES-RUNTIME · OPTION C HUMAN PILOT RUNBOOK                                  
     No tenant data on Worker    The desk is loopback. This paper does not deploy.
     Pages off                   No Pages workflow.
     Human authority             Engagement rules and settlement do not outrank a human.
-    SHADOW-SEALED               The start, when it exists, does not auto-promote and does not open Option D.
-    pilot_started false         Manifest, health-local, prep, the start-gate, and this paper all say so.
-    live_backends false         Unchanged. This paper does not flip it.
+    SHADOW-SEALED               The start command does not auto-promote and does not open Option D.
+    pilot_started false         Shipped catalog, default health, prep, the start-gate panel, and this paper say so.
+                                The isolate file says true only after a human runs pilot:start.
+    live_backends false         Unchanged. This paper does not flip it. The start command does not flip it.
 
 
  Honesty
     Option C software: code-ready.
     Option C prep: npm run pilot:prep. Receipt with pilot_started false.
-    Option C pilot: not started.
-    Option C start command: OPEN. npm run pilot:start is not in this tree.
+    Option C start command: shipped.
+      npm run pilot:start -- --branch <branchId>
+      CLI: pilot-start --branch <branchId>
+      Sets pilot_started true only on that operator isolate, and only when a human runs it
+      after prep is ready. The shipped catalog stays false.
+    Option C pilot: not started on this tree. This paper does not run the command.
     Option D: not started.
     Office Softwares 1.0: blocked until a real Option C pilot. Not this paper.
     Field Softwares 1.0: blocked on the same gate. PR #23 waits. Not this paper.
     Field launch: false.
     live_backends: false.
-    pilot_started: false.
+    pilot_started: false in the shipped catalog, default health, and this paper.
+      True only after a human runs pilot:start on their isolate.
 
 
  What this paper does not do
     It does not start the Option C pilot.
-    It does not add npm run pilot:start.
-    It does not flip pilot_started.
+    It does not run npm run pilot:start.
+    It does not flip pilot_started in the shipped catalog or in default health.
     It does not turn on live_backends.
     It does not start Option D.
     It does not add a ServiceTitan or ProBooks write client.
