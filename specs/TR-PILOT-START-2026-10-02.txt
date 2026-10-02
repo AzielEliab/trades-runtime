@@ -1,0 +1,73 @@
+TRADES-RUNTIME · OPTION C HUMAN PILOT START                                                                                     TR-PILOT-START-2026-10-02
+
+
+
+
+ Receipt ID TR-PILOT-START-2026-10-02 · 2026-10-02
+ Identity: Aziel Eliab only.
+ This cut closes the OPEN start command named in TR-OPTION-C-PILOT-RUNBOOK-2026-10-02.
+ It adds the human command. It does not start a pilot by itself.
+ A person must run the command on the operator box.
+ live_backends remains false. Pages remain off. Option D remains not started.
+ This cut does not deploy the public Worker. No tenant data is placed on the Worker.
+ This cut does not bump the package, the manifest version, glama.json, or the Worker source pin.
+ Local Softwares 1.0 stays the shipped label. The pin stays 1.0.0-local.
+ This cut does not claim Field Softwares 1.0.
+ This cut does not claim Office Softwares 1.0.
+ This cut does not claim a live company OS.
+
+
+ What this is
+ Prep is still npm run pilot:prep. A green prep receipt does not flip pilot_started.
+ The new command is the only software flip:
+
+   npm run pilot:start -- --branch <branchId>
+   npx tsx src/cli.ts pilot-start --branch <branchId>
+
+ It refuses when --branch is missing, blank, repeated, or split with a comma.
+ It refuses the prep branch id tr:branch:option-c-prep.
+ It runs the same checks as pilot prep and refuses when that prep would not be ready.
+ It does not flip the flag when prep, desk boot, or an explicit shadow mode change runs.
+ requestShadowModeChange still returns pilotStarted false.
+ SHADOW-SEALED stays. autoPromote stays false. field_launch stays false.
+ ServiceTitan, ProBooks, and trades-app writes still throw.
+ --claim-company with empty inbound, or with inbound that is only synthetic fixtures, refuses the start.
+ A synthetic file is not their books. An empty folder is not a company drop.
+ A successful start writes data/runtime/<instanceId>/pilot.json for that instance only
+ and appends a lifecycle line to data/runtime/<instanceId>/receipts.jsonl.
+ health-local and the Option C start gate read that file when given the operator root.
+ The shipped src/manifest.ts catalog stays pilot_started false.
+ The receipt records branchId, pilot_started true, live_backends false, the timestamp,
+ and that this is not a company OS live claim, not Field 1.0, and not Office Softwares 1.0.
+
+
+ Version
+    Package, manifest, glama.json claim file, and the giveaway Worker source pin stay 1.0.0-local.
+    Product label stays Local Softwares 1.0 (installable). That label is Track L.
+    This cut is not a version bump and it is not an Office 1.0 or Field 1.0 claim.
+    Public Glama listing stays parked. No Make Release.
+    This paper does not deploy. TradesBot redeploys via GitBaby/Chief when a human asks.
+    Checked pattern: the already-running Worker cite in tree stays the prior observation.
+    This paper does not rewrite that observation.
+
+
+ Laws held
+    One named branch. One isolate. SHADOW-SEALED.
+    Writes refused. live_backends false. Pages off.
+    Human command only. No silent flip.
+    Wrapper is not verification. Synthetic is not a company.
+    Field 1.0 is not this cut. Office Softwares 1.0 is not this cut.
+
+
+ What this paper does not do
+    It does not retitle the desk to Field 1.0 or Office Softwares 1.0.
+    It does not turn on live_backends.
+    It does not add a ServiceTitan or ProBooks write client.
+    It does not publish Pages.
+    It does not run a Glama admin Deploy or Make Release.
+    It does not bump 1.0.0-local.
+    It does not deploy the Worker.
+    It does not flip pilot_started in the shipped catalog.
+    It does not start Option D.
+    It does not merge field flags.
+    It does not place a company file in data/inbound.

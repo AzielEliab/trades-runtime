@@ -283,7 +283,7 @@ export function startOperatorDesk(options: DeskServerOptions = {}): Promise<Desk
       return;
     }
     if (url.pathname === "/api/health") {
-      send(res, 200, JSON.stringify(healthLocal()), "application/json; charset=utf-8");
+      send(res, 200, JSON.stringify(healthLocal({ cwd })), "application/json; charset=utf-8");
       return;
     }
     if (url.pathname === "/api/snapshot") {

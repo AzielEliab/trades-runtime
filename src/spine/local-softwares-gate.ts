@@ -138,7 +138,8 @@ const ITEMS: readonly LocalSoftwaresGateItem[] = [
     id: "option-c-pilot",
     state: "blocked",
     label: "Option C pilot has not started",
-    detail: "Blocked until an operator starts a real pilot (pilot_started true with real Option C). This checklist does not flip that flag."
+    detail:
+      "The catalog stays blocked. npm run pilot:start can set pilot_started on one operator isolate after a human names a branch. This checklist does not flip that flag. Field 1.0 stays out of this label."
   },
   {
     id: "option-d",

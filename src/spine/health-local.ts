@@ -1,6 +1,7 @@
 import { engagementNotice } from "../core/engagement-rules.js";
 import { RUNTIME_MANIFEST } from "../manifest.js";
 import { LOCAL_SOFTWARES_LABEL, LOCAL_SOFTWARES_TRACK } from "./local-softwares-gate.js";
+import { readIsolatePilot } from "./pilot-isolate.js";
 
 /**
  * Local honesty card for the operator box.
@@ -23,18 +24,41 @@ export interface HealthLocal {
   phone_home: false;
   central_dump: false;
   tenant_data_on_worker: false;
-  pilot_started: false;
+  pilot_started: boolean;
   field_launch: false;
-  option_c: "code-ready-pilot-not-started";
+  option_c: "code-ready-pilot-not-started" | "pilot-started-shadow-sealed";
   option_d: "not-started";
   mode: "SHADOW-SEALED";
   auto_promote: false;
   wrapper_is_verification: false;
   engagement_notice: string;
-  claim: "Option C prep only. Pilot not started. Not a live company pilot.";
+  claim: string;
+  branch_id?: string;
+  instance_id?: string;
+  isolate_pilot?: true;
 }
 
-export function healthLocal(): HealthLocal {
+const NOT_STARTED_CLAIM = "Option C prep only. Pilot not started. Not a live company pilot.";
+const STARTED_CLAIM =
+  "Option C pilot started on this isolate by an explicit human command. SHADOW-SEALED. Not a live company pilot. Not Field 1.0. Not Office Softwares 1.0.";
+
+export function healthLocal(options?: { cwd?: string; instanceId?: string }): HealthLocal {
+  const card = catalogHealth();
+  if (!options?.cwd) return card;
+  const record = readIsolatePilot(options.cwd, options.instanceId);
+  if (!record) return card;
+  return {
+    ...card,
+    pilot_started: true,
+    option_c: "pilot-started-shadow-sealed",
+    claim: STARTED_CLAIM,
+    branch_id: record.branchId,
+    instance_id: record.instanceId,
+    isolate_pilot: true
+  };
+}
+
+function catalogHealth(): HealthLocal {
   return {
     ok: true,
     product: "trades-runtime",
@@ -60,6 +84,6 @@ export function healthLocal(): HealthLocal {
     auto_promote: false,
     wrapper_is_verification: false,
     engagement_notice: engagementNotice(),
-    claim: "Option C prep only. Pilot not started. Not a live company pilot."
+    claim: NOT_STARTED_CLAIM
   };
 }

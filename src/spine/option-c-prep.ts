@@ -25,7 +25,8 @@ import {
 import { mayWriteServiceTitan, refuseServiceTitanWrite, refuseServiceTitanWriteMethod } from "./servicetitan-shadow.js";
 import { mayWriteTradesApp, refuseTradesAppWrite, refuseTradesAppWriteMethod } from "./trades-app-shadow.js";
 
-const PREP_BRANCH = "tr:branch:option-c-prep";
+export const OPTION_C_PREP_BRANCH = "tr:branch:option-c-prep";
+const PREP_BRANCH = OPTION_C_PREP_BRANCH;
 const CLAIM = "Machine prep only. Option C pilot has not started. Not a live company pilot.";
 
 export interface OptionCPrepOptions {
@@ -103,7 +104,7 @@ export interface OptionCPrepReceipt {
     booted: boolean;
     host: "127.0.0.1";
     url: string | null;
-    health_pilot_started: false | null;
+    health_pilot_started: boolean | null;
   };
   ledger: {
     path: string | null;
@@ -153,8 +154,8 @@ function receiptIdFor(at: string): string {
   return `tr:receipt:option-c-prep:${at.replace(/[:.]/g, "-")}`;
 }
 
-function baseReceipt(at: string, checks: OptionCPrepCheck[]): OptionCPrepReceipt {
-  const health = healthLocal();
+function baseReceipt(at: string, checks: OptionCPrepCheck[], cwd: string): OptionCPrepReceipt {
+  const health = healthLocal({ cwd });
   return {
     kind: "option-c-pilot-prep",
     receiptId: receiptIdFor(at),
@@ -235,7 +236,7 @@ export async function runOptionCPrep(options: OptionCPrepOptions = {}): Promise<
   const now = options.now ?? new Date().toISOString();
   const bootDesk = options.bootDesk !== false;
   const checks: OptionCPrepCheck[] = [];
-  const receipt = baseReceipt(now, checks);
+  const receipt = baseReceipt(now, checks, cwd);
 
   if (!existsSync(cwd)) {
     check(checks, "cwd", false, `operator root is missing: ${cwd}`);
@@ -243,16 +244,27 @@ export async function runOptionCPrep(options: OptionCPrepOptions = {}): Promise<
   }
 
   check(checks, "author", RUNTIME_MANIFEST.author === "Aziel Eliab" && RUNTIME_MANIFEST.identity === "Aziel Eliab", "author is Aziel Eliab only");
+  const isolateAlreadyStarted =
+    receipt.health.pilot_started === true &&
+    receipt.health.company_os_live === false &&
+    receipt.health.field_claim === false &&
+    receipt.health.field_launch === false &&
+    receipt.health.live_backends === false &&
+    receipt.health.mode === "SHADOW-SEALED";
   check(
     checks,
     "honesty-flags",
     RUNTIME_MANIFEST.live_backends === false &&
       RUNTIME_MANIFEST.pilot_started === false &&
-      receipt.health.pilot_started === false &&
       receipt.health.live_backends === false &&
       receipt.health.writes === false &&
-      receipt.health.pages === "off",
-    "manifest and health-local keep live_backends false and pilot_started false"
+      receipt.health.pages === "off" &&
+      receipt.health.field_claim === false &&
+      receipt.health.company_os_live === false &&
+      (receipt.health.pilot_started === false || isolateAlreadyStarted),
+    isolateAlreadyStarted
+      ? "manifest keeps pilot_started false; this isolate already records a human pilot-start"
+      : "manifest and health-local keep live_backends false and pilot_started false"
   );
 
   const trackGate = localSoftwaresGate();
@@ -481,21 +493,31 @@ export async function runOptionCPrep(options: OptionCPrepOptions = {}): Promise<
       const html = await page.text();
       const healthResponse = await fetch(new URL("/api/health", desk.url));
       const health = (await healthResponse.json()) as Partial<HealthLocal>;
+      const isolateHealth =
+        health.pilot_started === true &&
+        health.company_os_live === false &&
+        health.field_claim === false &&
+        health.field_launch === false &&
+        health.live_backends === false;
       const healthHonest =
         healthResponse.ok &&
-        health.pilot_started === false &&
+        (health.pilot_started === false || isolateHealth) &&
         health.live_backends === false &&
         health.writes === false &&
         health.mode === "SHADOW-SEALED" &&
-        health.surface === "health-local";
-      if (healthHonest) receipt.desk.health_pilot_started = false;
-      const pageHonest = page.ok && html.includes("pilot_started false") && html.includes("Option C pilot not started");
+        health.surface === "health-local" &&
+        health.company_os_live === false &&
+        health.field_claim === false;
+      if (healthHonest) receipt.desk.health_pilot_started = health.pilot_started === true;
+      const pilotWord = health.pilot_started === true ? "pilot_started true" : "pilot_started false";
+      const optionWord = health.pilot_started === true ? "Option C pilot started on this isolate" : "Option C pilot not started";
+      const pageHonest = page.ok && html.includes(pilotWord) && html.includes(optionWord);
       check(
         checks,
         "desk-boot",
         healthHonest && pageHonest,
         healthHonest && pageHonest
-          ? `desk booted at ${desk.url} and /api/health reported pilot_started false`
+          ? `desk booted at ${desk.url} and /api/health reported pilot_started ${health.pilot_started === true ? "true" : "false"}`
           : `desk responded without the expected honesty flags (${desk.url})`
       );
     } catch (error) {

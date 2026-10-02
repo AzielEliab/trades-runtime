@@ -38,6 +38,7 @@
     "drop-in:demo": "tsx src/cli.ts drop-in-demo",
     "desk": "tsx src/cli.ts desk",
     "pilot:prep": "tsx src/cli.ts pilot-prep",
+    "pilot:start": "tsx src/cli.ts pilot-start",
     "health:local": "tsx src/cli.ts health-local",
     "shadow:sealed-demo": "tsx src/cli.ts shadow-sealed-demo",
     "giveaway:pack": "node workers/giveaway/scripts/pack-release.mjs",

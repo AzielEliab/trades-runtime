@@ -212,8 +212,8 @@ export interface OperatorSnapshot {
   writes: false;
   dataLabel: DeskDataLabel;
   honesty: string;
-  pilot_started: false;
-  pilot: { optionC: "not-started"; optionD: "not-started" };
+  pilot_started: boolean;
+  pilot: { optionC: "not-started" | "started-local-isolate"; optionD: "not-started" };
   tracking: { transport: "sse"; intervalMs: number; source: string };
   metrics: {
     jobs: number;
@@ -1336,7 +1336,7 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
     inboundQuality = persistInboundQuality({ cwd, report: inboundQuality });
     alertActions = persistAlertActions({ cwd, report: alertActions });
   }
-  const startGate = optionCStartGate(now);
+  const startGate = optionCStartGate(now, { cwd, instanceId });
   const positions = loadLocalPositions({
     cwd,
     instanceId,
@@ -1412,8 +1412,11 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
     writes: false,
     dataLabel,
     honesty,
-    pilot_started: false,
-    pilot: { optionC: "not-started", optionD: "not-started" },
+    pilot_started: startGate.pilot_started,
+    pilot: {
+      optionC: startGate.pilot_started ? "started-local-isolate" : "not-started",
+      optionD: "not-started"
+    },
     tracking: {
       transport: "sse",
       intervalMs: DESK_REFRESH_MS,

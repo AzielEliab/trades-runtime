@@ -263,7 +263,9 @@ export { defaultLocalInboundConfig, parseLocalInboundConfig } from "./spine/loca
 export { isolateAlertsPath, isolateReceiptPath, openIsolatedReceipts, describeRuntimeIsolate } from "./spine/runtime-isolate.js";
 export { healthLocal } from "./spine/health-local.js";
 export { recordEngagementDrop } from "./spine/engagement-receipt.js";
-export { runOptionCPrep } from "./spine/option-c-prep.js";
+export { runOptionCPrep, OPTION_C_PREP_BRANCH } from "./spine/option-c-prep.js";
+export { runOptionCPilotStart, classifyOperatorInbound } from "./spine/option-c-pilot-start.js";
+export { readIsolatePilot } from "./spine/pilot-isolate.js";
 export { runRecordedShadowDays, runShadowDayDemo } from "./demo/shadow-day.js";
 export { runByoAdmitDemo, printByoAdmitDemo } from "./demo/byo-admit.js";
 export { runDropInDemo, printDropInDemo } from "./demo/drop-in.js";
