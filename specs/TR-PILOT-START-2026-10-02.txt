@@ -45,7 +45,7 @@ TRADES-RUNTIME · OPTION C HUMAN PILOT START                                    
     Package, manifest, glama.json claim file, and the giveaway Worker source pin stay 1.0.0-local.
     Product label stays Local Softwares 1.0 (installable). That label is Track L.
     This cut is not a version bump and it is not an Office 1.0 or Field 1.0 claim.
-    Public Glama listing stays parked. No Make Release.
+    Checked 2026-10-02: Glama Latest/releaseVersion is 1.0.0-local. The badge matches the Softwares cite tip. No Make Release in this paper.
     This paper does not deploy. TradesBot redeploys via GitBaby/Chief when a human asks.
     Checked pattern: the already-running Worker cite in tree stays the prior observation.
     This paper does not rewrite that observation.

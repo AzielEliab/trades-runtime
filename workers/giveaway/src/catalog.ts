@@ -150,7 +150,7 @@ export function llmsTxt(): string {
 > Product label: ${PRODUCT_LABEL} (installable). pilot_started false. live_backends false. Field 1.0 is a later track.
 > Worker source pin is ${VERSION}. x-product-version and /v1/health in this source match that pin.
 > Already-running Worker checked ${OBSERVED_LIVE_WORKER_CHECKED} is ${OBSERVED_LIVE_WORKER_VERSION}. This source does not deploy.
-> Public Glama listing: Version ${GLAMA_PUBLIC_VERSION} / Latest ${GLAMA_PUBLIC_LATEST}. Stale and parked. Not ${VERSION}. No Make Release.
+> Public Glama listing: Latest/releaseVersion ${GLAMA_PUBLIC_LATEST}. The badge matches the Softwares cite tip ${VERSION}. Local Softwares 1.0. Not a Field 1.0 claim. Not Office Softwares 1.0.
 > License: ${LICENSE}
 > Worker: ${PUBLIC_ORIGIN}
 

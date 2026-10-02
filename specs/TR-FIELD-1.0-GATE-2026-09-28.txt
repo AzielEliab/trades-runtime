@@ -30,7 +30,7 @@ TRACK F — Field Softwares 1.0 ONLY after a real Option C pilot
   4. Settlement path, then Option D, as later separate waves.
 - Messaging: Field Softwares 1.0 (local / pilot) — never company OS live.
 - No fake GPS. No fake telematics. No accuracy percent.
-- KEEP: live_backends=false; no ST/ProBooks live writes; Pages off; Glama parked (no Make Release).
+- KEEP: live_backends=false; no ST/ProBooks live writes; Pages off; Glama Latest 1.0.0-local matches the Softwares tip (this paper does not Make Release).
 - Do NOT flip pilot_started or live_backends in this paper or in code.
 
 Ladder today: A done, B done-in-software, C code-ready / pilot not started, D not started.
@@ -47,9 +47,10 @@ Ladder today: A done, B done-in-software, C code-ready / pilot not started, D no
     pilot_started false, live_backends false, field_claim false.
     That read is Local Softwares 1.0 on the giveaway Worker. It is not a Field 1.0 claim
     and it is not a version bump.
-    Public Glama listing stays the Track L parked check: Version 0.3.4, Latest pre-0.4.4
-    (checked 2026-09-27). This paper does not Make Release and does not publish a new badge number.
-    glama.json version is the in-repo claim file, not that badge.
+    Checked 2026-10-02: Glama Latest/releaseVersion is 1.0.0-local.
+    The badge matches the Softwares cite tip. Local Softwares 1.0.
+    This paper does not Make Release and does not deploy.
+    glama.json version is the in-repo claim file and matches that badge.
 
 
  Checklist
@@ -150,8 +151,8 @@ Ladder today: A done, B done-in-software, C code-ready / pilot not started, D no
 
  BLOCKED glama-make-release
     No Glama admin Deploy. No Make Release.
-    The parked public badge (Version 0.3.4 / Latest pre-0.4.4, checked 2026-09-27)
-    is not a Field 1.0 badge.
+    Glama Latest/releaseVersion 1.0.0-local (checked 2026-10-02) matches the Softwares cite tip.
+    It is not a Field 1.0 badge.
 
  BLOCKED mix-into-other-prs
     Do not mix Field flags into Office PRs.

@@ -9,7 +9,7 @@ TRADES-RUNTIME · INBOUND QUALITY, ALERT STUBS, OPTION C START GATE             
  live_backends remains false. Pages remain off. Option D remains out of scope.
  Option C remains prep until a human operator starts a real pilot.
  This cut does not start that pilot and does not deploy the public Worker.
- Public Glama listing Version stays 0.3.4 / Latest pre-0.4.4.
+ Checked 2026-10-02: Glama Latest/releaseVersion is 1.0.0-local. The badge matches the Softwares cite tip. Local Softwares 1.0.
  The Worker already deployed remains 0.4.5. A 0.4.7 redeploy is separately in flight.
  This source does not claim the public Worker is already 0.4.9.
 

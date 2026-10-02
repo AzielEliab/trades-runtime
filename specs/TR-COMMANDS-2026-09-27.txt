@@ -9,7 +9,7 @@ TRADES-RUNTIME · COMMON COMMANDS                                               
  live_backends remains false. Pages remain off. Option C pilot remains not started. Option D remains not started.
  pilot_started remains false. No ServiceTitan or ProBooks write-back.
  This cut does not deploy the public Worker and does not claim a Glama admin Deploy.
- Public Glama listing Version remains 0.3.4. Latest remains pre-0.4.4.
+ Checked 2026-10-02: Glama Latest/releaseVersion is 1.0.0-local. The badge matches the Softwares cite tip. Local Softwares 1.0. Not a Field 1.0 claim. Not Office Softwares 1.0.
  The giveaway Worker version pin in this repo moves to 0.4.12 with the package, the manifest, and glama.json.
  Those surfaces are the source pin. They are not the public Glama badge.
 

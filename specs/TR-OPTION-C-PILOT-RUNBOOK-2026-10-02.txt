@@ -50,8 +50,8 @@ TRADES-RUNTIME · OPTION C HUMAN PILOT RUNBOOK                                  
     TR-OFFICE-1.0-GATE-2026-09-28 recorded a same-day /v1/health read of 1.0.0-local
     with pilot_started false and live_backends false. That read is Local Softwares 1.0.
     This paper does not rewrite those checks and does not deploy.
-    Public Glama listing stays parked: Version 0.3.4, Latest pre-0.4.4 (checked 2026-09-27).
-    No Make Release. glama.json version is the in-repo claim file, not that badge.
+    Checked 2026-10-02: Glama Latest/releaseVersion is 1.0.0-local. The badge matches the Softwares cite tip. Local Softwares 1.0. Not a Field 1.0 claim. Not Office Softwares 1.0.
+    No Make Release in this paper. glama.json version is the in-repo claim file and matches that badge.
 
 
  Checklist
@@ -263,7 +263,7 @@ TRADES-RUNTIME · OPTION C HUMAN PILOT RUNBOOK                                  
     No live_backends. The flag stays false. No hosted company OS. No live tenant pull.
     No live ServiceTitan writes. No ProBooks writes. No trades-app writes.
     No Pages. Do not add a Pages workflow. docs/ is a local catalog only.
-    No Glama Make Release. The parked public badge is not moved by this paper.
+    No Glama Make Release in this paper. Glama Latest is already 1.0.0-local and matches the Softwares cite tip.
     No fake GPS. No fake telematics. No accuracy percent.
     A quality checklist score is not an accuracy percent. Pins on the desk are not a live GPS feed.
     No company OS live claim. Local Softwares 1.0 is not that claim.

@@ -94,7 +94,9 @@ describe("giveaway Worker routes", () => {
     const fileLink = html.indexOf(`Download ${RELEASE_FILENAME}`);
     expect(fileLink).toBeGreaterThan(citePanel);
     expect(html).toContain('href="/download"');
-    expect(html).toContain("Public Glama listing Version is 0.3.4");
+    expect(html).toContain("Glama Latest/releaseVersion is 1.0.0-local");
+    expect(html).toContain("The badge matches the Softwares cite tip");
+    expect(html).not.toContain("pre-0.4.4");
 
     const stats = await (await hit(env, "/v1/stats")).json() as FleetStats;
     expect(stats.views).toBe(1);
@@ -195,15 +197,15 @@ describe("giveaway Worker routes", () => {
     expect(cite.sameAs).toContain("https://x.com/AzielEliab");
     expect(cite.sameAs).toContain("https://www.azielcorpuslibrary.net/software");
     expect(cite.sameAs).not.toContain("https://glama.ai");
-    expect((cite as { glama_public_version?: string }).glama_public_version).toBe("0.3.4");
-    expect((cite as { glama_public_latest?: string }).glama_public_latest).toBe("pre-0.4.4");
+    expect((cite as { glama_public_version?: string }).glama_public_version).toBe("1.0.0-local");
+    expect((cite as { glama_public_latest?: string }).glama_public_latest).toBe("1.0.0-local");
     expect((cite as { deployed_worker_version?: string }).deployed_worker_version).toBe("1.0.0-local");
     expect((cite as { observed_live_worker_version?: string }).observed_live_worker_version).toBe("0.4.12");
     expect((cite as { product_label?: string }).product_label).toBe("Local Softwares 1.0");
     expect((cite as { pilot_started?: boolean }).pilot_started).toBe(false);
-    expect((cite as { glama_listing_stale?: boolean }).glama_listing_stale).toBe(true);
+    expect((cite as { glama_listing_stale?: boolean }).glama_listing_stale).toBe(false);
     expect(cite.version).toBe((cite as { deployed_worker_version?: string }).deployed_worker_version);
-    expect(cite.version).not.toBe((cite as { glama_public_version?: string }).glama_public_version);
+    expect(cite.version).toBe((cite as { glama_public_version?: string }).glama_public_version);
     expect(cite.keywords.join(" ")).toMatch(/trades-runtime/);
     expect(cite.keywords.join(" ")).toMatch(/HVAC/);
     expect(cite.how_to_cite).toMatch(/Eliab, Aziel/);
@@ -404,7 +406,9 @@ describe("giveaway Worker routes", () => {
     expect(llms).toContain("Worker source pin is 1.0.0-local");
     expect(llms).toContain("Already-running Worker checked 2026-09-28 is 0.4.12");
     expect(llms).toContain("without downloading first");
-    expect(llms).toContain("Stale and parked");
+    expect(llms).toContain("The badge matches the Softwares cite tip");
+    expect(llms).toContain("Latest/releaseVersion 1.0.0-local");
+    expect(llms).not.toContain("pre-0.4.4");
     expect(llms).not.toMatch(/does not claim the public Worker is already/);
     expect(ai).toContain("Worker source pin is 1.0.0-local");
     expect(ai).toContain("Already-running Worker checked 2026-09-28 is 0.4.12");
