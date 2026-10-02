@@ -200,8 +200,8 @@ export function renderPrintableSnapshot(snapshot: OperatorSnapshot): string {
       <span class="chip">live_backends false</span>
       <span class="chip">write false</span>
       <span class="chip">UNVERIFIED</span>
-      <span class="chip">pilot_started false</span>
-      <span class="chip">Option C pilot not started</span>
+      <span class="chip">pilot_started ${snapshot.pilot_started ? "true" : "false"}</span>
+      <span class="chip">${snapshot.pilot_started ? "Option C pilot started on this isolate" : "Option C pilot not started"}</span>
       <span class="chip">${esc(snapshot.dataLabel)}</span>
     </div>
     <p class="banner">${esc(snapshot.honesty)}</p>
@@ -367,7 +367,7 @@ export function renderPrintableSnapshot(snapshot: OperatorSnapshot): string {
     <h2>Inbound quality</h2>
     <p>${esc(snapshot.inboundQuality.note)} Mean checklist score ${snapshot.inboundQuality.meanScore == null ? "none" : snapshot.inboundQuality.meanScore}. Not an accuracy percent.</p>
     <h2>Option C start gate</h2>
-    <p>${esc(snapshot.optionCStartGate.claim)} pilot_started false. Every gate is blocked-until.</p>
+    <p>${esc(snapshot.optionCStartGate.claim)} pilot_started ${snapshot.pilot_started ? "true" : "false"}. Every gate is blocked-until.</p>
     <h2>Inbound</h2>
     <table>
       <thead><tr><th>File</th><th>Peer</th><th>Profile</th><th>Verification</th><th>Hash</th></tr></thead>
@@ -378,7 +378,7 @@ export function renderPrintableSnapshot(snapshot: OperatorSnapshot): string {
     <ul>${receipts}</ul>
     <footer>
       Human surface. Printed from local state on 127.0.0.1. Agent MCP does not carry this page.
-      live_backends false. Writes refused. pilot_started false. Option D is not started.
+      live_backends false. Writes refused. pilot_started ${snapshot.pilot_started ? "true" : "false"}. Option D is not started.
     </footer>
   </main>
 </body>
@@ -448,7 +448,7 @@ export function renderPrintableHuddle(snapshot: OperatorSnapshot): string {
     <div class="chips">
       <span class="chip">live_backends false</span>
       <span class="chip">write false</span>
-      <span class="chip">pilot_started false</span>
+      <span class="chip">pilot_started ${snapshot.pilot_started ? "true" : "false"}</span>
       <span class="chip">not a skill score</span>
       <span class="chip">${esc(snapshot.dataLabel)}</span>
     </div>

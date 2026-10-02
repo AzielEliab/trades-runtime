@@ -1,5 +1,6 @@
 import { RUNTIME_MANIFEST } from "../manifest.js";
 import { LOCAL_SOFTWARES_LABEL, LOCAL_SOFTWARES_TRACK } from "./local-softwares-gate.js";
+import { readIsolatePilot } from "./pilot-isolate.js";
 
 /**
  * Option C start-gate conditions for the local desk.
@@ -31,15 +32,16 @@ export interface OptionCStartGate {
   writes: false;
   phoneHome: false;
   pages: "off";
-  pilot_started: false;
+  pilot_started: boolean;
   pilotMayStart: false;
-  pilot: "not-started";
-  optionC: "prep-only";
+  pilot: "not-started" | "started-local-isolate";
+  optionC: "prep-only" | "started-local-isolate";
+  branch_id?: string;
   optionD: "out-of-scope";
   cutover: false;
   shadow: true;
   local: true;
-  claim: typeof OPTION_C_START_CLAIM;
+  claim: string;
   gates: OptionCStartGateItem[];
 }
 
@@ -95,11 +97,29 @@ const GATE_COPY: readonly Omit<OptionCStartGateItem, "state" | "required">[] = [
     id: "human-starts-pilot",
     label: "A named human must start the real pilot",
     detail:
-      "Blocked until that person starts a real Option C pilot outside this prep panel. This software does not flip the gate."
+      "Blocked on this panel until a human runs npm run pilot:start -- --branch <branchId> on this box. This panel does not flip the gate. A mode change does not flip it."
   }
 ];
 
-export function optionCStartGate(now: string): OptionCStartGate {
+const ISOLATE_GATE_CLAIM =
+  "This isolate records a human Option C start. This panel did not start it. Option D is out of scope. No cutover automation is on this desk. Not Field 1.0. Not Office Softwares 1.0. Not a live company OS.";
+
+export function optionCStartGate(now: string, options?: { cwd?: string; instanceId?: string }): OptionCStartGate {
+  const gate = catalogStartGate(now);
+  if (!options?.cwd) return gate;
+  const record = readIsolatePilot(options.cwd, options.instanceId);
+  if (!record) return gate;
+  return {
+    ...gate,
+    pilot_started: true,
+    pilot: "started-local-isolate",
+    optionC: "started-local-isolate",
+    claim: ISOLATE_GATE_CLAIM,
+    branch_id: record.branchId
+  };
+}
+
+function catalogStartGate(now: string): OptionCStartGate {
   return {
     product: "trades-runtime",
     product_label: LOCAL_SOFTWARES_LABEL,

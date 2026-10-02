@@ -785,7 +785,7 @@ export function renderOptionCStartGate(snapshot: OperatorSnapshot): string {
     )
     .join("");
   return `<p class="quiet">${esc(gate.claim)}</p>
-    <p class="quiet">option C ${esc(gate.optionC)}. pilot ${esc(gate.pilot)}. pilot_started false. pilot may start false. option D ${esc(gate.optionD)}. cutover false. live_backends false. Pages ${esc(gate.pages)}.</p>
+    <p class="quiet">option C ${esc(gate.optionC)}. pilot ${esc(gate.pilot)}. pilot_started ${gate.pilot_started ? "true" : "false"}. pilot may start ${gate.pilotMayStart ? "true" : "false"}. option D ${esc(gate.optionD)}. cutover false. live_backends false. Pages ${esc(gate.pages)}.</p>
     <ul class="gates">${items}</ul>
     <p class="quiet"><a href="/api/option-c-start-gate">Start-gate JSON</a>. This panel does not start a pilot.</p>`;
 }
@@ -1341,8 +1341,8 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
       <span class="chip">write false</span>
       <span class="chip">UNVERIFIED</span>
       <span class="chip">127.0.0.1 only</span>
-      <span class="chip">Option C pilot not started</span>
-      <span class="chip">pilot_started false</span>
+      <span class="chip">${snapshot.pilot_started ? "Option C pilot started on this isolate" : "Option C pilot not started"}</span>
+      <span class="chip">pilot_started ${snapshot.pilot_started ? "true" : "false"}</span>
       <span class="chip" id="clock">updated ${esc(snapshot.generatedAt)}</span>
     </div>
     <nav class="domain-nav" aria-label="Desk domains">

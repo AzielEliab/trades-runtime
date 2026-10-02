@@ -7,7 +7,8 @@ import { parseShadowMode, type ShadowMode } from "./shadow-modes.js";
 
 /**
  * One named branch. Option C software scaffolding only.
- * Pilot is not started. Never auto-promote SHADOW-SEALED → SHADOW-VISIBLE.
+ * Pilot is not started here. An explicit mode change still returns pilotStarted false.
+ * It does not run pilot-start. Never auto-promote SHADOW-SEALED → SHADOW-VISIBLE.
  */
 export interface OneBranchShadowConfig {
   branchId: string;
