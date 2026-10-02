@@ -1,0 +1,287 @@
+TRADES-RUNTIME · OPTION C HUMAN PILOT RUNBOOK                                                                                TR-OPTION-C-PILOT-RUNBOOK-2026-10-02
+
+
+
+
+ Receipt ID TR-OPTION-C-PILOT-RUNBOOK-2026-10-02 · 2026-10-02
+ Identity: Aziel Eliab only.
+ Human steps to START a real Option C pilot on an operator box after prep is green.
+ This paper is the start path. Prep already exists. Option D stays a separate wave.
+ This paper does not start that pilot. It does not flip pilot_started.
+ live_backends remains false. Pages remain off. Option D remains not started.
+ This paper does not deploy the public Worker. No tenant data is placed on the Worker.
+ This paper does not bump the package, the manifest, glama.json, or the Worker source pin.
+ Local Softwares 1.0 (Track L, 1.0.0-local) stays the shipped label.
+
+
+ What this is
+ Prep is TR-OPTION-C-PREP-2026-09-25. The command is npm run pilot:prep.
+ A green prep receipt means the box can host a future shadow.
+ It does not mean a company, a GM, or a field pilot is underway.
+ This paper is the human start path that comes after that receipt.
+ It is not a second prep. It is not Option D. It is not Office 1.0 and it is not Field 1.0.
+ Office Softwares 1.0 is TR-OFFICE-1.0-GATE-2026-09-28.
+ Field Softwares 1.0 is TR-FIELD-1.0-GATE-2026-09-28.
+ Track L is TR-1.0-GATE-2026-09-28.
+ Ladder today: A done, B done-in-software, C code-ready / pilot not started, D not started.
+ Checked on this tree 2026-10-02: no command sets pilot_started true.
+ That gap is OPEN software work. This paper does not close it.
+
+
+ Version
+    Package, manifest, glama.json claim file, and the giveaway Worker source pin stay 1.0.0-local.
+    The product label already shipped is Local Softwares 1.0 (installable). That label is Track L.
+    This runbook is not a version cut and it is not an Office 1.0 or Field 1.0 claim.
+    TR-1.0-GATE-2026-09-28 recorded the already-running Worker as 0.4.12 at that cut's check.
+    TR-OFFICE-1.0-GATE-2026-09-28 recorded a same-day /v1/health read of 1.0.0-local
+    with pilot_started false and live_backends false. That read is Local Softwares 1.0.
+    This paper does not rewrite those checks and does not deploy.
+    Public Glama listing stays parked: Version 0.3.4, Latest pre-0.4.4 (checked 2026-09-27).
+    No Make Release. glama.json version is the in-repo claim file, not that badge.
+
+
+ Checklist
+
+ 1. Preconditions
+    Node.js 20 or newer (package.json engines.node is >=20). From a checkout of this repo:
+
+      npm install
+      npm test
+      npm run typecheck
+
+    Author on every export is Aziel Eliab only. Credentials stay on this machine.
+
+    Then the prep receipt, still not a start:
+
+      npm run pilot:prep
+      npm run health:local
+
+    pilot:prep is src/cli.ts command pilot-prep, implemented by runOptionCPrep
+    in src/spine/option-c-prep.ts. It prints one JSON receipt.
+    ready true means the box passed the checks.
+    pilot_started is false on that receipt. The CLI exits 1 when ready is false,
+    and it also exits 1 when pilot_started is not false.
+    health:local is src/spine/health-local.ts. The card says pilot_started false,
+    live_backends false, writes false, mode SHADOW-SEALED.
+    Claim on that card: Option C prep only. Pilot not started. Not a live company pilot.
+
+    Inbound stays empty until a human places their own files.
+    Empty folders and .gitkeep markers are the honest state after prep.
+    Do not fill them to make the receipt look like a company drop.
+    A green prep receipt with empty inbound is the precondition for this runbook.
+    pilot_started is still false when that receipt is green.
+
+ 2. BYO drop rules
+    The only inbound layout is the one in src/spine/inbound-layout.ts:
+
+      data/inbound/servicetitan/     their read-only ST export, when they choose to place one
+      data/inbound/probooks/         their read-only ProBooks export
+      data/inbound/trades-app/       other field-service exports in the same class
+
+    Not data/tenants/. That path is a hosted multi-tenant layout.
+    isHostedTenantLayout refuses it. refuseHostedTenantLayout throws.
+    Real exports stay gitignored. .gitignore ignores data/** and keeps only the
+    folder markers, data/inbound/README.md, local.json.example, and the runtime
+    *.example files. Do not commit a customer file. Do not force-add one.
+    The authoring node is not a data custodian. Copy nothing upstream.
+    Do not upload a drop to GitHub, to the public Worker, or to a shared demo.
+
+    Synthetic fixtures are not a company drop.
+    test/fixtures/byo/ is the synthetic set.
+    npm run byo:admit-demo and npm run drop-in:demo copy those fixtures into a temp tree
+    and leave the operator drop folders alone.
+    Wrapper admission is not verification. Status stays UNVERIFIED.
+    MEDIUM trust is not truth.
+    The empty-folder desk labels a synthetic demo. That label is not their books.
+    Copying a fixture into data/inbound and calling it the company drop is a false start.
+
+ 3. Explicit human start checklist
+    These are the human acts on the operator box. None of them flip the flag.
+
+    3.1 Name one branch.
+        One branch inside that company. The id is a non-empty string.
+        src/core/shadow-branch.ts createOneBranchShadowConfig throws when branchId is blank.
+        The prep validator uses its own id, tr:branch:option-c-prep, inside option-c-prep.ts.
+        That id is the prep branch. It is not the company branch.
+        Naming the branch, in notes or in that function, still returns pilotStarted false.
+        Do not name a second branch and call it the same pilot.
+
+    3.2 Keep SHADOW-SEALED.
+        The default from createOneBranchShadowConfig is SHADOW-SEALED.
+        autoPromote is false. fieldLaunch is false.
+        requestShadowModeChange throws on an automatic move from SHADOW-SEALED
+        to SHADOW-VISIBLE ("never auto-promote SHADOW-SEALED to SHADOW-VISIBLE").
+        An explicit mode change still writes pilotStarted false and fieldLaunch false.
+        SHADOW-VISIBLE is display only. ADVISE-LOCKED is Option D and stays out of this start.
+        Starting Option C does not mean leaving SHADOW-SEALED.
+
+    3.3 Refuse-write stays true.
+        mayWriteServiceTitan, mayWriteProBooks, and mayWriteTradesApp return false.
+        Those functions live in src/spine/servicetitan-shadow.ts,
+        src/spine/probooks-shadow.ts, and src/spine/trades-app-shadow.ts.
+        POST, PUT, and PATCH throw. The throw text is "live … writes are refused".
+        A start checklist is not a write client.
+
+    3.4 Desk stays on 127.0.0.1:4174.
+
+          npm run desk
+          # http://127.0.0.1:4174/
+
+        src/cli.ts desk binds that host. The default port is 4174.
+        /api/health on that desk is health-local.
+        /api/option-c-start-gate is src/spine/option-c-start-gate.ts.
+        Every gate on that panel stays blocked-until. pilotMayStart stays false.
+        The public Worker may cite the install path. It does not serve this desk.
+
+    3.5 Engagement rules stay in force.
+        The written notice in src/core/engagement-rules.ts is:
+        "This is not an order. SHADOW-VISIBLE is display-only. Do not treat a recommendation as a ticket, booking, or dispatch write."
+        Violations: treated-as-order, treated-as-ticket, complaint-as-order,
+        booking-write-attempted, dispatch-write-attempted.
+        applyEngagement drops SHADOW-VISIBLE back to SHADOW-SEALED on any of those.
+        recordEngagementDrop in src/spine/engagement-receipt.ts writes that drop
+        on the isolate ledger and refuses to record a promotion or a started pilot.
+        The drop receipt keeps pilot_started false.
+        Human authority wins. A recommendation is not a ticket, a booking, or a dispatch write.
+
+    3.6 What actually sets pilot_started true.
+        Nothing in this tree. Checked 2026-10-02.
+        package.json has "pilot:prep": "tsx src/cli.ts pilot-prep". It has no pilot:start.
+        src/cli.ts accepts pilot-prep. It does not accept pilot-start.
+        An unknown command prints Unknown command and exits non-zero.
+        src/manifest.ts keeps pilot_started false, and launch_options.C.pilot_started false,
+        with status code-ready-pilot-not-started.
+        src/spine/health-local.ts types pilot_started as false and returns false.
+        src/spine/option-c-prep.ts types the prep receipt's pilot_started as false.
+        src/spine/option-c-start-gate.ts returns pilot_started false and pilotMayStart false.
+        Gate id human-starts-pilot says this software does not flip the gate.
+        src/core/shadow-branch.ts types pilotStarted as false on every return.
+        src/spine/local-softwares-gate.ts keeps option-c-pilot blocked and does not flip the flag.
+        src/spine/engagement-receipt.ts writes pilot_started false.
+
+        OPEN. A follow-up Softwares cut has to add the human command.
+        The intended command, not present in this tree, is:
+
+          npm run pilot:start -- --branch <branchId>
+
+        That is npx tsx src/cli.ts pilot-start --branch <branchId> once the script exists.
+        It does not exist today. Do not invent it by editing the manifest, health-local,
+        the start-gate, or shadow-branch in silence.
+        When that cut lands, the command is the only flip, and only because a human typed it
+        on this box after prep is ready true, one branch is named, the mode is SHADOW-SEALED,
+        refuse-write is still true, and the files in the drop are theirs.
+        That cut must keep live_backends false, Pages off, and writes refused.
+        It must refuse a flip that comes from prep, from booting the desk, from a mode change,
+        from copying test/fixtures/byo, or from this paper.
+        Until that command exists, finishing this checklist leaves pilot_started false.
+        Do not tell a GM the pilot has begun.
+
+ 4. After start — next Softwares waves
+    These waves wait until pilot_started is true with a real Option C.
+    They are not done in this paper. This paper does not retitle the desk.
+
+    Office messaging path.
+    TR-OFFICE-1.0-GATE-2026-09-28.
+    The local desk is already the Office surface: npm run desk on 127.0.0.1:4174.
+    Monitoring, the call board, huddle, callbacks, inbound quality, and alert stubs
+    are already on that desk under Local Softwares 1.0.
+    The words, once a real pilot is underway: Office Softwares 1.0 (local / pilot).
+    That is the same shared gate as Field.
+    Today the shipped label remains Local Softwares 1.0.
+    Office 1.0 is not Field 1.0 and it is not a live company OS.
+
+    Field path. Separate wave.
+    TR-FIELD-1.0-GATE-2026-09-28.
+    Field Softwares 1.0 (local / pilot) waits on the same pilot_started gate.
+    Draft field flags stay on open PR #23, branch cursor/field-flags-34af
+    (draft, checked 2026-10-02). The draft paper on that branch is
+    TR-FIELD-FLAGS-2026-09-27. Kinds named there: needsParts, safetyHold,
+    customerEscalation, vanDown, callbackRisk
+    (needs-parts, safety, escalation, van-down, callback-risk).
+    That PR waits until pilot_started is true. This paper does not merge it.
+    Do not copy those flags onto the Office desk. Do not mix Field into Office.
+
+ 5. Settlement fields, and Option D
+    When a human later compares a sealed day to actuals, the settlement receipt
+    still requires every field in SETTLEMENT_REQUIRED_FIELDS
+    (src/core/settlement-harness.ts):
+    plannedAction, contemporaneousEvidenceHash, prediction_confidence,
+    evidence_strength, source_quality, cross_source_agreement,
+    verification_status, humanOverride, actualOutcome, and timeToSettleMs.
+    humanOverride may be null. A missing key is not a settlement.
+    Hindsight must not rewrite the sealed recommendation.
+    assertSealedRecommendationUnchanged throws when the sealed hash or the planned action moves.
+    Human authority wins.
+    npm run shadow:sealed-demo is a synthetic harness. It keeps pilotStarted false.
+    This paper does not open a sealed day against company actuals.
+    Option D (launch_options.D, Advise-lock pilot) stays not started.
+    Settlement against a live advise-lock, and Option D, stay later separate waves.
+    Do not enter ADVISE-LOCKED to call Option C started.
+
+ 6. What NOT to do
+    No live_backends. The flag stays false. No hosted company OS. No live tenant pull.
+    No live ServiceTitan writes. No ProBooks writes. No trades-app writes.
+    No Pages. Do not add a Pages workflow. docs/ is a local catalog only.
+    No Glama Make Release. The parked public badge is not moved by this paper.
+    No fake GPS. No fake telematics. No accuracy percent.
+    A quality checklist score is not an accuracy percent. Pins on the desk are not a live GPS feed.
+    No company OS live claim. Local Softwares 1.0 is not that claim.
+    No mixing Field into Office. PR #23 stays on its own branch.
+    No version bump. Do not edit package.json, the manifest version, glama.json, or the Worker pin for this paper.
+    No silent flip of pilot_started. Desk boot, prep, a mode change, and this file do not set it.
+    No central dump. Do not upload tenant exports to the authoring node, to GitHub, to the public Worker, or to a shared demo.
+    No phone-home. No hosted uploader. No cloud account in local.json.
+    Do not deploy the Worker for this cut.
+    Do not treat the wrapper, the desk label, a prep receipt, or this runbook as VERIFIED.
+    Do not treat Install Server, a Worker URL, or this paper as a live pilot.
+    Do not invent a completed Option C pilot, a named-GM result, or sealed days against their actuals.
+
+
+ Laws held
+    Law                         This paper
+
+    BYO, not central dump       The company drop, when a human places it, stays on the operator machine.
+    Per-runtime isolate         Receipts sit under data/runtime/<instanceId>/.
+    Both sources first-class    ServiceTitan and ProBooks stay named peers. trades-app stays the third drop.
+    FragGate still admits       A human drop is still untrusted until admitted and hashed.
+    Wrapper ≠ verified          Admit status stays UNVERIFIED. A folder of files is not truth.
+    Writes refused              ST, ProBooks, and trades-app write methods throw.
+    Credentials local           Tokens and exports stay on this machine.
+    No tenant data on Worker    The desk is loopback. This paper does not deploy.
+    Pages off                   No Pages workflow.
+    Human authority             Engagement rules and settlement do not outrank a human.
+    SHADOW-SEALED               The start, when it exists, does not auto-promote and does not open Option D.
+    pilot_started false         Manifest, health-local, prep, the start-gate, and this paper all say so.
+    live_backends false         Unchanged. This paper does not flip it.
+
+
+ Honesty
+    Option C software: code-ready.
+    Option C prep: npm run pilot:prep. Receipt with pilot_started false.
+    Option C pilot: not started.
+    Option C start command: OPEN. npm run pilot:start is not in this tree.
+    Option D: not started.
+    Office Softwares 1.0: blocked until a real Option C pilot. Not this paper.
+    Field Softwares 1.0: blocked on the same gate. PR #23 waits. Not this paper.
+    Field launch: false.
+    live_backends: false.
+    pilot_started: false.
+
+
+ What this paper does not do
+    It does not start the Option C pilot.
+    It does not add npm run pilot:start.
+    It does not flip pilot_started.
+    It does not turn on live_backends.
+    It does not start Option D.
+    It does not add a ServiceTitan or ProBooks write client.
+    It does not publish Pages.
+    It does not run a Glama admin Deploy or Make Release.
+    It does not bump the package, the manifest, glama.json, or the Worker source pin.
+    It does not deploy the Worker.
+    It does not claim Office Softwares 1.0.
+    It does not claim Field Softwares 1.0.
+    It does not claim a live company OS.
+    It does not merge PR #23.
+    It does not invent GPS, telematics, or an accuracy percent.
+    It does not place a company file in data/inbound.
