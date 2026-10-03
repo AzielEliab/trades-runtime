@@ -24,6 +24,7 @@ data/**
 !data/runtime/
 !data/runtime/.gitkeep
 !data/runtime/alerts.json.example
+!data/runtime/field-flags.json.example
 !data/runtime/drive-miles.json.example
 !data/runtime/positions.json.example
 !data/runtime/time-cards.json.example

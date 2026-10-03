@@ -10,7 +10,7 @@ Public giveaway. Humans use the Worker UI on this VibeLock host (browser / PWA) 
 
 This Worker does not ingest ServiceTitan dumps, does not write to ServiceTitan or ProBooks, and does not store tenant data. `live_backends` is false.
 
-GitHub Pages stays off. The repo may stay private. Public get is the Worker UI. `GET /download` is the optional counted pack.
+GitHub Pages stays off. The git source is free to clone and run locally. Public browser UI is this Worker. `GET /download` is the optional counted pack. This README does not deploy the Worker.
 
 ## Honest counters (Workers KV `COUNTS`)
 

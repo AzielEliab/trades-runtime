@@ -36,6 +36,11 @@ const RULE_STUBS: Record<AlertRuleKind, { label: string; role: string; rationale
     label: "Keep the row unverified until a human supplies evidence",
     role: "operator",
     rationale: "The verification-stall rule fired. Wrapper admission is not verification. An operator decides. The desk does not mark the row verified."
+  },
+  "field-flag": {
+    label: "Read the field flag and decide on this machine",
+    role: "operator",
+    rationale: "A local field flag named a van and a label. A person decides. The stub is not an order and it does not write ServiceTitan or ProBooks. Not an accuracy percent. Not Field 1.0."
   }
 };
 

@@ -3,6 +3,7 @@ import { isAbsolute, join, dirname } from "node:path";
 import type { BookingBlock } from "../domain/workforce-capacity.js";
 import { isHostedTenantLayout, refuseHostedTenantLayout, RUNTIME_ISOLATE_ROOT } from "../spine/inbound-layout.js";
 import { sanitizeInstanceId } from "../spine/runtime-isolate.js";
+import { fieldFlagAlertDraft, type FieldFlag } from "./field-flags.js";
 
 /** Same labels the desk already uses. Repeated here so this module does not import the snapshot. */
 export type AlertDataLabel = "synthetic-demo" | "byo-admitted" | "byo-admitted-synthetic";
@@ -18,7 +19,8 @@ export const ALERT_RULE_KINDS = [
   "late-jobs",
   "trust-band",
   "booking-block",
-  "verification-stall"
+  "verification-stall",
+  "field-flag"
 ] as const;
 
 export type AlertRuleKind = (typeof ALERT_RULE_KINDS)[number];
@@ -54,6 +56,10 @@ export interface AlertRuleConfig {
     enabled: boolean;
     whenStatus: Array<"UNVERIFIED" | "PARTIAL" | "CONFLICTED">;
     stallMinutes: number;
+  };
+  /** Explicit field flags. Off leaves files on disk and does not show them. */
+  fieldFlag: {
+    enabled: boolean;
   };
 }
 
@@ -139,9 +145,14 @@ const FORBIDDEN_CONFIG_KEYS = [
   "hosted_uploader",
   "phoneHome",
   "phone_home",
+  "sms",
+  "push",
   "tenants",
   "tenantId",
-  "tenant_id"
+  "tenant_id",
+  "accuracy",
+  "accuracyPercent",
+  "accuracy_percent"
 ] as const;
 
 export function dataLabelWords(label: AlertDataLabel): string {
@@ -162,7 +173,8 @@ export function defaultAlertConfig(): AlertConfig {
         enabled: true,
         whenStatus: ["UNVERIFIED", "CONFLICTED"],
         stallMinutes: 720
-      }
+      },
+      fieldFlag: { enabled: true }
     },
     hooks: { file: null, webhook: null }
   };
@@ -305,6 +317,7 @@ export function parseAlertConfig(raw: unknown): AlertConfig {
   const trustRaw = asRecord(rulesRaw.trustBand ?? {}, "trust-band rule");
   const bookingRaw = asRecord(rulesRaw.bookingBlock ?? {}, "booking-block rule");
   const stallRaw = asRecord(rulesRaw.verificationStall ?? {}, "verification-stall rule");
+  const fieldFlagRaw = asRecord(rulesRaw.fieldFlag ?? {}, "field-flag rule");
   const floor = trustRaw.atOrBelow ?? defaults.rules.trustBand.atOrBelow;
   if (floor !== "LOW" && floor !== "MEDIUM" && floor !== "HIGH") {
     throw new Error("trustBand.atOrBelow must be LOW, MEDIUM, or HIGH");
@@ -360,6 +373,9 @@ export function parseAlertConfig(raw: unknown): AlertConfig {
           1,
           525600
         )
+      },
+      fieldFlag: {
+        enabled: requireBoolean(fieldFlagRaw.enabled, "fieldFlag.enabled", defaults.rules.fieldFlag.enabled)
       }
     },
     hooks: parseHooks(record.hooks)
@@ -483,7 +499,8 @@ interface DraftAlert {
 function evaluateRules(
   signals: DeskRuleSignals,
   config: AlertConfig,
-  previousTrust: EvidenceTrustScore | null
+  previousTrust: EvidenceTrustScore | null,
+  fieldFlags: FieldFlag[]
 ): { firing: DraftAlert[]; notices: AlertNotice[] } {
   const firing: DraftAlert[] = [];
   const notices: AlertNotice[] = [];
@@ -589,6 +606,21 @@ function evaluateRules(
     });
   }
 
+  if (rules.fieldFlag.enabled) {
+    const byFlag = new Map<string, FieldFlag>();
+    for (const flag of fieldFlags) byFlag.set(flag.flagId, flag);
+    for (const flag of byFlag.values()) {
+      const draft = fieldFlagAlertDraft(flag, label);
+      firing.push({ ...draft, rule: "field-flag" });
+    }
+  } else if (fieldFlags.length) {
+    notices.push({
+      severity: "info",
+      title: "Field-flag rule off",
+      detail: `${label} ${fieldFlags.length} local field flags stayed on disk and were not shown. Not an accuracy percent.`
+    });
+  }
+
   return { firing, notices };
 }
 
@@ -597,9 +629,12 @@ export function applyDeskAlerts(input: {
   config: AlertConfig;
   state: AlertStateFile | null;
   now: string;
+  fieldFlags?: FieldFlag[];
+  /** When a flag directory cannot be listed, keep active field flags instead of clearing them. */
+  retainFieldFlags?: boolean;
 }): { active: StoredAlert[]; history: StoredAlert[]; state: AlertStateFile; notices: AlertNotice[]; raised: StoredAlert[] } {
   const prior = input.state ?? emptyAlertState();
-  const evaluated = evaluateRules(input.signals, input.config, prior.lastTrustBand);
+  const evaluated = evaluateRules(input.signals, input.config, prior.lastTrustBand, input.fieldFlags ?? []);
   const byId = new Map(prior.alerts.map((alert) => [alert.id, { ...alert }]));
   const firingIds = new Set(evaluated.firing.map((alert) => alert.id));
   const raised: StoredAlert[] = [];
@@ -635,6 +670,7 @@ export function applyDeskAlerts(input: {
 
   for (const [id, row] of byId) {
     if (row.active && !firingIds.has(id)) {
+      if (input.retainFieldFlags && row.rule === "field-flag") continue;
       row.active = false;
       row.lastSeenAt = input.now;
       byId.set(id, row);
@@ -868,5 +904,6 @@ export function enabledRuleList(config: AlertConfig): AlertRuleKind[] {
   if (config.rules.trustBand.enabled) enabled.push("trust-band");
   if (config.rules.bookingBlock.enabled) enabled.push("booking-block");
   if (config.rules.verificationStall.enabled) enabled.push("verification-stall");
+  if (config.rules.fieldFlag.enabled) enabled.push("field-flag");
   return enabled;
 }

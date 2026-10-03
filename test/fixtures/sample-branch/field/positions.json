@@ -1,0 +1,16 @@
+{
+  "liveTelematics": false,
+  "live_backends": false,
+  "source": "operator-file",
+  "note": "Sample branch sample-shop. Fixture pins for the field shadow try. Not a live GPS feed. Not a company van. Not Field 1.0.",
+  "pins": [
+    {
+      "technicianId": "tech-local",
+      "technicianName": "Sample Tech",
+      "lat": 41.88,
+      "lng": -87.64,
+      "kind": "tech",
+      "at": "2026-10-03T16:00:00.000Z"
+    }
+  ]
+}

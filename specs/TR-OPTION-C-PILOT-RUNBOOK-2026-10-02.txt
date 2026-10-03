@@ -234,13 +234,11 @@ TRADES-RUNTIME · OPTION C HUMAN PILOT RUNBOOK                                  
     Field path. Separate wave.
     TR-FIELD-1.0-GATE-2026-09-28.
     Field Softwares 1.0 (local / pilot) waits on the same pilot_started gate.
-    Draft field flags stay on open PR #23, branch cursor/field-flags-34af
-    (draft, checked 2026-10-02). The draft paper on that branch is
-    TR-FIELD-FLAGS-2026-09-27. Kinds named there: needsParts, safetyHold,
+    Local field flags are shadow software (npm run shadow:field). Not Field 1.0.
+    Paper: TR-FIELD-FLAGS-2026-09-27. Kinds: needsParts, safetyHold,
     customerEscalation, vanDown, callbackRisk
     (needs-parts, safety, escalation, van-down, callback-risk).
-    That PR waits until pilot_started is true. This paper does not merge it.
-    Do not copy those flags onto the Office desk. Do not mix Field into Office.
+    The fixture try does not set pilot_started. Do not mix Field into Office.
 
  5. Settlement fields, and Option D
     When a human later compares a sealed day to actuals, the settlement receipt
@@ -267,7 +265,7 @@ TRADES-RUNTIME · OPTION C HUMAN PILOT RUNBOOK                                  
     No fake GPS. No fake telematics. No accuracy percent.
     A quality checklist score is not an accuracy percent. Pins on the desk are not a live GPS feed.
     No company OS live claim. Local Softwares 1.0 is not that claim.
-    No mixing Field into Office. PR #23 stays on its own branch.
+    No mixing Field into Office. Field shadow and office shadow are separate commands.
     No version bump. Do not edit package.json, the manifest version, glama.json, or the Worker pin for this paper.
     No silent flip of pilot_started. Desk boot, prep, a mode change, and this file do not set it.
     No central dump. Do not upload tenant exports to the authoring node, to GitHub, to the public Worker, or to a shared demo.
@@ -308,7 +306,7 @@ TRADES-RUNTIME · OPTION C HUMAN PILOT RUNBOOK                                  
     Option C pilot: not started on this tree. This paper does not run the command.
     Option D: not started.
     Office Softwares 1.0: blocked until a real Option C pilot. Not this paper.
-    Field Softwares 1.0: blocked on the same gate. PR #23 waits. Not this paper.
+    Field Softwares 1.0: blocked on the same gate. The shadow try is not that claim.
     Field launch: false.
     live_backends: false.
     pilot_started: false in the shipped catalog, default health, and this paper.
@@ -329,6 +327,6 @@ TRADES-RUNTIME · OPTION C HUMAN PILOT RUNBOOK                                  
     It does not claim Office Softwares 1.0.
     It does not claim Field Softwares 1.0.
     It does not claim a live company OS.
-    It does not merge PR #23.
+    It does not treat a fixture try as a started pilot.
     It does not invent GPS, telematics, or an accuracy percent.
     It does not place a company file in data/inbound.

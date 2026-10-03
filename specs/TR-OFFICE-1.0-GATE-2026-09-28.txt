@@ -26,7 +26,7 @@ OFFICE — Office Softwares 1.0 after a real Option C pilot on the local desk
 
 FIELD stays a separate paper
 - Field Softwares 1.0 is TR-FIELD-1.0-GATE-2026-09-28.
-- Draft field flags are open PR #23 on cursor/field-flags-34af. Do not merge that PR from an Office cut.
+- Field flags are a separate shadow command (npm run shadow:field). Do not mix that wave into an Office cut.
 - Local Softwares 1.0 alone is not an Office 1.0 claim and it is not a Field 1.0 claim.
 
 Ladder today: A done, B done-in-software, C code-ready / pilot not started, D not started.
@@ -193,11 +193,10 @@ Ladder today: A done, B done-in-software, C code-ready / pilot not started, D no
 
  BLOCKED field-in-office
     Field flags and Field 1.0 stay out of Office PRs.
-    Draft field flags (needs-parts, safety, escalation, van-down, callback-risk)
-    are open PR #23 on branch cursor/field-flags-34af
-    (draft paper TR-FIELD-FLAGS-2026-09-27 on that branch; kinds needsParts,
-    safetyHold, customerEscalation, vanDown, callbackRisk).
-    This paper does not merge that PR and does not copy those flags onto the desk.
+    Field flags (needs-parts, safety, escalation, van-down, callback-risk)
+    are the separate field shadow (npm run shadow:field, paper TR-FIELD-FLAGS-2026-09-27).
+    Kinds: needsParts, safetyHold, customerEscalation, vanDown, callbackRisk.
+    The office shadow command does not load them. This is not an Office 1.0 claim.
 
 
  What this cut does not do
@@ -213,5 +212,5 @@ Ladder today: A done, B done-in-software, C code-ready / pilot not started, D no
     It does not claim Office Softwares 1.0 is live today.
     It does not claim Field 1.0.
     It does not claim a live company OS.
-    It does not merge PR #23.
+    It does not mix field flags into the office shadow command.
     It does not invent GPS, telematics, or an accuracy percent.
