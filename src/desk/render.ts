@@ -4,6 +4,8 @@ import { explainMissionPace } from "../domain/mission-board.js";
 import { capacityChart, countBars, coverageMap, jobsChart, milesChart, positionMap, rankedBars } from "./charts.js";
 import type { OperatorSnapshot } from "./snapshot.js";
 import { deskViewClientScript } from "./view-prefs.js";
+import { deskHintClientScript } from "./hint-prefs.js";
+import { aztradesActionScript, renderAztrades, renderDriveLongAlerts, renderPropertyCard } from "./aztrades-render.js";
 
 function esc(value: string): string {
   return value
@@ -250,7 +252,13 @@ export function renderCalls(snapshot: OperatorSnapshot): string {
     <div class="table-scroll"><table>
       <thead><tr><th>Call</th><th>Lane</th><th>Day</th><th>Tech</th><th>Callback</th><th>Warranty</th><th>Reason</th></tr></thead>
       <tbody>${rows || `<tr><td colspan="7">No rows in this filter. The export was not relabeled.</td></tr>`}</tbody>
-    </table></div>`;
+    </table></div>
+    <div class="property-cards">
+      ${snapshot.propertyCards
+        .filter((card) => snapshot.visibleCalls.some((call) => call.id === card.jobId))
+        .map((card) => renderPropertyCard(card))
+        .join("")}
+    </div>`;
 }
 
 export function renderCallbackWeek(snapshot: OperatorSnapshot): string {
@@ -397,7 +405,8 @@ export function renderPartCosts(snapshot: OperatorSnapshot): string {
       ? ""
       : `<p>Adapted parts ${snapshot.partCosts.adaptedParts}. Current parts ${snapshot.partCosts.currentParts}. Last parts ${snapshot.partCosts.lastParts}. Not a skill score.</p>`;
   return `<p class="quiet">${esc(snapshot.partCosts.note)}</p>
-    <p class="quiet">Subordinate to a human. Auto-applied false. Source ${esc(snapshot.partCosts.source)}.</p>
+    <p class="quiet">Subordinate to a human. Auto-applied false. Source ${esc(snapshot.partCosts.source)}. Job sell prices are on the AZTrades panel. This board stays current, last, and adapted cost. It is not a skill score and not a supplier order.</p>
+    <p class="quiet">${esc(snapshot.jobPrices.note)}</p>
     ${totals}
     <div class="table-scroll"><table>
       <thead><tr><th>SKU</th><th>Current</th><th>Last</th><th>Adapted</th><th>Market weight</th><th>Evidence</th></tr></thead>
@@ -449,6 +458,8 @@ export function renderDrive(snapshot: OperatorSnapshot): string {
   return `<p class="quiet">${esc(drive.note)}</p>
     <p class="quiet">Source ${esc(drive.source)}. live telematics false. telematics vendor false. GPS trace false.</p>
     <p>Miles driven <strong>${numOrUnknown(drive.totalMiles)}</strong>. Miles per stop <strong>${numOrUnknown(drive.milesPerStop)}</strong>. Minutes per stop <strong>${numOrUnknown(drive.minutesPerStop)}</strong>. Miles per completed job <strong>${numOrUnknown(drive.milesPerCompletedJob)}</strong>.</p>
+    <h3>Drive time runs long</h3>
+    ${renderDriveLongAlerts(snapshot.fieldShell.driveAlerts)}
     ${milesChart(drive.days)}
     <p class="quiet"><a href="/api/drive">Drive JSON</a></p>
     <div class="table-scroll"><table>
@@ -835,7 +846,8 @@ const DESK_BOARDS: [string, string][] = [
   ["fulfillment-board", "Trucks"],
   ["inbound-board", "Inbound"],
   ["inbound-quality-board", "Quality"],
-  ["option-c-board", "Start gate"]
+  ["option-c-board", "Start gate"],
+  ["aztrades", "AZTrades"]
 ];
 
 const DESK_CHARTS: [string, string][] = [
@@ -1285,6 +1297,14 @@ const DESK_STYLES = `
       .metrics, .scores, .kpis, .tech-cards, .call-board, .time-cards { grid-template-columns: 1fr; }
       .wrap { padding-top: max(1.1rem, env(safe-area-inset-top)); }
     }
+    body[data-az-role="field"] [data-az]:not([data-az~="field"]) { display: none !important; }
+    body[data-az-role="office"] [data-az]:not([data-az~="office"]) { display: none !important; }
+    body[data-az-role="management"] [data-az]:not([data-az~="management"]) { display: none !important; }
+    html[data-hints="off"] .hint { display: none !important; }
+    .hint { color: var(--muted); font-size: 0.88rem; margin: 0.35rem 0 0.6rem; }
+    .property-card, .priced-job { border-top: 1px solid var(--line); margin-top: 0.8rem; padding-top: 0.6rem; }
+    .hint-switch { display: inline-flex; align-items: center; gap: 0.45rem; min-height: 44px; }
+    button[aria-pressed="true"] { border-color: var(--accent); color: var(--ink); }
     @media print {
       .domain-nav, .view-panel, .actions, .live, .dot { display: none; }
       body { background: #fff; color: #111; }
@@ -1295,7 +1315,7 @@ const DESK_STYLES = `
 export function renderDeskPage(snapshot: OperatorSnapshot): string {
   const embedded = JSON.stringify({ generatedAt: snapshot.generatedAt, dataLabel: snapshot.dataLabel }).replaceAll("<", "\\u003c");
   return `<!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="dark" data-hints="on">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -1309,13 +1329,14 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
     } catch (error) {}
   </script>
 </head>
-<body>
+<body data-az-role="office">
   <a class="skip" href="#mission-board">Skip to the mission board</a>
   <main class="wrap">
     <header class="top">
       <div>
         <p class="kicker">Trades-Runtime ${esc(snapshot.version)} · ${esc(RUNTIME_MANIFEST.product_label)} · ${esc(snapshot.author)} · local operator desk</p>
         <h1>The day, on this machine.</h1>
+        <p class="quiet">AZTrades · local field shell · ${esc(RUNTIME_MANIFEST.product_label)}. Not a Field 1.0 claim. Not Office Softwares 1.0.</p>
       </div>
       <div class="actions">
         <button type="button" class="text-btn" id="theme-toggle">Light theme</button>
@@ -1345,7 +1366,20 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
       <span class="chip">pilot_started ${snapshot.pilot_started ? "true" : "false"}</span>
       <span class="chip" id="clock">updated ${esc(snapshot.generatedAt)}</span>
     </div>
-    <nav class="domain-nav" aria-label="Desk domains">
+    <div class="actions" id="az-role">
+      <button type="button" data-az-role="field" aria-pressed="false">Field</button>
+      <button type="button" data-az-role="office" aria-pressed="true">Office</button>
+      <button type="button" data-az-role="management" aria-pressed="false">Management</button>
+      <label class="hint-switch"><input type="checkbox" id="hint-toggle" checked> Help hints</label>
+      <p class="quiet" id="az-status" role="status"></p>
+    </div>
+    <nav class="domain-nav" aria-label="Field" data-az="field">
+      <a href="#aztrades-home">Home</a>
+      <a href="#calls-board">Schedule</a>
+      <a href="#aztrades-time">Time</a>
+      <a href="#aztrades-price">Job price</a>
+    </nav>
+    <nav class="domain-nav" aria-label="Desk domains" data-az="office management">
       <a href="#monitoring-board" data-view="section:monitoring-board">Monitoring</a>
       <a href="#mission-board" data-view="section:mission-board">Mission</a>
       <a href="#tech-board" data-view="section:tech-board">Tech</a>
@@ -1368,91 +1402,95 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
       <a href="#option-c-board" data-view="section:option-c-board">Start gate</a>
     </nav>
     ${renderDeskViewPanel(snapshot)}
+    <section class="panel lift" id="aztrades" data-az="field office management" data-view="section:aztrades">
+      <h2>AZTrades</h2>
+      <div id="aztrades-body">${renderAztrades(snapshot)}</div>
+    </section>
     <div class="banner-stack" id="banner">${renderBanner(snapshot)}</div>
     <div class="banner-stack" id="rule-banner">${renderRuleBanner(snapshot)}</div>
-    <section class="panel lift" id="monitoring-board" data-view="section:monitoring-board">
+    <section class="panel lift" id="monitoring-board" data-az="office management" data-view="section:monitoring-board">
       <h2>Monitoring</h2>
       <div id="monitoring">${renderMonitoring(snapshot)}</div>
     </section>
     <section class="board">
-      <div class="panel" id="mission-board" data-view="section:mission-board">
+      <div class="panel" id="mission-board" data-az="office management" data-view="section:mission-board">
         <h2>Mission board</h2>
         <div id="mission">${renderMission(snapshot)}</div>
       </div>
-      <div class="panel" id="tech-board" data-view="section:tech-board">
+      <div class="panel" id="tech-board" data-az="office management" data-view="section:tech-board">
         <h2>Tech board</h2>
         <div id="tech">${renderTech(snapshot)}</div>
       </div>
     </section>
-    <section class="panel lift" id="calls-board" data-view="section:calls-board">
+    <section class="panel lift" id="calls-board" data-az="field office management" data-view="section:calls-board">
       <h2>Calls</h2>
       <div id="calls">${renderCalls(snapshot)}</div>
     </section>
     <section class="split">
-      <div class="panel" id="huddle-board" data-view="section:huddle-board">
+      <div class="panel" id="huddle-board" data-az="office management" data-view="section:huddle-board">
         <h2>Morning huddle</h2>
         <div id="huddle">${renderHuddle(snapshot)}</div>
       </div>
-      <div class="panel" id="callback-week-board" data-view="section:callback-week-board">
+      <div class="panel" id="callback-week-board" data-az="office management" data-view="section:callback-week-board">
         <h2>Callback week</h2>
         <div id="callback-week">${renderCallbackWeek(snapshot)}</div>
       </div>
     </section>
-    <section class="metrics" id="metrics" data-view="section:metrics">${renderMetrics(snapshot)}</section>
-    <section class="charts" id="charts" data-view="section:charts">${renderCharts(snapshot)}</section>
-    <section class="panel lift" id="lanes-board" data-view="section:lanes-board">
+    <section class="metrics" id="metrics" data-az="office management" data-view="section:metrics">${renderMetrics(snapshot)}</section>
+    <section class="charts" id="charts" data-az="office management" data-view="section:charts">${renderCharts(snapshot)}</section>
+    <section class="panel lift" id="lanes-board" data-az="office management" data-view="section:lanes-board">
       <h2>Lane view</h2>
       <div class="lanes" id="lanes">${renderLanes(snapshot)}</div>
     </section>
     <section class="split">
-      <div class="panel" id="scores-board" data-view="section:scores-board">
+      <div class="panel" id="scores-board" data-az="office management" data-view="section:scores-board">
         <h2>Scores</h2>
         <div class="scores" id="scores">${renderScores(snapshot)}</div>
       </div>
-      <div class="panel" id="alerts-board" data-view="section:alerts-board">
+      <div class="panel" id="alerts-board" data-az="office management" data-view="section:alerts-board">
         <h2>Alerts</h2>
         <div id="alerts">${renderAlerts(snapshot)}</div>
       </div>
     </section>
     <section class="split">
-      <div class="panel" id="drive-board" data-view="section:drive-board">
+      <div class="panel" id="drive-board" data-az="office management" data-view="section:drive-board">
         <h2>Miles and drive performance</h2>
         <div id="drive">${renderDrive(snapshot)}</div>
       </div>
-      <div class="panel" id="performance-board" data-view="section:performance-board">
+      <div class="panel" id="performance-board" data-az="office management" data-view="section:performance-board">
         <h2>Performance board</h2>
         <div id="performance">${renderPerformance(snapshot)}</div>
       </div>
     </section>
-    <section class="panel lift" id="work-together-board" data-view="section:work-together-board">
+    <section class="panel lift" id="work-together-board" data-az="office management" data-view="section:work-together-board">
       <h2>Work together</h2>
       <div id="work-together">${renderWorkTogether(snapshot)}</div>
     </section>
     <section class="split">
-      <div class="panel" id="part-cost-board" data-view="section:part-cost-board">
+      <div class="panel" id="part-cost-board" data-az="office management" data-view="section:part-cost-board">
         <h2>Part cost</h2>
         <div id="part-cost">${renderPartCosts(snapshot)}</div>
       </div>
-      <div class="panel" id="behavior-board" data-view="section:behavior-board">
+      <div class="panel" id="behavior-board" data-az="office management" data-view="section:behavior-board">
         <h2>Department behavior</h2>
         <div id="behavior">${renderBehavior(snapshot)}</div>
       </div>
     </section>
     <section class="split">
-      <div class="panel" id="fulfillment-board" data-view="section:fulfillment-board">
+      <div class="panel" id="fulfillment-board" data-az="office management" data-view="section:fulfillment-board">
         <h2>Fulfillment and truck counts</h2>
         <div id="fulfillment">${renderFulfillment(snapshot)}</div>
       </div>
-      <div class="panel" id="inbound-board" data-view="section:inbound-board">
+      <div class="panel" id="inbound-board" data-az="office management" data-view="section:inbound-board">
         <h2>Inbound</h2>
         <div id="inbound">${renderInbound(snapshot)}</div>
       </div>
     </section>
-    <section class="panel lift" id="inbound-quality-board" data-view="section:inbound-quality-board">
+    <section class="panel lift" id="inbound-quality-board" data-az="office management" data-view="section:inbound-quality-board">
       <h2>Inbound quality</h2>
       <div id="inbound-quality">${renderInboundQuality(snapshot)}</div>
     </section>
-    <section class="panel lift" id="option-c-board" data-view="section:option-c-board">
+    <section class="panel lift" id="option-c-board" data-az="office management" data-view="section:option-c-board">
       <h2>Option C start gate</h2>
       <div id="option-c">${renderOptionCStartGate(snapshot)}</div>
     </section>
@@ -1462,6 +1500,7 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
       Optional miles file: <code>data/runtime/&lt;instanceId&gt;/drive-miles.json</code> or <code>data/inbound/drive-miles.json</code>. Copy <code>data/runtime/drive-miles.json.example</code>. No GPS vendor.
       Optional positions file: <code>data/runtime/&lt;instanceId&gt;/positions.json</code> or <code>data/inbound/positions.json</code>. Copy <code>data/runtime/positions.json.example</code>. Local or demo pins only. Not a live GPS vendor.
       Optional time cards: <code>data/runtime/&lt;instanceId&gt;/time-cards.json</code> or <code>data/inbound/time-cards.json</code>. Copy <code>data/runtime/time-cards.json.example</code>. The desk writes <code>time-tracking.json</code> and <code>time-tracking.jsonl</code> on this machine.
+      AZTrades clock, meal, and drive events append to <code>data/runtime/&lt;instanceId&gt;/field-events.jsonl</code>. Job prices stay in <code>job-prices.json</code>. Dropped part images stay in <code>job-images</code>. None of those write a provider or place a supplier order.
       Optional coverage: <code>data/runtime/&lt;instanceId&gt;/coverage.json</code> or <code>data/inbound/coverage.json</code>. Copy <code>data/runtime/coverage.json.example</code>. Layer switches stay in <code>coverage-layers.json</code>. Not a live map tile. The address map stays undrawn.
       Right tech suggestions stay on this Monitoring panel. They do not dispatch and they do not write back.
       Alert rules: copy <code>data/runtime/alerts.json.example</code> to <code>data/runtime/&lt;instanceId&gt;/alerts.json</code>.
@@ -1474,6 +1513,8 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
   <script id="desk-boot" type="application/json">${embedded}</script>
   <script>
     ${deskViewClientScript()}
+    ${deskHintClientScript()}
+    ${aztradesActionScript()}
     const THEME_KEY = "trades-desk-theme";
     function applyTheme(theme) {
       const next = theme === "light" ? "light" : "dark";
@@ -1494,7 +1535,7 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
       domainNav.querySelectorAll("a").forEach((node) => node.removeAttribute("aria-current"));
       link.setAttribute("aria-current", "true");
     });
-    const slots = ["banner", "rule-banner", "monitoring", "metrics", "charts", "scores", "alerts", "mission", "tech", "calls", "huddle", "callback-week", "lanes", "drive", "performance", "work-together", "part-cost", "behavior", "fulfillment", "inbound", "inbound-quality", "option-c"];
+    const slots = ["banner", "rule-banner", "monitoring", "metrics", "charts", "scores", "alerts", "mission", "tech", "calls", "huddle", "callback-week", "lanes", "drive", "performance", "work-together", "part-cost", "behavior", "fulfillment", "inbound", "inbound-quality", "option-c", "aztrades-body"];
     function apply(view) {
       for (const slot of slots) {
         const node = document.getElementById(slot);
@@ -1505,6 +1546,7 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
       const state = document.getElementById("live-state");
       if (state) state.textContent = "live on this machine · " + (view.dataLabel || "");
       if (typeof window.__applyDeskView === "function") window.__applyDeskView();
+      if (typeof window.__applyAztradesChrome === "function") window.__applyAztradesChrome();
     }
     if (new URLSearchParams(location.search).has("static")) {
       const state = document.getElementById("live-state");
@@ -1512,7 +1554,17 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
     } else {
       const source = new EventSource("/api/events" + window.location.search);
       source.addEventListener("snapshot", (event) => {
-        apply(JSON.parse(event.data));
+        const view = JSON.parse(event.data);
+        const active = document.activeElement;
+        const typing = active && active.closest && active.closest("#aztrades");
+        if (typing) {
+          const kept = view["aztrades-body"];
+          delete view["aztrades-body"];
+          apply(view);
+          view["aztrades-body"] = kept;
+          return;
+        }
+        apply(view);
       });
       source.onerror = () => {
         const state = document.getElementById("live-state");
@@ -1582,6 +1634,7 @@ export function renderDeskView(snapshot: OperatorSnapshot): Record<string, strin
     fulfillment: renderFulfillment(snapshot),
     inbound: renderInbound(snapshot),
     "inbound-quality": renderInboundQuality(snapshot),
-    "option-c": renderOptionCStartGate(snapshot)
+    "option-c": renderOptionCStartGate(snapshot),
+    "aztrades-body": renderAztrades(snapshot)
   };
 }

@@ -7,6 +7,23 @@ import { acknowledgeStoredAlert, alertDigestCsv, buildAlertDigest, defaultAlertS
 import { buildOperatorSnapshot, DESK_REFRESH_MS, type DeskSnapshotOptions, type OperatorSnapshot } from "./snapshot.js";
 import { renderPrintableHuddle, renderPrintableSnapshot } from "./print.js";
 import { renderDeskPage, renderDeskView } from "./render.js";
+import { FIELD_EVENT_KINDS, recordFieldEvent, type FieldEventKind } from "./field-time.js";
+import {
+  addDiscount,
+  addTask,
+  applyDiscount,
+  attachExistingImageFile,
+  attachPart,
+  lookupCatalogPrice,
+  recordCatalogView,
+  saveDroppedImage,
+  setLabor,
+  setMargin,
+  setPartCost,
+  updateJobPrices
+} from "./job-price.js";
+import type { AuthorityRole } from "../core/actor-registry.js";
+import { AUTHORITY_ROLES } from "../core/actor-registry.js";
 
 export interface DeskServerOptions extends DeskSnapshotOptions {
   port?: number;
@@ -30,13 +47,13 @@ function send(res: ServerResponse, status: number, body: string, type: string, e
   res.end(body);
 }
 
-function readBody(req: IncomingMessage): Promise<string> {
+function readBody(req: IncomingMessage, max = 2048): Promise<string> {
   return new Promise((resolve, reject) => {
     const chunks: Buffer[] = [];
     let size = 0;
     req.on("data", (chunk: Buffer) => {
       size += chunk.length;
-      if (size > 2048) {
+      if (size > max) {
         reject(new Error("body too large"));
         req.destroy();
         return;
@@ -172,6 +189,10 @@ function huddleJson(snapshot: OperatorSnapshot): string {
   });
 }
 
+function isDeskRole(value: unknown): value is AuthorityRole {
+  return typeof value === "string" && (AUTHORITY_ROLES as readonly string[]).includes(value);
+}
+
 export function startOperatorDesk(options: DeskServerOptions = {}): Promise<DeskServer> {
   const host = options.host ?? "127.0.0.1";
   if (host !== "127.0.0.1" && host !== "localhost") {
@@ -278,6 +299,188 @@ export function startOperatorDesk(options: DeskServerOptions = {}): Promise<Desk
         });
       return;
     }
+    if (req.method === "POST" && url.pathname === "/api/field/event") {
+      void readBody(req)
+        .then((raw) => {
+          const body = raw ? (JSON.parse(raw) as { kind?: unknown; technicianId?: unknown; jobId?: unknown }) : {};
+          const kind = typeof body.kind === "string" ? body.kind.trim() : "";
+          if (!FIELD_EVENT_KINDS.includes(kind as FieldEventKind)) {
+            send(res, 400, JSON.stringify({ error: "kind must be clock-in, clock-out, meal-start, meal-end, or extended-drive", vendorWrite: false, liveGps: false }), "application/json; charset=utf-8");
+            return;
+          }
+          const technicianId = typeof body.technicianId === "string" ? body.technicianId : "";
+          const jobId = typeof body.jobId === "string" ? body.jobId : "";
+          const snapshot = snapshotFor(deskOptions, url);
+          const event = recordFieldEvent({
+            cwd,
+            instanceId,
+            kind: kind as FieldEventKind,
+            at: new Date().toISOString(),
+            technicianId,
+            technicianName: snapshot.fieldShell.techs.find((tech) => tech.id === technicianId.trim())?.name ?? null,
+            jobId: jobId || null,
+            rosterIds: snapshot.fieldShell.techs.map((tech) => tech.id)
+          });
+          send(
+            res,
+            200,
+            JSON.stringify({
+              ok: true,
+              event,
+              writes: false,
+              vendorWrite: false,
+              servicetitanWrite: false,
+              probooksWrite: false,
+              jobberWrite: false,
+              liveGps: false,
+              live_backends: false,
+              pilot_started: false,
+              field_claim: false,
+              ordersEnabled: false
+            }),
+            "application/json; charset=utf-8"
+          );
+        })
+        .catch((error: unknown) => {
+          const message = error instanceof Error ? error.message : String(error);
+          if (!res.headersSent) {
+            send(res, 400, JSON.stringify({ error: message, vendorWrite: false, liveGps: false, ordersEnabled: false }), "application/json; charset=utf-8");
+          }
+        });
+      return;
+    }
+    if (req.method === "POST" && url.pathname === "/api/job-price") {
+      void readBody(req, 2_000_000)
+        .then((raw) => {
+          const body = raw ? (JSON.parse(raw) as Record<string, unknown>) : {};
+          const action = typeof body.action === "string" ? body.action.trim() : "";
+          const jobId = typeof body.jobId === "string" ? body.jobId : "";
+          const role: AuthorityRole = isDeskRole(body.role) ? body.role : "technician";
+          const textOf = (key: string) => (typeof body[key] === "string" ? body[key] : "");
+          const numberOf = (key: string, label: string) => {
+            const value = body[key];
+            const parsed = typeof value === "number" ? value : typeof value === "string" && value.trim() ? Number(value) : NaN;
+            if (!Number.isFinite(parsed)) throw new Error(`${label} must be a number`);
+            return parsed;
+          };
+          let note = "Saved on this desk. Not a supplier order. Not a provider write.";
+          let lookup: ReturnType<typeof lookupCatalogPrice> | null = null;
+          const store = updateJobPrices(cwd, instanceId, (current) => {
+            if (action === "attach-part") {
+              const attached = attachPart(current, { jobId, sku: String(textOf("sku")), name: String(textOf("name")) });
+              note = `Part ${attached.part.sku} attached. Cost is empty until typed. No catalog price was invented. No order was placed.`;
+              return attached.store;
+            }
+            if (action === "set-cost") {
+              note = "Typed part cost saved on this desk. This is not a live catalog price.";
+              return setPartCost(current, { jobId, partId: String(textOf("partId")), cost: numberOf("cost", "part cost") });
+            }
+            if (action === "lookup" || action === "signin") {
+              const viewed = recordCatalogView(current, {
+                jobId,
+                sourceId: String(textOf("sourceId")),
+                sku: String(textOf("sku") || textOf("partId") || "unspecified"),
+                actorRole: role,
+                at: new Date().toISOString()
+              });
+              lookup = viewed.lookup;
+              note = action === "signin" ? viewed.request.note : viewed.lookup.note;
+              return viewed.store;
+            }
+            if (action === "attach-image") {
+              note = "Dropped image kept on this machine. No catalog photo was invented.";
+              return attachExistingImageFile({
+                cwd,
+                instanceId,
+                store: current,
+                jobId,
+                partId: String(textOf("partId")),
+                fileName: String(textOf("fileName"))
+              });
+            }
+            if (action === "drop-image") {
+              const mediaType = String(textOf("mediaType"));
+              const encoded = String(textOf("imageBase64"));
+              const bytes = Buffer.from(encoded, "base64");
+              const saved = saveDroppedImage({ cwd, instanceId, jobId, partId: String(textOf("partId")), mediaType, bytes });
+              note = "Dropped image kept on this machine. No catalog photo was invented.";
+              return attachExistingImageFile({
+                cwd,
+                instanceId,
+                store: current,
+                jobId,
+                partId: String(textOf("partId")),
+                fileName: saved.relativePath.split(/[/\\]/).pop() ?? ""
+              });
+            }
+            if (action === "set-labor") {
+              note = "Labor saved on this desk.";
+              return setLabor(current, jobId, numberOf("labor", "labor"));
+            }
+            if (action === "set-margin") {
+              note = "Margin multiplier saved on this desk. Immediate price uses it locally and does not write a provider.";
+              return setMargin(current, jobId, numberOf("margin", "margin"));
+            }
+            if (action === "add-task") {
+              note = "Task cost added on this desk.";
+              return addTask(current, { jobId, label: String(textOf("label")), amount: numberOf("amount", "task cost") });
+            }
+            if (action === "add-discount") {
+              const kind = textOf("kind");
+              if (kind !== "percent" && kind !== "manager" && kind !== "member" && kind !== "coupon") {
+                throw new Error("discount kind must be percent, manager, member, or coupon");
+              }
+              const added = addDiscount(current, {
+                jobId,
+                kind,
+                value: numberOf("value", "discount"),
+                locked: kind === "manager" ? true : body.locked === true
+              });
+              note = added.discount.locked
+                ? "Discount added and locked. Only an allowed role can apply it."
+                : "Discount added. It is not applied until Apply discount.";
+              return added.store;
+            }
+            if (action === "apply-discount") {
+              note = "Discount applied on this desk for the named role. Not a provider write.";
+              return applyDiscount(current, {
+                jobId,
+                discountId: String(textOf("discountId")),
+                role,
+                actorId: String(textOf("actorId") || role)
+              });
+            }
+            throw new Error("unknown job price action");
+          });
+          send(
+            res,
+            200,
+            JSON.stringify({
+              ok: true,
+              note,
+              lookup,
+              ordersEnabled: false,
+              writes: false,
+              vendorWrite: false,
+              servicetitanWrite: false,
+              probooksWrite: false,
+              jobberWrite: false,
+              live_backends: false,
+              pilot_started: false,
+              field_claim: false,
+              jobs: store.jobs.length
+            }),
+            "application/json; charset=utf-8"
+          );
+        })
+        .catch((error: unknown) => {
+          const message = error instanceof Error ? error.message : String(error);
+          if (!res.headersSent) {
+            send(res, 400, JSON.stringify({ error: message, vendorWrite: false, ordersEnabled: false, live_backends: false }), "application/json; charset=utf-8");
+          }
+        });
+      return;
+    }
     if (req.method !== "GET" && req.method !== "HEAD") {
       send(res, 405, JSON.stringify({ error: "method not allowed", write: false }), "application/json; charset=utf-8");
       return;
@@ -352,6 +555,16 @@ export function startOperatorDesk(options: DeskServerOptions = {}): Promise<Desk
     }
     if (url.pathname === "/api/monitoring" || url.pathname === "/api/monitoring.json") {
       const board = snapshotFor(deskOptions, url).monitoring;
+      send(res, 200, JSON.stringify(board), "application/json; charset=utf-8");
+      return;
+    }
+    if (url.pathname === "/api/field" || url.pathname === "/api/field.json") {
+      const shell = snapshotFor(deskOptions, url).fieldShell;
+      send(res, 200, JSON.stringify(shell), "application/json; charset=utf-8");
+      return;
+    }
+    if (url.pathname === "/api/job-price" || url.pathname === "/api/job-price.json") {
+      const board = snapshotFor(deskOptions, url).jobPrices;
       send(res, 200, JSON.stringify(board), "application/json; charset=utf-8");
       return;
     }
