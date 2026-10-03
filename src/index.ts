@@ -271,6 +271,7 @@ export { runByoAdmitDemo, printByoAdmitDemo } from "./demo/byo-admit.js";
 export { runDropInDemo, printDropInDemo } from "./demo/drop-in.js";
 export { runSealedShadowDemo, printSealedShadowDemo } from "./demo/shadow-sealed.js";
 export { buildOperatorSnapshot } from "./desk/snapshot.js";
+export { readShadowDesk, shadowDeskFromSnapshot, shadowReadsFromSnapshot } from "./desk/shadow-read.js";
 export { startOperatorDesk } from "./desk/server.js";
 export {
   acknowledgeAlert,
