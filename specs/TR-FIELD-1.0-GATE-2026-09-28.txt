@@ -23,7 +23,8 @@ TRACK F — Field Softwares 1.0 ONLY after a real Option C pilot
 - Do not mix Field flags into Office PRs. Do not mix Field waves into Track L PRs.
 - Then, as separate Softwares waves, not one mixed cut:
   1. Field flags: needs-parts, safety, escalation, van-down, callback-risk.
-     Draft only. Open PR #23 on branch cursor/field-flags-34af. Do not merge it here.
+     Local shadow software: npm run shadow:field on sample branch sample-shop.
+     That try is not a Field 1.0 claim. Do not mix it into an Office cut.
   2. Field time, coverage, and right-tech under pilot files.
      The local APIs already exist in the 0.4.10 ops cut. Pilot files are not this paper.
   3. Phone-width mobile desk as the field surface. The layout is already local.
@@ -102,15 +103,15 @@ Ladder today: A done, B done-in-software, C code-ready / pilot not started, D no
     Never company OS live. This paper does not retitle the product.
 
  OPEN field-flags-wave
-    The field-flags Softwares wave is draft, not on this tree.
-    Open PR #23, branch cursor/field-flags-34af, draft paper TR-FIELD-FLAGS-2026-09-27
-    on that branch only.
-    Kinds named there: needsParts, safetyHold, customerEscalation, vanDown, callbackRisk.
+    The field-flags behavior is local shadow software in this tree.
+    Paper: TR-FIELD-FLAGS-2026-09-27. Command: npm run shadow:field.
+    Sample branch in the fixture: sample-shop.
+    Kinds: needsParts, safetyHold, customerEscalation, vanDown, callbackRisk.
     Those are needs-parts, safety, escalation, van-down, and callback-risk.
-    Severity on that draft is info, watch, or hold. inventedAccuracy false. No accuracy percent.
-    Flags would live under data/runtime/<instanceId>/field-flags/ and raise on loopback only.
-    This paper does not merge PR #23, does not copy that code, and does not add the route.
-    The wave waits until the Option C pilot has started, then lands as its own Softwares cut.
+    Severity is info, watch, or hold. inventedAccuracy false. No accuracy percent.
+    Flags live under data/runtime/<instanceId>/field-flags/ and raise on loopback only.
+    This is not a Field 1.0 claim. The claim stays blocked until a human runs
+    pilot:start on their own isolate. Office shadow does not include these flags.
 
  OPEN pilot-data-labels
     Under a pilot, time cards, coverage, positions, and miles that a human placed
@@ -158,8 +159,8 @@ Ladder today: A done, B done-in-software, C code-ready / pilot not started, D no
     Do not mix Field flags into Office PRs.
     Do not mix Field 1.0 into Track L PRs.
     Do not claim Field 1.0 off Local Softwares 1.0 alone.
-    PR #23 stays a draft until a human merges it on its own, after the pilot gate is open.
-    This paper does not merge it.
+    Field flag software is the separate shadow command npm run shadow:field.
+    The Field 1.0 claim stays blocked until a human runs pilot:start on their isolate.
 
 
  What this cut does not do
@@ -175,6 +176,6 @@ Ladder today: A done, B done-in-software, C code-ready / pilot not started, D no
     It does not claim Field Softwares 1.0 is live today.
     It does not claim a live company OS.
     It does not claim GPS, telematics, or an accuracy percent.
-    It does not merge PR #23.
-    It does not add field flags to the Office desk.
+    It does not treat the local shadow try as Field 1.0.
+    It does not put field flags inside the office shadow command.
     It does not treat Local Softwares 1.0 as Field 1.0.

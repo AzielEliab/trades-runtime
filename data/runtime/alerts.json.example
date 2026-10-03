@@ -23,6 +23,9 @@
       "enabled": true,
       "whenStatus": ["UNVERIFIED", "CONFLICTED"],
       "stallMinutes": 720
+    },
+    "fieldFlag": {
+      "enabled": true
     }
   },
   "hooks": {

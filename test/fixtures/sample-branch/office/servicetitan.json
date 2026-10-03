@@ -1,0 +1,45 @@
+{
+  "synthetic": true,
+  "note": "Sample branch sample-shop. Synthetic office-shadow ServiceTitan-shaped export. Not a company export. Not Office Softwares 1.0. Not a live tenant.",
+  "exportedAt": "2026-10-03T12:00:00.000Z",
+  "source": "trades-runtime-fixture",
+  "branch": "sample-shop",
+  "jobs": [
+    {
+      "id": "SAMPLE-ST-JOB-1",
+      "jobNumber": 1,
+      "trade": "hvac",
+      "technicianId": "tech-sample",
+      "technicianName": "Sample Tech",
+      "isCallback": false,
+      "isWarranty": false,
+      "jobType": "no cool",
+      "status": "Scheduled",
+      "customerId": "SAMPLE-CUST-1",
+      "businessUnit": "sample-shop",
+      "summary": "Synthetic office shadow call"
+    },
+    {
+      "id": "SAMPLE-ST-JOB-2",
+      "jobNumber": 2,
+      "trade": "plumbing",
+      "technicianId": "tech-sample",
+      "technicianName": "Sample Tech",
+      "isCallback": true,
+      "isWarranty": false,
+      "jobType": "leak",
+      "status": "Completed",
+      "customerId": "SAMPLE-CUST-2",
+      "businessUnit": "sample-shop",
+      "summary": "Synthetic office shadow callback label"
+    }
+  ],
+  "pricebook": [
+    {
+      "id": "SAMPLE-ST-PB-1",
+      "code": "SKU-SAMPLE-1",
+      "description": "Synthetic office shadow part",
+      "price": 40
+    }
+  ]
+}

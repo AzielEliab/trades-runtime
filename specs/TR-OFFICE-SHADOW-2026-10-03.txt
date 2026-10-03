@@ -1,0 +1,35 @@
+TRADES-RUNTIME · OFFICE SHADOW TRY                                                                                 TR-OFFICE-SHADOW-2026-10-03
+
+
+
+
+ Receipt ID TR-OFFICE-SHADOW-2026-10-03 · 2026-10-03
+ Identity: Aziel Eliab only. Author of the free software. Not the operator. Not a customer.
+ Local shadow office software. Not Office Softwares 1.0. Not a live company OS.
+ live_backends remains false. Catalog pilot_started remains false. Pages remain off.
+ This paper does not deploy the Worker, does not Make Release, and does not bump 1.0.0-local.
+ Glama Latest/releaseVersion is 1.0.0-local.
+ Field flags are not this paper. They are TR-FIELD-FLAGS-2026-09-27 and npm run shadow:field.
+
+
+ Try it without a tenant
+    npm run shadow:office
+    Fixtures: test/fixtures/sample-branch/office/
+    Sample branch name: sample-shop
+    The receipt keeps office_softwares_1_0 false, field flags at zero on that run,
+    writes false, and pilot_started false.
+    npm run desk with empty inbound folders shows the synthetic demo at 127.0.0.1:4174.
+    That page is not a company board.
+
+ What this is
+    Admitted sample jobs, a huddle count, an inbound quality checklist, and alert stubs
+    that refuse write-back. The checklist is not an accuracy percent.
+    ServiceTitan and ProBooks writes stay refused.
+
+ What this is not
+    It does not start a pilot. Merging the repo does not start a pilot.
+    The only software path that sets pilot_started true is
+    npm run pilot:start -- --branch <branchId> on the operator's own isolate.
+    That command still refuses a bad branch, prep that is not ready,
+    and --claim-company without real inbound.
+    It does not claim Office Softwares 1.0 or Field 1.0.
