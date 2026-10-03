@@ -21,6 +21,7 @@ import { collectDepartmentFlags, flagHandoffBehavior, type DepartmentBehaviorBoa
 import { flagCrossTradeBehavior } from "../domain/cross-trade-matrix.js";
 import { loadDrivePerformance, type DrivePerformance } from "../domain/drive-miles.js";
 import { buildFieldShell, type FieldShell } from "./field-time.js";
+import { loadLocalLogin, type LocalLoginView } from "./local-login.js";
 import { loadJobPriceBoard, stockHitsFromLines, type JobPriceBoard } from "./job-price.js";
 import { buildPropertyCard, type PropertyCard } from "./property-card.js";
 import { loadLocalPositions } from "../domain/local-positions.js";
@@ -289,6 +290,7 @@ export interface OperatorSnapshot {
   fieldShell: FieldShell;
   jobPrices: JobPriceBoard;
   propertyCards: PropertyCard[];
+  localLogin: LocalLoginView;
 }
 
 export interface DeskSnapshotOptions {
@@ -313,6 +315,8 @@ export interface DeskSnapshotOptions {
   rightTechJob?: string;
   /** Write the local quality report and alert-action stubs under data/runtime. */
   persistLocalReports?: boolean;
+  /** Local sign-in token from the desk cookie. Not a hosted identity provider. */
+  localSessionToken?: string | null;
 }
 
 export interface DeskPartCostLine {
@@ -1440,6 +1444,11 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
       ...huddle.techs.map((tech) => ({ id: tech.id, name: tech.name }))
     ]
   });
+  const localLogin = loadLocalLogin({
+    cwd,
+    instanceId,
+    sessionToken: options.localSessionToken ?? null
+  });
   const jobPrices = loadJobPriceBoard({
     cwd,
     instanceId,
@@ -1544,6 +1553,7 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
     report,
     fieldShell,
     jobPrices,
-    propertyCards
+    propertyCards,
+    localLogin
   };
 }

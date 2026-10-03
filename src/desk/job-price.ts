@@ -4,12 +4,14 @@ import { sha256 } from "../core/hash.js";
 import type { AuthorityRole } from "../core/actor-registry.js";
 import { AUTHORITY_ROLES } from "../core/actor-registry.js";
 import { sanitizeInstanceId } from "../spine/runtime-isolate.js";
+import type { SupplyHousePublicResult } from "./supplyhouse-public.js";
+import { SUPPLYHOUSE_AVAILABILITY } from "./supplyhouse-public.js";
 
 /**
  * Job price on the local desk.
- * Part cost is typed, or filled only when a permitted catalog lookup actually returns a price.
- * This module does not call supplier sites, does not scrape, does not order, and does not
- * write ServiceTitan, Jobber, or ProBooks.
+ * Part cost is typed, or filled only when a SupplyHouse public read returns a number.
+ * This module does not place supplier orders and does not write ServiceTitan, Jobber, or ProBooks.
+ * Other named suppliers stay empty.
  *
  * Immediate price = (part cost + labor + task costs) × the company's margin multiplier.
  * Discounts apply after that. A locked discount refuses a role that is not allowed.
@@ -50,8 +52,11 @@ export interface CatalogSource {
 const SOURCE_NOTE =
   "No permitted account and no public price feed is connected. This desk does not scrape the site, does not invent a price or a stock count, and does not place an order. Sign-in here only records a local view request.";
 
+const SUPPLYHOUSE_NOTE =
+  "Public product page on supplyhouse.com, read-only. A price, an availability word, or an image is used only when that page returns it without a login. A stock count is not invented. If the page does not return a number, the typed cost remains and the live price is unavailable. Sign-in on this desk records a local view request and does not open a session that can order. This desk does not scrape a signed-in account and does not place an order.";
+
 export const CATALOG_SOURCES: readonly CatalogSource[] = [
-  { id: "supplyhouse", label: "SupplyHouse", host: "supplyhouse.com", kind: "supply-house", priceConnected: false, stockConnected: false, ordersEnabled: false, scrape: false, signInForPriceOnly: true, note: SOURCE_NOTE },
+  { id: "supplyhouse", label: "SupplyHouse", host: "supplyhouse.com", kind: "supply-house", priceConnected: false, stockConnected: false, ordersEnabled: false, scrape: false, signInForPriceOnly: true, note: SUPPLYHOUSE_NOTE },
   { id: "johnstone", label: "Johnstone Supply", host: "johnstone.com", kind: "supply-house", priceConnected: false, stockConnected: false, ordersEnabled: false, scrape: false, signInForPriceOnly: true, note: SOURCE_NOTE },
   { id: "ruud", label: "Ruud", host: "ruud.com", kind: "manufacturer-site", priceConnected: false, stockConnected: false, ordersEnabled: false, scrape: false, signInForPriceOnly: true, note: SOURCE_NOTE },
   { id: "rheem", label: "Rheem", host: "rheem.com", kind: "manufacturer-site", priceConnected: false, stockConnected: false, ordersEnabled: false, scrape: false, signInForPriceOnly: true, note: SOURCE_NOTE },
@@ -79,10 +84,13 @@ export interface CatalogLookup {
   sourceId: CatalogSourceId;
   label: string;
   sku: string;
-  price: null;
+  price: number | null;
   stock: null;
-  imageUrl: null;
-  priceConnected: false;
+  imageUrl: string | null;
+  pageUrl: string | null;
+  availability: string | null;
+  httpStatus: number | null;
+  priceConnected: boolean;
   stockConnected: false;
   ordersEnabled: false;
   scraped: false;
@@ -96,8 +104,13 @@ export interface CatalogViewRequest {
   sku: string;
   actorRole: AuthorityRole;
   ordersPlaced: false;
-  priceReturned: null;
-  localStub: true;
+  priceReturned: number | null;
+  localStub: boolean;
+  pageUrl: string | null;
+  imageUrl: string | null;
+  availability: string | null;
+  stockCount: null;
+  httpStatus: number | null;
   note: string;
 }
 
@@ -115,7 +128,7 @@ export interface JobPart {
   imagePath: string | null;
   imageSource: PartImageSource;
   imageNote: string;
-  catalogImageUrl: null;
+  catalogImageUrl: string | null;
 }
 
 export interface TaskCost {
@@ -149,6 +162,7 @@ export interface PresentedPart extends JobPart {
   areaStock: LocalStockHit[];
   supplierStock: null;
   stockNote: string;
+  livePriceNote: string;
 }
 
 export interface JobPriceSheet {
@@ -275,6 +289,9 @@ export function lookupCatalogPrice(sourceId: string, sku: string): CatalogLookup
     price: null,
     stock: null,
     imageUrl: null,
+    pageUrl: null,
+    availability: null,
+    httpStatus: null,
     priceConnected: false,
     stockConnected: false,
     ordersEnabled: false,
@@ -501,7 +518,12 @@ export function recordCatalogView(
     ordersPlaced: false,
     priceReturned: null,
     localStub: true,
-    note: `Sign-in recorded locally for ${lookup.label} price and stock view only. No account is connected. No order was placed. No price was returned.`
+    pageUrl: null,
+    imageUrl: null,
+    availability: null,
+    stockCount: null,
+    httpStatus: null,
+    note: `Sign-in recorded locally for ${lookup.label} price and stock view only. No account is connected. No browser session is opened. No order was placed. No price was returned.`
   };
   const jobs = sheet.catalogViews.some((row) => row.id === request.id)
     ? sheet.catalogViews
@@ -511,7 +533,7 @@ export function recordCatalogView(
 
 function imageNoteFor(source: PartImageSource, path: string | null): string {
   if (source === "dropped-file" && path) return `Image kept from a file on this machine: ${path}. Not a catalog photo.`;
-  if (source === "catalog") return "Catalog image from a permitted source.";
+  if (source === "catalog") return "Image from the SupplyHouse public product page. A photo was not invented.";
   return MISSING_IMAGE;
 }
 
@@ -610,7 +632,7 @@ export function priceJob(sheet: JobPriceSheet): JobPriceResult {
     return {
       ...refused,
       partCost: roundMoney(known),
-      reason: "A part on this job has no cost. Type a cost, or connect a permitted price. A missing price is not zero. No live catalog price is connected."
+      reason: "A part on this job has no cost. Type a cost, or read a public SupplyHouse price when that page returns a number. A missing price is not zero. No order is placed."
     };
   }
   if (sheet.labor == null) {
@@ -644,7 +666,7 @@ export function priceJob(sheet: JobPriceSheet): JobPriceResult {
     beforeDiscount,
     discountAmount,
     immediate: sell,
-    reason: "Immediate price is typed part cost plus labor plus task costs, times the company margin multiplier, then applied discounts. Not a supplier order. Not a provider write.",
+    reason: immediateReason(sheet),
     ordersEnabled: false,
     vendorWrite: false
   };
@@ -654,10 +676,103 @@ function partTotal(sheet: JobPriceSheet): number {
   return roundMoney(sheet.parts.reduce((sum, part) => sum + (part.cost ?? 0) * part.quantity, 0));
 }
 
-export function presentPart(part: JobPart, hits: readonly LocalStockHit[]): PresentedPart {
+function immediateReason(sheet: JobPriceSheet): string {
+  const catalog = sheet.parts.some((part) => part.costSource === "catalog");
+  const typed = sheet.parts.some((part) => part.costSource === "typed");
+  const source = catalog && typed ? "typed part cost and a SupplyHouse public price" : catalog ? "a SupplyHouse public price" : "typed part cost";
+  return `Immediate price is ${source} plus labor plus task costs, times the company margin multiplier, then applied discounts. Not a supplier order. Not a provider write.`;
+}
+
+function knownAvailability(value: string | null | undefined): string | null {
+  if (!value) return null;
+  return (SUPPLYHOUSE_AVAILABILITY as readonly string[]).includes(value) ? value : null;
+}
+
+export function latestSupplyHouseRead(sheet: JobPriceSheet, sku: string): CatalogViewRequest | null {
+  const want = sku.toLowerCase();
+  for (let index = sheet.catalogViews.length - 1; index >= 0; index -= 1) {
+    const row = sheet.catalogViews[index];
+    if (row && row.sourceId === "supplyhouse" && row.localStub === false && row.sku.toLowerCase() === want) return row;
+  }
+  return null;
+}
+
+/** Apply a SupplyHouse public read. A missing number does not clear a typed cost and does not order. */
+export function applySupplyHouseLookup(
+  store: JobPriceStore,
+  input: { jobId: string; sku: string; partId?: string; actorRole: AuthorityRole; at: string; result: SupplyHousePublicResult }
+): { store: JobPriceStore; request: CatalogViewRequest; lookup: CatalogLookup } {
+  if (!(AUTHORITY_ROLES as readonly string[]).includes(input.actorRole)) throw new Error(`unknown authority role: ${input.actorRole}`);
+  const result = input.result;
+  if (result.ordersEnabled !== false || result.ordersPlaced !== false || result.stockCount !== null) {
+    throw new Error("SupplyHouse read refused");
+  }
+  const source = catalogSource("supplyhouse");
+  const lookup: CatalogLookup = {
+    sourceId: "supplyhouse",
+    label: source.label,
+    sku: result.sku,
+    price: result.price,
+    stock: null,
+    imageUrl: result.imageUrl,
+    pageUrl: result.pageUrl,
+    availability: result.availability,
+    httpStatus: result.httpStatus,
+    priceConnected: result.price != null,
+    stockConnected: false,
+    ordersEnabled: false,
+    scraped: false,
+    note: result.note
+  };
+  const sheet = sheetOf(store, input.jobId);
+  const request: CatalogViewRequest = {
+    id: sha256({ jobId: sheet.jobId, sourceId: "supplyhouse", sku: result.sku, at: input.at }).slice(0, 12),
+    at: input.at,
+    sourceId: "supplyhouse",
+    sku: result.sku,
+    actorRole: input.actorRole,
+    ordersPlaced: false,
+    priceReturned: result.price,
+    localStub: false,
+    pageUrl: result.pageUrl,
+    imageUrl: result.imageUrl,
+    availability: result.availability,
+    stockCount: null,
+    httpStatus: result.httpStatus,
+    note: result.note
+  };
+  const want = result.sku.toLowerCase();
+  const parts = sheet.parts.map((part) => {
+    if (part.sku.toLowerCase() !== want) return part;
+    if (input.partId && part.partId !== input.partId) return part;
+    let next = part;
+    if (result.price != null) {
+      next = { ...next, cost: result.price, costSource: "catalog", catalogSourceId: "supplyhouse" };
+    }
+    if (result.productSeen) {
+      const catalogImageUrl = result.imageUrl;
+      const state = partImageState({ imagePath: next.imagePath, catalogImageUrl, imageSource: next.imageSource });
+      next = { ...next, catalogImageUrl, imageSource: state.imageSource, imageNote: state.imageNote };
+    }
+    return next;
+  });
+  const catalogViews = [...sheet.catalogViews.filter((row) => row.id !== request.id), request];
+  return { store: saveSheet(store, { ...sheet, parts, catalogViews }), request, lookup };
+}
+
+export function presentPart(part: JobPart, hits: readonly LocalStockHit[], publicRead?: CatalogViewRequest | null): PresentedPart {
   const areaStock = hits.filter((hit) => hit.sku === part.sku);
   const image = partImageState(part);
-  const supplierNote = "Supplier stock is not connected. It is unknown, not zero. No order is placed.";
+  const availability = publicRead && publicRead.localStub === false ? knownAvailability(publicRead.availability) : null;
+  const supplierNote = availability
+    ? `SupplyHouse public page says ${availability}. No stock count was published, so the count is unknown, not zero. No order is placed.`
+    : "Supplier stock is not connected. It is unknown, not zero. No order is placed.";
+  const livePriceNote =
+    publicRead && publicRead.localStub === false
+      ? publicRead.priceReturned == null
+        ? "Live price is unavailable."
+        : `Source: SupplyHouse public product page${publicRead.pageUrl ? ` ${publicRead.pageUrl}` : ""}.`
+      : "No live public price has been read for this part.";
   return {
     ...part,
     imageSource: image.imageSource,
@@ -667,14 +782,15 @@ export function presentPart(part: JobPart, hits: readonly LocalStockHit[]): Pres
     supplierStock: null,
     stockNote: areaStock.length
       ? `Local counts on this machine name this sku. ${supplierNote}`
-      : `Stock in the area is not known. No local count names this sku. ${supplierNote}`
+      : `Stock in the area is not known. No local count names this sku. ${supplierNote}`,
+    livePriceNote
   };
 }
 
 export function presentJob(sheet: JobPriceSheet, hits: readonly LocalStockHit[]): PricedJobView {
   return {
     sheet,
-    parts: sheet.parts.map((part) => presentPart(part, hits)),
+    parts: sheet.parts.map((part) => presentPart(part, hits, latestSupplyHouseRead(sheet, part.sku))),
     price: priceJob(sheet),
     livePriceConnected: false,
     ordersEnabled: false
@@ -705,7 +821,7 @@ export function loadJobPriceBoard(args: {
     pilot_started: false,
     field_claim: false,
     path,
-    note: "Job prices stay on this machine. Typed costs and typed labor are marked typed. Catalog lookups stay empty because no permitted account or public price feed is connected. Supplier sites are not scraped and orders are not placed. The same sheet is what field, office, and management read. ServiceTitan, Jobber, and ProBooks writes stay false. The part-cost board remains current, last, and adapted cost. It is not this sell price and not a skill score.",
+    note: "Job prices stay on this machine. Typed costs and typed labor are marked typed. SupplyHouse is a read-only public product page: a number is kept only when that page returns one, otherwise the live price is unavailable and the typed cost remains. Johnstone, Ruud, Rheem, Bryant, Carrier, Duncan, Gustave A. Larson, Habegger, Lee Supply, Lowe's, and Home Depot stay named and empty. No supplier order is placed. The same sheet is what field, office, and management read. ServiceTitan, Jobber, and ProBooks writes stay false. The part-cost board remains current, last, and adapted cost. It is not this sell price and not a skill score.",
     sources: CATALOG_SOURCES,
     jobs: views
   };

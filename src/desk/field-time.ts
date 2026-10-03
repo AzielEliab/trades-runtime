@@ -71,6 +71,9 @@ export interface FieldHint {
   text: string;
 }
 
+export const AZTRADES_TRY_PATH =
+  "Try path: Point A is ServiceTitan, or another existing bring-your-own drop-in. The shadow bridge is trades-runtime. Point B is the AZTrades shell. A shop tries AZTrades by shadowing its own export through this desk. Trying is not a commit. Committing to AZTrades is a later human choice. pilot_started false. live_backends false. field_claim false. This cut does not write ServiceTitan.";
+
 export const FIELD_HINTS: readonly FieldHint[] = [
   {
     id: "clock-in",
@@ -120,7 +123,7 @@ export const FIELD_HINTS: readonly FieldHint[] = [
   {
     id: "price",
     control: "Job price",
-    text: "Immediate price is part cost plus labor plus task costs, times the profit-margin multiplier the company types. Discounts apply after that. A typed cost is a typed cost. A catalog lookup stays empty until a permitted account or a public price is actually connected. No supplier order is placed. Prices are not written to ServiceTitan or Jobber."
+    text: "Immediate price is part cost plus labor plus task costs, times the profit-margin multiplier the company types. Discounts apply after that. A typed cost stays typed. SupplyHouse is a read-only public product page: a number is used only when that page returns one, and otherwise the live price is unavailable. Johnstone, Ruud, Rheem, Bryant, Carrier, Duncan, Gustave A. Larson, Habegger, Lee Supply, Lowe's, and Home Depot are named and not connected. No supplier order is placed. Prices are not written to ServiceTitan or Jobber."
   },
   {
     id: "kpi",
@@ -148,6 +151,7 @@ export interface FieldShell {
   notField10: true;
   notOffice10: true;
   notCompanyOs: true;
+  tryPath: string;
   path: string;
   dataLabel: string;
   missionDay: string;
@@ -369,11 +373,12 @@ export function buildFieldShell(args: {
     notField10: true,
     notOffice10: true,
     notCompanyOs: true,
+    tryPath: AZTRADES_TRY_PATH,
     path,
     dataLabel: args.dataLabel,
     missionDay: args.missionDay,
     generatedAt: args.now,
-    note: "AZTrades is the local field shell on this operator desk. trades-runtime is the bridge. Point A stays the company's current provider through the existing drop-in profiles. Point B is this desk. Clock, meal, and drive events are local records the field, office, and management read together. This is Local Softwares 1.0 (installable). It is not a Field 1.0 claim, not Office Softwares 1.0, and not a live company OS. pilot_started false. live_backends false. Provider writes stay refused.",
+    note: `AZTrades is the local field shell on this operator desk. trades-runtime is the bridge. Point A stays the company's current provider through the existing drop-in profiles. Point B is this desk. Clock, meal, and drive events are local records the field, office, and management read together. This is Local Softwares 1.0 (installable). It is not a Field 1.0 claim, not Office Softwares 1.0, and not a live company OS. pilot_started false. live_backends false. Provider writes stay refused. ${AZTRADES_TRY_PATH}`,
     hints: FIELD_HINTS,
     techs: [...techs.entries()].map(([id, name]) => ({ id, name })).sort((a, b) => a.id.localeCompare(b.id)),
     todayJob: todayJob

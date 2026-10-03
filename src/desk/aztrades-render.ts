@@ -1,7 +1,9 @@
 import type { FieldShell } from "./field-time.js";
 import type { JobPriceBoard, PricedJobView } from "./job-price.js";
+import type { LocalLoginView } from "./local-login.js";
 import type { PropertyCard } from "./property-card.js";
 import { TASK_PRESETS } from "./job-price.js";
+import { isSupplyHouseImageUrl } from "./supplyhouse-public.js";
 
 function esc(value: string): string {
   return value
@@ -45,7 +47,9 @@ function renderPricedJob(view: PricedJobView): string {
       return `<article class="job-card" data-part="${esc(part.partId)}">
         <strong>${esc(part.name)}</strong>
         <span>SKU ${esc(part.sku)} · qty ${part.quantity}</span>
-        <p>Part cost ${money(part.cost)} · source ${esc(part.costSource)}. ${part.costSource === "typed" ? "Typed on this desk." : part.costSource === "catalog" ? "Catalog price." : "No cost yet."}</p>
+        <p>Part cost ${money(part.cost)} · source ${esc(part.costSource)}. ${part.costSource === "typed" ? "Typed on this desk." : part.costSource === "catalog" ? "Catalog price from the SupplyHouse public product page." : "No cost yet."}</p>
+        <p>${esc(part.livePriceNote)}</p>
+        ${part.imageSource === "catalog" && isSupplyHouseImageUrl(part.catalogImageUrl) ? `<img alt="SupplyHouse public product image" src="${esc(part.catalogImageUrl)}" />` : ""}
         <p>Image ${esc(part.imageSource)}. ${esc(part.imageNote)}</p>
         <p>Area stock ${esc(stock)}. Supplier stock unknown. ${esc(part.stockNote)}</p>
       </article>`;
@@ -62,7 +66,11 @@ function renderPricedJob(view: PricedJobView): string {
     })
     .join("");
   const views = view.sheet.catalogViews
-    .map((row) => `<li>${esc(row.sourceId)} · ${esc(row.sku)} · price returned none · orders placed false. ${esc(row.note)}</li>`)
+    .map((row) => {
+      const price = row.priceReturned == null ? "live price is unavailable" : row.priceReturned.toFixed(2);
+      const page = row.pageUrl ? ` · ${row.pageUrl}` : "";
+      return `<li>${esc(row.sourceId)} · ${esc(row.sku)} · price ${esc(price)}${esc(page)} · orders placed false. ${esc(row.note)}</li>`;
+    })
     .join("");
   const price = view.price;
   return `<section class="priced-job" data-priced-job="${esc(view.sheet.jobId)}">
@@ -75,10 +83,15 @@ function renderPricedJob(view: PricedJobView): string {
     <ul>${discounts || "<li>No discounts.</li>"}</ul>
     <p>Part cost ${money(price.partCost)}. Before discount ${money(price.beforeDiscount)}. Discount ${money(price.discountAmount)}. Immediate price <strong>${money(price.immediate)}</strong>.</p>
     <p class="quiet">${esc(price.reason)}</p>
-    <p class="quiet">Live price connected false. Orders enabled false. Vendor write false.</p>
+    <p class="quiet">No standing supplier account is connected. Orders enabled false. Vendor write false. pilot_started false. live_backends false. field_claim false.</p>
     <h4>Catalog view requests</h4>
     <ul>${views || "<li>No sign-in recorded.</li>"}</ul>
   </section>`;
+}
+
+function rankHigher(actor: string, target: string): boolean {
+  const rank: Record<string, number> = { field: 1, office: 2, management: 3 };
+  return (rank[actor] ?? 0) > (rank[target] ?? 0);
 }
 
 export function renderAztrades(snapshot: {
@@ -87,6 +100,7 @@ export function renderAztrades(snapshot: {
   fieldShell: FieldShell;
   jobPrices: JobPriceBoard;
   propertyCards: PropertyCard[];
+  localLogin: LocalLoginView;
 }): string {
   const shell = snapshot.fieldShell;
   const prices = snapshot.jobPrices;
@@ -101,7 +115,10 @@ export function renderAztrades(snapshot: {
     .map((view) => `<option value="${esc(view.sheet.jobId)}">${esc(view.sheet.jobId)}</option>`)
     .join("");
   const sources = prices.sources
-    .map((source) => `<option value="${esc(source.id)}">${esc(source.label)}${source.host ? ` · ${source.host}` : ""}</option>`)
+    .map((source) => {
+      const state = source.id === "supplyhouse" ? "public page, read-only" : "not connected";
+      return `<option value="${esc(source.id)}">${esc(source.label)}${source.host ? ` · ${source.host}` : ""} · ${state}</option>`;
+    })
     .join("");
   const tasks = TASK_PRESETS.map((label) => `<option value="${esc(label)}">${esc(label)}</option>`).join("");
   const events = shell.events
@@ -121,7 +138,49 @@ export function renderAztrades(snapshot: {
     )
     .join("");
   const hintList = shell.hints.map((hint) => `<p class="hint" data-hint="${esc(hint.id)}"><strong>${esc(hint.control)}.</strong> ${esc(hint.text)}</p>`).join("");
+  const login = snapshot.localLogin;
+  const signed = login.signedIn;
+  const pending = login.users.filter((user) => !user.approved);
+  const approvable = signed ? pending.filter((user) => rankHigher(signed.role, user.role)) : [];
+  const userRows = login.users
+    .map(
+      (user) => `<li>${esc(user.name)} · ${esc(user.role)} · approved ${user.approved ? "yes" : "no"}${user.firstUser ? " · first local user" : ""}${user.approvedByUserId ? ` · approved by ${esc(user.approvedByUserId)}` : ""}</li>`
+    )
+    .join("");
+  const approveButtons = approvable
+    .map((user) => `<button type="button" data-login-action="approve" data-user-id="${esc(user.userId)}">Approve ${esc(user.name)}</button>`)
+    .join("");
   return `<p class="quiet">${esc(shell.note)}</p>
+    <section id="aztrades-try" data-az="field office management">
+      <h3>Try path</h3>
+      <p>${esc(shell.tryPath)}</p>
+    </section>
+    <section id="aztrades-login" data-az="field office management">
+      <h3>Local sign-in</h3>
+      <p>${esc(login.note)}</p>
+      <p class="quiet">hosted identity provider false. pilot_started false. live_backends false. field_claim false. ServiceTitan write false.</p>
+      <p>${signed ? `Signed in as ${esc(signed.name)} · ${esc(signed.role)}.` : "Not signed in."}</p>
+      <ul>${userRows || "<li>No local user yet.</li>"}</ul>
+      ${
+        login.users.length
+          ? `<label>Name <input id="login-name" name="username" autocomplete="username" maxlength="80"></label>
+             <label>Password <input id="login-password" name="password" type="password" autocomplete="current-password" maxlength="200"></label>
+             <button type="button" data-login-action="sign-in">Sign in</button>
+             <button type="button" data-login-action="sign-out">Sign out</button>
+             <h4>Request access</h4>
+             <label>Name <input id="request-name" name="username" autocomplete="off" maxlength="80"></label>
+             <label>Password <input id="request-password" name="password" type="password" autocomplete="new-password" maxlength="200"></label>
+             <label>Role <select id="request-role"><option value="field">field</option><option value="office">office</option><option value="management">management</option></select></label>
+             <button type="button" data-login-action="request-access">Request access</button>`
+          : `<label>Name <input id="login-name" name="username" autocomplete="username" maxlength="80"></label>
+             <label>Password <input id="login-password" name="password" type="password" autocomplete="new-password" maxlength="200"></label>
+             <label>Role <select id="login-role"><option value="field">field</option><option value="office">office</option><option value="management">management</option></select></label>
+             <p class="quiet">The first local user is already okayed and needs no approver.</p>
+             <button type="button" data-login-action="create-first">Create first local user</button>`
+      }
+      ${approveButtons}
+      <p class="quiet" id="login-status" role="status"></p>
+    </section>
     <p class="quiet">Surface ${esc(shell.surface)}. Product label ${esc(shell.productLabel)}. field_claim false. office_claim false. pilot_started false. live_backends false. live GPS false. Provider writes false. Pages off. Data ${esc(snapshot.dataLabel)}.</p>
     <div class="chips">
       <span class="chip">Local Softwares 1.0</span>
@@ -175,7 +234,7 @@ export function renderAztrades(snapshot: {
     <section id="aztrades-price" data-az="field office management">
       <h3>Job price</h3>
       <p class="quiet">${esc(prices.note)}</p>
-      <p class="hint" data-hint="price">Type a part cost when no live price is connected. Look up stays empty. Sign-in records a view request and does not order.</p>
+      <p class="hint" data-hint="price">Type a part cost when SupplyHouse does not return a number. The typed cost remains, and the card says the live price is unavailable. Other named sources stay empty. Sign-in records a view request and does not order.</p>
       <label>Job
         <select id="price-job">${jobs || `<option value="">No job id</option>`}</select>
       </label>
@@ -198,7 +257,8 @@ export function renderAztrades(snapshot: {
       </label>
       <button type="button" data-price-action="lookup">Look up price</button>
       <button type="button" data-price-action="signin">Sign in to view price and stock only</button>
-      <p class="quiet">Sign-in does not order. No permitted account is connected, so the button records a local view request and does not open the supplier.</p>
+      <p class="quiet">When SupplyHouse does not return a number, the typed cost remains and the card says the live price is unavailable.</p>
+      <p class="quiet">Sign-in does not order. No permitted account is connected, so the button records a local view request and does not open a browser session that can order.</p>
       <p class="quiet">Image is missing until a file is dropped on this machine or a permitted catalog returns one. A photo is not invented.</p>
       <label>Image file already in job-images
         <input id="part-image-name" name="image" autocomplete="off" maxlength="120">
@@ -410,6 +470,31 @@ export function aztradesActionScript(): string {
         });
       };
       reader.readAsDataURL(file);
+    });
+    document.body.addEventListener("click", (event) => {
+      const button = event.target && event.target.closest ? event.target.closest("[data-login-action]") : null;
+      if (!button) return;
+      const action = button.getAttribute("data-login-action");
+      const body = { action: action, name: "", password: "", role: "", userId: "" };
+      if (action === "create-first" || action === "sign-in") {
+        body.name = azValue("login-name");
+        body.password = azValue("login-password");
+        body.role = azValue("login-role");
+      } else if (action === "request-access") {
+        body.name = azValue("request-name");
+        body.password = azValue("request-password");
+        body.role = azValue("request-role");
+      } else if (action === "approve") {
+        body.userId = button.getAttribute("data-user-id") || "";
+      }
+      button.disabled = true;
+      azPost("/api/local-login", body).then((payload) => {
+        azStatus("login-status", payload.note || "Saved on this machine.");
+        location.reload();
+      }).catch((error) => {
+        button.disabled = false;
+        azStatus("login-status", error.message);
+      });
     });
   `;
 }

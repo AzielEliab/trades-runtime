@@ -61,6 +61,13 @@ describe("AZTrades field shell", () => {
     expect(snapshot.jobPrices.ordersEnabled).toBe(false);
     expect(snapshot.jobPrices.field_claim).toBe(false);
     expect(snapshot.jobPrices.live_backends).toBe(false);
+    expect(snapshot.fieldShell.tryPath).toContain("Trying is not a commit");
+    expect(snapshot.fieldShell.tryPath).toContain("pilot_started false");
+    expect(snapshot.localLogin.hostedIdentityProvider).toBe(false);
+    expect(snapshot.localLogin.pilot_started).toBe(false);
+    expect(snapshot.localLogin.live_backends).toBe(false);
+    expect(snapshot.localLogin.field_claim).toBe(false);
+    expect(snapshot.localLogin.servicetitanWrite).toBe(false);
     expect(SERVICE_TITAN_WRITES_ENABLED).toBe(false);
     expect(PROBOOKS_WRITES_ENABLED).toBe(false);
     expect(RUNTIME_MANIFEST.field_claim).toBe(false);
@@ -321,6 +328,20 @@ describe("AZTrades field shell", () => {
     expect(html).toContain("Drive time runs long");
     expect(html).toContain("pilot_started false");
     expect(html).toContain("live_backends false");
+    expect(html).toContain("Trying is not a commit");
+    expect(html).toContain("The first local user is already okayed");
+    expect(html).toContain("Not a hosted identity provider");
+    expect(html).toContain("the live price is unavailable");
+    expect(html).toContain("difficult access");
+    expect(html).toContain("ladder setup");
+    expect(html).toContain("additional techs");
+    expect(html).toContain("parts acquisition");
+    expect(html).toContain("installation");
+    expect(html).toContain("Manager discount");
+    expect(html).toContain("Member discount");
+    expect(html).toContain("Coupon amount");
+    expect(html).toContain("Johnstone Supply · johnstone.com · not connected");
+    expect(html).toContain("public page, read-only");
     expect(html).not.toContain("Field Softwares 1.0");
     expect(html).not.toContain("Office Softwares 1.0 is live");
     for (const source of ["supplyhouse.com", "johnstone.com", "carrier.com", "Home Depot", "Gustave A. Larson"]) {
