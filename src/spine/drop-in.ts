@@ -109,6 +109,8 @@ export interface AdmittedDropRecord {
   sold?: number;
   /** Explicit current revenue dollars. Absent when the row did not name one. */
   revenue?: number;
+  /** Service address copied from the job row. Absent when the export did not name one. */
+  serviceAddress?: string;
   /** Explicit field labels on a job row. Absent when the row names none. */
   fieldFlags?: FieldFlag[];
   fieldFlagNotices?: FieldFlagNotice[];
@@ -213,6 +215,35 @@ export function knownTradeLane(raw: Record<string, unknown>): string | undefined
   for (const item of list) {
     const lane = normalizeTradeLane(text(item));
     if (lane) return lane;
+  }
+  return undefined;
+}
+
+const ADDRESS_KEYS = ["serviceAddress", "service_address", "jobAddress", "job_address", "address", "street"];
+
+function addressText(value: unknown): string {
+  if (typeof value === "string") {
+    const found = value.trim();
+    if (!found || found.length > 240) return "";
+    if (/^-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?$/.test(found)) return "";
+    return found;
+  }
+  if (!isRecord(value)) return "";
+  const street = firstText(value, ["street", "line1", "address1", "address"]);
+  const city = firstText(value, ["city"]);
+  const region = firstText(value, ["state", "region"]);
+  return [street, city, region].filter(Boolean).join(", ").slice(0, 240);
+}
+
+/** Service address copied from the export. Coordinates are not an address. Listing sites are not queried. */
+export function knownServiceAddress(raw: Record<string, unknown>): string | undefined {
+  for (const key of ADDRESS_KEYS) {
+    const found = addressText(raw[key]);
+    if (found) return found;
+  }
+  for (const key of ["location", "property", "site", "serviceLocation", "service_location"]) {
+    const found = addressText(raw[key]);
+    if (found) return found;
   }
   return undefined;
 }
@@ -1100,6 +1131,7 @@ function admitRecord(
     const laned = lane ? { ...row, lane } : row;
     if (laned.entity !== "job") return laned;
     const money = knownJobMoney(record.raw);
+    const serviceAddress = knownServiceAddress(record.raw);
     const extracted = fieldFlagsFromInboundRow({
       raw: record.raw,
       jobId: laned.externalId,
@@ -1114,6 +1146,7 @@ function admitRecord(
       ...(money.ticket != null ? { ticket: money.ticket } : {}),
       ...(money.sold != null ? { sold: money.sold } : {}),
       ...(money.revenue != null ? { revenue: money.revenue } : {}),
+      ...(serviceAddress ? { serviceAddress } : {}),
       ...(extracted.flags.length ? { fieldFlags: extracted.flags } : {}),
       ...(extracted.notices.length ? { fieldFlagNotices: extracted.notices } : {})
     };

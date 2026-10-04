@@ -20,6 +20,10 @@ import { buildWeeklyCallbackDigest, type WeeklyCallbackDigest } from "./callback
 import { collectDepartmentFlags, flagHandoffBehavior, type DepartmentBehaviorBoard } from "../domain/chain-d.js";
 import { flagCrossTradeBehavior } from "../domain/cross-trade-matrix.js";
 import { loadDrivePerformance, type DrivePerformance } from "../domain/drive-miles.js";
+import { buildFieldShell, type FieldShell } from "./field-time.js";
+import { loadLocalLogin, type LocalLoginView } from "./local-login.js";
+import { loadJobPriceBoard, stockHitsFromLines, type JobPriceBoard } from "./job-price.js";
+import { buildPropertyCard, type PropertyCard } from "./property-card.js";
 import { loadLocalPositions } from "../domain/local-positions.js";
 import { loadCoverage, type CoverageBoard } from "../domain/coverage-map.js";
 import { buildRightTech, type RightTechBoard } from "../domain/right-tech.js";
@@ -195,6 +199,8 @@ export interface DeskCallRow {
   notClassified: boolean;
   /** Reasons come from labels on the row. Coverage is not invented. */
   invented: false;
+  /** Service address copied from the job. Null when the row did not name one. */
+  serviceAddress: string | null;
 }
 
 export interface CallFilterState {
@@ -282,6 +288,10 @@ export interface OperatorSnapshot {
   refused: { file: string; code: string; reason: string }[];
   readEndpointHints: string[];
   report: ReportMetadata;
+  fieldShell: FieldShell;
+  jobPrices: JobPriceBoard;
+  propertyCards: PropertyCard[];
+  localLogin: LocalLoginView;
 }
 
 export interface DeskSnapshotOptions {
@@ -306,6 +316,8 @@ export interface DeskSnapshotOptions {
   rightTechJob?: string;
   /** Write the local quality report and alert-action stubs under data/runtime. */
   persistLocalReports?: boolean;
+  /** Local sign-in token from the desk cookie. Not a hosted identity provider. */
+  localSessionToken?: string | null;
   /** Isolate id for alert state and field flags. Defaults to local.json, then "local". */
   instanceId?: string;
 }
@@ -732,6 +744,7 @@ interface CollectedRecord {
   ticket?: number;
   sold?: number;
   revenue?: number;
+  serviceAddress?: string;
   fieldFlags?: FieldFlag[];
   fieldFlagNotices?: FieldFlagNotice[];
 }
@@ -776,6 +789,7 @@ function collect(files: DropInFileResult[], receivedAt: string): {
         ticket: record.ticket,
         sold: record.sold,
         revenue: record.revenue,
+        serviceAddress: record.serviceAddress,
         fieldFlags: record.fieldFlags,
         fieldFlagNotices: record.fieldFlagNotices
       });
@@ -869,6 +883,7 @@ function toDeskCall(args: {
   status: string | null;
   missionDay: string;
   classified: CallClassification;
+  serviceAddress?: string | null;
 }): DeskCallRow {
   return {
     id: args.id,
@@ -885,7 +900,8 @@ function toDeskCall(args: {
     warrantyBasis: args.classified.warrantyBasis,
     reason: describeCallReason(args.classified),
     notClassified: isNotClassified(args.classified),
-    invented: false
+    invented: false,
+    serviceAddress: args.serviceAddress ?? null
   };
 }
 
@@ -970,7 +986,8 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
             technicianName: tech?.name ?? null,
             status: row.status,
             missionDay,
-            classified: classifyCall(row.raw)
+            classified: classifyCall(row.raw),
+            serviceAddress: null
           });
         })
       : jobEntities.map((record) =>
@@ -982,7 +999,8 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
             technicianName: record.technicianName ?? null,
             status: record.status ?? null,
             missionDay,
-            classified: record.callClass ?? classifyCall({})
+            classified: record.callClass ?? classifyCall({}),
+            serviceAddress: record.serviceAddress ?? null
           })
         );
   const callCounts = aggregateCallClasses(draftedCalls);
@@ -1420,6 +1438,49 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
     }))
   });
 
+  const propertyCards = calls.map((call) =>
+    buildPropertyCard({
+      jobId: call.id,
+      address: call.serviceAddress,
+      lane: call.lane,
+      status: call.status
+    })
+  );
+  const fieldShell = buildFieldShell({
+    cwd,
+    instanceId,
+    now,
+    missionDay,
+    dataLabel,
+    calls: calls.map((call) => ({
+      id: call.id,
+      day: call.day,
+      technicianId: call.technicianId,
+      technicianName: call.technicianName,
+      status: call.status,
+      lane: call.lane,
+      serviceAddress: call.serviceAddress,
+      open: call.open
+    })),
+    drive,
+    extraTechs: [
+      ...timeTracking.cards.map((card) => ({ id: card.technicianId, name: card.technicianName })),
+      ...huddle.techs.map((tech) => ({ id: tech.id, name: tech.name }))
+    ]
+  });
+  const localLogin = loadLocalLogin({
+    cwd,
+    instanceId,
+    sessionToken: options.localSessionToken ?? null
+  });
+  const jobPrices = loadJobPriceBoard({
+    cwd,
+    instanceId,
+    missionDay,
+    jobs: calls.map((call) => ({ id: call.id, day: call.day })),
+    stock: stockHitsFromLines(stock.lines, stock.source)
+  });
+
   const honesty =
     dataLabel === "synthetic-demo"
       ? "Synthetic demo on this machine. Not BYO company data. Not a live GM pilot. Miles, the ranked board, collaboration suggestions, and friction are a labeled fixture, not a telematics feed, not a company export, and not a hosted HR system. Inbound quality is a shadow checklist, not an accuracy percent and not a tenant pull. Alert actions are stubs. Option C remains prep. Monitoring is local pins, time cards, coverage, right-tech suggestions, scores, a call board, and charts on this machine. Not a live GPS feed. Suggestions are not a dispatch."
@@ -1513,6 +1574,10 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
     inbound: collected.inbound,
     refused: collected.refused,
     readEndpointHints: endpointHints(config),
-    report
+    report,
+    fieldShell,
+    jobPrices,
+    propertyCards,
+    localLogin
   };
 }

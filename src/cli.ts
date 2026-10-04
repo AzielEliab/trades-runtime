@@ -6,6 +6,7 @@ import { printByoAdmitDemo } from "./demo/byo-admit.js";
 import { printDropInDemo } from "./demo/drop-in.js";
 import { printSealedShadowDemo } from "./demo/shadow-sealed.js";
 import { startOperatorDesk } from "./desk/server.js";
+import { readShadowDesk } from "./desk/shadow-read.js";
 import { healthLocal } from "./spine/health-local.js";
 import { plainSoftwaresLead } from "./spine/local-softwares-gate.js";
 import { runOptionCPilotStart } from "./spine/option-c-pilot-start.js";
@@ -47,6 +48,10 @@ export function helpText(): string {
     "  npx tsx src/cli.ts shadow-office         local office shadow on sample branch sample-shop (fixtures, no tenant)",
     "  npx tsx src/cli.ts shadow-field          local field shadow on sample branch sample-shop (fixtures, no tenant)",
     "  npx tsx src/cli.ts desk [--port 4174]    local human operator desk (127.0.0.1)",
+    "  npx tsx src/cli.ts shadow-field [--root dir]",
+    "                                    local shadow read of the desk field-events list and job price",
+    "  npx tsx src/cli.ts shadow-office [--root dir]",
+    "                                    same field-events list and job price as shadow-field and the desk",
     "                                    /api/receipt /api/huddle /api/stock /api/drive /api/performance /api/work-together /api/friction /api/calls/week.json",
     "                                    /api/inbound-quality /api/alert-actions /api/monitoring /api/time-tracking /api/coverage /api/right-tech /api/option-c-start-gate",
     "                                    filters: ?calls=callback | warranty | not-classified",
@@ -61,6 +66,7 @@ export function helpText(): string {
     "softwares also accepts Softwares in any letter case.",
     "BYO local ServiceTitan, ProBooks, and trades-app inbound. No live writes. Credentials stay on this machine.",
     "Local Softwares 1.0 is not a Field 1.0 claim and it is not a live company OS.",
+    "shadow-field and shadow-office read the operator desk snapshot. They share data/runtime/<instanceId>/field-events.jsonl and the job price record. They do not start a pilot.",
     "Option C code-ready / pilot not started until a human runs pilot-start --branch <branchId> on this box.",
     "That command does not claim Field 1.0, Office Softwares 1.0, or a live company OS.",
     "shadow-office and shadow-field use fixtures in test/fixtures/sample-branch. They do not start a pilot.",
@@ -115,6 +121,7 @@ export type CliPlan =
   | { kind: "shadow-field" }
   | { kind: "pilot-prep"; cwd: string }
   | { kind: "pilot-start"; cwd: string; branchIds: string[]; claimCompany: boolean }
+  | { kind: "shadow-desk"; role: "field" | "office"; cwd: string }
   | { kind: "desk"; port: number; cwd: string };
 
 function commandName(raw: string | undefined): string | undefined {
@@ -132,6 +139,8 @@ function commandName(raw: string | undefined): string | undefined {
     raw === "shadow-field" ||
     raw === "pilot-prep" ||
     raw === "pilot-start" ||
+    raw === "shadow-field" ||
+    raw === "shadow-office" ||
     raw === "desk"
   ) {
     return raw;
@@ -175,8 +184,17 @@ export function planCli(argv: string[]): CliPlan {
   if (name === "byo-admit-demo") return { kind: "byo-admit-demo" };
   if (name === "drop-in-demo") return { kind: "drop-in-demo" };
   if (name === "shadow-sealed-demo") return { kind: "shadow-sealed-demo" };
-  if (name === "shadow-office") return { kind: "shadow-office" };
-  if (name === "shadow-field") return { kind: "shadow-field" };
+  if (name === "shadow-office" || name === "shadow-field") {
+    const root = flagValue(argv, "--root");
+    if (root) {
+      return {
+        kind: "shadow-desk",
+        role: name === "shadow-field" ? "field" : "office",
+        cwd: root
+      };
+    }
+    return { kind: name };
+  }
   if (name === "pilot-prep") {
     return { kind: "pilot-prep", cwd: flagValue(argv, "--root") ?? process.cwd() };
   }
@@ -252,6 +270,17 @@ function main(argv: string[]): void {
         process.stderr.write(`${message}\n`);
         process.exitCode = 1;
       });
+    return;
+  }
+  if (plan.kind === "shadow-desk") {
+    try {
+      const read = readShadowDesk(plan.role, { cwd: plan.cwd });
+      process.stdout.write(`${JSON.stringify(read, null, 2)}\n`);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      process.stderr.write(`${message}\n`);
+      process.exitCode = 1;
+    }
     return;
   }
   startOperatorDesk({ port: plan.port, cwd: plan.cwd })
