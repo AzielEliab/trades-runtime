@@ -1,0 +1,11 @@
+{
+  "flagId": "example-van-down",
+  "vanId": "van-example",
+  "jobId": "JOB-EXAMPLE",
+  "kind": "vanDown",
+  "severity": "hold",
+  "note": "Example only. Copy into data/runtime/<instanceId>/field-flags/<flagId>.json. This file is not a live flag. Not a company van. Not an accuracy percent. Not Field 1.0.",
+  "raisedAt": "2026-10-03T15:00:00.000Z",
+  "raisedBy": "local-tech",
+  "inventedAccuracy": false
+}

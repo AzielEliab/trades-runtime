@@ -69,5 +69,5 @@ TRADES-RUNTIME · OPTION C HUMAN PILOT START                                    
     It does not deploy the Worker.
     It does not flip pilot_started in the shipped catalog.
     It does not start Option D.
-    It does not merge field flags.
+    It does not treat field flags or the office shadow try as a 1.0 claim.
     It does not place a company file in data/inbound.

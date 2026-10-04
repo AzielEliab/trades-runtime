@@ -1,0 +1,58 @@
+TRADES-RUNTIME · FIELD FLAGS ON THE LOCAL DESK                                                                    TR-FIELD-FLAGS-2026-09-27
+
+
+
+
+ Receipt ID TR-FIELD-FLAGS-2026-09-27 · landed as local shadow 2026-10-03
+ Identity: Aziel Eliab only. Author of the free software. Not the operator. Not a customer.
+ Extends the local alert rules of TR-ALERTS-2026-09-25.
+ live_backends remains false. Pages remain off. Catalog pilot_started remains false.
+ This cut does not deploy the public Worker and does not Make Release.
+ Package version stays 1.0.0-local. Glama Latest/releaseVersion is 1.0.0-local.
+ This is local shadow field software. It is not a Field 1.0 claim.
+ It is not mixed into the office shadow command (npm run shadow:office).
+
+
+ What changed
+ Field techs can raise a flag that the local desk shows on the banner, the alerts panel,
+ history, acknowledge, and the alert digest. Capacity, late jobs, trust-band, booking block,
+ and verification stall stay.
+
+ Try it without a tenant
+    npm run shadow:field
+    Fixtures: test/fixtures/sample-branch/field/
+    Sample branch name: sample-shop
+    That command does not start a pilot.
+
+ Flag
+    flagId, vanId, jobId (optional), kind, severity, note, raisedAt, raisedBy.
+    kind is one of needsParts, safetyHold, customerEscalation, vanDown, callbackRisk.
+    severity is info, watch, or hold. The file states it. The desk does not invent one
+    for a file that omits it.
+    inventedAccuracy is false. A true value is refused. No accuracy percent is computed.
+
+ Where a flag lives
+    data/runtime/<instanceId>/field-flags/*.json
+    That directory is gitignored. The committed example is data/runtime/field-flags.json.example
+    and is not read as a live flag.
+    An admitted job row may also name the same labels, or a labels array of those names,
+    or a fieldFlags array of the same object shape.
+    A row that names a label and does not name a van is not turned into a flag.
+    No van is invented. Job notes, descriptions, and tags are not scanned.
+    When the row does not state a severity, the desk uses a fixed label severity:
+    safetyHold and vanDown are hold; the other three are watch. That is a label, not a percent.
+
+ Desk
+    POST /api/flags/raise on 127.0.0.1 writes one local JSON file and nothing else.
+    Acknowledge is the existing local POST. It does not text, push, or write ServiceTitan or ProBooks.
+    The digest includes field-flag hits. Hooks stay file-or-loopback.
+    The public Worker does not receive flags.
+
+ Laws held
+    Flag files stay on the operator machine.
+    Writes refused. Raise writes the local flag file only.
+    No phone-home. No SMS. No push.
+    pilot_started stays false in the shipped catalog.
+    The only software path that sets pilot_started true is npm run pilot:start -- --branch <branchId>
+    on that operator's isolate. It still refuses a bad branch, prep that is not ready,
+    and --claim-company without real inbound.

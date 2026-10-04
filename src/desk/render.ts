@@ -165,7 +165,8 @@ export function renderAlerts(snapshot: OperatorSnapshot): string {
     : `<li class="quiet">No alert history on this machine yet.</li>`;
   return `<p class="quiet">${esc(snapshot.alertActions.note)}</p>
     <p class="quiet">${esc(snapshot.alertActions.humanAuthorityRule)}</p>
-    <p class="quiet">Export current rule hits on this machine: <a href="/api/alerts/digest.json">JSON</a> · <a href="/api/alerts/digest.csv">CSV</a> · <a href="/api/alert-actions">Action stubs</a></p>
+    <p class="quiet">Export current rule hits on this machine: <a href="/api/alerts/digest.json">JSON</a> · <a href="/api/alerts/digest.csv">CSV</a> · <a href="/api/alert-actions">Action stubs</a>. A field flag uses this same banner when a local flag file names a van. That is shadow field software, not Field 1.0.</p>
+    <p class="quiet">Field flags are files under <code>data/runtime/&lt;instanceId&gt;/field-flags/</code> on this machine. No SMS. No push. No accuracy percent.</p>
     <h3 class="subhead">Active rules</h3>
     <div class="rule-alerts">${active}</div>
     <h3 class="subhead">History</h3>
@@ -1504,6 +1505,7 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
       Optional coverage: <code>data/runtime/&lt;instanceId&gt;/coverage.json</code> or <code>data/inbound/coverage.json</code>. Copy <code>data/runtime/coverage.json.example</code>. Layer switches stay in <code>coverage-layers.json</code>. Not a live map tile. The address map stays undrawn.
       Right tech suggestions stay on this Monitoring panel. They do not dispatch and they do not write back.
       Alert rules: copy <code>data/runtime/alerts.json.example</code> to <code>data/runtime/&lt;instanceId&gt;/alerts.json</code>.
+      Field flags: <code>data/runtime/&lt;instanceId&gt;/field-flags/</code>. Copy <code>data/runtime/field-flags.json.example</code>. Loopback <code>POST /api/flags/raise</code> only. Not Field 1.0.
       Inbound quality and alert-action stubs write under <code>data/runtime/&lt;instanceId&gt;/</code> on this machine. They do not call a tenant.
       Option C remains prep until a human operator starts a real pilot. Option D is out of scope. No cutover.
       Theme stays in this browser under <code>trades-desk-theme</code>. Which boards, metrics, KPIs, techs, scores, charts, lanes, and alerts stay visible is stored in this browser under <code>trades-desk-view</code>. Both stay on this machine. Print snapshot stays on this machine.

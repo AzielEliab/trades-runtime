@@ -1,0 +1,31 @@
+{
+  "liveTelematics": false,
+  "live_backends": false,
+  "telematicsVendor": null,
+  "source": "operator-file",
+  "note": "Sample branch sample-shop. Synthetic field-shadow time cards. Not a company timeclock. Not a live GPS feed. Not Field 1.0.",
+  "cards": [
+    {
+      "technicianId": "tech-local",
+      "technicianName": "Local Tech",
+      "jobId": "JOB-1",
+      "jobLabel": "No cool",
+      "trade": "hvac",
+      "status": "on-call",
+      "skills": ["hvac"],
+      "estimatedMinutes": 90,
+      "segments": [
+        {
+          "kind": "travel",
+          "startedAt": "2026-09-27T16:40:00.000Z",
+          "endedAt": "2026-09-27T17:02:00.000Z"
+        },
+        {
+          "kind": "clocked",
+          "startedAt": "2026-09-27T17:10:00.000Z",
+          "endedAt": null
+        }
+      ]
+    }
+  ]
+}

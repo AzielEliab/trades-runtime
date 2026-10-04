@@ -283,6 +283,15 @@ export {
   dispatchLocalHooks,
   parseAlertConfig
 } from "./desk/alerts.js";
+export {
+  FIELD_FLAG_KINDS,
+  fieldFlagsFromInboundRow,
+  parseFieldFlag,
+  readFieldFlagDirectory,
+  writeFieldFlagFile
+} from "./desk/field-flags.js";
+export { runOfficeShadow } from "./shadow/office-try.js";
+export { runFieldShadow } from "./shadow/field-try.js";
 export { buildAlertActionReport, persistAlertActions, proposeAlertActions, HUMAN_AUTHORITY_RULE } from "./desk/alert-actions.js";
 export {
   ingestTradesAppShadow,

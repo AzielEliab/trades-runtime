@@ -1,0 +1,11 @@
+{
+  "flagId": "sample-escalation",
+  "vanId": "van-sample-1",
+  "jobId": "JOB-1",
+  "kind": "customerEscalation",
+  "severity": "watch",
+  "note": "Sample-shop fixture. Customer escalation label only. Not an accuracy percent.",
+  "raisedAt": "2026-10-03T15:10:00.000Z",
+  "raisedBy": "sample-tech",
+  "inventedAccuracy": false
+}

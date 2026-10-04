@@ -11,6 +11,8 @@ import { healthLocal } from "./spine/health-local.js";
 import { plainSoftwaresLead } from "./spine/local-softwares-gate.js";
 import { runOptionCPilotStart } from "./spine/option-c-pilot-start.js";
 import { runOptionCPrep } from "./spine/option-c-prep.js";
+import { printFieldShadow } from "./shadow/field-try.js";
+import { printOfficeShadow } from "./shadow/office-try.js";
 
 function flagValue(argv: string[], name: string): string | undefined {
   const index = argv.indexOf(name);
@@ -43,6 +45,8 @@ export function helpText(): string {
     "  npx tsx src/cli.ts demo                  run synthetic shadow-day + receipts",
     "  npx tsx src/cli.ts byo-admit-demo        synthetic ST+ProBooks admit proof (not customer data)",
     "  npx tsx src/cli.ts drop-in-demo          synthetic ST + ProBooks + trades-app drop-in proof",
+    "  npx tsx src/cli.ts shadow-office         local office shadow on sample branch sample-shop (fixtures, no tenant)",
+    "  npx tsx src/cli.ts shadow-field          local field shadow on sample branch sample-shop (fixtures, no tenant)",
     "  npx tsx src/cli.ts desk [--port 4174]    local human operator desk (127.0.0.1)",
     "  npx tsx src/cli.ts shadow-field [--root dir]",
     "                                    local shadow read of the desk field-events list and job price",
@@ -52,6 +56,7 @@ export function helpText(): string {
     "                                    /api/inbound-quality /api/alert-actions /api/monitoring /api/time-tracking /api/coverage /api/right-tech /api/option-c-start-gate",
     "                                    filters: ?calls=callback | warranty | not-classified",
     "                                    alert rules: data/runtime/alerts.json.example",
+    "                                    field flags: data/runtime/<instanceId>/field-flags/  (not Field 1.0)",
     "  npx tsx src/cli.ts shadow-sealed-demo    synthetic N-day sealed settlement (pilot not started)",
     "  npx tsx src/cli.ts health-local          local honesty card (catalog pilot_started false until pilot-start)",
     "  npx tsx src/cli.ts pilot-prep            Option C box prep receipt (does not start the pilot)",
@@ -64,6 +69,8 @@ export function helpText(): string {
     "shadow-field and shadow-office read the operator desk snapshot. They share data/runtime/<instanceId>/field-events.jsonl and the job price record. They do not start a pilot.",
     "Option C code-ready / pilot not started until a human runs pilot-start --branch <branchId> on this box.",
     "That command does not claim Field 1.0, Office Softwares 1.0, or a live company OS.",
+    "shadow-office and shadow-field use fixtures in test/fixtures/sample-branch. They do not start a pilot.",
+    "Merging this repo does not start a pilot. Aziel Eliab is the author, not the operator.",
     "Option D not started. Pages intentionally disabled.",
     "Public get (if deployed): https://trades-runtime.vibelock.workers.dev — giveaway Worker UI without downloading first. Optional counted tarball at /download.",
     "The public Worker does not host this desk or tenant metrics.",
@@ -110,6 +117,8 @@ export type CliPlan =
   | { kind: "byo-admit-demo" }
   | { kind: "drop-in-demo" }
   | { kind: "shadow-sealed-demo" }
+  | { kind: "shadow-office" }
+  | { kind: "shadow-field" }
   | { kind: "pilot-prep"; cwd: string }
   | { kind: "pilot-start"; cwd: string; branchIds: string[]; claimCompany: boolean }
   | { kind: "shadow-desk"; role: "field" | "office"; cwd: string }
@@ -126,6 +135,8 @@ function commandName(raw: string | undefined): string | undefined {
     raw === "byo-admit-demo" ||
     raw === "drop-in-demo" ||
     raw === "shadow-sealed-demo" ||
+    raw === "shadow-office" ||
+    raw === "shadow-field" ||
     raw === "pilot-prep" ||
     raw === "pilot-start" ||
     raw === "shadow-field" ||
@@ -173,6 +184,17 @@ export function planCli(argv: string[]): CliPlan {
   if (name === "byo-admit-demo") return { kind: "byo-admit-demo" };
   if (name === "drop-in-demo") return { kind: "drop-in-demo" };
   if (name === "shadow-sealed-demo") return { kind: "shadow-sealed-demo" };
+  if (name === "shadow-office" || name === "shadow-field") {
+    const root = flagValue(argv, "--root");
+    if (root) {
+      return {
+        kind: "shadow-desk",
+        role: name === "shadow-field" ? "field" : "office",
+        cwd: root
+      };
+    }
+    return { kind: name };
+  }
   if (name === "pilot-prep") {
     return { kind: "pilot-prep", cwd: flagValue(argv, "--root") ?? process.cwd() };
   }
@@ -182,13 +204,6 @@ export function planCli(argv: string[]): CliPlan {
       cwd: flagValue(argv, "--root") ?? process.cwd(),
       branchIds: flagValues(argv, "--branch"),
       claimCompany: argv.includes("--claim-company")
-    };
-  }
-  if (name === "shadow-field" || name === "shadow-office") {
-    return {
-      kind: "shadow-desk",
-      role: name === "shadow-field" ? "field" : "office",
-      cwd: flagValue(argv, "--root") ?? process.cwd()
     };
   }
   const port = Number(flagValue(argv, "--port") ?? "4174");
@@ -215,6 +230,14 @@ function main(argv: string[]): void {
   }
   if (plan.kind === "shadow-sealed-demo") {
     printSealedShadowDemo();
+    return;
+  }
+  if (plan.kind === "shadow-office") {
+    printOfficeShadow();
+    return;
+  }
+  if (plan.kind === "shadow-field") {
+    printFieldShadow();
     return;
   }
   if (plan.kind === "pilot-prep") {
@@ -268,6 +291,7 @@ function main(argv: string[]): void {
           "  /api/receipt  /api/huddle  /api/huddle.json  /api/stock  /api/drive  /api/performance  /api/work-together  /api/friction  /api/calls/week.json",
           "  /api/inbound-quality  /api/inbound-quality.txt  /api/alert-actions  /api/monitoring  /api/time-tracking  /api/coverage  /api/right-tech  /api/option-c-start-gate",
           "  filters: ?calls=callback | warranty | not-classified",
+          "  field flags: data/runtime/<instanceId>/field-flags/  (loopback POST /api/flags/raise, not Field 1.0)",
           ""
         ].join("\n")
       );

@@ -1,0 +1,11 @@
+{
+  "flagId": "sample-needs-parts",
+  "vanId": "van-sample-1",
+  "jobId": "JOB-1",
+  "kind": "needsParts",
+  "severity": "watch",
+  "note": "Sample-shop fixture. Parts label only. Not an accuracy percent.",
+  "raisedAt": "2026-10-03T15:05:00.000Z",
+  "raisedBy": "sample-tech",
+  "inventedAccuracy": false
+}

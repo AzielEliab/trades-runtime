@@ -6,7 +6,7 @@ Private **TypeScript runtime** for a shadow-first AI operating system / company 
 **Version:** 1.0.0-local (**Local Softwares 1.0**, installable)  
 **Role:** `trades-runtime`  
 **License:** Apache-2.0  
-**Visibility:** this repository stays **private**; public get is the giveaway Worker  
+**Release:** free software (Apache-2.0). Clone it and run the local shadow on your machine. Aziel Eliab is the author, not the operator, and is not running a company pilot.  
 **Public Worker (if deployed):** https://trades-runtime.vibelock.workers.dev  
 **Try on Glama (intended listing):** https://glama.ai/mcp/servers/AzielEliab/trades-runtime — pack is in-repo (`glama.json`, `Dockerfile`, `cli/mcp-stdio.mjs`). Do **not** treat Install Server as LIVE from this git tree alone. Checked 2026-10-02: Glama Latest/releaseVersion is **1.0.0-local**. The badge matches the Softwares cite tip. Local Softwares 1.0. That match is not a Field 1.0 claim and not Office Softwares 1.0. This cut does not Make Release. See [`docs/GLAMA.md`](docs/GLAMA.md).  
 **Status:** 1.0.0-local installable Local Softwares 1.0 (Track L gate; pilot not started; live_backends false; not a Field 1.0 claim) — 0.4.12 familiar commands (`help`, `softwares`, `version`, `health`) so a person can discover the product without reading the whole README; desk features stay frozen (**pilot not started**) — 0.4.11 giveaway human UI on the VibeLock Worker (browser / PWA) without downloading first; optional counted pack; operator desk still local (**pilot not started**) — 0.4.10 local time tracking, service-coverage switches, and right-tech suggestions on the Monitoring desk (**pilot not started**) — 0.4.9 local inbound quality report for ServiceTitan and ProBooks fragments, alert-to-action stubs with refused write-back, and an Option C start-gate prep panel (**pilot not started**) — 0.4.8 local miles driven and drive performance, a ranked employee and department performance board, work-together suggestions across departments, and an employee friction rate beside that board (**pilot not started**) — 0.4.7 part cost with regional market adaptation, per-tech trainingNeeded, good and bad department behavior flags, and local truck counts (**pilot not started**) — 0.4.6 per-call classify reasons, callback / warranty / not-classified filters, a loopback weekly callback-rate digest, and a tech morning huddle (**pilot not started**) — 0.4.5 local callback and warranty counts, alert-digest export, score explanations, and booking-block receipt (**pilot not started**) — 0.4.4 local operator desk polish (theme, lane view, printable snapshot; **pilot not started**) — 0.4.3 Option C BYO pilot prep (local runbook + `npm run pilot:prep`; **pilot not started**) — 0.4.2 local alert rules on the operator desk — 0.4.1 named trades-app vendor profiles on the 0.4.0 universal drop-in — lockstep with Property Intelligence v1.0 in-tree — live-pure core + honest stubs — **BYO** local ServiceTitan + ProBooks + trades-app inbound — **no** live writes, tenant data, ST/ProBooks write-back, phone-home, DOIs, hosted uploader, or production company-OS claim — **Option C code-ready / pilot not started** — **Option D not started**
@@ -16,6 +16,37 @@ The product is the software in `src/`. `docs/` is a thin local catalog/UI. GitHu
 Standing rule: every PDF Aziel sends is a spec to implement as coded software.
 
 Paper trail: [`TR-1.0-GATE-2026-09-28`](specs/TR-1.0-GATE-2026-09-28.txt) (Track L Local Softwares 1.0 gate; pilot not started) · [`TR-COMMANDS-2026-09-27`](specs/TR-COMMANDS-2026-09-27.txt) (common CLI commands help, softwares, version, health; desk frozen; pilot not started) · [`TR-OPS-2026-09-27`](specs/TR-OPS-2026-09-27.txt) (local time tracking, coverage switches, right-tech suggestions; pilot not started) · [`TR-DESK-VIEW-2026-09-27`](specs/TR-DESK-VIEW-2026-09-27.txt) (local show/hide checkboxes; Softwares card grids unchanged; pilot not started) · [`TR-MOBILE-DESK-2026-09-27`](specs/TR-MOBILE-DESK-2026-09-27.txt) (phone-width local desk; Softwares cards unchanged; pilot not started) · [`TR-QUALITY-2026-09-27`](specs/TR-QUALITY-2026-09-27.txt) (inbound quality, alert-action stubs, Option C start gate; pilot not started) · [`TR-DRIVE-2026-09-27`](specs/TR-DRIVE-2026-09-27.txt) (miles driven, drive performance, ranked employee and department board; pilot not started) · [`TR-SOFTWARES-2026-09-27`](specs/TR-SOFTWARES-2026-09-27.txt) (part cost and market adaptation, trainingNeeded, department behavior flags, local truck counts; pilot not started) · [`TR-HUDDLE-2026-09-26`](specs/TR-HUDDLE-2026-09-26.txt) (per-call classify reason, call filters, weekly callback rate, morning huddle; pilot not started) · [`TR-CALLS-2026-09-26`](specs/TR-CALLS-2026-09-26.txt) (callback and warranty counts, alert digest, score why, booking-block receipt; pilot not started) · [`TR-DESK-POLISH-2026-09-25`](specs/TR-DESK-POLISH-2026-09-25.txt) (local desk polish; pilot not started) · [`TR-OPTION-C-PILOT-RUNBOOK-2026-10-02`](specs/TR-OPTION-C-PILOT-RUNBOOK-2026-10-02.txt) (human Option C start path; catalog pilot not started) · [`TR-PILOT-START-2026-10-02`](specs/TR-PILOT-START-2026-10-02.txt) (explicit `pilot:start --branch` on the operator isolate; not Field 1.0; not Office Softwares 1.0) · [`TR-OPTION-C-PREP-2026-09-25`](specs/TR-OPTION-C-PREP-2026-09-25.txt) (Option C box prep; pilot not started) · [`TR-ALERTS-2026-09-25`](specs/TR-ALERTS-2026-09-25.txt) (local alert rules) · [`TR-VENDOR-2026-09-25`](specs/TR-VENDOR-2026-09-25.txt) (named vendor profiles) · [`TR-DESK-2026-09-25`](specs/TR-DESK-2026-09-25.txt) (universal drop-in + local human desk) · [`TR-AUDIT-2026-09-18C`](specs/TR-AUDIT-2026-09-18C.txt) · [`TR-AUDIT-2026-09-18B`](specs/TR-AUDIT-2026-09-18B.txt) · [`TR-AUDIT-2026-09-18`](specs/TR-AUDIT-2026-09-18.txt) · [`TR-AUDIT-2026-09-17`](specs/TR-AUDIT-2026-09-17.txt) · [`TR-CUT-2026-09-17`](specs/TR-CUT-2026-09-17.txt) · [`TR-BOT-2026-09-17`](specs/TR-BOT-2026-09-17.txt) (standing brief) · [`TR-BYO-2026-09-17`](specs/TR-BYO-2026-09-17.txt) (amends TR-BOT §9 and TR-CUT R2–R3).
+
+## Try it on your machine
+
+Merging this repository does not start a pilot. Aziel Eliab wrote the software. He is not the operator, he is not a customer, and he is not running a shop on this repo. `live_backends` stays false. There is no write-back. A fresh clone needs no ServiceTitan or ProBooks tenant and no secrets.
+
+```bash
+git clone https://github.com/AzielEliab/trades-runtime.git
+cd trades-runtime
+npm install
+npm test
+npm run demo
+npm run shadow:office
+npm run shadow:field
+npm run desk
+```
+
+What you will see:
+
+- `npm run demo` prints a synthetic shadow day in the terminal. It is a fixture. It is not a company result and it does not print an accuracy percent.
+- `npm run shadow:office` runs the office shadow on the sample branch named `sample-shop`. Fixtures are already in `test/fixtures/sample-branch/office/`. The receipt says `office_softwares_1_0: false`, `pilot_started: false`, and `live_backends: false`. You will see admitted sample jobs, a huddle count, inbound quality as a checklist, and alert stubs that refuse write-back. That command does not load field flags.
+- `npm run shadow:field` runs the field shadow on the same sample branch, from `test/fixtures/sample-branch/field/`. You will see local flags (`needsParts`, `safetyHold`, `vanDown`, and a row that names a label without a van, which does not invent a van), a time card, coverage places, and a right-tech suggestion. `field_softwares_1_0` is false. It is not a live GPS feed and not Field 1.0. It is a separate command from the office shadow.
+- `npm run desk` opens the local desk at http://127.0.0.1:4174/ . With empty inbound folders the page is labeled synthetic demo. It is not your company and not a live tenant. Dropping your own exports into `data/inbound/` is optional and stays on your machine.
+
+When you have a real branch on your own machine, and only then:
+
+```bash
+npm run pilot:prep
+npm run pilot:start -- --branch <branchId>
+```
+
+That is the only software path that sets `pilot_started` true, and it does it on your isolate only. It refuses a missing or bad branch, prep that is not ready, and `--claim-company` when inbound is empty or only synthetic. The shipped catalog stays `pilot_started` false. Mode stays SHADOW-SEALED. Writes stay refused. The receipt is not a live company OS, not Office Softwares 1.0, and not Field 1.0.
 
 ## Install, test, demo
 
@@ -31,6 +62,8 @@ npm run demo
 npm run byo:admit-demo
 npm run drop-in:demo
 npm run desk
+npm run shadow:office
+npm run shadow:field
 npm run pilot:prep
 npm run pilot:start -- --branch <branchId>
 npm run health:local
@@ -268,7 +301,7 @@ docker run --rm -i trades-runtime-mcp
 
 GitHub Pages is **intentionally disabled**. There is no `.github/workflows/pages.yml`. Do not add a Pages deploy workflow. Do not enable Pages on the repository. Do not treat a github.io URL as a live product surface.
 
-Keep the repository private. Do not change visibility to public. Public get is the Worker UI on https://trades-runtime.vibelock.workers.dev. The counted tarball is optional. Do not enable GitHub Pages. Do not add PDFs under `docs/`.
+The software is free to clone. GitHub Pages stays off. Do not enable Pages. Do not add PDFs under `docs/`. A browser UI, if a Worker is already deployed, is https://trades-runtime.vibelock.workers.dev. This repository does not deploy that Worker. The counted tarball is optional.
 
 Local UI preview (Pages stay off):
 

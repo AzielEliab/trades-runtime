@@ -4,7 +4,14 @@ import { defaultCoverageLayersPath, writeCoverageLayer } from "../domain/coverag
 import { parseCallDeskFilter } from "../domain/call-class.js";
 import { healthLocal } from "../spine/health-local.js";
 import { acknowledgeStoredAlert, alertDigestCsv, buildAlertDigest, defaultAlertStatePath } from "./alerts.js";
-import { buildOperatorSnapshot, DESK_REFRESH_MS, type DeskSnapshotOptions, type OperatorSnapshot } from "./snapshot.js";
+import { fieldFlagsDirectory, writeFieldFlagFile } from "./field-flags.js";
+import {
+  buildOperatorSnapshot,
+  DESK_REFRESH_MS,
+  resolveOperatorInstanceId,
+  type DeskSnapshotOptions,
+  type OperatorSnapshot
+} from "./snapshot.js";
 import { renderPrintableHuddle, renderPrintableSnapshot } from "./print.js";
 import { renderDeskPage, renderDeskView } from "./render.js";
 import { FIELD_EVENT_KINDS, recordFieldEvent, type FieldEventKind } from "./field-time.js";
@@ -64,13 +71,13 @@ function send(res: ServerResponse, status: number, body: string, type: string, e
   res.end(body);
 }
 
-function readBody(req: IncomingMessage, max = 2048): Promise<string> {
+function readBody(req: IncomingMessage, maxBytes = 2048): Promise<string> {
   return new Promise((resolve, reject) => {
     const chunks: Buffer[] = [];
     let size = 0;
     req.on("data", (chunk: Buffer) => {
       size += chunk.length;
-      if (size > max) {
+      if (size > maxBytes) {
         reject(new Error("body too large"));
         req.destroy();
         return;
@@ -80,6 +87,11 @@ function readBody(req: IncomingMessage, max = 2048): Promise<string> {
     req.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")));
     req.on("error", reject);
   });
+}
+
+function isLoopbackPeer(req: IncomingMessage): boolean {
+  const host = (req.socket.remoteAddress ?? "").replace(/^::ffff:/i, "").toLowerCase();
+  return host === "127.0.0.1" || host === "::1" || host === "localhost";
 }
 
 function snapshotFor(options: DeskSnapshotOptions, requestUrl: URL, req?: IncomingMessage): OperatorSnapshot {
@@ -218,7 +230,7 @@ export function startOperatorDesk(options: DeskServerOptions = {}): Promise<Desk
   }
   const port = options.port ?? 4174;
   const cwd = options.cwd ?? process.cwd();
-  const instanceId = options.config?.instanceId ?? "local";
+  const instanceId = options.instanceId ?? resolveOperatorInstanceId(cwd, options.config);
   const deskOptions: DeskSnapshotOptions = {
     cwd,
     now: options.now,
@@ -234,7 +246,8 @@ export function startOperatorDesk(options: DeskServerOptions = {}): Promise<Desk
     timeCardsPath: options.timeCardsPath,
     coveragePath: options.coveragePath,
     rightTechJob: options.rightTechJob,
-    persistLocalReports: options.persistLocalReports ?? true
+    persistLocalReports: options.persistLocalReports ?? true,
+    instanceId
   };
 
   const server = createServer((req: IncomingMessage, res: ServerResponse) => {
@@ -272,6 +285,53 @@ export function startOperatorDesk(options: DeskServerOptions = {}): Promise<Desk
           const message = error instanceof Error ? error.message : String(error);
           if (!res.headersSent) {
             send(res, 400, JSON.stringify({ error: message, writes: false, vendorWrite: false }), "application/json; charset=utf-8");
+          }
+        });
+      return;
+    }
+    if (req.method === "POST" && url.pathname === "/api/flags/raise") {
+      if (!isLoopbackPeer(req)) {
+        send(
+          res,
+          403,
+          JSON.stringify({ error: "loopback only", writes: false, vendorWrite: false, phoneHome: false }),
+          "application/json; charset=utf-8"
+        );
+        return;
+      }
+      void readBody(req, 8192)
+        .then((raw) => {
+          const body = raw ? (JSON.parse(raw) as unknown) : {};
+          const raised = writeFieldFlagFile(fieldFlagsDirectory(cwd, instanceId), body);
+          send(
+            res,
+            200,
+            JSON.stringify({
+              ok: true,
+              id: `field-flag:${raised.flag.flagId}`,
+              flagId: raised.flag.flagId,
+              kind: raised.flag.kind,
+              severity: raised.flag.severity,
+              inventedAccuracy: false,
+              writes: false,
+              vendorWrite: false,
+              phoneHome: false,
+              surface: "local-field-flag",
+              office_softwares_1_0: false,
+              field_softwares_1_0: false
+            }),
+            "application/json; charset=utf-8"
+          );
+        })
+        .catch((error: unknown) => {
+          const message = error instanceof Error ? error.message : String(error);
+          if (!res.headersSent) {
+            send(
+              res,
+              400,
+              JSON.stringify({ error: message, writes: false, vendorWrite: false, phoneHome: false }),
+              "application/json; charset=utf-8"
+            );
           }
         });
       return;

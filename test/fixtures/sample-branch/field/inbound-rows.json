@@ -1,0 +1,17 @@
+{
+  "synthetic": true,
+  "note": "Sample branch sample-shop. Field-shadow inbound rows. A label without a van is not a flag. Not a company export. Not Field 1.0.",
+  "jobs": [
+    {
+      "id": "JOB-NO-VAN",
+      "needsParts": true,
+      "note": "Coil on order. This row does not name a van."
+    },
+    {
+      "id": "JOB-2",
+      "vanId": "van-sample-2",
+      "safetyHold": "hold",
+      "note": "Sample ladder footing. Not an accuracy percent."
+    }
+  ]
+}

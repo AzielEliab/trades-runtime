@@ -1,0 +1,35 @@
+{
+  "synthetic": true,
+  "note": "Sample branch sample-shop. Synthetic office-shadow ProBooks-shaped export. Not a company export. Not Office Softwares 1.0.",
+  "exportedAt": "2026-10-03T12:00:00.000Z",
+  "source": "trades-runtime-fixture",
+  "branch": "sample-shop",
+  "books": [
+    {
+      "id": "SAMPLE-PB-BOOK",
+      "name": "sample-shop-parts"
+    }
+  ],
+  "items": [
+    {
+      "id": "SAMPLE-PB-ITEM-1",
+      "sku": "SKU-SAMPLE-1",
+      "cost": 18,
+      "bookId": "SAMPLE-PB-BOOK"
+    }
+  ],
+  "costs": [
+    {
+      "id": "SAMPLE-PB-COST-1",
+      "itemId": "SAMPLE-PB-ITEM-1",
+      "amount": 18,
+      "kind": "acquisition"
+    }
+  ],
+  "vendors": [
+    {
+      "id": "SAMPLE-PB-VEND-1",
+      "nameHash": "sample-shop-vendor"
+    }
+  ]
+}
