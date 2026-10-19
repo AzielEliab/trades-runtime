@@ -30,6 +30,8 @@ Named trades-app profiles (0.4.1, synthetic fixtures only — not live connector
 
 Kept: Jobber, Housecall Pro, Service Fusion, QuickBooks Online, QuickBooks Desktop, generic CSV, generic JSON, ServiceTitan, ProBooks.
 
+One path per platform (TR-PLATFORMS-ROUTE-2026-10-19): the ServiceM8, SuccessWare, and ServiceTrade fingerprints above still detect the file, but the file is admitted through that vendor's platform connector (`peerClass` `servicem8` / `successware` / `servicetrade`, the same mapper and source ids as a file dropped in `data/inbound/<kind>/`). A sniffed file and a file in the platform folder give the same records and hashes. A Successware CSV is admitted as profile `successware-csv`. Only a document that explicitly declares `"sourceKind": "trades-app"` keeps the older generic trades-app mapper. AccuLynx, Xero, FieldEdge, Jobber, Housecall Pro, Service Fusion, and QuickBooks profiles are not re-routed in this change.
+
 Each named profile normalizes into the same trades-app shadow entities (`job`, `pricebook`, `customer`, `appointment`, `invoice`, `technician`, `equipment`) and is admitted through FragGate as MEDIUM, `live:false`, `write:false`, UNVERIFIED. Wrapper ≠ verified. Receipt: [`specs/TR-VENDOR-2026-09-25.txt`](../../specs/TR-VENDOR-2026-09-25.txt).
 
 ## Platform peers (TR-PLATFORMS-2026-10-19)
@@ -218,7 +220,12 @@ Refrigerant rules come from the eCFR as read on 2026-10-19:
 
 Refrigerant class comes only from a built-in list of common ODS/HFC codes. Any other refrigerant is `undetermined` until the operator sets `refrigerantClass`. This is a record-keeping aid, not compliance advice.
 
-Revenue at risk adds up only the `price` written on each agreement. An agreement with no price is counted as "price unknown". Nothing is estimated.
+Pricing is optional. Revenue at risk adds up only prices the shop supplies. Each at-risk agreement contributes one of two things:
+
+- the `price` written on the agreement itself, or
+- if it has none, the shop's own price for its plan in `settings.planPrices`, for example `{ "Gold plan": 189 }`. Plan names match case-insensitively.
+
+An agreement with neither is counted as "price unknown", never as zero. Nothing is estimated. The board reports how many priced agreements used each source (`revenueAtRisk.pricedFrom`). The prices in `data/runtime/agreements.json.example` are labeled example data, are synthetic placeholders (111.11, 222.22, 199.99), and are not market rates.
 
 Every write goes through the approval gate. Permissions are off by default, and the operator says yes or no each time.
 

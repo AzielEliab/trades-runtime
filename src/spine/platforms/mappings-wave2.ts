@@ -25,7 +25,17 @@ const SUCCESSWARE: CollectionMap[] = [
       scheduledOn: ["scheduledDate", "ScheduledDate"],
       serviceAddress: ["locationAddress", "address"]
     },
-    children: [{ keys: ["equipment"], entity: "equipment", idKeys: ["equipmentId", "serialNumber", "id"] }]
+    children: [
+      { keys: ["equipment"], entity: "equipment", idKeys: ["equipmentId", "serialNumber", "id"] },
+      {
+        keys: ["$row"],
+        entity: "technician",
+        idKeys: ["technicianId", "techId", "technician"],
+        fields: { technicianId: ["technicianId", "techId"], technicianName: ["technician", "technicianName", "techName"] },
+        rawKeys: ["technicianId", "techId", "technician", "technicianName", "techName"],
+        filter: (row) => Boolean(row.technicianId || row.techId || row.technician)
+      }
+    ]
   },
   { keys: ["customers", "locations"], entity: "customer", idKeys: ["customerId", "locationId", "id"], fields: { customerName: ["customerName", "name", "locationName"] } },
   { keys: ["invoices"], entity: "invoice", idKeys: ["invoiceNumber", "invoiceId", "id"], observedKeys: ["invoiceDate"], statusKeys: ["status"], fields: { invoiceTotal: ["total", "invoiceTotal"], customerId: ["customerId", "locationId"] } },
@@ -216,7 +226,17 @@ const SERVICEM8: CollectionMap[] = [
       customerName: ["company_name"],
       jobTotal: ["total_invoice_amount"],
       serviceAddress: ["job_address"]
-    }
+    },
+    children: [
+      {
+        keys: ["$row"],
+        entity: "customer",
+        idKeys: ["company_uuid"],
+        fields: { customerName: ["company_name"] },
+        rawKeys: ["company_uuid", "company_name"],
+        filter: (row) => Boolean(row.company_uuid)
+      }
+    ]
   },
   {
     keys: ["jobactivity", "jobActivities", "jobactivities"],

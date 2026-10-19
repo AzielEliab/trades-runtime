@@ -148,11 +148,28 @@ describe("maintenance agreements", () => {
     expect(board.revenueAtRisk.agreementsPriceUnknown).toBe(1);
   });
 
+  it("values risk from agreement prices and the optional shop plan price list in the example", () => {
+    const cwd = box();
+    const doc = example("agreements") as Record<string, unknown>;
+    expect(String(doc.note)).toMatch(/EXAMPLE DATA \(synthetic\)/);
+    seed(cwd, "agreements", doc);
+    const board = buildAgreementBoard(ctx(cwd));
+    const byId = Object.fromEntries(board.agreements.map((row) => [row.agreementId, row]));
+    expect(byId["SYN-AGR-1"]).toMatchObject({ price: 111.11, priceSource: "plan-price-list" });
+    expect(byId["SYN-AGR-2"]).toMatchObject({ price: 199.99, priceSource: "agreement" });
+    expect(byId["SYN-AGR-3"]!.price).toBeUndefined();
+    expect(byId["SYN-AGR-3"]!.priceSource).toBeUndefined();
+    expect(board.revenueAtRisk).toMatchObject({ amount: 311.1, agreementsPriced: 2, agreementsPriceUnknown: 1, pricedFrom: { agreement: 1, planPriceList: 1 } });
+  });
+
   it("reports no revenue at risk when no prices are on file", () => {
     const cwd = box();
-    seed(cwd, "agreements", example("agreements"));
+    const doc = example("agreements") as { settings: Record<string, unknown>; agreements: Array<Record<string, unknown>> };
+    delete doc.settings.planPrices;
+    for (const row of doc.agreements) delete row.price;
+    seed(cwd, "agreements", doc);
     const board = buildAgreementBoard(ctx(cwd));
-    expect(board.revenueAtRisk).toMatchObject({ amount: 0, agreementsPriced: 0, agreementsPriceUnknown: 1 });
+    expect(board.revenueAtRisk).toMatchObject({ amount: 0, agreementsPriced: 0, agreementsPriceUnknown: 3 });
   });
 });
 

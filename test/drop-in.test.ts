@@ -1,3 +1,4 @@
+import { PLATFORM_SPECS } from "../src/spine/platforms/catalog.js";
 import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -52,22 +53,23 @@ describe("universal trades-app drop-in", () => {
 
   it("prefers named vendor profiles from keys, then falls back to generic sniff", () => {
     const expected = [
-      ["servicem8-export.json", "servicem8", ["job", "customer"]],
-      ["acculynx-export.json", "acculynx", ["job", "customer", "appointment"]],
-      ["successware-export.json", "successware", ["job", "technician", "appointment"]],
-      ["xero-export.json", "xero", ["invoice", "customer", "pricebook"]],
-      ["fieldedge-export.json", "fieldedge", ["job", "customer", "technician", "appointment"]],
-      ["servicetrade-export.json", "servicetrade", ["job", "appointment"]]
+      // ServiceM8, Successware, and ServiceTrade route into their platform connectors (one path per platform).
+      ["servicem8-export.json", "servicem8", ["job", "customer"], "servicem8"],
+      ["acculynx-export.json", "acculynx", ["job", "customer", "appointment"], "trades-app"],
+      ["successware-export.json", "successware", ["job", "technician"], "successware"],
+      ["xero-export.json", "xero", ["invoice", "customer", "pricebook"], "trades-app"],
+      ["fieldedge-export.json", "fieldedge", ["job", "customer", "technician", "appointment"], "trades-app"],
+      ["servicetrade-export.json", "servicetrade", ["job", "customer"], "servicetrade"]
     ] as const;
 
-    for (const [file, profileId, entities] of expected) {
+    for (const [file, profileId, entities, peerClass] of expected) {
       const doc = fixture(file) as Record<string, unknown>;
       delete doc.vendor;
       delete doc.app;
       delete doc.source;
       const detected = detectDropIn(doc);
       expect(detected.ok && detected.profileId, file).toBe(profileId);
-      expect(detected.ok && detected.peerClass, file).toBe("trades-app");
+      expect(detected.ok && detected.peerClass, file).toBe(peerClass);
       const admitted = admitDropInDocument(doc, { receivedAt: RECEIVED });
       expect(admitted.ok, file).toBe(true);
       if (!admitted.ok) continue;
@@ -78,7 +80,8 @@ describe("universal trades-app drop-in", () => {
       expect(admitted.write).toBe(false);
       expect(admitted.verificationStatus).toBe("UNVERIFIED");
       expect(admitted.wrapperIsVerification).toBe(false);
-      expect(admitted.records.map((record) => record.entity)).toEqual([...entities]);
+      expect(admitted.peerClass, file).toBe(peerClass);
+      expect(admitted.records.map((record) => record.entity), file).toEqual([...entities]);
       for (const record of admitted.records) {
         expect(record.packetHash).toHaveLength(64);
         expect(record.shadowHash).toHaveLength(64);
@@ -86,7 +89,7 @@ describe("universal trades-app drop-in", () => {
         expect(record.verificationStatus).toBe("UNVERIFIED");
         expect(record.live).toBe(false);
         expect(record.write).toBe(false);
-        expect(record.sourceId.startsWith("ta:")).toBe(true);
+        expect(record.sourceId.startsWith(peerClass === "trades-app" ? "ta:" : `${PLATFORM_SPECS[peerClass].idPrefix}:`), file).toBe(true);
       }
     }
 
@@ -94,7 +97,8 @@ describe("universal trades-app drop-in", () => {
       "# synthetic: true\nCall ID,Agreement Number,Job Class,Status\nSYN-SW-HDR,AGR-H,Service,Completed\n",
       { receivedAt: RECEIVED, fileName: "calls.csv" }
     );
-    expect(headerOnly.ok && headerOnly.profileId).toBe("successware");
+    expect(headerOnly.ok && headerOnly.profileId).toBe("successware-csv");
+    expect(headerOnly.ok && headerOnly.peerClass).toBe("successware");
     expect(headerOnly.ok && headerOnly.records[0]?.externalId).toBe("SYN-SW-HDR");
 
     const byName = admitDropInText(
@@ -117,7 +121,12 @@ describe("universal trades-app drop-in", () => {
 
     const tradeNotTitan = detectDropIn(fixture("servicetrade-export.json"), { fileName: "servicetitan-export.json" });
     expect(tradeNotTitan.ok && tradeNotTitan.profileId).toBe("servicetrade");
-    expect(tradeNotTitan.ok && tradeNotTitan.peerClass).toBe("trades-app");
+    expect(tradeNotTitan.ok && tradeNotTitan.peerClass).toBe("servicetrade");
+
+    // Declaring sourceKind "trades-app" explicitly keeps the older generic trades-app mapper.
+    const legacy = admitDropInDocument({ ...(fixture("servicem8-export.json") as Record<string, unknown>), sourceKind: "trades-app" }, { receivedAt: RECEIVED });
+    expect(legacy.ok && legacy.peerClass).toBe("trades-app");
+    expect(legacy.ok && legacy.profileId).toBe("servicem8");
   });
 
   it("admits a trades-app drop as MEDIUM, hashed, live:false, write:false, unverified", () => {
@@ -247,13 +256,17 @@ describe("universal trades-app drop-in", () => {
     expect(byFile["servicem8-export.json"]?.profileId).toBe("servicem8");
     expect(byFile["acculynx-export.json"]?.profileId).toBe("acculynx");
     expect(byFile["successware-export.json"]?.profileId).toBe("successware");
-    expect(byFile["successware-calls.csv"]?.profileId).toBe("successware");
+    expect(byFile["successware-calls.csv"]?.profileId).toBe("successware-csv");
     expect(byFile["xero-export.json"]?.profileId).toBe("xero");
     expect(byFile["fieldedge-export.json"]?.profileId).toBe("fieldedge");
     expect(byFile["servicetrade-export.json"]?.profileId).toBe("servicetrade");
-    for (const file of ["servicem8-export.json", "acculynx-export.json", "successware-export.json", "xero-export.json", "fieldedge-export.json", "servicetrade-export.json", "successware-calls.csv"]) {
+    for (const file of ["acculynx-export.json", "xero-export.json", "fieldedge-export.json"]) {
       expect(byFile[file]?.peerClass).toBe("trades-app");
     }
+    expect(byFile["servicem8-export.json"]?.peerClass).toBe("servicem8");
+    expect(byFile["successware-export.json"]?.peerClass).toBe("successware");
+    expect(byFile["successware-calls.csv"]?.peerClass).toBe("successware");
+    expect(byFile["servicetrade-export.json"]?.peerClass).toBe("servicetrade");
     for (const file of proof.files) {
       expect(file.hashes.every((hash) => hash.length === 64)).toBe(true);
       expect(file.verificationStatus).toBe("UNVERIFIED");

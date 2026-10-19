@@ -84,7 +84,7 @@ export function renderPermitsPanel(board: PermitBoard): string {
 
 export function renderAgreementsPanel(board: AgreementBoard): string {
   const rows = board.agreements
-    .map((a) => `<tr><td>${esc(a.customerName ?? a.customerId ?? a.agreementId)}</td><td>${cell(a.plan)}</td><td>${cell(a.renewalOn?.slice(0, 10))}</td><td>${cell(a.daysToRenewal)}</td><td>${cell(a.lastVisitOn)}</td><td>${a.completedVisitsThisTerm}/${cell(a.expectedVisitsToDate)}</td><td>${cell(a.price)}</td><td>${[a.lapsed ? "lapsed" : "", a.renewalDue ? "renewal due" : "", a.missedTuneUps ? `${a.missedTuneUps} missed` : "", a.notVisited ? "not visited" : ""].filter(Boolean).join(", ") || "—"}</td></tr>`)
+    .map((a) => `<tr><td>${esc(a.customerName ?? a.customerId ?? a.agreementId)}</td><td>${cell(a.plan)}</td><td>${cell(a.renewalOn?.slice(0, 10))}</td><td>${cell(a.daysToRenewal)}</td><td>${cell(a.lastVisitOn)}</td><td>${a.completedVisitsThisTerm}/${cell(a.expectedVisitsToDate)}</td><td>${cell(a.price)}${a.priceSource === "plan-price-list" ? ` <span class="quiet">(plan price list)</span>` : ""}</td><td>${[a.lapsed ? "lapsed" : "", a.renewalDue ? "renewal due" : "", a.missedTuneUps ? `${a.missedTuneUps} missed` : "", a.notVisited ? "not visited" : ""].filter(Boolean).join(", ") || "—"}</td></tr>`)
     .join("");
   const risk = board.revenueAtRisk;
   return `<section class="panel lift" id="agreements-board" data-az="office management" data-view="section:agreements-board">
@@ -92,7 +92,7 @@ export function renderAgreementsPanel(board: AgreementBoard): string {
       <p class="quiet">${esc(board.note)} Renewal window ${board.settings.renewalWindowDays} days. Not-visited threshold ${board.settings.notVisitedDays} days.</p>
       ${sourceLine(board.source, "agreements")}
       <p>Renewals due ${board.renewalsDue.length}. Lapsed ${board.lapsed.length}. Behind on tune-ups ${board.missedTuneUps.length}. Not visited ${board.notVisited.length}.
-      Revenue at risk ${risk.agreementsPriced ? `$${risk.amount.toFixed(2)} across ${risk.agreementsPriced} priced agreement(s)` : "not computed (no prices in the data)"}${risk.agreementsPriceUnknown ? `; ${risk.agreementsPriceUnknown} at-risk agreement(s) have no price on file` : ""}.</p>
+      Revenue at risk ${risk.agreementsPriced ? `$${risk.amount.toFixed(2)} across ${risk.agreementsPriced} priced agreement(s)${risk.pricedFrom.planPriceList ? ` (${risk.pricedFrom.planPriceList} priced from your plan price list)` : ""}` : "not computed (no prices in the data; add a price on each agreement or settings.planPrices)"}${risk.agreementsPriceUnknown ? `; ${risk.agreementsPriceUnknown} at-risk agreement(s) have no price on file` : ""}.</p>
       <p class="quiet">${esc(risk.basis)}</p>
       ${alertList(board.alerts)}
       <div class="table-scroll"><table><thead><tr><th>Member</th><th>Plan</th><th>Renews</th><th>Days</th><th>Last visit</th><th>Visits done/expected</th><th>Price</th><th>Flags</th></tr></thead>

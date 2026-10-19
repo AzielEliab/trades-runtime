@@ -32,6 +32,9 @@ export interface CollectionMap {
   cents?: string[];
   /** Only map rows that pass. */
   filter?: (row: Record<string, unknown>) => boolean;
+  /** Keep only these vendor keys in raw (used by "$row" children so a flat parent row is not copied whole). */
+  rawKeys?: string[];
+  /** Child maps. A child key of "$row" reads the parent row itself (a flat export that names, say, the customer on the job row). */
   children?: CollectionMap[];
 }
 
@@ -144,7 +147,8 @@ function mapOne(
     if (map.filter && !map.filter(row)) return;
     const fallback = parentId ? `${parentId}:${map.entity}:${index + 1}` : `row-${map.entity}-${index + 1}`;
     const externalId = firstPathText(row, map.idKeys) || fallback;
-    const raw = normalizedRow(row, map);
+    const source = map.rawKeys ? Object.fromEntries(map.rawKeys.filter((key) => row[key] != null && row[key] !== "").map((key) => [key, row[key]])) : row;
+    const raw = normalizedRow(source, map);
     out.push({
       entity: map.entity,
       externalId,
@@ -154,7 +158,7 @@ function mapOne(
     });
     for (const child of map.children ?? []) {
       for (const key of child.keys) {
-        const value = getPath(row, key);
+        const value = key === "$row" ? row : getPath(row, key);
         const childRows = isRecord(value) && !Array.isArray(value.nodes) && !Array.isArray(value.edges) ? [value] : rowsOf(value);
         if (childRows.length) {
           mapOne(childRows, child, out, externalId);
@@ -214,13 +218,13 @@ export type CsvField = "id" | "status" | "observed" | "technicianName" | "techni
 export type CsvColumnOverrides = Partial<Record<PlatformEntity, Partial<Record<CsvField, string[]>>>>;
 
 const CSV_ALIASES: Record<CsvField, string[]> = {
-  id: ["id", "job #", "job number", "job_number", "job id", "job_id", "work order", "work order #", "work_order_number", "wo #", "wo number", "work order no", "workorderno", "ticket #", "ticket id", "invoice #", "invoice number", "invoice_id", "estimate #", "quote #", "quote number", "customer id", "client id", "employee id", "transaction id", "payment id", "number"],
+  id: ["id", "job #", "job number", "job_number", "job id", "job_id", "work order", "work order #", "work_order_number", "wo #", "wo number", "work order no", "workorderno", "call id", "call_id", "call #", "ticket #", "ticket id", "invoice #", "invoice number", "invoice_id", "estimate #", "quote #", "quote number", "customer id", "client id", "employee id", "transaction id", "payment id", "number"],
   status: ["status", "job status", "work status", "work_status", "invoice status", "quote status"],
-  observed: ["date", "scheduled", "scheduled date", "scheduled start", "start", "start date", "visit date", "created", "created at", "issued date", "txn date", "completed"],
+  observed: ["date", "scheduled", "scheduled date", "scheduled_date", "scheduled start", "start", "start date", "visit date", "created", "created at", "issued date", "txn date", "completed"],
   technicianName: ["technician", "tech", "assigned to", "assigned employees", "team member", "visit assigned to", "employee", "employee name", "name"],
   technicianId: ["technician id", "tech id", "employee id", "team member id"],
   customerName: ["customer", "customer name", "client", "client name", "display name", "company"],
-  customerId: ["customer id", "client id"],
+  customerId: ["customer id", "client id", "location id", "location_id"],
   jobTotal: ["total", "job total", "invoice total", "amount", "total amount", "grand total"],
   serviceAddress: ["service address", "address", "property address", "job address", "street"]
 };

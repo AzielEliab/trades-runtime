@@ -27,12 +27,14 @@ const TOOLS = [
   },
   {
     name: "trades_runtime_cite",
-    description: "Public cite.json for Trades-Runtime. Read-only.",
+    description:
+      "Public cite.json for Trades-Runtime. Read-only. Includes local_package: the local runtime's modules (refrigerant log, permits, agreements, warranty claims, truck stock, callback root cause) and platform peers (Jobber, Housecall Pro, Square, QuickBooks Online, FieldEdge, Service Fusion, Successware, Workiz, ServiceTrade, BuildOps, FieldPulse, Kickserv, mHelpDesk, ServiceM8, Simpro, Commusoft, Wintac) with each peer's mode and mappingConfidence. They run only on the operator machine; this Worker holds no tenant data and was not tested against a live tenant.",
     inputSchema: { type: "object", properties: {}, additionalProperties: false }
   },
   {
     name: "trades_runtime_skill",
-    description: "Agent skill markdown for the public giveaway Worker.",
+    description:
+      "Agent skill markdown for the public giveaway Worker, including what the local package carries: modules, platform peers (file drop or optional read-only pull), and mapping confidence (documented / partial / guessed). Read-only.",
     inputSchema: { type: "object", properties: {}, additionalProperties: false }
   }
 ];
