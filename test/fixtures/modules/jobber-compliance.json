@@ -1,0 +1,17 @@
+{
+  "synthetic": true,
+  "sourceKind": "jobber",
+  "note": "Synthetic Jobber-shaped jobs carrying refrigerant, permit, and agreement fields. Not customer data.",
+  "jobs": [
+    {
+      "id": "SYN-CMP-JOB-1",
+      "jobStatus": "completed",
+      "trade": "hvac",
+      "client": { "id": "SYN-CMP-CL-1", "name": "Synthetic Grocer" },
+      "visits": { "nodes": [{ "id": "SYN-CMP-V-1", "startAt": "2026-10-10T14:00:00Z", "assignedUsers": { "nodes": [{ "id": "SYN-CMP-T-1", "name": { "full": "Synthetic Tech R" } }] } }] },
+      "refrigerant": [{ "applianceId": "SYN-CASE-1", "action": "charge", "refrigerant": "R-404A", "pounds": 3, "techCertNumber": "SYN-608-9" }],
+      "permits": [{ "permitId": "SYN-CMP-P-1", "jurisdiction": "Synthetic County", "status": "failed", "statusChangedOn": "2026-10-01" }],
+      "agreement": { "agreementId": "SYN-CMP-A-1", "plan": "Synthetic refrigeration PM", "price": 1200, "renewalOn": "2026-11-01", "visitsPerTerm": 4, "status": "active" }
+    }
+  ]
+}

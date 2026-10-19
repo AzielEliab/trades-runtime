@@ -187,3 +187,26 @@ npm run desk
 The desk listens on `http://127.0.0.1:4174/`. It reads these folders locally, draws charts from admitted rows or from the synthetic demo when the folders are empty, and labels which one you are seeing. It does not write back to ServiceTitan, ProBooks, or any trades app. At about 375px the same page keeps its Softwares cards, adds a domain nav, and scrolls wide tables and monitor charts inside their panels. Receipt: [`specs/TR-MOBILE-DESK-2026-09-27.txt`](../../specs/TR-MOBILE-DESK-2026-09-27.txt).
 
 Synthetic (not customer) fixtures for `npm run drop-in:demo` and `npm run byo:admit-demo` live in `test/fixtures/byo/`. Those demos copy fixtures into a **temp** inbound dir. Do not commit real exports here.
+
+## Compliance and revenue modules (TR-MODULES-B-2026-10-19)
+
+Three local modules read the shop's own files plus any admitted inbound rows. Nothing is filed with a regulator or jurisdiction, and nothing is billed.
+
+| Module | Local file | Inbound fields read on admitted job / equipment rows | Read tool / desk route | Write permission |
+| --- | --- | --- | --- | --- |
+| Refrigerant log | `data/runtime/<instanceId>/refrigerant.json` | `refrigerant`, `refrigerantLog`, `refrigerantEvents` on jobs; `fullChargeLbs` / `applianceType` on equipment | `trades_runtime_refrigerant`, `/api/refrigerant` | `refrigerant.write` |
+| Permits and inspections | `data/runtime/<instanceId>/permits.json` | `permits` / `permit` on jobs | `trades_runtime_permits`, `/api/permits` | `permits.write` |
+| Maintenance agreements | `data/runtime/<instanceId>/agreements.json` | `agreement`, `membership`, `servicePlan`, `service_plan` on jobs; completed jobs count as visits | `trades_runtime_agreements`, `/api/agreements` | `agreements.write` |
+
+Refrigerant rules come from the eCFR as read on 2026-10-19:
+
+- Leak rate: 40 CFR 82.152, annualizing or rolling-average method (one method per facility).
+- Section 608 leak repair, 40 CFR 82.157: ODS (class I/II) refrigerant, full charge 50 lb or more. Trigger rates are 20% for commercial refrigeration, 30% for industrial process refrigeration, and 10% for comfort cooling and other appliances.
+- AIM Act, 40 CFR 84.106, effective 2026-01-01: HFC (or substitute with GWP > 53) refrigerant, full charge 15 lb or more, at the same rates. Residential and light-commercial AC and heat pumps are excluded.
+- Repair is due within 30 days (120 if an industrial process shutdown is needed). The repair-by date shown on the desk is a guide. The regulation is the authority.
+
+Refrigerant class comes only from a built-in list of common ODS/HFC codes. Any other refrigerant is `undetermined` until the operator sets `refrigerantClass`. This is a record-keeping aid, not compliance advice.
+
+Revenue at risk adds up only the `price` written on each agreement. An agreement with no price is counted as "price unknown". Nothing is estimated.
+
+Every write goes through the approval gate. Permissions are off by default, and the operator says yes or no each time.

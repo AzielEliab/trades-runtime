@@ -4,6 +4,7 @@ import { ApprovalGate, mcpCallerId } from "./gate.js";
 import { enabledPermissions, PERMISSIONS_NOTE, skipsPrompt, WRITE_PERMISSIONS } from "./permissions.js";
 import { WRITE_TOOLS } from "./tools.js";
 import { PLATFORM_KINDS, PLATFORM_SPECS } from "../spine/platforms/catalog.js";
+import { MODULE_READ_TOOLS } from "../modules/registry.js";
 
 /**
  * Local MCP JSON-RPC surface for the operator machine (POST /mcp on the
@@ -81,6 +82,12 @@ export function localToolsList(gate: ApprovalGate) {
   const enabled = enabledPermissions(settings);
   return [
     ...READ_TOOLS,
+    ...MODULE_READ_TOOLS.map((tool) => ({
+      name: tool.name,
+      description: tool.description,
+      inputSchema: { type: "object", properties: {}, additionalProperties: false },
+      annotations: { readOnlyHint: true }
+    })),
     ...WRITE_TOOLS.map((tool) => ({
       name: tool.name,
       description: `${tool.description} Permission: ${tool.permission} (${enabled.includes(tool.permission) ? "on" : "off"}).`,
@@ -157,6 +164,10 @@ export async function handleLocalMcp(message: RpcMessage, gate: ApprovalGate, se
         live_backends: false
       })
     );
+  }
+  const moduleTool = MODULE_READ_TOOLS.find((tool) => tool.name === name);
+  if (moduleTool) {
+    return ok(id, textResult(moduleTool.build({ cwd: gate.cwd, instanceId: gate.instanceId, now: new Date().toISOString() })));
   }
   if (name === "trades_runtime_health_local") return ok(id, textResult(healthLocal({ cwd: gate.cwd, instanceId: gate.instanceId })));
   if (name === "trades_runtime_permissions") {

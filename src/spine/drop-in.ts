@@ -119,6 +119,8 @@ export interface AdmittedDropRecord {
   /** Explicit field labels on a job row. Absent when the row names none. */
   fieldFlags?: FieldFlag[];
   fieldFlagNotices?: FieldFlagNotice[];
+  /** Mapped row, only when the caller asked for keepRaw (local module readers). Never sent to the Worker. */
+  raw?: Record<string, unknown>;
 }
 
 export interface DropInAdmit {
@@ -1130,12 +1132,13 @@ function admitRecord(
   receivedAt: string,
   profileId: string,
   vendorHint: string,
-  options?: { via?: "file-drop" | "live-pull" }
+  options?: { via?: "file-drop" | "live-pull"; keepRaw?: boolean }
 ): AdmittedDropRecord {
   const lane = knownTradeLane(record.raw);
   const technician = knownTechnician(record.raw);
   const finish = (row: AdmittedDropRecord): AdmittedDropRecord => {
-    const laned = lane ? { ...row, lane } : row;
+    const laned0 = lane ? { ...row, lane } : row;
+    const laned = options?.keepRaw ? { ...laned0, raw: record.raw } : laned0;
     if (laned.entity !== "job") return laned;
     const money = knownJobMoney(record.raw);
     const serviceAddress = knownServiceAddress(record.raw);
@@ -1269,13 +1272,13 @@ function platformTarget(doc: Record<string, unknown>, preferClass: DropInPeerCla
 function admitPlatformDocument(
   kind: PlatformKind,
   doc: Record<string, unknown>,
-  options: { receivedAt: string; fileName?: string }
+  options: { receivedAt: string; fileName?: string; keepRaw?: boolean }
 ): DropInResult {
   const mapped = mapPlatformDocument(kind, doc, options.fileName);
   if (!mapped.length) return refuse("FG-REFUSE-EMPTY", `${kind} drop-in contained no ${kind} records this mapper knows`);
   const via = doc.livePull === true ? "live-pull" : "file-drop";
   const profileId = text(doc.vendor) === "generic-csv" ? `${kind}-csv` : kind;
-  const records = mapped.map((record) => admitRecord(record, kind, options.receivedAt, profileId, kind, { via }));
+  const records = mapped.map((record) => admitRecord(record, kind, options.receivedAt, profileId, kind, { via, keepRaw: options.keepRaw }));
   return {
     ok: true,
     refused: false,
@@ -1294,7 +1297,7 @@ function admitPlatformDocument(
 
 export function admitDropInDocument(
   input: unknown,
-  options: { receivedAt: string; preferClass?: DropInPeerClass; fileName?: string }
+  options: { receivedAt: string; preferClass?: DropInPeerClass; fileName?: string; keepRaw?: boolean }
 ): DropInResult {
   const detected = detectDropIn(input, { preferClass: options.preferClass, fileName: options.fileName });
   const platformDoc = coerceDoc(input);
@@ -1316,7 +1319,7 @@ export function admitDropInDocument(
 
   const peerClass = detected.peerClass;
   const records = mapped.map((record) =>
-    admitRecord(record, peerClass, options.receivedAt, detected.profileId, detected.vendorHint)
+    admitRecord(record, peerClass, options.receivedAt, detected.profileId, detected.vendorHint, { keepRaw: options.keepRaw })
   );
 
   return {
@@ -1406,7 +1409,7 @@ export function parseCsv(text: string): { synthetic: boolean; rows: Record<strin
 
 export function admitDropInText(
   text: string,
-  options: { receivedAt: string; fileName: string; preferClass?: DropInPeerClass }
+  options: { receivedAt: string; fileName: string; preferClass?: DropInPeerClass; keepRaw?: boolean }
 ): DropInResult {
   const ext = extname(options.fileName).toLowerCase();
   if (ext === ".csv") {
@@ -1446,7 +1449,7 @@ export function listDropInFiles(dir: string): string[] {
 
 export function admitDropInFile(
   filePath: string,
-  options: { receivedAt?: string; preferClass?: DropInPeerClass } = {}
+  options: { receivedAt?: string; preferClass?: DropInPeerClass; keepRaw?: boolean } = {}
 ): DropInFileResult {
   const file = basename(filePath);
   let size = 0;
@@ -1474,13 +1477,13 @@ export function admitDropInFile(
   return {
     file,
     receivedAt,
-    result: admitDropInText(text, { receivedAt, fileName: file, preferClass: options.preferClass })
+    result: admitDropInText(text, { receivedAt, fileName: file, preferClass: options.preferClass, keepRaw: options.keepRaw })
   };
 }
 
 export function admitDropInFolder(
   dir: string,
-  options: { preferClass?: DropInPeerClass; receivedAt?: string } = {}
+  options: { preferClass?: DropInPeerClass; receivedAt?: string; keepRaw?: boolean } = {}
 ): { files: DropInFileResult[]; live: false; write: false } {
   const files = listDropInFiles(dir).map((filePath) => admitDropInFile(filePath, options));
   return { files, live: false, write: false };
