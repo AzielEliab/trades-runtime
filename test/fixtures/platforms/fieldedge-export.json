@@ -1,18 +1,28 @@
 {
   "synthetic": true,
-  "note": "Synthetic FieldEdge work-order export (file drop; FieldEdge API is partner-gated). Not customer data.",
+  "note": "Synthetic FieldEdge work-order export shaped like the FieldEdge Open API schemas (https://docs-dev.fieldedge.com/). File drop; FieldEdge API is partner-gated. Not customer data.",
   "workOrders": [
     {
       "workOrderId": "SYN-FE-WO-1",
       "workOrderNumber": "WO-9001",
+      "completed": true,
+      "resolution": "Replaced igniter",
       "callReason": "No heat",
       "trade": "hvac",
       "status": "Completed",
       "total": 275,
-      "customer": { "customerId": "SYN-FE-C-1", "displayName": "Synthetic House" },
-      "assignment": { "assignmentId": "SYN-FE-AS-1", "technicianId": "SYN-FE-T-1", "techName": "Synthetic Tech F", "scheduledStart": "2026-10-13T13:00:00Z" },
+      "customerId": "SYN-FE-C-1",
+      "customerName": "Synthetic House",
+      "serviceAddress": { "addressLine1": "9 Synthetic Ct", "city": "Synthetic", "state": "IN", "postalCode": "46000" },
+      "scheduledStart": "2026-10-13T13:00:00Z",
+      "primaryAssignment": { "employeeId": "SYN-FE-T-1", "name": "Synthetic Tech F" },
+      "invoiceId": "SYN-FE-INV-1",
+      "assignments": [
+        { "assignmentId": "SYN-FE-AS-1", "workOrderId": "SYN-FE-WO-1", "technicianId": "SYN-FE-T-1", "technicianName": "Synthetic Tech F", "scheduleDateTime": "2026-10-13T13:00:00Z", "status": "Completed" }
+      ],
       "equipment": { "equipmentId": "SYN-FE-EQ-1", "model": "SYN-FURNACE-80" }
     }
   ],
-  "technicians": [{ "technicianId": "SYN-FE-T-1", "name": "Synthetic Tech F" }]
+  "customers": [{ "id": "SYN-FE-C-1", "displayName": "Synthetic House" }],
+  "employees": [{ "id": "SYN-FE-T-1", "name": "Synthetic Tech F", "role": "Technician", "active": true }]
 }

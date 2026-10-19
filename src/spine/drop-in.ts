@@ -1345,7 +1345,8 @@ export function parseCsv(text: string): { synthetic: boolean; rows: Record<strin
     .split(/\r?\n/)
     .filter((line) => {
       const trimmed = line.trim();
-      if (trimmed.startsWith("#")) {
+      // "# ..." lines are comments. A header whose first column starts with "#" (FieldPulse's "#ID,...") is kept.
+      if (trimmed.startsWith("#") && !/^#\w+\s*,/.test(trimmed)) {
         if (/synthetic\s*:\s*true/i.test(trimmed)) synthetic = true;
         return false;
       }

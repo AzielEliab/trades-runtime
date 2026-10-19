@@ -47,7 +47,7 @@ export const WAVE2_KINDS: readonly Wave2Kind[] = [
   "wintac"
 ];
 
-export const WAVE2_SPECS: Record<Wave2Kind, Omit<PlatformSpec, "kind" | "writebackPermission"> & { kind: Wave2Kind; writebackPermission: `${Wave2Kind}.writeback` }> = {
+export const WAVE2_SPECS: Record<Wave2Kind, Omit<PlatformSpec, "kind" | "writebackPermission" | "mappingConfidence" | "mappingSources" | "mappingNote"> & { kind: Wave2Kind; writebackPermission: `${Wave2Kind}.writeback` }> = {
   successware: {
     kind: "successware",
     label: "Successware",
@@ -80,12 +80,12 @@ export const WAVE2_SPECS: Record<Wave2Kind, Omit<PlatformSpec, "kind" | "writeba
       status: "documented-public-api",
       livePull: true,
       docsUrl: "https://developer.workiz.com/v2/",
-      defaultBaseUrl: "https://api.workiz.com/api/v2",
+      defaultBaseUrl: "https://api.workiz.com/crm/api",
       auth: "Named v2 API key (Settings > Integrations > Developer > v2, Developer API add-on) sent as Authorization: Bearer <key>. A key with Read on Jobs is enough.",
       access: "Public REST API v2; requires the Developer API add-on from the Workiz Feature center."
     },
     writebackPermission: "workiz.writeback",
-    honesty: `File drop + documented REST GET pull (jobs, first page). Vendor API needs the Developer API add-on. ${NOT_LIVE}`,
+    honesty: `File drop + documented REST GET pull (v2 jobs, clients, invoices, estimates; first page; jobs default to the last 30 days by scheduled date). Vendor API needs the Developer API add-on. ${NOT_LIVE}`,
     selection: {
       reason: "Ranked first for HVAC dispatch on an independent comparison and listed for residential HVAC and plumbing with high call volume.",
       sources: [FSS_HVAC_DISPATCH, STATWHARF_HVAC, "https://help.workiz.com/hc/en-us/articles/50737427251473-Accessing-your-Workiz-API-credentials"]
@@ -107,7 +107,7 @@ export const WAVE2_SPECS: Record<Wave2Kind, Omit<PlatformSpec, "kind" | "writeba
       access: "Public REST API with vendor SDKs (PHP, Python). Commercial-service focused."
     },
     writebackPermission: "servicetrade.writeback",
-    honesty: `File drop + documented REST GET pull (jobs, locations). Appointment and invoice windows use Unix seconds and are converted. ${NOT_LIVE}`,
+    honesty: `File drop + documented REST GET pull (jobs, appointments, locations, customer companies, invoices, quotes, techs/helpers, assets; first page). Times are Unix seconds and are converted. ${NOT_LIVE}`,
     selection: {
       reason: "Software Advice 2026 plumbing FrontRunner (344 reviews shown) and on an HVAC dispatch ranking; covers commercial HVAC, mechanical, and plumbing service.",
       sources: [SA_PLUMBING, FSS_HVAC_DISPATCH, "https://github.com/servicetrade/servicetrade-php-sdk"]
@@ -236,7 +236,7 @@ export const WAVE2_SPECS: Record<Wave2Kind, Omit<PlatformSpec, "kind" | "writeba
       access: "Public REST API per build. No shared base URL, so the operator names it."
     },
     writebackPermission: "simpro.writeback",
-    honesty: `File drop + documented REST GET pull (jobs, first page). Needs the operator's build URL and company id. ${NOT_LIVE}`,
+    honesty: `File drop + documented REST GET pull (jobs with named columns, first page). Needs the operator's build URL and company id. ${NOT_LIVE}`,
     selection: {
       reason: "Residential and commercial trades platform (HVAC, plumbing, electrical) listed among plumbing products on Software Advice; the vendor states 250,000+ users worldwide (vendor claim, not verified).",
       sources: [SA_PLUMBING, "https://developer.simprogroup.com/apidoc/"]

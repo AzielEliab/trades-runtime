@@ -2,13 +2,13 @@ import type { Wave2Kind } from "./catalog-wave2.js";
 import type { CollectionMap } from "./map.js";
 
 /**
- * Collection maps for wave-2 platform peers. Where the vendor publishes an API
- * reference (Workiz, ServiceTrade, FieldPulse, ServiceM8, Simpro, Commusoft,
- * Kickserv) object names follow it. Where it does not (Successware, BuildOps,
- * mHelpDesk, Wintac) the maps read common export column names and CSV falls
- * back to header aliases. Every map is fixture-tested only.
+ * Collection maps for wave-2 platform peers. How well each map's field names
+ * are backed by a published source is recorded per platform in
+ * mapping-verification.ts (documented / partial / guessed). Every map is
+ * fixture-tested only.
  */
 
+// Guessed: no published Successware field list (see MAPPING_VERIFICATION.successware).
 const SUCCESSWARE: CollectionMap[] = [
   {
     keys: ["calls", "Calls", "jobs", "Jobs"],
@@ -33,36 +33,38 @@ const SUCCESSWARE: CollectionMap[] = [
   { keys: ["equipment"], entity: "equipment", idKeys: ["equipmentId", "serialNumber", "id"] }
 ];
 
+// Workiz Developer API v2 (OpenAPI embedded at https://developer.workiz.com/v2/): camelCase fields, list envelope { data: [...] }.
 const WORKIZ: CollectionMap[] = [
   {
-    keys: ["jobs", "Jobs"],
+    keys: ["jobs", "data"],
     entity: "job",
-    idKeys: ["UUID", "uuid", "id", "SerialId", "serialId"],
-    observedKeys: ["JobDateTime", "jobDateTime", "CreatedDate", "createdAt"],
-    statusKeys: ["Status", "status", "SubStatus", "subStatus"],
+    idKeys: ["uuid", "id", "serialId"],
+    observedKeys: ["date", "createdAt"],
+    statusKeys: ["status"],
     fields: {
-      customerId: ["ClientId", "clientId"],
-      customerName: ["ClientName", "clientName", "FirstName"],
-      technicianId: ["Team.0.id", "team.0.id"],
-      technicianName: ["Team.0.Name", "Team.0.name", "team.0.name"],
-      jobTotal: ["JobTotalPrice", "jobTotalPrice", "total"],
-      scheduledOn: ["JobDateTime", "jobDateTime"],
-      serviceAddress: ["Address", "address"]
+      customerId: ["clientInfo.clientId"],
+      customerName: ["clientInfo.companyName", "clientInfo.firstName"],
+      technicianId: ["team.0.id"],
+      technicianName: ["team.0.name"],
+      jobTotal: ["totalPrice"],
+      balance: ["amountDue"],
+      scheduledOn: ["date"],
+      serviceAddress: ["clientInfo.addressDetails"]
     },
-    children: [{ keys: ["Team", "team"], entity: "technician", idKeys: ["id"], fields: { technicianName: ["Name", "name"] } }]
+    children: [{ keys: ["team"], entity: "technician", idKeys: ["id"], fields: { technicianName: ["name"] } }]
   },
-  { keys: ["clients", "Clients"], entity: "customer", idKeys: ["UUID", "id", "ClientId"], fields: { customerName: ["ClientName", "name", "FirstName"] } },
-  { keys: ["invoices"], entity: "invoice", idKeys: ["UUID", "id", "InvoiceNumber"], observedKeys: ["CreatedDate", "createdAt"], statusKeys: ["Status", "status"], fields: { invoiceTotal: ["Total", "total"], customerId: ["ClientId", "clientId"] } },
-  { keys: ["estimates"], entity: "estimate", idKeys: ["UUID", "id"], statusKeys: ["Status", "status"], fields: { jobTotal: ["Total", "total"] } },
-  { keys: ["users", "team"], entity: "technician", idKeys: ["id", "UUID"], fields: { technicianName: ["name", "Name"] } }
+  { keys: ["clients"], entity: "customer", idKeys: ["id", "serialId"], observedKeys: ["created"], fields: { customerName: ["fullName", "companyName", "firstName"], serviceAddress: ["fullAddress", "address"] } },
+  { keys: ["invoices"], entity: "invoice", idKeys: ["uuid", "id", "serialId"], observedKeys: ["created"], fields: { invoiceTotal: ["totalPrice"], balance: ["amountDue"], jobId: ["jobId"] } },
+  { keys: ["estimates"], entity: "estimate", idKeys: ["id", "serialId"], observedKeys: ["estimateDate", "created"], statusKeys: ["status"], fields: { jobTotal: ["total"], customerId: ["clientId"], jobId: ["jobId"] } }
 ];
 
+// ServiceTrade OpenAPI (https://api.servicetrade.com/openapi/openapi.json): { data: { totalPages, page, <collection> } }, Unix-second times.
 const SERVICETRADE: CollectionMap[] = [
   {
     keys: ["jobs", "data.jobs"],
     entity: "job",
     idKeys: ["id", "number"],
-    observedKeys: ["currentAppointment.windowStart", "scheduledDate", "dueBy", "created"],
+    observedKeys: ["currentAppointment.windowStart", "scheduledDate", "completedOn", "dueBy", "created"],
     observedEpochSeconds: true,
     statusKeys: ["status"],
     fields: {
@@ -73,16 +75,34 @@ const SERVICETRADE: CollectionMap[] = [
       jobTotal: ["estimatedPrice"],
       serviceAddress: ["location.address"]
     },
-    children: [{ keys: ["location"], entity: "customer", idKeys: ["id"], fields: { customerName: ["name"] } }]
+    children: [{ keys: ["location"], entity: "customer", idKeys: ["id"], fields: { customerName: ["name"], serviceAddress: ["address"] } }]
   },
-  { keys: ["appointments", "data.appointments"], entity: "appointment", idKeys: ["id"], observedKeys: ["windowStart"], observedEpochSeconds: true, statusKeys: ["status"], fields: { technicianId: ["techs.0.id"], technicianName: ["techs.0.name"] } },
-  { keys: ["locations", "data.locations"], entity: "customer", idKeys: ["id"], fields: { customerName: ["name"] } },
-  { keys: ["invoices", "data.invoices"], entity: "invoice", idKeys: ["id", "invoiceNumber"], observedKeys: ["transactionDate", "created"], observedEpochSeconds: true, statusKeys: ["status"], fields: { invoiceTotal: ["totalPrice"] } },
-  { keys: ["quotes", "data.quotes"], entity: "estimate", idKeys: ["id"], statusKeys: ["status"], fields: { jobTotal: ["totalPrice"] } },
+  {
+    keys: ["appointments", "data.appointments"],
+    entity: "appointment",
+    idKeys: ["id"],
+    observedKeys: ["windowStart", "dueBy", "created"],
+    observedEpochSeconds: true,
+    statusKeys: ["status"],
+    fields: { technicianId: ["techs.0.id"], technicianName: ["techs.0.name"], jobId: ["job.id"], customerId: ["location.id"] }
+  },
+  { keys: ["locations", "data.locations"], entity: "customer", idKeys: ["id"], fields: { customerName: ["name"], serviceAddress: ["address"] } },
+  { keys: ["companies", "data.companies"], entity: "customer", idKeys: ["id"], fields: { customerName: ["name"], serviceAddress: ["address"] } },
+  {
+    keys: ["invoices", "data.invoices"],
+    entity: "invoice",
+    idKeys: ["id", "invoiceNumber"],
+    observedKeys: ["transactionDate", "created"],
+    observedEpochSeconds: true,
+    statusKeys: ["status"],
+    fields: { invoiceTotal: ["totalPrice"], customerId: ["customer.id"], customerName: ["customer.name"], jobId: ["job.id"] }
+  },
+  { keys: ["quotes", "data.quotes"], entity: "estimate", idKeys: ["id", "refNumber"], observedKeys: ["created"], observedEpochSeconds: true, statusKeys: ["status"], fields: { jobTotal: ["totalPrice"], customerId: ["customer.id"] } },
   { keys: ["users", "data.users"], entity: "technician", idKeys: ["id"], fields: { technicianName: ["name"] } },
-  { keys: ["assets", "data.assets"], entity: "equipment", idKeys: ["id"] }
+  { keys: ["assets", "data.assets"], entity: "equipment", idKeys: ["id"], fields: { customerId: ["location.id"] } }
 ];
 
+// Guessed: BuildOps API reference is invite-gated (see MAPPING_VERIFICATION.buildops).
 const BUILDOPS: CollectionMap[] = [
   {
     keys: ["jobs", "Jobs"],
@@ -108,29 +128,33 @@ const BUILDOPS: CollectionMap[] = [
   { keys: ["assets"], entity: "equipment", idKeys: ["assetId", "serialNumber", "id"] }
 ];
 
+// FieldPulse: list envelope { error, total_count, response } is documented; item fields come from the documented
+// create-request bodies (customer_id, status, start_time, assignments, display_name, invoiced_date, job_id).
+// total, customer.display_name, and assigned_to are guessed response fields.
 const FIELDPULSE: CollectionMap[] = [
   {
     keys: ["jobs", "response"],
     entity: "job",
     idKeys: ["id"],
-    observedKeys: ["start_time", "scheduled_start", "start_date", "created_at"],
-    statusKeys: ["status", "status_name"],
+    observedKeys: ["start_time", "created_at"],
+    statusKeys: ["status"],
     fields: {
       customerId: ["customer_id", "customer.id"],
-      customerName: ["customer.display_name", "customer_name"],
-      technicianId: ["assigned_to.0.id", "team_members.0.id"],
-      technicianName: ["assigned_to.0.name", "team_members.0.name"],
+      customerName: ["customer.display_name"],
+      technicianId: ["assignments.0.assigned_members.0", "assigned_to.0.id"],
+      technicianName: ["assigned_to.0.name"],
       jobTotal: ["total"],
-      scheduledOn: ["start_time", "start_date"],
-      serviceAddress: ["address", "location.address"]
+      scheduledOn: ["start_time"],
+      serviceAddress: ["location_id", "location.address"]
     }
   },
   { keys: ["customers"], entity: "customer", idKeys: ["id"], fields: { customerName: ["display_name", "company_name", "first_name"] } },
-  { keys: ["invoices"], entity: "invoice", idKeys: ["id", "invoice_number"], observedKeys: ["created_at"], statusKeys: ["status"], fields: { invoiceTotal: ["total"], customerId: ["customer_id"] } },
-  { keys: ["estimates"], entity: "estimate", idKeys: ["id"], statusKeys: ["status"], fields: { jobTotal: ["total"], customerId: ["customer_id"] } },
-  { keys: ["users", "team_members"], entity: "technician", idKeys: ["id"], fields: { technicianName: ["name", "first_name"] } }
+  { keys: ["invoices"], entity: "invoice", idKeys: ["id"], observedKeys: ["invoiced_date", "created_at"], statusKeys: ["status"], fields: { invoiceTotal: ["total"], customerId: ["customer_id"], jobId: ["job_id"] } },
+  { keys: ["estimates"], entity: "estimate", idKeys: ["id"], statusKeys: ["status"], fields: { jobTotal: ["total"], customerId: ["customer_id"], jobId: ["job_id"] } },
+  { keys: ["users"], entity: "technician", idKeys: ["id"], fields: { technicianName: ["first_name", "name"] } }
 ];
 
+// Kickserv Swagger (https://app.kickserv.com/api-def) field names; invoices/estimates collections are guessed (Kickserv keeps them on the job).
 const KICKSERV: CollectionMap[] = [
   {
     keys: ["jobs", "job"],
@@ -155,6 +179,7 @@ const KICKSERV: CollectionMap[] = [
   { keys: ["items", "item"], entity: "pricebook", idKeys: ["id", "name"] }
 ];
 
+// mHelpDesk JSON maps are guessed (no published JSON or ticket export). Its published CSV report columns are in PLATFORM_CSV_COLUMNS.
 const MHELPDESK: CollectionMap[] = [
   {
     keys: ["tickets", "Tickets", "jobs", "workOrders"],
@@ -206,16 +231,17 @@ const SERVICEM8: CollectionMap[] = [
   { keys: ["material", "materials"], entity: "pricebook", idKeys: ["uuid", "item_number"] }
 ];
 
+// Simpro apidoc field names (PascalCase), read via a docs mirror and a community SDK; the vendor page is behind a browser challenge.
 const SIMPRO: CollectionMap[] = [
   {
     keys: ["jobs", "Jobs"],
     entity: "job",
     idKeys: ["ID", "id"],
-    observedKeys: ["DateIssued", "DateModified"],
+    observedKeys: ["DateIssued", "CompletedDate", "DateModified"],
     statusKeys: ["Status.Name", "Stage"],
     fields: {
       customerId: ["Customer.ID"],
-      customerName: ["Customer.CompanyName", "Customer.GivenName"],
+      customerName: ["Customer.CompanyName", "Customer.GivenName", "Customer.FamilyName"],
       technicianId: ["Technician.ID"],
       technicianName: ["Technician.Name"],
       jobTotal: ["Total.IncTax", "Total.ExTax"],
@@ -248,6 +274,7 @@ const COMMUSOFT: CollectionMap[] = [
   { keys: ["assets"], entity: "equipment", idKeys: ["id"] }
 ];
 
+// Guessed: no published Wintac column list (see MAPPING_VERIFICATION.wintac).
 const WINTAC: CollectionMap[] = [
   {
     keys: ["workOrders", "WorkOrders", "jobs"],

@@ -121,16 +121,32 @@ export const PULL_PLANS: Partial<Record<PlatformKind, PullPlan>> = {
   },
   // Wave 2 (TR-PLATFORMS-2-2026-10-19). Successware, BuildOps, mHelpDesk, and Wintac have no plan (file drop only).
   workiz: {
+    // Workiz Developer API v2 OpenAPI (https://developer.workiz.com/v2/): server https://api.workiz.com/crm/api,
+    // Authorization: Bearer, list envelope { pageSize, page, totalResults, hasMore, data }.
+    // /v2/jobs defaults to the last 30 days by scheduled date when no date filter is sent.
     authScheme: "Bearer",
     docs: "https://developer.workiz.com/v2/",
-    requests: [{ key: "jobs", method: "GET", path: "/jobs?pageSize={pageSize}", collect: "data" }]
+    requests: [
+      { key: "jobs", method: "GET", path: "/v2/jobs?pageSize={pageSize}&page=1", collect: "data" },
+      { key: "clients", method: "GET", path: "/v2/clients?pageSize={pageSize}&page=1", collect: "data" },
+      { key: "invoices", method: "GET", path: "/v2/invoices?pageSize={pageSize}&page=1", collect: "data" },
+      { key: "estimates", method: "GET", path: "/v2/estimates?pageSize={pageSize}&page=1", collect: "data" }
+    ]
   },
   servicetrade: {
+    // ServiceTrade OpenAPI (https://api.servicetrade.com/openapi/openapi.json): host https://api.servicetrade.com/api,
+    // every success response is { data: { totalPages, page, <collection> }, meta }.
     authScheme: "Bearer",
     docs: "https://api.servicetrade.com/api/docs",
     requests: [
       { key: "jobs", method: "GET", path: "/api/job?page=1", collect: "data.jobs" },
-      { key: "locations", method: "GET", path: "/api/location?page=1", collect: "data.locations" }
+      { key: "appointments", method: "GET", path: "/api/appointment?page=1", collect: "data.appointments" },
+      { key: "locations", method: "GET", path: "/api/location?page=1", collect: "data.locations" },
+      { key: "companies", method: "GET", path: "/api/company?page=1&isCustomer=true", collect: "data.companies" },
+      { key: "invoices", method: "GET", path: "/api/invoice?page=1", collect: "data.invoices" },
+      { key: "quotes", method: "GET", path: "/api/quote?page=1", collect: "data.quotes" },
+      { key: "users", method: "GET", path: "/api/user?page=1&isTechOrHelper=true", collect: "data.users" },
+      { key: "assets", method: "GET", path: "/api/asset?page=1", collect: "data.assets" }
     ]
   },
   fieldpulse: {
@@ -159,7 +175,15 @@ export const PULL_PLANS: Partial<Record<PlatformKind, PullPlan>> = {
     authScheme: "Bearer",
     requiredFields: ["companyId"],
     docs: "https://developer.simprogroup.com/apidoc/",
-    requests: [{ key: "jobs", method: "GET", path: "/api/v1.0/companies/{companyId}/jobs/?pageSize={pageSize}", collect: "" }]
+    // List calls return only ID/Description/Total unless the documented columns parameter names more.
+    requests: [
+      {
+        key: "jobs",
+        method: "GET",
+        path: "/api/v1.0/companies/{companyId}/jobs/?pageSize={pageSize}&columns=ID,Name,Stage,Status,Customer,Site,Technician,DateIssued,CompletedDate,DateModified,Total",
+        collect: ""
+      }
+    ]
   },
   kickserv: {
     // Documented in Kickserv's Swagger definition (https://app.kickserv.com/api-def): XML over HTTP, Basic auth with

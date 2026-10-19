@@ -254,7 +254,7 @@ You can also pull data yourself with `npm run pull -- <platform>`. This is a rea
 | QuickBooks Online | file drop + documented API pull | Public Accounting API query endpoint. |
 | Service Fusion | file drop + documented API pull | Public REST API; the vendor offers it on the Pro plan. |
 | FieldEdge | file drop only | The API is gated behind a partner program, so no pull is shipped. |
-| Workiz | file drop + documented API pull | Public REST API v2 (Bearer key; Developer API add-on). |
+| Workiz | file drop + documented API pull | Public REST API v2 at `https://api.workiz.com/crm/api` (Bearer key; Developer API add-on). |
 | ServiceTrade | file drop + documented API pull | Public REST API (OAuth2 bearer). |
 | FieldPulse | file drop + documented API pull | Public REST API (`x-api-key`, token from FieldPulse support). |
 | ServiceM8 | file drop + documented API pull | Public JSON REST API (`X-API-Key`). |
@@ -265,6 +265,8 @@ You can also pull data yourself with `npm run pull -- <platform>`. This is a rea
 | Kickserv | file drop + documented API pull | XML REST API (Basic auth with the employee API token; Premium plan), read by a small reader with no dependencies. |
 | mHelpDesk | file drop only | No public API found. |
 | Wintac | file drop only | Desktop software; export to CSV. |
+
+Each platform also carries a mapping confidence: `documented`, `partial`, or `guessed`. Documented: FieldEdge, Workiz, ServiceTrade. Partial: FieldPulse, Kickserv, mHelpDesk, Simpro, and the platforms not re-checked in this pass. Guessed: Successware, BuildOps, Wintac. The desk platform list shows which mappers need a real shop export to confirm. Sources and details are in `data/inbound/README.md`.
 
 All of this is tested against fixtures only. **Not tested against a live tenant.** Each platform's `<kind>.writeback` goes through the approval gate. It is off by default and asks yes or no on every call. When no backend is configured, it returns `no-backend-configured`. It never reports a success that didn't happen. Run `npm run platforms` to list them.
 

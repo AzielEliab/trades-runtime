@@ -14,6 +14,9 @@
  */
 
 import { WAVE2_SPECS } from "./catalog-wave2.js";
+import { MAPPING_VERIFICATION, type MappingConfidence } from "./mapping-verification.js";
+
+export type { MappingConfidence };
 
 export const PLATFORM_KINDS = [
   "jobber",
@@ -76,11 +79,17 @@ export interface PlatformSpec {
   honesty: string;
   /** Why this platform was added and which public pages informed the pick. No market-share figures. */
   selection?: { reason: string; sources: string[] };
+  /** documented / partial / guessed: how well the mapper's field names are backed by a published source. */
+  mappingConfidence: MappingConfidence;
+  mappingSources: string[];
+  mappingNote: string;
 }
+
+type BaseSpec = Omit<PlatformSpec, "mappingConfidence" | "mappingSources" | "mappingNote">;
 
 const NOT_LIVE = "Not tested against a live tenant.";
 
-export const PLATFORM_SPECS: Readonly<Record<PlatformKind, PlatformSpec>> = {
+const BASE_SPECS: Readonly<Record<PlatformKind, BaseSpec>> = {
   jobber: {
     kind: "jobber",
     label: "Jobber",
@@ -199,6 +208,10 @@ export const PLATFORM_SPECS: Readonly<Record<PlatformKind, PlatformSpec>> = {
   },
   ...WAVE2_SPECS
 };
+
+export const PLATFORM_SPECS: Readonly<Record<PlatformKind, PlatformSpec>> = Object.fromEntries(
+  Object.entries(BASE_SPECS).map(([kind, spec]) => [kind, { ...spec, ...MAPPING_VERIFICATION[kind as PlatformKind] }])
+) as Record<PlatformKind, PlatformSpec>;
 
 export function isPlatformKind(value: unknown): value is PlatformKind {
   return typeof value === "string" && (PLATFORM_KINDS as readonly string[]).includes(value);
