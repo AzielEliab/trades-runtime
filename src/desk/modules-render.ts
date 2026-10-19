@@ -1,6 +1,9 @@
 import type { RefrigerantBoard } from "../modules/refrigerant.js";
 import type { PermitBoard } from "../modules/permits.js";
 import type { AgreementBoard } from "../modules/agreements.js";
+import type { WarrantyClaimBoard } from "../modules/warranty-claims.js";
+import type { TruckStockBoard } from "../modules/truck-stock-plan.js";
+import type { CallbackRootCauseBoard, Rollup } from "../modules/callback-root-cause.js";
 
 function esc(value: unknown): string {
   return String(value ?? "")
@@ -96,10 +99,67 @@ export function renderAgreementsPanel(board: AgreementBoard): string {
     </section>`;
 }
 
+export function renderWarrantyClaimsPanel(board: WarrantyClaimBoard): string {
+  const unclaimed = board.unclaimed.map((p) => `<tr><td>${esc(p.jobId)}</td><td>${esc(p.partNumber)}</td><td>${cell(p.manufacturer)}</td><td>${cell(p.equipmentModel)}</td><td>${cell(p.serialNumber)}</td><td>${cell(p.replacedOn)}</td><td>${cell(p.ageDays)}</td><td>${cell(p.filingDaysLeft)}</td></tr>`).join("");
+  const claims = board.claims.map((c) => `<tr><td>${esc(c.claimNumber ?? c.claimId)}</td><td>${cell(c.jobId)}</td><td>${cell(c.partNumber)}</td><td>${cell(c.manufacturer)}</td><td>${esc(c.status)}</td><td>${cell(c.ageDays)}</td><td>${cell(c.amountClaimed)}</td><td>${cell(c.amountPaid)}</td></tr>`).join("");
+  return `<section class="panel lift" id="warranty-claims-board" data-az="office management" data-view="section:warranty-claims-board">
+      <h2>Manufacturer warranty claims</h2>
+      <p class="quiet">${esc(board.note)}</p>
+      ${sourceLine(board.source, "warranty-claims")}
+      <p>${board.totals.warrantyParts} warranty part(s). Unclaimed ${board.totals.unclaimed}. Open claims ${board.totals.openClaims}. Claimed $${board.totals.amountClaimed.toFixed(2)}. Paid $${board.totals.amountPaid.toFixed(2)} (amounts written on claims only).</p>
+      ${alertList(board.alerts)}
+      <div class="table-scroll"><table><thead><tr><th>Job</th><th>Part</th><th>Manufacturer</th><th>Model</th><th>Serial</th><th>Replaced</th><th>Age days</th><th>Filing days left</th></tr></thead>
+      <tbody>${unclaimed || `<tr><td colspan="8">No unclaimed warranty parts.</td></tr>`}</tbody></table></div>
+      <div class="table-scroll"><table><thead><tr><th>Claim</th><th>Job</th><th>Part</th><th>Manufacturer</th><th>Status</th><th>Age days</th><th>Claimed</th><th>Paid</th></tr></thead>
+      <tbody>${claims || `<tr><td colspan="8">No claims on file.</td></tr>`}</tbody></table></div>
+    </section>`;
+}
+
+export function renderTruckStockPanel(board: TruckStockBoard): string {
+  const vans = board.vans
+    .map(
+      (van) => `<h3>Van ${esc(van.vanId)}${van.technicianIds.length ? ` · ${esc(van.technicianIds.join(", "))}` : ""} · ${van.jobs} job(s)</h3>
+      <div class="table-scroll"><table><thead><tr><th>SKU</th><th>Needed</th><th>On van</th><th>Par</th><th>Short</th><th>Restock</th><th>From</th><th>Jobs</th></tr></thead><tbody>${van.lines
+        .map((l) => `<tr data-short="${(l.short ?? 0) > 0}"><td>${esc(l.sku)}</td><td>${l.needed}</td><td>${l.onVan === null ? "not counted" : l.onVan}</td><td>${l.par}</td><td>${cell(l.short)}</td><td>${cell(l.suggestedRestock)}</td><td>${cell(l.restockFrom)}</td><td>${esc(l.jobs.join(", "))}</td></tr>`)
+        .join("")}</tbody></table></div>`
+    )
+    .join("");
+  return `<section class="panel lift" id="truck-stock-board" data-az="field management" data-view="section:truck-stock-board">
+      <h2>Truck stock for tomorrow (${esc(board.tomorrow)})</h2>
+      <p class="quiet">${esc(board.note)} Zone ${esc(board.timeZone)}.</p>
+      ${sourceLine(board.source, "truck-stock")}
+      <p>${board.totals.jobsTomorrow} job(s) with parts tomorrow. ${board.totals.shortages} shortage line(s). ${board.totals.uncounted} line(s) not counted. Suggested restock ${board.totals.restockUnits} unit(s).</p>
+      ${alertList(board.alerts)}
+      ${vans || `<p>No part needs on tomorrow's scheduled jobs.</p>`}
+    </section>`;
+}
+
+function rollupTable(title: string, rows: Rollup[]): string {
+  return `<div class="table-scroll"><table><thead><tr><th>${esc(title)}</th><th>Callbacks</th><th>Warranty</th></tr></thead><tbody>${rows.map((r) => `<tr><td>${esc(r.key)}</td><td>${r.callbacks}</td><td>${r.warranty}</td></tr>`).join("") || `<tr><td colspan="3">—</td></tr>`}</tbody></table></div>`;
+}
+
+export function renderCallbacksPanel(board: CallbackRootCauseBoard): string {
+  const links = board.links.map((l) => `<tr><td>${esc(l.callbackJobId)}</td><td>${cell(l.originalJobId)}</td><td>${cell(l.originalTechnicianName ?? l.originalTechnicianId)}</td><td>${cell(l.partNumber)}</td><td>${cell(l.equipmentModel)}</td><td>${cell(l.installStep)}</td><td>${esc(l.category)}</td><td>${cell(l.daysBetween)}</td></tr>`).join("");
+  return `<section class="panel lift" id="callbacks-board" data-az="field office management" data-view="section:callbacks-board">
+      <h2>Callback root cause</h2>
+      <p class="quiet">${esc(board.note)}</p>
+      ${sourceLine(board.source, "callbacks")}
+      <p>${board.totals.callbacks} callback(s) and ${board.totals.warranty} warranty job(s) across ${board.totals.jobs} admitted jobs. Linked ${board.totals.linked}. Unlinked ${board.totals.unlinked}. Not classified ${board.totals.notClassified}.</p>
+      ${alertList(board.alerts)}
+      <div class="table-scroll"><table><thead><tr><th>Callback</th><th>Original job</th><th>Original tech</th><th>Part</th><th>Model</th><th>Install step</th><th>Cause</th><th>Days</th></tr></thead>
+      <tbody>${links || `<tr><td colspan="8">No linked callbacks.</td></tr>`}</tbody></table></div>
+      <div class="split">${rollupTable("Tech", board.byTechnician)}${rollupTable("Part", board.byPart)}</div>
+      <div class="split">${rollupTable("Equipment model", board.byEquipmentModel)}${rollupTable("Install step", board.byInstallStep)}</div>
+    </section>`;
+}
+
 export function renderModulePanels(boards: Record<string, unknown>): string {
   const out: string[] = [];
   if (boards.refrigerant) out.push(renderRefrigerantPanel(boards.refrigerant as RefrigerantBoard));
   if (boards.permits) out.push(renderPermitsPanel(boards.permits as PermitBoard));
   if (boards.agreements) out.push(renderAgreementsPanel(boards.agreements as AgreementBoard));
+  if (boards.warranty_claims) out.push(renderWarrantyClaimsPanel(boards.warranty_claims as WarrantyClaimBoard));
+  if (boards.truck_stock) out.push(renderTruckStockPanel(boards.truck_stock as TruckStockBoard));
+  if (boards.callbacks) out.push(renderCallbacksPanel(boards.callbacks as CallbackRootCauseBoard));
   return out.join("\n    ");
 }

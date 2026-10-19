@@ -1,0 +1,8 @@
+{
+  "note": "Example only (synthetic). Copy to data/runtime/<instanceId>/truck-stock.json. vans maps techs to vans. par is the minimum you keep on a van (vanId optional = every van). demand adds part needs not on an admitted job. On-van counts live in stock-counts.json (truck_stock.write). Nothing is ordered.",
+  "settings": { "timeZone": "America/Indiana/Indianapolis" },
+  "vans": [{ "vanId": "SYN-VAN-1", "technicianIds": ["SYN-TECH-1"] }],
+  "par": [{ "sku": "SYN-CAP-45", "min": 2 }],
+  "demand": [{ "jobId": "SYN-JOB-10", "vanId": "SYN-VAN-1", "sku": "SYN-CAP-45", "quantity": 1, "scheduledFor": "2026-10-20" }],
+  "synthetic": true
+}

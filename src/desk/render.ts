@@ -994,6 +994,15 @@ const DESK_STYLES = `
         max(1.15rem, env(safe-area-inset-left));
     }
     header.top { display: flex; justify-content: space-between; gap: 1.2rem; align-items: flex-start; flex-wrap: wrap; }
+    .quiet { color: var(--muted); font-size: 0.85rem; }
+    .table-scroll { overflow-x: auto; margin: 0.6rem 0; }
+    .table-scroll table { border-collapse: collapse; width: 100%; font-size: 0.85rem; }
+    .table-scroll th, .table-scroll td { border-bottom: 1px solid var(--line); padding: 0.3rem 0.5rem; text-align: left; vertical-align: top; }
+    .table-scroll tr[data-exceeds="true"] td, .table-scroll tr[data-short="true"] td, .table-scroll tr[data-blocking="true"] td:last-child { color: var(--hold); }
+    .split { display: grid; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); gap: 0.8rem; }
+    .module-alerts { list-style: none; padding: 0; margin: 0.5rem 0; }
+    .module-alerts li { border-left: 3px solid var(--watch); padding: 0.2rem 0.6rem; margin: 0.25rem 0; }
+    .module-alerts li[data-severity="hold"] { border-left-color: var(--hold); }
     .kicker { letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); font-size: 0.72rem; margin: 0; }
     h1 { font-family: var(--display); font-weight: 500; font-size: clamp(2rem, 4vw, 3rem); margin: 0.15rem 0 0; line-height: 1.02; letter-spacing: -0.02em; }
     h2 { font-family: var(--display); font-weight: 500; font-size: 1.35rem; margin: 0; letter-spacing: -0.02em; }
