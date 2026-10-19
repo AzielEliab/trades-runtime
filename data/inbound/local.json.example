@@ -7,5 +7,50 @@
   "probooksReadEndpoint": null,
   "tradesAppReadEndpoint": null,
   "alertsPath": "data/runtime/local/alerts.json",
-  "note": "Paths and optional local read-endpoint hints only. The runtime does not call those hints. No cloud account. Credentials stay on this machine. alertsPath points at a gitignored threshold file. Copy data/runtime/alerts.json.example there. Webhook hooks in that file must be loopback. No phone-home."
+  "platforms": {
+    "jobber": {
+      "path": "data/inbound/jobber",
+      "pull": {
+        "tokenEnv": "TRADES_RUNTIME_JOBBER_TOKEN",
+        "graphqlVersion": "<an active version from developer.getjobber.com changelog>",
+        "pageSize": 50
+      }
+    },
+    "housecallpro": {
+      "path": "data/inbound/housecallpro",
+      "pull": {
+        "tokenEnv": "TRADES_RUNTIME_HCP_API_KEY",
+        "pageSize": 50
+      }
+    },
+    "square": {
+      "path": "data/inbound/square",
+      "pull": {
+        "tokenEnv": "TRADES_RUNTIME_SQUARE_TOKEN",
+        "squareVersion": "<a Square-Version date from developer.squareup.com>",
+        "locationId": null,
+        "pageSize": 50
+      }
+    },
+    "quickbooks": {
+      "path": "data/inbound/quickbooks",
+      "pull": {
+        "tokenEnv": "TRADES_RUNTIME_QBO_TOKEN",
+        "realmIdEnv": "TRADES_RUNTIME_QBO_REALM_ID",
+        "minorVersion": null,
+        "pageSize": 50
+      }
+    },
+    "fieldedge": {
+      "path": "data/inbound/fieldedge"
+    },
+    "servicefusion": {
+      "path": "data/inbound/servicefusion",
+      "pull": {
+        "tokenEnv": "TRADES_RUNTIME_SF_TOKEN",
+        "pageSize": 50
+      }
+    }
+  },
+  "note": "Paths and optional local read-endpoint hints only. The runtime does not call those hints. No cloud account. Credentials stay on this machine. alertsPath points at a gitignored threshold file. Copy data/runtime/alerts.json.example there. Webhook hooks in that file must be loopback. No phone-home. platforms.<kind>.path overrides a platform drop folder. platforms.<kind>.pull is optional and read-only: it names an environment variable (tokenEnv), never a token; inline token, secret, password, or key fields are refused. Remove a pull block to stay file-drop only. FieldEdge has no pull (partner-gated API). npm run pull -- <kind> writes one JSON file into that folder on this machine. Not tested against a live tenant."
 }

@@ -8,5 +8,32 @@
     "baseUrl": "https://probooks.example.invalid",
     "tokenEnv": "TRADES_RUNTIME_PROBOOKS_TOKEN"
   },
-  "note": "Example only. Copy to data/runtime/<instanceId>/write-backends.json on the operator machine. This file names environment variables; it never holds a token, secret, password, or key (inline credentials are refused). The probooks baseUrl is a placeholder: set your vendor's real API origin. Write-back still runs only after an operator yes on each call and only when the permission is enabled. Without this file or the env vars, write-back returns no-backend-configured and writes nothing. Not tested against a live tenant."
+  "jobber": {
+    "baseUrl": "https://api.getjobber.com",
+    "tokenEnv": "TRADES_RUNTIME_JOBBER_TOKEN",
+    "headers": {
+      "X-JOBBER-GRAPHQL-VERSION": "<active version>"
+    }
+  },
+  "housecallpro": {
+    "baseUrl": "https://api.housecallpro.com",
+    "tokenEnv": "TRADES_RUNTIME_HCP_API_KEY",
+    "authScheme": "Token"
+  },
+  "square": {
+    "baseUrl": "https://connect.squareup.com",
+    "tokenEnv": "TRADES_RUNTIME_SQUARE_TOKEN",
+    "headers": {
+      "Square-Version": "<version date>"
+    }
+  },
+  "quickbooks": {
+    "baseUrl": "https://quickbooks.api.intuit.com",
+    "tokenEnv": "TRADES_RUNTIME_QBO_TOKEN"
+  },
+  "servicefusion": {
+    "baseUrl": "https://api.servicefusion.com",
+    "tokenEnv": "TRADES_RUNTIME_SF_TOKEN"
+  },
+  "note": "Example only. Copy to data/runtime/<instanceId>/write-backends.json on the operator machine. This file names environment variables; it never holds a token, secret, password, or key (inline credentials are refused). The probooks baseUrl is a placeholder: set your vendor's real API origin. Write-back still runs only after an operator yes on each call and only when the permission is enabled. Without this file or the env vars, write-back returns no-backend-configured and writes nothing. Not tested against a live tenant. Platform backends (jobber, housecallpro, square, quickbooks, fieldedge, servicefusion) follow the same rule: headers holds only non-secret static headers (credential-looking header names are refused); authScheme is Bearer unless the vendor documents Token (Housecall Pro). FieldEdge is omitted because its API is partner-gated; add it only if FieldEdge issued you credentials."
 }

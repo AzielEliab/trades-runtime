@@ -1,3 +1,4 @@
+import { isPlatformKind, PLATFORM_KINDS, type PlatformKind } from "./platforms/catalog.js";
 import { inboundDir, isHostedTenantLayout, refuseHostedTenantLayout } from "./inbound-layout.js";
 import { isolateLedgerPath, isolateReceiptPath, sanitizeInstanceId } from "./runtime-isolate.js";
 
@@ -23,6 +24,8 @@ export interface LocalInboundConfig {
   tradesAppReadEndpoint?: string;
   receiptPath: string;
   ledgerPath: string;
+  /** Local drop folder per platform inbound class (data/inbound/<kind>/ by default). */
+  platformPaths?: Record<PlatformKind, string>;
   /** Optional path to a local alert-rule file. Missing file uses built-in defaults. */
   alertsPath?: string;
   cloudAccount?: never;
@@ -37,6 +40,7 @@ export function defaultLocalInboundConfig(instanceId = "local"): LocalInboundCon
     servicetitanPath: inboundDir("servicetitan"),
     probooksPath: inboundDir("probooks"),
     tradesAppPath: inboundDir("trades-app"),
+    platformPaths: Object.fromEntries(PLATFORM_KINDS.map((kind) => [kind, inboundDir(kind)])) as Record<PlatformKind, string>,
     receiptPath: isolateReceiptPath(id),
     ledgerPath: isolateLedgerPath(id)
   };
@@ -76,8 +80,19 @@ export function parseLocalInboundConfig(raw: unknown): LocalInboundConfig {
   const receiptPath = optionalString(record.receiptPath, "receiptPath") ?? defaults.receiptPath;
   const ledgerPath = optionalString(record.ledgerPath, "ledgerPath") ?? defaults.ledgerPath;
   const alertsPath = optionalString(record.alertsPath, "alertsPath");
+  const platformPaths = { ...defaults.platformPaths } as Record<PlatformKind, string>;
+  if (record.platforms != null) {
+    const platforms = asRecord(record.platforms);
+    for (const [kind, value] of Object.entries(platforms)) {
+      if (!isPlatformKind(kind)) throw new Error(`local inbound config platforms.${kind} is not a known platform (${PLATFORM_KINDS.join(", ")})`);
+      if (value == null) continue;
+      const entry = asRecord(value);
+      const path = optionalString(entry.path, `platforms.${kind}.path`);
+      if (path) platformPaths[kind] = path;
+    }
+  }
 
-  for (const path of [servicetitanPath, probooksPath, tradesAppPath, receiptPath, ledgerPath, alertsPath]) {
+  for (const path of [servicetitanPath, probooksPath, tradesAppPath, receiptPath, ledgerPath, alertsPath, ...Object.values(platformPaths)]) {
     if (path && isHostedTenantLayout(path)) refuseHostedTenantLayout(path);
   }
   if (alertsPath && /^[a-z][a-z0-9+.-]*:\/\//i.test(alertsPath)) {
@@ -89,6 +104,7 @@ export function parseLocalInboundConfig(raw: unknown): LocalInboundConfig {
     servicetitanPath,
     probooksPath,
     tradesAppPath,
+    platformPaths,
     servicetitanReadEndpoint: optionalString(record.servicetitanReadEndpoint, "servicetitanReadEndpoint"),
     probooksReadEndpoint: optionalString(record.probooksReadEndpoint, "probooksReadEndpoint"),
     tradesAppReadEndpoint: optionalString(record.tradesAppReadEndpoint, "tradesAppReadEndpoint"),

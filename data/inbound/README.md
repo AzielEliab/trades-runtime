@@ -32,9 +32,28 @@ Kept: Jobber, Housecall Pro, Service Fusion, QuickBooks Online, QuickBooks Deskt
 
 Each named profile normalizes into the same trades-app shadow entities (`job`, `pricebook`, `customer`, `appointment`, `invoice`, `technician`, `equipment`) and is admitted through FragGate as MEDIUM, `live:false`, `write:false`, UNVERIFIED. Wrapper ≠ verified. Receipt: [`specs/TR-VENDOR-2026-09-25.txt`](../../specs/TR-VENDOR-2026-09-25.txt).
 
+## Platform peers (TR-PLATFORMS-2026-10-19)
+
+Six more platforms are named peer classes with their own FragGate `sourceKind` and folder. A file in one of these folders (or a JSON file with `"sourceKind": "<kind>"`) is mapped by that platform's mapper. A file that is clearly ServiceTitan or ProBooks still stays on that named peer. The older trades-app profiles for Jobber, Housecall Pro, Service Fusion, QuickBooks Online, and FieldEdge still work for files dropped in `trades-app/`.
+
+| Folder | Platform | Documented objects mapped | Live pull |
+| --- | --- | --- | --- |
+| `data/inbound/jobber/` | Jobber | Job, Visit, Client, Invoice, Quote, PaymentRecord, User, LineItem | Optional. GraphQL queries only (`POST /api/graphql`, `X-JOBBER-GRAPHQL-VERSION`). |
+| `data/inbound/housecallpro/` | Housecall Pro | jobs (+ schedule), customers, employees, estimates, invoices. Cents → dollars. | Optional. REST GETs. Vendor says the API needs the MAX plan. |
+| `data/inbound/square/` | Square | Booking, Customer, Invoice, Payment, TeamMember. No job object, so no jobs. | Optional. List GETs + the documented read-only team-member search. |
+| `data/inbound/quickbooks/` | QuickBooks Online | Customer, Invoice, Payment, Estimate, Employee, Item | Optional. `GET /v3/company/<realmId>/query` with `select` only. |
+| `data/inbound/fieldedge/` | FieldEdge | work orders (+ assignment, customer, equipment), customers, invoices, estimates, technicians | None. FieldEdge API access is partner/member-gated through its developer portal, so this runtime ships file drop only. |
+| `data/inbound/servicefusion/` | Service Fusion | jobs (+ techs), customers, estimates, invoices, equipment | Optional. REST GETs (`/v1/jobs` always sorted). Vendor says the API needs the Pro plan. |
+
+CSV exports work in each folder. The entity comes from the file name (`customers.csv`, `invoices.csv`, `payments.csv`, `estimates.csv` / `quotes.csv`, `employees.csv` / `techs.csv`, anything else is jobs) and common column headers.
+
+Live pull is off until you add `platforms.<kind>.pull` to `local.json` (see `local.json.example`). It names an environment variable that holds the token. Inline tokens, secrets, passwords, and keys are refused. `npm run pull -- <kind>` fetches the first page of each documented read, writes one `live-pull-<time>.json` into the platform folder on this machine, and the desk admits it like any drop (MEDIUM, UNVERIFIED). `npm run platforms` lists the peers. None of this has been tested against a live tenant.
+
+Write-back for each platform is its own permission (`jobber.writeback`, `housecallpro.writeback`, `square.writeback`, `quickbooks.writeback`, `fieldedge.writeback`, `servicefusion.writeback`). Default off. Each call asks the operator yes or no. Without a backend in `data/runtime/<instanceId>/write-backends.json` and a token in the named env var the call returns `no-backend-configured` and writes nothing.
+
 ## Law
 
-- FragGate admits `servicetitan`, `probooks`, and `trades-app` as inbound (MEDIUM, hashed, `live:false`, `write:false`).
+- FragGate admits `servicetitan`, `probooks`, `trades-app`, and the platform peers `jobber`, `housecallpro`, `square`, `quickbooks`, `fieldedge`, `servicefusion` as inbound (MEDIUM, hashed, `live:false`, `write:false`).
 - `operator-file` stays LOW until origin is tagged `servicetitan`, `probooks`, or `trades-app`. Still hashed. Still not truth.
 - `human` manager corrections go on Chain C with actor id.
 - Wrapper ≠ verified. No silent promotion to VERIFIED.

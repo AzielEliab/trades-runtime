@@ -69,7 +69,7 @@ import {
   type DropInFileResult,
   type DropInPeerClass
 } from "../spine/drop-in.js";
-import { BYO_INBOUND_ROOT, type ByoInboundKind } from "../spine/inbound-layout.js";
+import { BYO_INBOUND_KINDS, BYO_INBOUND_ROOT, inboundDir, type ByoInboundKind } from "../spine/inbound-layout.js";
 import { defaultLocalInboundConfig, parseLocalInboundConfig, type LocalInboundConfig } from "../spine/local-inbound-config.js";
 import {
   applyDeskAlerts,
@@ -913,6 +913,21 @@ function emptyFulfillment(): OperatorSnapshot["fulfillment"] {
   };
 }
 
+/** Every local drop folder: the named ServiceTitan / ProBooks / trades-app peers plus each platform peer. */
+export function inboundFolders(cwd: string, config?: LocalInboundConfig): { dir: string; preferClass: DropInPeerClass }[] {
+  return BYO_INBOUND_KINDS.map((kind: ByoInboundKind) => {
+    const configured =
+      kind === "servicetitan"
+        ? config?.servicetitanPath
+        : kind === "probooks"
+          ? config?.probooksPath
+          : kind === "trades-app"
+            ? config?.tradesAppPath
+            : config?.platformPaths?.[kind];
+    return { dir: resolveUnder(cwd, configured ?? inboundDir(kind)), preferClass: kind };
+  });
+}
+
 export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): OperatorSnapshot {
   const now = options.now ?? new Date().toISOString();
   const cwd = options.cwd ?? process.cwd();
@@ -920,17 +935,7 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
   const config = options.config ?? loaded?.config;
   const folders =
     options.folders ??
-    (["servicetitan", "probooks", "trades-app"] as ByoInboundKind[]).map((kind) => ({
-      dir: resolveUnder(
-        cwd,
-        kind === "servicetitan"
-          ? (config?.servicetitanPath ?? "data/inbound/servicetitan")
-          : kind === "probooks"
-            ? (config?.probooksPath ?? "data/inbound/probooks")
-            : (config?.tradesAppPath ?? "data/inbound/trades-app")
-      ),
-      preferClass: kind
-    }));
+    inboundFolders(cwd, config);
 
   const admitted = folders.flatMap((folder) => admitDropInFolder(folder.dir, { preferClass: folder.preferClass }).files);
   const collected = collect(admitted, now);
