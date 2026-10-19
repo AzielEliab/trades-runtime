@@ -4,6 +4,7 @@ import { isHostedTenantLayout } from "../inbound-layout.js";
 import { isPlatformKind, PLATFORM_SPECS, type PlatformKind } from "./catalog.js";
 import { getPath, isRecord, rowsOf } from "./map.js";
 import { PULL_PLANS, type PullPlan } from "./pull-plans.js";
+import { parseXml, xmlCollectionRows } from "./xml.js";
 
 /**
  * Optional read-only live pull for platform peers.
@@ -29,6 +30,8 @@ export interface PlatformPullConfig {
   minorVersion?: string;
   /** Simpro company id (non-secret). */
   companyId?: string;
+  /** Kickserv account slug (non-secret; the name after app.kickserv.com/). */
+  accountSlug?: string;
 }
 
 export type PullOutcome = "pulled" | "partial" | "no-pull-configured" | "file-drop-only" | "vendor-error";
@@ -56,6 +59,12 @@ const SECRET_KEYS = ["token", "accessToken", "access_token", "secret", "clientSe
 function isLoopback(host: string): boolean {
   const h = host.toLowerCase().replace(/^\[|\]$/g, "");
   return h === "127.0.0.1" || h === "localhost" || h === "::1";
+}
+
+function slug(value: string | undefined): string | undefined {
+  if (value === undefined) return undefined;
+  if (!/^[A-Za-z0-9_-]{1,64}$/.test(value)) throw new Error("accountSlug must be letters, digits, dash, or underscore");
+  return value;
 }
 
 export function parsePlatformPullConfig(kind: PlatformKind, raw: unknown): PlatformPullConfig {
@@ -92,7 +101,8 @@ export function parsePlatformPullConfig(kind: PlatformKind, raw: unknown): Platf
     realmId: str("realmId"),
     realmIdEnv: str("realmIdEnv"),
     minorVersion: str("minorVersion"),
-    companyId: str("companyId")
+    companyId: str("companyId"),
+    accountSlug: slug(str("accountSlug"))
   };
 }
 
@@ -175,6 +185,8 @@ export async function runPlatformPull(args: {
   if (plan.authScheme === "Header") {
     if (!plan.authHeader) throw new Error(`${kind} pull plan names no auth header`);
     headers[plan.authHeader] = token;
+  } else if (plan.authScheme === "BasicTokenTwice") {
+    headers.Authorization = `Basic ${Buffer.from(`${token}:${token}`, "utf8").toString("base64")}`;
   } else {
     headers.Authorization = `${plan.authScheme} ${token}`;
   }
@@ -189,6 +201,7 @@ export async function runPlatformPull(args: {
     locationId: config.locationId,
     realmId,
     companyId: config.companyId,
+    accountSlug: config.accountSlug,
     minorVersionParam: config.minorVersion ? `&minorversion=${encodeURIComponent(config.minorVersion)}` : ""
   };
   for (const field of plan.requiredFields ?? []) {
@@ -221,10 +234,19 @@ export async function runPlatformPull(args: {
     }
     const url = `${baseUrl}${fill(request.path, values)}`;
     try {
-      const res = await fetchImpl(url, { method: request.method, headers, body: body ? JSON.stringify(body) : undefined });
+      const xml = request.format === "xml";
+      const requestHeaders = xml ? { ...headers, Accept: "application/xml" } : headers;
+      if (xml) delete requestHeaders["Content-Type"];
+      const res = await fetchImpl(url, { method: request.method, headers: requestHeaders, body: body ? JSON.stringify(body) : undefined });
       const text = await res.text();
       if (!res.ok) {
         errors[request.key] = `HTTP ${res.status}: ${text.slice(0, 200)}`;
+        continue;
+      }
+      if (xml) {
+        const rows = xmlCollectionRows(getPath(parseXml(text), request.collect));
+        doc[request.key] = rows;
+        counts[request.key] = rows.length;
         continue;
       }
       const parsed = JSON.parse(text) as unknown;

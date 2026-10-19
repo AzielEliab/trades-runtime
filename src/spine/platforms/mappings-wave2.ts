@@ -139,7 +139,7 @@ const KICKSERV: CollectionMap[] = [
     observedKeys: ["scheduled_on", "scheduled_at", "created_at"],
     statusKeys: ["status", "job_status"],
     fields: {
-      customerId: ["customer.customer_number", "customer_number", "customer_id"],
+      customerId: ["customer.customer_number", "customer_number", "customer.id", "customer_id"],
       customerName: ["customer.name", "customer_name"],
       technicianName: ["employees.0.name", "assigned_to"],
       jobTotal: ["total"],
@@ -151,7 +151,8 @@ const KICKSERV: CollectionMap[] = [
   { keys: ["customers", "customer"], entity: "customer", idKeys: ["customer_number", "id"], fields: { customerName: ["name"] } },
   { keys: ["invoices", "invoice"], entity: "invoice", idKeys: ["invoice_number", "id"], observedKeys: ["invoice_date", "created_at"], statusKeys: ["status"], fields: { invoiceTotal: ["total"] } },
   { keys: ["estimates", "estimate"], entity: "estimate", idKeys: ["estimate_number", "id"], statusKeys: ["status"], fields: { jobTotal: ["total"] } },
-  { keys: ["employees", "employee"], entity: "technician", idKeys: ["id", "employee_number"], fields: { technicianName: ["name", "first_name"] } }
+  { keys: ["employees", "employee"], entity: "technician", idKeys: ["employee_number", "id"], fields: { technicianName: ["name"] } },
+  { keys: ["items", "item"], entity: "pricebook", idKeys: ["id", "name"] }
 ];
 
 const MHELPDESK: CollectionMap[] = [

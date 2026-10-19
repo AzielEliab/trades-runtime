@@ -262,7 +262,7 @@ You can also pull data yourself with `npm run pull -- <platform>`. This is a rea
 | Commusoft | file drop + documented API pull | Public REST API v2 (Bearer key); recall jobs link to their parent job. |
 | Successware | file drop only | No public API documentation; integrations only through partners. |
 | BuildOps | file drop only | API docs are invite-gated. |
-| Kickserv | file drop only | The documented API is XML, and the pull reads JSON. |
+| Kickserv | file drop + documented API pull | XML REST API (Basic auth with the employee API token; Premium plan), read by a small reader with no dependencies. |
 | mHelpDesk | file drop only | No public API found. |
 | Wintac | file drop only | Desktop software; export to CSV. |
 

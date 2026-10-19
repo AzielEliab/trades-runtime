@@ -70,7 +70,8 @@
       "pull": { "tokenEnv": "TRADES_RUNTIME_FIELDPULSE_KEY", "pageSize": 50 }
     },
     "kickserv": {
-      "path": "data/inbound/kickserv"
+      "path": "data/inbound/kickserv",
+      "pull": { "tokenEnv": "TRADES_RUNTIME_KICKSERV_TOKEN", "accountSlug": "your-account-slug" }
     },
     "mhelpdesk": {
       "path": "data/inbound/mhelpdesk"

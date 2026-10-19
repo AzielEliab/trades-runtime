@@ -23,8 +23,8 @@ function byEntity(kind: PlatformKind) {
   return out;
 }
 
-const LIVE: PlatformKind[] = ["workiz", "servicetrade", "fieldpulse", "servicem8", "simpro", "commusoft"];
-const FILE_ONLY: PlatformKind[] = ["successware", "buildops", "kickserv", "mhelpdesk", "wintac"];
+const LIVE: PlatformKind[] = ["workiz", "servicetrade", "fieldpulse", "servicem8", "simpro", "commusoft", "kickserv"];
+const FILE_ONLY: PlatformKind[] = ["successware", "buildops", "mhelpdesk", "wintac"];
 
 describe("wave-2 platform catalog", () => {
   it("adds Successware plus ten researched platforms, each with a reason and sources, no usage figures", () => {
@@ -42,7 +42,7 @@ describe("wave-2 platform catalog", () => {
     }
   });
 
-  it("ships live pull only for documented JSON APIs; the rest are file drop only", () => {
+  it("ships live pull only for documented APIs; the rest are file drop only", () => {
     for (const kind of LIVE) {
       expect(PLATFORM_SPECS[kind].api.livePull, kind).toBe(true);
       expect(PULL_PLANS[kind], kind).toBeDefined();

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<customers>
+  <customer><id>5001</id><customer_number>201</customer_number><name>Synthetic Customer K</name></customer>
+  <customer><id>5002</id><customer_number>202</customer_number><name>Synthetic Customer L &#x26; Sons</name></customer>
+</customers>
