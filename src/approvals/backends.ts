@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { isAbsolute, join } from "node:path";
 import { sanitizeInstanceId } from "../spine/runtime-isolate.js";
+import { PLATFORM_KINDS } from "../spine/platforms/catalog.js";
 
 /**
  * Operator-configured write-back backends.
@@ -14,7 +15,7 @@ import { sanitizeInstanceId } from "../spine/runtime-isolate.js";
  * Without both, a write-back returns `no-backend-configured`. It never fakes success.
  */
 
-export const WRITE_BACKEND_KINDS = ["servicetitan", "probooks", "tradesapp"] as const;
+export const WRITE_BACKEND_KINDS = ["servicetitan", "probooks", "tradesapp", ...PLATFORM_KINDS] as const;
 export type WriteBackendKind = (typeof WRITE_BACKEND_KINDS)[number];
 
 export const WRITE_BACK_METHODS = ["POST", "PUT", "PATCH"] as const;
@@ -29,6 +30,10 @@ export interface WriteBackendConfig {
   appKeyEnv?: string;
   /** Header name for appKeyEnv. Defaults to ST-App-Key for servicetitan, X-App-Key otherwise. */
   appKeyHeader?: string;
+  /** Authorization scheme. Bearer by default; Housecall Pro documents "Token". */
+  authScheme?: "Bearer" | "Token";
+  /** Static, non-secret headers the vendor requires (X-JOBBER-GRAPHQL-VERSION, Square-Version). */
+  headers?: Record<string, string>;
 }
 
 export type WriteBackendsFile = Partial<Record<WriteBackendKind, WriteBackendConfig>>;
@@ -83,12 +88,30 @@ export function parseWriteBackends(raw: unknown): WriteBackendsFile {
     if (url.protocol !== "https:" && !(url.protocol === "http:" && isLoopbackHost(url.hostname))) {
       throw new Error(`${kind} backend baseUrl must be https (http only for loopback)`);
     }
+    const authScheme = record.authScheme == null ? undefined : String(record.authScheme);
+    if (authScheme !== undefined && authScheme !== "Bearer" && authScheme !== "Token") {
+      throw new Error(`${kind} backend authScheme must be Bearer or Token`);
+    }
+    let headers: Record<string, string> | undefined;
+    if (record.headers != null) {
+      if (typeof record.headers !== "object" || Array.isArray(record.headers)) throw new Error(`${kind} backend headers must be an object`);
+      headers = {};
+      for (const [name, value] of Object.entries(record.headers as Record<string, unknown>)) {
+        if (/^(authorization|cookie|.*token.*|.*secret.*|.*key.*)$/i.test(name)) {
+          throw new Error(`${kind} backend refuses credential header ${name}; use tokenEnv / appKeyEnv`);
+        }
+        if (typeof value !== "string" || !value.trim()) throw new Error(`${kind} backend header ${name} must be a non-empty string`);
+        headers[name] = value.trim();
+      }
+    }
     out[kind as WriteBackendKind] = {
       baseUrl: url.origin + url.pathname.replace(/\/$/, ""),
       tokenEnv,
       appKeyEnv: typeof record.appKeyEnv === "string" && record.appKeyEnv.trim() ? record.appKeyEnv.trim() : undefined,
       appKeyHeader:
-        typeof record.appKeyHeader === "string" && record.appKeyHeader.trim() ? record.appKeyHeader.trim() : undefined
+        typeof record.appKeyHeader === "string" && record.appKeyHeader.trim() ? record.appKeyHeader.trim() : undefined,
+      ...(authScheme ? { authScheme: authScheme as "Bearer" | "Token" } : {}),
+      ...(headers ? { headers } : {})
     };
   }
   return out;
@@ -156,7 +179,8 @@ export async function runWriteBack(args: {
     };
   }
   const headers: Record<string, string> = {
-    Authorization: `Bearer ${token}`,
+    ...(config.headers ?? {}),
+    Authorization: `${config.authScheme ?? "Bearer"} ${token}`,
     "Content-Type": "application/json",
     Accept: "application/json"
   };

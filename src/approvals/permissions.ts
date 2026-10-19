@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, isAbsolute, join } from "node:path";
 import { sanitizeInstanceId } from "../spine/runtime-isolate.js";
+import { PLATFORM_WRITEBACK_PERMISSIONS } from "../spine/platforms/catalog.js";
 
 /**
  * Write permissions for the local runtime.
@@ -18,6 +19,11 @@ export const WRITE_PERMISSIONS = [
   "probooks.writeback",
   /** Write-back to another trades app (Jobber, Housecall Pro, ...) through an operator-configured local backend. */
   "tradesapp.writeback",
+  /**
+   * One write-back permission per platform peer (jobber.writeback, housecallpro.writeback,
+   * square.writeback, quickbooks.writeback, fieldedge.writeback, servicefusion.writeback).
+   */
+  ...PLATFORM_WRITEBACK_PERMISSIONS,
   /** Acknowledge a firing local alert (data/runtime/<instanceId>/alert-state.json). */
   "alerts.ack",
   /** Raise a local field flag (data/runtime/<instanceId>/field-flags/). */

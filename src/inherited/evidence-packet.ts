@@ -1,3 +1,4 @@
+import type { PlatformKind } from "../spine/platforms/catalog.js";
 import { sha256 } from "../core/hash.js";
 import type { EvidenceBand } from "../core/confidence.js";
 
@@ -5,6 +6,7 @@ export type EvidenceSourceType =
   | "servicetitan"
   | "probooks"
   | "trades-app"
+  | PlatformKind
   | "operator-file"
   | "human"
   | "technician-note"

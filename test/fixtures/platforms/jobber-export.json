@@ -1,0 +1,36 @@
+{
+  "synthetic": true,
+  "sourceKind": "jobber",
+  "note": "Synthetic Jobber GraphQL-shaped export. Not customer data.",
+  "jobs": {
+    "nodes": [
+      {
+        "id": "SYN-JB-JOB-1",
+        "jobNumber": 1001,
+        "title": "Synthetic no-cool call",
+        "jobStatus": "requires_invoicing",
+        "total": 489.5,
+        "trade": "hvac",
+        "createdAt": "2026-10-12T13:00:00Z",
+        "client": { "id": "SYN-JB-CL-1", "name": "Synthetic Client One" },
+        "property": { "address": { "street": "1 Synthetic Way", "city": "Testville", "province": "IN" } },
+        "visits": {
+          "nodes": [
+            {
+              "id": "SYN-JB-VIS-1",
+              "title": "Diagnose",
+              "startAt": "2026-10-13T14:00:00Z",
+              "endAt": "2026-10-13T15:30:00Z",
+              "assignedUsers": { "nodes": [{ "id": "SYN-JB-USR-1", "name": { "full": "Synthetic Tech A" } }] }
+            }
+          ]
+        },
+        "lineItems": { "nodes": [{ "id": "SYN-JB-LI-1", "name": "Capacitor 45/5", "unitPrice": 89 }] }
+      }
+    ]
+  },
+  "invoices": { "nodes": [{ "id": "SYN-JB-INV-1", "invoiceNumber": 501, "invoiceStatus": "awaiting_payment", "issuedDate": "2026-10-13", "amounts": { "total": 489.5, "invoiceBalance": 489.5 }, "client": { "id": "SYN-JB-CL-1", "name": "Synthetic Client One" } }] },
+  "quotes": { "nodes": [{ "id": "SYN-JB-Q-1", "quoteNumber": 77, "quoteStatus": "awaiting_response", "amounts": { "total": 7200 }, "client": { "id": "SYN-JB-CL-1" } }] },
+  "paymentRecords": { "nodes": [{ "id": "SYN-JB-PAY-1", "amount": 100, "entryDate": "2026-10-14" }] },
+  "users": { "nodes": [{ "id": "SYN-JB-USR-1", "name": { "full": "Synthetic Tech A" } }] }
+}

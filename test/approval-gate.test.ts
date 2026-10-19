@@ -61,6 +61,12 @@ describe("approval-gated writes", () => {
       "servicetitan.writeback",
       "probooks.writeback",
       "tradesapp.writeback",
+      "jobber.writeback",
+      "housecallpro.writeback",
+      "square.writeback",
+      "quickbooks.writeback",
+      "fieldedge.writeback",
+      "servicefusion.writeback",
       "alerts.ack",
       "field_flags.write",
       "field_events.write"
@@ -84,7 +90,7 @@ describe("approval-gated writes", () => {
       trades_runtime_field_event_record: EVENT_ARGS
     };
     for (const tool of WRITE_TOOLS) {
-      const result = await gate.requestWrite({ tool: tool.name, args: calls[tool.name]!, requestedBy: "mcp:a" });
+      const result = await gate.requestWrite({ tool: tool.name, args: calls[tool.name] ?? { method: "POST", path: "/x" }, requestedBy: "mcp:a" });
       expect(result.status).toBe("refused");
       if (result.status === "refused") expect(result.reason).toMatch(/is off on this machine/);
     }

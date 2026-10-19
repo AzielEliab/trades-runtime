@@ -24,6 +24,8 @@ import {
   type WritePermission
 } from "./approvals/permissions.js";
 import { resolveOperatorInstanceId } from "./desk/snapshot.js";
+import { PLATFORM_KINDS, PLATFORM_SPECS } from "./spine/platforms/catalog.js";
+import { runPlatformPull } from "./spine/platforms/live-pull.js";
 
 function flagValue(argv: string[], name: string): string | undefined {
   const index = argv.indexOf(name);
@@ -77,6 +79,9 @@ export function helpText(): string {
     "  npx tsx src/cli.ts approve <id> yes|no   operator yes/no for one pending write (npm run approve -- <id> yes|no)",
     "  npx tsx src/cli.ts permissions [--mode all|selected] [--enable p] [--disable p] [--auto-approve on|off] [--ttl seconds]",
     "                                    show or change write permissions (data/runtime/<instanceId>/permissions.json)",
+    "  npx tsx src/cli.ts platforms             list platform inbound peers (file drop, live pull, write-back permission)",
+    "  npx tsx src/cli.ts pull <platform>       optional read-only pull from a documented vendor API into data/inbound/<platform>/",
+    "                                    needs platforms.<platform>.pull in data/inbound/local.json and the named token env var",
     "",
     "Writes require operator approval; default off. Default is selected mode with nothing enabled.",
     "softwares also accepts Softwares in any letter case.",
@@ -141,6 +146,7 @@ export type CliPlan =
   | { kind: "desk"; port: number; cwd: string }
   | { kind: "approvals"; cwd: string; all: boolean }
   | { kind: "approve"; cwd: string; approvalId: string; decision: string; by: string }
+  | { kind: "pull"; cwd: string; platform: string }
   | {
       kind: "permissions";
       cwd: string;
@@ -171,7 +177,9 @@ function commandName(raw: string | undefined): string | undefined {
     raw === "desk" ||
     raw === "approvals" ||
     raw === "approve" ||
-    raw === "permissions"
+    raw === "permissions" ||
+    raw === "platforms" ||
+    raw === "pull"
   ) {
     return raw;
   }
@@ -236,6 +244,11 @@ export function planCli(argv: string[]): CliPlan {
       claimCompany: argv.includes("--claim-company")
     };
   }
+  if (name === "platforms") return { kind: "text", exitCode: 0, text: platformsText() };
+  if (name === "pull") {
+    const platform = argv.slice(3).find((value) => !value.startsWith("--")) ?? "";
+    return { kind: "pull", cwd: flagValue(argv, "--root") ?? process.cwd(), platform };
+  }
   if (name === "approvals") {
     return { kind: "approvals", cwd: flagValue(argv, "--root") ?? process.cwd(), all: argv.includes("--all") };
   }
@@ -267,8 +280,32 @@ export function planCli(argv: string[]): CliPlan {
   return { kind: "desk", port, cwd: flagValue(argv, "--root") ?? process.cwd() };
 }
 
+export function platformsText(): string {
+  const lines = ["Platform inbound peers (each its own FragGate sourceKind and data/inbound/<kind>/ folder).", "Not tested against a live tenant.", ""];
+  for (const kind of PLATFORM_KINDS) {
+    const spec = PLATFORM_SPECS[kind];
+    lines.push(`${kind} — ${spec.label}`);
+    lines.push(`    folder ${spec.inboundDir}/  live pull ${spec.api.livePull ? "documented public API (read-only, optional)" : "none (file drop only)"}  write-back ${spec.writebackPermission} (approval gate, default off)`);
+    lines.push(`    ${spec.honesty}`);
+  }
+  lines.push("");
+  return lines.join("\n");
+}
+
 function main(argv: string[]): void {
   const plan = planCli(argv);
+  if (plan.kind === "pull") {
+    runPlatformPull({ kind: plan.platform, cwd: plan.cwd })
+      .then((pulled) => {
+        process.stdout.write(`${JSON.stringify(pulled, null, 2)}\n`);
+        if (!pulled.ok && pulled.outcome !== "file-drop-only") process.exitCode = 1;
+      })
+      .catch((error: unknown) => {
+        process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
+        process.exitCode = 1;
+      });
+    return;
+  }
   if (plan.kind === "text") {
     process.stdout.write(plan.text);
     if (plan.exitCode !== 0) process.exitCode = plan.exitCode;

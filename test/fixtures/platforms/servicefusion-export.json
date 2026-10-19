@@ -1,0 +1,10 @@
+{
+  "synthetic": true,
+  "note": "Synthetic Service Fusion API v1-shaped export. Not customer data.",
+  "jobs": [
+    { "id": "SYN-SF-JOB-1", "number": "SF-1440", "customer_name": "Synthetic Plaza", "status": "Completed", "category": "electrical", "trade": "electrical", "start_date": "2026-10-12T16:00:00Z", "total": 610, "techs": [{ "id": "SYN-SF-TECH-1", "first_name": "Synthetic Tech G" }] }
+  ],
+  "customers": [{ "id": "SYN-SF-CUS-1", "customer_name": "Synthetic Plaza" }],
+  "estimates": [{ "id": "SYN-SF-EST-1", "number": "E-12", "status": "Open", "total": 2200, "customer_name": "Synthetic Plaza" }],
+  "invoices": [{ "id": "SYN-SF-INV-1", "number": "I-55", "status": "Paid", "total": 610, "customer_name": "Synthetic Plaza" }]
+}

@@ -45,6 +45,8 @@
     "approvals": "tsx src/cli.ts approvals",
     "approve": "tsx src/cli.ts approve",
     "permissions": "tsx src/cli.ts permissions",
+    "platforms": "tsx src/cli.ts platforms",
+    "pull": "tsx src/cli.ts pull",
     "shadow:sealed-demo": "tsx src/cli.ts shadow-sealed-demo",
     "giveaway:pack": "node workers/giveaway/scripts/pack-release.mjs",
     "giveaway:test": "npm test --prefix workers/giveaway"

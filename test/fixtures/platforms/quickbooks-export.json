@@ -1,0 +1,12 @@
+{
+  "synthetic": true,
+  "note": "Synthetic QuickBooks Online Accounting API query-shaped export. Not customer data.",
+  "QueryResponse": {
+    "Customer": [{ "Id": "SYN-QB-C-1", "DisplayName": "Synthetic Books Customer", "BillAddr": { "Line1": "5 Synthetic Blvd", "City": "Testville" } }],
+    "Invoice": [{ "Id": "SYN-QB-INV-1", "DocNumber": "1037", "TxnDate": "2026-10-10", "TotalAmt": 362.07, "Balance": 0, "CustomerRef": { "value": "SYN-QB-C-1", "name": "Synthetic Books Customer" } }],
+    "Payment": [{ "Id": "SYN-QB-PAY-1", "TxnDate": "2026-10-11", "TotalAmt": 362.07, "CustomerRef": { "value": "SYN-QB-C-1" } }],
+    "Estimate": [{ "Id": "SYN-QB-EST-1", "DocNumber": "1001", "TxnDate": "2026-10-01", "TxnStatus": "Pending", "TotalAmt": 9100, "CustomerRef": { "value": "SYN-QB-C-1" } }],
+    "Employee": [{ "Id": "SYN-QB-EMP-1", "DisplayName": "Synthetic Tech E" }],
+    "Item": [{ "Id": "SYN-QB-ITEM-1", "Name": "Synthetic filter 16x25", "UnitPrice": 24 }]
+  }
+}

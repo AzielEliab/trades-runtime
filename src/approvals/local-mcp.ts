@@ -3,6 +3,7 @@ import { RUNTIME_MANIFEST } from "../manifest.js";
 import { ApprovalGate, mcpCallerId } from "./gate.js";
 import { enabledPermissions, PERMISSIONS_NOTE, skipsPrompt, WRITE_PERMISSIONS } from "./permissions.js";
 import { WRITE_TOOLS } from "./tools.js";
+import { PLATFORM_KINDS, PLATFORM_SPECS } from "../spine/platforms/catalog.js";
 
 /**
  * Local MCP JSON-RPC surface for the operator machine (POST /mcp on the
@@ -17,6 +18,12 @@ import { WRITE_TOOLS } from "./tools.js";
 export const LOCAL_MCP_PROTOCOL = "2024-11-05";
 
 const READ_TOOLS = [
+  {
+    name: "trades_runtime_platforms",
+    description: "Platform inbound peers on this runtime (Jobber, Housecall Pro, Square, QuickBooks Online, FieldEdge, Service Fusion): drop folder, live-pull status, write-back permission. Read-only. Not tested against a live tenant.",
+    inputSchema: { type: "object", properties: {}, additionalProperties: false },
+    annotations: { readOnlyHint: true }
+  },
   {
     name: "trades_runtime_health_local",
     description: "Local honesty card for this operator machine. Read-only.",
@@ -128,6 +135,27 @@ export async function handleLocalMcp(message: RpcMessage, gate: ApprovalGate, se
         },
         true
       )
+    );
+  }
+  if (name === "trades_runtime_platforms") {
+    return ok(
+      id,
+      textResult({
+        platforms: PLATFORM_KINDS.map((kind) => {
+          const spec = PLATFORM_SPECS[kind];
+          return {
+            kind,
+            label: spec.label,
+            folder: spec.inboundDir,
+            livePull: spec.api.livePull,
+            apiStatus: spec.api.status,
+            docs: spec.api.docsUrl,
+            writebackPermission: spec.writebackPermission,
+            honesty: spec.honesty
+          };
+        }),
+        live_backends: false
+      })
     );
   }
   if (name === "trades_runtime_health_local") return ok(id, textResult(healthLocal({ cwd: gate.cwd, instanceId: gate.instanceId })));

@@ -1,4 +1,5 @@
 import { join } from "node:path";
+import { PLATFORM_KINDS, PLATFORM_SPECS, type PlatformKind } from "./platforms/catalog.js";
 
 /** Local BYO inbound on the user's machine. Not a hosted multi-tenant corpus. */
 export const BYO_INBOUND_ROOT = "data/inbound";
@@ -8,7 +9,10 @@ export const TRADES_APP_INBOUND_DIR = "data/inbound/trades-app";
 export const RUNTIME_ISOLATE_ROOT = "data/runtime";
 export const HOSTED_TENANT_LAYOUT = "data/tenants";
 
-export type ByoInboundKind = "servicetitan" | "probooks" | "trades-app";
+export type ByoInboundKind = "servicetitan" | "probooks" | "trades-app" | PlatformKind;
+
+/** Every local drop folder class, named peers first. */
+export const BYO_INBOUND_KINDS: readonly ByoInboundKind[] = ["servicetitan", "probooks", "trades-app", ...PLATFORM_KINDS];
 
 export const TR_BYO_LAWS = [
   "byo-not-central-dump",
@@ -26,7 +30,8 @@ export type TrByoLaw = (typeof TR_BYO_LAWS)[number];
 const INBOUND_DIRS: Record<ByoInboundKind, string> = {
   servicetitan: SERVICE_TITAN_INBOUND_DIR,
   probooks: PROBOOKS_INBOUND_DIR,
-  "trades-app": TRADES_APP_INBOUND_DIR
+  "trades-app": TRADES_APP_INBOUND_DIR,
+  ...(Object.fromEntries(PLATFORM_KINDS.map((kind) => [kind, PLATFORM_SPECS[kind].inboundDir])) as Record<PlatformKind, string>)
 };
 
 export function inboundDir(kind: ByoInboundKind): string {

@@ -10,13 +10,21 @@ import {
 } from "../domain/property-record.js";
 import type { EvidenceBand, VerificationStatus } from "../core/confidence.js";
 import type { OverrideRecord } from "../core/chains.js";
+import { PLATFORM_KINDS, type PlatformKind } from "./platforms/catalog.js";
 
 /**
  * First-class BYO inbound classes (TR-BYO-2026-09-17, TR-DESK-2026-09-25).
  * servicetitan and probooks stay named peers. trades-app is the generic field-service class.
  * Wrapper admission is not verification.
  */
-export const FIRST_CLASS_SOURCE_KINDS = ["servicetitan", "probooks", "trades-app", "operator-file", "human"] as const;
+export const FIRST_CLASS_SOURCE_KINDS = [
+  "servicetitan",
+  "probooks",
+  "trades-app",
+  ...PLATFORM_KINDS,
+  "operator-file",
+  "human"
+] as const;
 export type FirstClassSourceKind = (typeof FIRST_CLASS_SOURCE_KINDS)[number];
 
 /** Authorized inbound kinds. Wrapper admission is not verification. */
@@ -58,7 +66,7 @@ export type InboundRefuseCode =
   | "FG-REFUSE-EMPTY"
   | "FG-REFUSE-HUMAN-ACTOR";
 
-export type TaggedOriginKind = "servicetitan" | "probooks" | "trades-app";
+export type TaggedOriginKind = "servicetitan" | "probooks" | "trades-app" | PlatformKind;
 
 export interface RawInbound {
   sourceKind: InboundSourceKind;
@@ -115,11 +123,13 @@ export type InboundResult = AdmittedInbound | RefusedInbound;
 const AUTHORIZED = new Set<string>(AUTHORIZED_INBOUND_KINDS);
 const REFUSED = new Set<string>(REFUSED_INBOUND_KINDS);
 const FIRST_CLASS = new Set<string>(FIRST_CLASS_SOURCE_KINDS);
-const TAGGED_ORIGINS = new Set<string>(["servicetitan", "probooks", "trades-app"]);
+const TAGGED_ORIGINS = new Set<string>(["servicetitan", "probooks", "trades-app", ...PLATFORM_KINDS]);
+const PLATFORM_SET = new Set<string>(PLATFORM_KINDS);
 const EVIDENCE_TYPES = new Set<string>([
   "servicetitan",
   "probooks",
   "trades-app",
+  ...PLATFORM_KINDS,
   "operator-file",
   "human",
   "technician-note",
@@ -193,7 +203,7 @@ function taggedOrigin(originKind: string | undefined): TaggedOriginKind | undefi
 
 function defaultTrust(kind: AuthorizedInboundKind, origin: TaggedOriginKind | undefined): EvidenceBand {
   if (kind === "operator-file") return origin ? "MEDIUM" : "LOW";
-  if (kind === "servicetitan" || kind === "probooks" || kind === "trades-app") return "MEDIUM";
+  if (kind === "servicetitan" || kind === "probooks" || kind === "trades-app" || PLATFORM_SET.has(kind)) return "MEDIUM";
   if (kind === "human") return "MEDIUM";
   return "MEDIUM";
 }
@@ -273,7 +283,7 @@ export function admitInbound(raw: RawInbound): InboundResult {
 
   const origin = kind === "operator-file" ? taggedOrigin(raw.originKind) : undefined;
   const originTagged =
-    kind === "servicetitan" || kind === "probooks" || kind === "trades-app" || Boolean(origin);
+    kind === "servicetitan" || kind === "probooks" || kind === "trades-app" || PLATFORM_SET.has(kind) || Boolean(origin);
   const trust = resolveTrust(kind, origin, raw.trust);
   const correction = kind === "human" ? humanCorrection(raw) : undefined;
 

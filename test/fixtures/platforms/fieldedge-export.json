@@ -1,0 +1,18 @@
+{
+  "synthetic": true,
+  "note": "Synthetic FieldEdge work-order export (file drop; FieldEdge API is partner-gated). Not customer data.",
+  "workOrders": [
+    {
+      "workOrderId": "SYN-FE-WO-1",
+      "workOrderNumber": "WO-9001",
+      "callReason": "No heat",
+      "trade": "hvac",
+      "status": "Completed",
+      "total": 275,
+      "customer": { "customerId": "SYN-FE-C-1", "displayName": "Synthetic House" },
+      "assignment": { "assignmentId": "SYN-FE-AS-1", "technicianId": "SYN-FE-T-1", "techName": "Synthetic Tech F", "scheduledStart": "2026-10-13T13:00:00Z" },
+      "equipment": { "equipmentId": "SYN-FE-EQ-1", "model": "SYN-FURNACE-80" }
+    }
+  ],
+  "technicians": [{ "technicianId": "SYN-FE-T-1", "name": "Synthetic Tech F" }]
+}

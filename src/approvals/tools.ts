@@ -3,6 +3,7 @@ import { FIELD_FLAG_KINDS, fieldFlagsDirectory, parseFieldFlag, writeFieldFlagFi
 import { FIELD_EVENT_KINDS, recordFieldEvent, type FieldEventKind } from "../desk/field-time.js";
 import { parseWriteBackRequest, runWriteBack, type FetchLike, type WriteBackendKind } from "./backends.js";
 import type { WritePermission } from "./permissions.js";
+import { PLATFORM_KINDS, PLATFORM_SPECS } from "../spine/platforms/catalog.js";
 
 /**
  * Every write the local runtime can perform from a tool call.
@@ -86,7 +87,8 @@ function stringArg(args: Record<string, unknown>, key: string): string {
 export const WRITE_TOOLS: readonly WriteToolSpec[] = [
   writeBackTool("servicetitan", "servicetitan.writeback", "ServiceTitan"),
   writeBackTool("probooks", "probooks.writeback", "ProBooks"),
-  writeBackTool("tradesapp", "tradesapp.writeback", "another trades app (Jobber, Housecall Pro, ...)"),
+  writeBackTool("tradesapp", "tradesapp.writeback", "another trades app without its own platform peer"),
+  ...PLATFORM_KINDS.map((kind) => writeBackTool(kind, PLATFORM_SPECS[kind].writebackPermission, PLATFORM_SPECS[kind].label)),
   {
     name: "trades_runtime_alert_ack",
     permission: "alerts.ack",

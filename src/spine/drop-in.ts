@@ -20,9 +20,12 @@ import {
   TRADES_APP_ENTITIES,
   type TradesAppEntity
 } from "./trades-app-shadow.js";
+import { isPlatformKind, PLATFORM_KINDS, type PlatformEntity, type PlatformKind } from "./platforms/catalog.js";
+import { mapPlatformDocument } from "./platforms/mappings.js";
+import { ingestPlatformShadow } from "./platforms/shadow.js";
 
-export const DROP_IN_PEER_CLASSES = ["servicetitan", "probooks", "trades-app"] as const;
-export type DropInPeerClass = (typeof DROP_IN_PEER_CLASSES)[number];
+export const DROP_IN_PEER_CLASSES = ["servicetitan", "probooks", "trades-app", ...PLATFORM_KINDS] as const;
+export type DropInPeerClass = "servicetitan" | "probooks" | "trades-app" | PlatformKind;
 
 export const CANONICAL_TRADE_ENTITIES = [
   "job",
@@ -35,7 +38,9 @@ export const CANONICAL_TRADE_ENTITIES = [
   "book",
   "item",
   "cost",
-  "vendor"
+  "vendor",
+  "payment",
+  "estimate"
 ] as const;
 
 export type CanonicalTradeEntity = (typeof CANONICAL_TRADE_ENTITIES)[number];
@@ -291,6 +296,7 @@ function explicitRefuseKind(doc: Record<string, unknown>): string | undefined {
 function explicitPeer(doc: Record<string, unknown>): DropInPeerClass | undefined {
   const value = text(doc.sourceKind || doc.peerClass).toLowerCase();
   if (value === "servicetitan" || value === "probooks" || value === "trades-app") return value;
+  if (isPlatformKind(value)) return value;
   return undefined;
 }
 
@@ -1123,7 +1129,8 @@ function admitRecord(
   peerClass: DropInPeerClass,
   receivedAt: string,
   profileId: string,
-  vendorHint: string
+  vendorHint: string,
+  options?: { via?: "file-drop" | "live-pull" }
 ): AdmittedDropRecord {
   const lane = knownTradeLane(record.raw);
   const technician = knownTechnician(record.raw);
@@ -1201,6 +1208,31 @@ function admitRecord(
     });
   }
 
+  if (isPlatformKind(peerClass)) {
+    const ingested = ingestPlatformShadow({
+      kind: peerClass,
+      entity: record.entity as PlatformEntity,
+      externalId: record.externalId,
+      receivedAt,
+      payload: record.raw,
+      via: options?.via
+    });
+    return finish({
+      entity: record.entity,
+      externalId: record.externalId,
+      sourceId: ingested.inbound.packet.sourceId,
+      packetHash: ingested.packet.contentHash,
+      shadowHash: ingested.hash,
+      verificationStatus: "UNVERIFIED",
+      trust: ingested.inbound.packet.trust,
+      live: false,
+      write: false,
+      wrapperIsVerification: false,
+      status: record.status,
+      observedAt: record.observedAt
+    });
+  }
+
   const entity: TradesAppEntity = isTradesEntity(record.entity) ? record.entity : "job";
   const ingested = ingestTradesAppShadow({
     entity,
@@ -1226,11 +1258,52 @@ function admitRecord(
   });
 }
 
+/** A platform folder or an explicit platform sourceKind sends the file to that platform peer, unless it is clearly ServiceTitan or ProBooks. */
+function platformTarget(doc: Record<string, unknown>, preferClass: DropInPeerClass | undefined): PlatformKind | undefined {
+  const declared = explicitPeer(doc);
+  if (declared && isPlatformKind(declared)) return declared;
+  if (declared) return undefined;
+  return preferClass && isPlatformKind(preferClass) ? preferClass : undefined;
+}
+
+function admitPlatformDocument(
+  kind: PlatformKind,
+  doc: Record<string, unknown>,
+  options: { receivedAt: string; fileName?: string }
+): DropInResult {
+  const mapped = mapPlatformDocument(kind, doc, options.fileName);
+  if (!mapped.length) return refuse("FG-REFUSE-EMPTY", `${kind} drop-in contained no ${kind} records this mapper knows`);
+  const via = doc.livePull === true ? "live-pull" : "file-drop";
+  const profileId = text(doc.vendor) === "generic-csv" ? `${kind}-csv` : kind;
+  const records = mapped.map((record) => admitRecord(record, kind, options.receivedAt, profileId, kind, { via }));
+  return {
+    ok: true,
+    refused: false,
+    peerClass: kind,
+    profileId,
+    vendorHint: kind,
+    synthetic: doc.synthetic === true,
+    live: false,
+    write: false,
+    verificationStatus: "UNVERIFIED",
+    wrapperIsVerification: false,
+    trust: "MEDIUM",
+    records
+  };
+}
+
 export function admitDropInDocument(
   input: unknown,
   options: { receivedAt: string; preferClass?: DropInPeerClass; fileName?: string }
 ): DropInResult {
   const detected = detectDropIn(input, { preferClass: options.preferClass, fileName: options.fileName });
+  const platformDoc = coerceDoc(input);
+  const platform = platformDoc ? platformTarget(platformDoc, options.preferClass) : undefined;
+  if (platform && platformDoc) {
+    if (!detected.ok && (detected.code === "FG-REFUSE-SCRAPE" || detected.code === "FG-REFUSE-UNAUTHORIZED")) return detected;
+    const namedPeer = detected.ok && (detected.peerClass === "servicetitan" || detected.peerClass === "probooks") && detected.score >= 0.9;
+    if (!namedPeer) return admitPlatformDocument(platform, platformDoc, options);
+  }
   if (!detected.ok) return detected;
   const doc = coerceDoc(input);
   if (!doc) return refuse("FG-REFUSE-EMPTY", "drop-in document is empty");
