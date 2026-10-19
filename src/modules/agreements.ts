@@ -17,9 +17,10 @@ import {
 /**
  * Maintenance agreements (memberships / service plans).
  * Renewals due, missed tune-ups, and members not visited in N days.
- * Revenue at risk sums only the agreement prices the shop's own data names.
- * An agreement without a price is counted as "price unknown", never as zero
- * and never as an estimate.
+ * Revenue at risk sums only the agreement prices the shop's own data names:
+ * a price on the agreement itself, or (optional) the shop's own plan price list
+ * in settings.planPrices. An agreement with neither is counted as "price
+ * unknown", never as zero and never as an estimate.
  */
 
 export interface Agreement {
@@ -30,8 +31,10 @@ export interface Agreement {
   startOn?: string;
   renewalOn?: string;
   status: "active" | "expired" | "cancelled" | "unknown";
-  /** Price per term, exactly as the data names it. */
+  /** Price per term, exactly as the data names it (or the shop's plan price list). */
   price?: number;
+  /** Where the price came from. Absent when no price is on file. */
+  priceSource?: "agreement" | "plan-price-list";
   visitsPerTerm?: number;
   visits: string[];
   source: string;
@@ -40,9 +43,11 @@ export interface Agreement {
 export interface AgreementSettings {
   renewalWindowDays: number;
   notVisitedDays: number;
+  /** Optional shop-supplied price per term, keyed by plan name (case-insensitive). Used only when an agreement names no price. */
+  planPrices: Record<string, number>;
 }
 
-export const DEFAULT_AGREEMENT_SETTINGS: AgreementSettings = { renewalWindowDays: 60, notVisitedDays: 180 };
+export const DEFAULT_AGREEMENT_SETTINGS: AgreementSettings = { renewalWindowDays: 60, notVisitedDays: 180, planPrices: {} };
 
 export interface AgreementRow extends Agreement {
   daysToRenewal: number | null;
@@ -65,7 +70,14 @@ export interface AgreementBoard {
   lapsed: string[];
   missedTuneUps: string[];
   notVisited: string[];
-  revenueAtRisk: { amount: number; agreementsPriced: number; agreementsPriceUnknown: number; basis: string };
+  revenueAtRisk: {
+    amount: number;
+    agreementsPriced: number;
+    agreementsPriceUnknown: number;
+    /** How many priced at-risk agreements took their price from the agreement vs the shop's plan price list. */
+    pricedFrom: { agreement: number; planPriceList: number };
+    basis: string;
+  };
   alerts: Array<{ id: string; agreementId: string; severity: "watch" | "hold"; message: string }>;
   source: ModuleSourceNote;
   note: string;
@@ -120,11 +132,18 @@ export function agreementsFromInbound(rows: InboundRow[]): { agreements: Agreeme
 
 function settingsFrom(raw: unknown): AgreementSettings {
   const record = isRecord(raw) ? raw : {};
-  const pick = (key: keyof AgreementSettings) => {
+  const pick = (key: "renewalWindowDays" | "notVisitedDays"): number => {
     const value = record[key];
     return typeof value === "number" && Number.isInteger(value) && value > 0 && value <= 730 ? value : DEFAULT_AGREEMENT_SETTINGS[key];
   };
-  return { renewalWindowDays: pick("renewalWindowDays"), notVisitedDays: pick("notVisitedDays") };
+  const planPrices: Record<string, number> = {};
+  if (isRecord(record.planPrices)) {
+    for (const [plan, value] of Object.entries(record.planPrices)) {
+      const price = typeof value === "number" ? value : typeof value === "string" && value.trim() ? Number(value.replace(/[$,]/g, "")) : NaN;
+      if (plan.trim() && Number.isFinite(price) && price >= 0) planPrices[plan.trim().toLowerCase()] = price;
+    }
+  }
+  return { renewalWindowDays: pick("renewalWindowDays"), notVisitedDays: pick("notVisitedDays"), planPrices };
 }
 
 export function buildAgreementBoard(ctx: ModuleContext, rows?: InboundRow[]): AgreementBoard {
@@ -144,6 +163,13 @@ export function buildAgreementBoard(ctx: ModuleContext, rows?: InboundRow[]): Ag
     byId.set(agreement.agreementId, prior ? { ...prior, ...Object.fromEntries(Object.entries(agreement).filter(([, v]) => v !== undefined)), visits: [...prior.visits, ...agreement.visits] } as Agreement : agreement);
   }
   for (const visit of fromInbound.visits) byId.get(visit.agreementId)?.visits.push(visit.on);
+  for (const agreement of byId.values()) {
+    if (agreement.price !== undefined) agreement.priceSource = "agreement";
+    else if (agreement.plan && settings.planPrices[agreement.plan.toLowerCase()] !== undefined) {
+      agreement.price = settings.planPrices[agreement.plan.toLowerCase()];
+      agreement.priceSource = "plan-price-list";
+    }
+  }
 
   const now = ctx.now;
   const alerts: AgreementBoard["alerts"] = [];
@@ -192,7 +218,11 @@ export function buildAgreementBoard(ctx: ModuleContext, rows?: InboundRow[]): Ag
       amount: round(priced.reduce((total, row) => total + (row.price ?? 0), 0)),
       agreementsPriced: priced.length,
       agreementsPriceUnknown: atRisk.length - priced.length,
-      basis: "Sum of the term price named on each at-risk agreement (renewal due, lapsed, missed tune-up, or not visited). Agreements with no price in the data are counted, not valued."
+      pricedFrom: {
+        agreement: priced.filter((row) => row.priceSource === "agreement").length,
+        planPriceList: priced.filter((row) => row.priceSource === "plan-price-list").length
+      },
+      basis: "Sum of the term price on each at-risk agreement (renewal due, lapsed, missed tune-up, or not visited): the agreement's own price, else the shop's settings.planPrices entry for its plan. Agreements with neither are counted, not valued."
     },
     alerts,
     source: sourceNote(file, inbound.filter((row) => [row.raw.agreement, row.raw.membership, row.raw.servicePlan, row.raw.service_plan].some(isRecord))),

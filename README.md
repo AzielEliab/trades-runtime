@@ -230,7 +230,7 @@ FragGate first-class `sourceKind` values: `servicetitan` (MEDIUM, hashed, `live:
 
 ## Universal drop-in (TR-DESK-2026-09-25)
 
-ServiceTitan and ProBooks stay named peer classes. A third inbound class, `trades-app`, admits the same family of exports without a new paper for each vendor. The drop-in sniffs JSON/CSV shape and applies a mapping profile. 0.4.1 prefers a named profile when keys, headers, or the filename match: Jobber, Housecall Pro, Service Fusion, QuickBooks Online, QuickBooks Desktop, ServiceM8, AccuLynx, SuccessWare, Xero, FieldEdge, and ServiceTrade. Otherwise it uses generic JSON or generic CSV. A file that still looks like ServiceTitan or ProBooks stays on that peer class. See [`TR-VENDOR-2026-09-25`](specs/TR-VENDOR-2026-09-25.txt).
+ServiceTitan and ProBooks stay named peer classes. A third inbound class, `trades-app`, admits the same family of exports without a new paper for each vendor. The drop-in sniffs JSON/CSV shape and applies a mapping profile. 0.4.1 prefers a named profile when keys, headers, or the filename match: Jobber, Housecall Pro, Service Fusion, QuickBooks Online, QuickBooks Desktop, ServiceM8, AccuLynx, SuccessWare, Xero, FieldEdge, and ServiceTrade. Otherwise it uses generic JSON or generic CSV. A file that still looks like ServiceTitan or ProBooks stays on that peer class. ServiceM8, SuccessWare, and ServiceTrade files are now admitted through their platform connectors, so each of those has one path (see `data/inbound/README.md`). See [`TR-VENDOR-2026-09-25`](specs/TR-VENDOR-2026-09-25.txt).
 
 ```bash
 npm run drop-in:demo
@@ -294,7 +294,7 @@ This is a record-keeping aid. It is not an EPA filing and not legal advice.
 
 The modules never estimate a number:
 
-- Revenue at risk uses only the shop's own agreement prices.
+- Revenue at risk uses only prices the shop supplies: a price on each agreement, or an optional plan price list (`settings.planPrices`). An agreement without either is counted as price unknown. The example prices are synthetic placeholders.
 - Warranty filing windows show up only when the shop enters them.
 - A van that was never counted is unknown, not zero.
 - A callback links to its original job only through an explicit reference.

@@ -66,6 +66,12 @@ export interface MappingProfile {
   id: string;
   vendorHint: string;
   peerClass: DropInPeerClass;
+  /**
+   * Older trades-app profiles whose vendor now has a platform connector. Detection still uses the
+   * profile's sniff, but the file is admitted through that connector (one path per platform). Only a
+   * document that explicitly declares sourceKind "trades-app" keeps the older mapper.
+   */
+  routeTo?: PlatformKind;
   sniff(doc: Record<string, unknown>, context?: MappingSniffContext): number;
   map(doc: Record<string, unknown>): CanonicalTradeRecord[];
 }
@@ -961,6 +967,7 @@ export const MAPPING_PROFILES: MappingProfile[] = [
     id: "servicem8",
     vendorHint: "servicem8",
     peerClass: "trades-app",
+    routeTo: "servicem8",
     sniff(doc, context) {
       if (vendorToken(doc) === "servicem8") return 0.96;
       if (rowsFrom(doc, ["jobs", "records"]).some(isServiceM8Job)) return 0.91;
@@ -983,6 +990,7 @@ export const MAPPING_PROFILES: MappingProfile[] = [
     id: "successware",
     vendorHint: "successware",
     peerClass: "trades-app",
+    routeTo: "successware",
     sniff(doc, context) {
       if (vendorToken(doc) === "successware") return 0.96;
       if (rowsFrom(doc, ["calls", "Calls", "jobs", "records"]).some(isSuccessWareCall)) return 0.91;
@@ -1016,6 +1024,7 @@ export const MAPPING_PROFILES: MappingProfile[] = [
     id: "servicetrade",
     vendorHint: "servicetrade",
     peerClass: "trades-app",
+    routeTo: "servicetrade",
     sniff(doc, context) {
       if (vendorToken(doc) === "servicetrade") return 0.96;
       if (rowsFrom(doc, ["jobs", "records"]).some(isServiceTradeJob)) return 0.91;
@@ -1098,7 +1107,7 @@ export function detectDropIn(
     refused: false,
     profileId: picked.profile.id,
     vendorHint: picked.profile.vendorHint,
-    peerClass: declared ?? picked.profile.peerClass,
+    peerClass: declared ?? picked.profile.routeTo ?? picked.profile.peerClass,
     score: picked.score
   };
 }
@@ -1313,6 +1322,7 @@ export function admitDropInDocument(
 
   const profile = MAPPING_PROFILES.find((item) => item.id === detected.profileId) ?? MAPPING_PROFILES.find((item) => item.id === "generic-json");
   if (!profile) return refuse("FG-REFUSE-UNKNOWN", "drop-in profile missing");
+  if (profile.routeTo && detected.peerClass === profile.routeTo) return admitPlatformDocument(profile.routeTo, doc, options);
 
   const mapped = profile.map(doc);
   if (!mapped.length) return refuse("FG-REFUSE-EMPTY", "drop-in shape matched and contained no records");

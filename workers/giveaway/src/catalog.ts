@@ -27,6 +27,7 @@ import {
   X_URL
 } from "./identity.js";
 import { STATS_NOTE, type FleetStats } from "./counters.js";
+import { LOCAL_CATALOG_NOTE, LOCAL_MODULES, LOCAL_PLATFORM_PEERS } from "./local-catalog.js";
 
 export function json(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data, null, 2) + "\n", {
@@ -137,6 +138,12 @@ export function citeBody(): Record<string, unknown> {
     keywords: [...KEYWORDS],
     honesty: HONESTY.product,
     counters: HONESTY.counters,
+    local_package: {
+      runs_here: false,
+      note: LOCAL_CATALOG_NOTE,
+      modules: LOCAL_MODULES.map((m) => ({ ...m })),
+      platform_peers: LOCAL_PLATFORM_PEERS.map((p) => ({ ...p }))
+    },
     how_to_cite: `Eliab, Aziel. (2026). ${PRODUCT_TITLE} ${VERSION} [Software]. ${LICENSE}. ${REPOSITORY} · ${PUBLIC_ORIGIN}/`
   };
 }
@@ -177,6 +184,11 @@ curl -fsSL ${PUBLIC_ORIGIN}/download -o ${RELEASE_FILENAME}
 tar -xzf ${RELEASE_FILENAME}
 \`\`\`
 
+## In the local package (runs on the operator machine, not on this Worker)
+${LOCAL_CATALOG_NOTE}
+Modules: ${LOCAL_MODULES.map((m) => m.slug).join(", ")}
+Platform peers: ${LOCAL_PLATFORM_PEERS.map((p) => `${p.label} (${p.mode}, mapping ${p.mappingConfidence})`).join("; ")}
+
 ## AI clients
 ${COMPATIBLE_AI_CLIENTS.map((name) => `- ${name}`).join("\n")}
 `;
@@ -198,6 +210,16 @@ Worker: ${PUBLIC_ORIGIN}
 Local-first BYO TypeScript runtime for HVAC, plumbing, electrical, sewer, and cross-trades.
 People bring their own ServiceTitan and ProBooks. Humans use the giveaway Worker UI on this VibeLock host (browser / PWA) without downloading first. Agents use OpenAPI and MCP. The optional counted pack is GET /download. The operator desk still installs on the operator machine.
 Thin OpenAPI/MCP for health, stats, cite, and this skill.
+
+## In the local package (not on this Worker)
+
+${LOCAL_CATALOG_NOTE}
+
+Modules:
+${LOCAL_MODULES.map((m) => `- ${m.slug}: ${m.summary}`).join("\n")}
+
+Platform peers (folder data/inbound/<kind>/):
+${LOCAL_PLATFORM_PEERS.map((p) => `- ${p.label}: ${p.mode === "file-drop" ? "file drop only" : "file drop + optional read-only pull"}; mapping ${p.mappingConfidence}`).join("\n")}
 
 ## Honest counters
 
@@ -247,7 +269,12 @@ export function openApiSpec(): Record<string, unknown> {
       },
       "/stats": { get: { summary: "Alias of /v1/stats." } },
       "/count": { get: { summary: "Alias of /v1/stats (fleet download-tracker shape)." } },
-      "/cite.json": { get: { summary: "Public cite. Does not increment counters." } },
+      "/cite.json": {
+        get: {
+          summary: "Public cite. Does not increment counters.",
+          description: "Includes local_package: the local runtime's modules and platform peers (mode and mappingConfidence). They run only on the operator machine, never on this Worker."
+        }
+      },
       "/suite-card.json": {
         get: {
           summary: "AZInterface suite shell entry for this separate package. Does not increment counters."
@@ -261,13 +288,13 @@ export function openApiSpec(): Record<string, unknown> {
       "/person.jsonld": { get: { summary: "Person JSON-LD. Machine 15:20 disambiguation. No HTML chrome." } },
       "/graph.jsonld": { get: { summary: "SoftwareApplication + WebSite + Person JSON-LD." } },
       "/.well-known/mcp.json": { get: { summary: "MCP discovery for POST /mcp + OpenAPI." } },
-      "/v1/skill": { get: { summary: "Agent skill markdown." } },
+      "/v1/skill": { get: { summary: "Agent skill markdown, including what the local package carries (modules, platform peers, mapping confidence)." } },
       "/openapi.json": { get: { summary: "This OpenAPI document." } },
       "/mcp": {
         get: { summary: "MCP transport note. Use POST for JSON-RPC." },
         post: {
           summary: "Read-only MCP JSON-RPC (initialize, tools/list, tools/call)",
-          description: "Tools: health, stats, cite, skill. Public, no OAuth. Does not increment counters."
+          description: "Tools: health, stats, cite, skill. Public, no OAuth. Does not increment counters. cite and skill describe the local package's modules and platform peers; none of them runs here."
         }
       }
     }

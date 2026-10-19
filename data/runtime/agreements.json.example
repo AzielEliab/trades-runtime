@@ -1,8 +1,14 @@
 {
-  "note": "Example only (synthetic). Copy to data/runtime/<instanceId>/agreements.json. price is the term price exactly as the shop charges it; revenue at risk sums only these prices. visits are completed tune-up dates. Writes from tools need agreements.write and an operator yes. Nothing is billed.",
-  "settings": { "renewalWindowDays": 60, "notVisitedDays": 180 },
+  "note": "EXAMPLE DATA (synthetic). The prices below are placeholders, not market rates, and are not advice. Copy to data/runtime/<instanceId>/agreements.json and replace them with your own prices, or delete them. Pricing is optional: price on an agreement is the term price exactly as the shop charges it. settings.planPrices is an optional shop price list per plan name, used only when an agreement has no price. Revenue at risk sums only these prices. An agreement with neither price is counted as price unknown, never valued. visits are completed tune-up dates. Writes from tools need agreements.write and an operator yes. Nothing is billed.",
+  "settings": {
+    "renewalWindowDays": 60,
+    "notVisitedDays": 180,
+    "planPrices": { "Synthetic comfort plan": 111.11, "Synthetic plumbing plan": 222.22 }
+  },
   "agreements": [
-    { "agreementId": "SYN-AGR-1", "customerName": "Synthetic Member", "plan": "Synthetic comfort plan", "startOn": "2025-11-15", "renewalOn": "2026-11-15", "status": "active", "visitsPerTerm": 2, "visits": ["2026-03-10"] }
+    { "agreementId": "SYN-AGR-1", "customerName": "Synthetic Member", "plan": "Synthetic comfort plan", "startOn": "2025-11-15", "renewalOn": "2026-11-15", "status": "active", "visitsPerTerm": 2, "visits": ["2026-03-10"] },
+    { "agreementId": "SYN-AGR-2", "customerName": "Synthetic Member Two", "plan": "Synthetic plumbing plan", "price": 199.99, "startOn": "2025-11-01", "renewalOn": "2026-11-01", "status": "active", "visitsPerTerm": 1, "visits": [] },
+    { "agreementId": "SYN-AGR-3", "customerName": "Synthetic Member Three", "plan": "Synthetic unpriced plan", "startOn": "2025-12-01", "renewalOn": "2026-12-01", "status": "active", "visitsPerTerm": 2, "visits": [] }
   ],
   "synthetic": true
 }
