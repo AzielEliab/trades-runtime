@@ -240,6 +240,54 @@ That demo copies synthetic fixtures from `test/fixtures/byo/` into a temp inboun
 
 Real exports stay in the gitignored drop folders. `data/inbound/local.json` (copied from `local.json.example`) may name paths and read-endpoint hints. Hints are documentation for the operator. This process does not fetch them.
 
+## Platform peers (TR-PLATFORMS-2026-10-19)
+
+Jobber, Housecall Pro, Square, QuickBooks Online, FieldEdge, and Service Fusion are first-class inbound peers. Each one has its own folder, `data/inbound/<kind>/`. Drop a JSON or CSV export into that folder, and it is mapped to the vendor's documented object names, then admitted as MEDIUM, unverified, `live: false`.
+
+You can also pull data yourself with `npm run pull -- <platform>`. This is a read-only call against the vendor's documented public API. The env var that holds the token is named in `data/inbound/local.json`. No credential is kept in the repo, in Pages, or in the Worker.
+
+| Platform | Mode | Why |
+| --- | --- | --- |
+| Jobber | file drop + documented API pull | Public GraphQL API (`X-JOBBER-GRAPHQL-VERSION`). |
+| Housecall Pro | file drop + documented API pull | Public REST API; the vendor offers it on the MAX plan. |
+| Square | file drop + documented API pull | Public REST API (customers, payments, invoices, bookings, team). Square has no job object, so none is invented. |
+| QuickBooks Online | file drop + documented API pull | Public Accounting API query endpoint. |
+| Service Fusion | file drop + documented API pull | Public REST API; the vendor offers it on the Pro plan. |
+| FieldEdge | file drop only | The API is gated behind a partner program, so no pull is shipped. |
+
+All of this is tested against fixtures only. **Not tested against a live tenant.** Each platform's `<kind>.writeback` goes through the approval gate. It is off by default and asks yes or no on every call. When no backend is configured, it returns `no-backend-configured`. It never reports a success that didn't happen. Run `npm run platforms` to list them.
+
+## Local compliance, revenue, and ops modules (TR-MODULES-2026-10-19)
+
+Each module reads a local file, `data/runtime/<instanceId>/<module>.json` (gitignored; examples in `data/runtime/*.json.example`), plus whatever admitted inbound rows already carry the data. Each one has a desk panel on `http://127.0.0.1:4174/`, a JSON route, and a read tool on the local MCP. Writes need their own permission and a yes from the operator on each call.
+
+| Module | Desk route / read tool | Write permission |
+| --- | --- | --- |
+| Refrigerant log (EPA 608 / AIM Act) | `/api/refrigerant` · `trades_runtime_refrigerant` | `refrigerant.write` |
+| Permits and inspections | `/api/permits` · `trades_runtime_permits` | `permits.write` |
+| Maintenance agreements | `/api/agreements` · `trades_runtime_agreements` | `agreements.write` |
+| Manufacturer warranty claims | `/api/warranty-claims` · `trades_runtime_warranty_claims` | `warranty_claims.write` |
+| Truck stock vs tomorrow | `/api/truck-stock` · `trades_runtime_truck_stock` | `truck_stock.write` |
+| Callback root cause | `/api/callbacks` · `trades_runtime_callbacks` | `callbacks.write` |
+
+Refrigerant rules, as read on the eCFR on 2026-10-19:
+
+- The leak rate is calculated per [40 CFR 82.152](https://www.ecfr.gov/current/title-40/chapter-I/subchapter-C/part-82/subpart-F/section-82.152).
+- Section 608 leak repair covers ODS refrigerant at a full charge of 50 lb or more ([40 CFR 82.157](https://www.ecfr.gov/current/title-40/chapter-I/subchapter-C/part-82/subpart-F/section-82.157)).
+- The AIM Act rule covers HFC refrigerant at a full charge of 15 lb or more, from 2026-01-01. It excludes residential and light-commercial AC ([40 CFR 84.106](https://www.ecfr.gov/current/title-40/chapter-I/subchapter-C/part-84/subpart-C/section-84.106)).
+- Trigger rates are 20% for commercial refrigeration, 30% for industrial process, and 10% for comfort cooling and other appliances.
+
+This is a record-keeping aid. It is not an EPA filing and not legal advice.
+
+The modules never estimate a number:
+
+- Revenue at risk uses only the shop's own agreement prices.
+- Warranty filing windows show up only when the shop enters them.
+- A van that was never counted is unknown, not zero.
+- A callback links to its original job only through an explicit reference.
+
+`live_backends` and `pilot_started` both stay false.
+
 ## Human operator desk
 
 The desk is the human surface. The public Worker MCP stays a read-only bridge without this chrome. On the operator machine, the desk's loopback `POST /mcp` lets an agent request writes. Writes require operator approval; default off. See [Approval-gated writes](#approval-gated-writes).
