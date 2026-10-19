@@ -1,6 +1,6 @@
 # MCP directory log
 
-Updated 2026-10-19 10:05 AM ET. This is the update list. Do not mark a host live until its page actually shows the server.
+Updated 2026-10-19 1:05 PM ET. This is the update list. Do not mark a host live until its page actually shows the server.
 
 Forms on 2026-10-04 used collinhorton95@gmail.com. Free plans only. No payments.
 
@@ -22,6 +22,8 @@ Forms on 2026-10-04 used collinhorton95@gmail.com. Free plans only. No payments.
 | PulseMCP | Skipped. Not live. Submissions paused (notice dated 2026-09-03). No public page. Search showed 0 servers. | https://www.pulsemcp.com/submit |
 
 Public door: https://trades-runtime.vibelock.workers.dev/mcp
+
+2026-10-19 (1:00 PM ET): the public Worker was redeployed from main (40df454), version id 4d91ca74-c7e7-4272-9f43-f9d36016cf5e. Its read-only tool descriptions and cite.json `local_package` now list the 6 local modules and 17 platform peers, with mode (file drop, or file drop plus read-only pull) and mapping confidence. Health still reports 1.0.0-local, live_backends false. Version unchanged, so the Official MCP Registry was not republished, and Glama was not touched. No host listing was edited. Live listings that mirror the GitHub README (mcpservers.org, MCP Market, MCPHub.space) need no manual edit. A host-side refresh, if any, would need that host's own login, which was not used.
 Source tip recorded on 2026-10-04: 938e9ca94b305c29f62da8b50d3f9b5bbd3bc53a
 
 ## aziel-runtime
