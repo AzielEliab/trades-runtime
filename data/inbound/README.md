@@ -45,14 +45,14 @@ Six more platforms are named peer classes with their own FragGate `sourceKind` a
 | `data/inbound/fieldedge/` | FieldEdge | work orders (+ assignment, customer, equipment), customers, invoices, estimates, technicians | None. FieldEdge API access is partner/member-gated through its developer portal, so this runtime ships file drop only. |
 | `data/inbound/servicefusion/` | Service Fusion | jobs (+ techs), customers, estimates, invoices, equipment | Optional. REST GETs (`/v1/jobs` always sorted). Vendor says the API needs the Pro plan. |
 | `data/inbound/successware/` | Successware | calls (+ equipment), customers/locations, invoices, technicians | None. No public API documentation; partner integrations only. |
-| `data/inbound/workiz/` | Workiz | Job (+ Team), Client, Invoice, Estimate, User | Optional. v2 `GET /jobs` with a Bearer API key (Developer API add-on). |
-| `data/inbound/servicetrade/` | ServiceTrade | job (+ location), appointment, location, invoice, quote, user, asset. Unix-second times converted. | Optional. `GET /api/job`, `GET /api/location` with an OAuth2 bearer token. |
+| `data/inbound/workiz/` | Workiz | job (+ team), client, invoice, estimate (v2 camelCase) | Optional. v2 `GET /v2/jobs`, `/v2/clients`, `/v2/invoices`, `/v2/estimates` on `https://api.workiz.com/crm/api` with a Bearer API key (Developer API add-on). Jobs default to the last 30 days by scheduled date. |
+| `data/inbound/servicetrade/` | ServiceTrade | job (+ location), appointment, location, company, invoice, quote, user, asset. Unix-second times converted. | Optional. `GET /api/job`, `appointment`, `location`, `company?isCustomer=true`, `invoice`, `quote`, `user?isTechOrHelper=true`, `asset` (first page each) with an OAuth2 bearer token. |
 | `data/inbound/buildops/` | BuildOps | jobs (+ visits), customers/properties, invoices, quotes, employees, assets | None. API docs are invite-gated. |
 | `data/inbound/fieldpulse/` | FieldPulse | jobs, customers, invoices, estimates, users | Optional. REST GETs with the `x-api-key` header (token from FieldPulse support). |
 | `data/inbound/kickserv/` | Kickserv | jobs (+ customer, employees), customers, invoices, estimates, employees, items | Documented XML REST GETs (`/{accountSlug}/jobs.xml`, `customers.xml`, `employees.xml`, `items.xml`; first page of 30). HTTP Basic with the employee API token as user name and password. Premium plan. |
 | `data/inbound/mhelpdesk/` | mHelpDesk | tickets, appointments, customers, invoices, estimates | None. No public API documentation found. |
 | `data/inbound/servicem8/` | ServiceM8 | Job, JobActivity (scheduled only), Company, Staff, Material | Optional. `GET /api_1.0/<object>.json` with the `X-API-Key` header. |
-| `data/inbound/simpro/` | Simpro | Job, Customer, Invoice, Quote, Employee | Optional. `GET /api/v1.0/companies/<companyId>/jobs/` on your build host with an OAuth2 bearer token. |
+| `data/inbound/simpro/` | Simpro | Job, Customer, Invoice, Quote, Employee | Optional. `GET /api/v1.0/companies/<companyId>/jobs/?columns=...` on your build host with an OAuth2 bearer token. |
 | `data/inbound/commusoft/` | Commusoft | job (`recallOfParentJobID` feeds callback root cause), property, user, asset | Optional. v2 `GET /jobs`, `/properties`, `/users` with a Bearer API key (US or UK base). |
 | `data/inbound/wintac/` | Wintac | work orders, customers, invoices, technicians, equipment (Excel → CSV) | None. Desktop software with no public API. |
 
@@ -246,6 +246,39 @@ Successware was named by the owner. The other ten are field-service booking, dis
 | mHelpDesk, Wintac | file drop only (no public API) |
 
 Every platform here is fixture-tested only. None has been tested against a live tenant.
+
+
+### Mapping confidence (TR-PLATFORMS-MAPPING-2026-10-19)
+
+Each platform spec carries a `mappingConfidence` field, with its sources in `mappingSources` and the details in `mappingNote` (`src/spine/platforms/mapping-verification.ts`). The desk shows the same list under "Platform peers and mapping confidence". `npm run platforms` prints it too.
+
+- `documented`: the field names the mapper reads were checked against the vendor's published schema.
+- `partial`: some field names come from a published source, such as request fields, report column lists, import templates, an SDK, or a docs mirror. The rest are guessed or were not re-checked.
+- `guessed`: no published field list was found. Drop a real export and check the mapped fields before relying on them.
+
+| Platform | Mapping confidence | Field names checked against | Needs a real shop export to confirm |
+| --- | --- | --- | --- |
+| FieldEdge | documented | FieldEdge Open API schemas (docs-dev.fieldedge.com): work orders, assignments, invoices, quotes, employees, customers | FieldEdge app report exports (no published columns); job totals |
+| Workiz | documented | Workiz Developer API v2 OpenAPI (developer.workiz.com/v2) | CSV exports |
+| ServiceTrade | documented | ServiceTrade OpenAPI 3.1 (api.servicetrade.com/openapi/openapi.json) | CSV exports |
+| FieldPulse | partial | API create-request fields and the Job Report CSV columns (help.fieldpulse.com) | list-response-only fields (total, customer name, assignee name) |
+| Kickserv | partial | Kickserv Swagger (app.kickserv.com/api-def) | the XML envelope; separate invoice/estimate exports |
+| mHelpDesk | partial | CustomerList / ContactsList / InvoiceList report columns (ServiceTitan migration guide) and the mHelpDesk customer import template | ticket/job exports |
+| Simpro | partial | Simpro apidoc via a docs mirror and a community SDK (vendor page is behind a browser challenge) | a direct check against the vendor apidoc |
+| Successware | guessed | none published (backup-file migration; user-picked report columns) | everything |
+| BuildOps | guessed | none readable (API reference invite-gated) | everything |
+| Wintac | guessed | none published (backup-file migration) | everything |
+| Jobber, Housecall Pro, Square, QuickBooks Online, Service Fusion, ServiceM8, Commusoft | partial | vendor API references, used in the original build | a field-by-field re-check (not done in this pass) |
+
+"Documented" covers only the field names. None of these platforms has been tested against a live tenant.
+
+Corrections made from these sources:
+- **Workiz:** fields are now v2 camelCase (`uuid`, `status`, `date`, `totalPrice`, `clientInfo`, `team`). The base URL is `https://api.workiz.com/crm/api` with `/v2/...` paths, and the pull also reads clients, invoices, and estimates. The earlier PascalCase names and the `/api/v2` base were wrong.
+- **FieldEdge:** fields are now `customerId`, `scheduledStart`, `serviceAddress`, `primaryAssignment`, `invoiceId`, and assignments with `technicianId`, `technicianName`, and `scheduleDateTime`. The earlier nested `customer` / `assignment` guesses were dropped.
+- **ServiceTrade:** the pull now also reads appointments, customer companies, invoices, quotes, techs and helpers, and assets. The list keys are verified in the OpenAPI spec. Invoices and appointments link to `job.id`.
+- **Simpro:** the pull sends the documented `columns` parameter, because list calls otherwise return only ID, Description, and Total.
+- **FieldPulse:** the mapper now reads the assignee from `assignments[].assigned_members` and the invoice date from `invoiced_date`. Job Report CSVs with a `#ID` header are now read instead of being skipped as a comment.
+- **mHelpDesk:** `InvoiceList.csv` now keys on Invoice Number, not Ticket ID.
 
 ### Kickserv XML pull (TR-PLATFORMS-KICKSERV-2026-10-19)
 

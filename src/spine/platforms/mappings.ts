@@ -1,6 +1,6 @@
 import type { PlatformKind } from "./catalog.js";
 import { WAVE2_MAPPINGS } from "./mappings-wave2.js";
-import { isRecord, mapCollections, mapCsvRows, type CollectionMap, type PlatformRecord } from "./map.js";
+import { isRecord, mapCollections, mapCsvRows, type CollectionMap, type CsvColumnOverrides, type PlatformRecord } from "./map.js";
 
 /**
  * Per-platform collection maps. Object and field names follow each vendor's
@@ -168,32 +168,41 @@ const QUICKBOOKS: CollectionMap[] = [
   { keys: ["Item", "QueryResponse.Item", "items"], entity: "pricebook", idKeys: ["Id", "Name", "id"], fields: { price: ["UnitPrice"] } }
 ];
 
+// FieldEdge Open API (https://docs-dev.fieldedge.com/): work orders, assignments, invoices, quotes, employees, customers.
+// The documented work-order list has no money and no status string; total / invoiceTotal stay as guessed export fallbacks.
+const FE_ASSIGNMENT: CollectionMap = {
+  keys: ["assignments"],
+  entity: "appointment",
+  idKeys: ["assignmentId"],
+  observedKeys: ["scheduleDateTime", "promisedWindowStart"],
+  statusKeys: ["status"],
+  fields: { technicianId: ["technicianId"], technicianName: ["technicianName"], jobId: ["workOrderId"] }
+};
+
 const FIELDEDGE: CollectionMap[] = [
   {
     keys: ["workOrders", "WorkOrders", "work_orders"],
     entity: "job",
-    idKeys: ["workOrderId", "work_order_id", "id", "workOrderNumber"],
-    observedKeys: ["assignment.scheduledStart", "scheduledStart", "completedDate"],
+    idKeys: ["workOrderId", "workOrderNumber"],
+    observedKeys: ["scheduledStart", "scheduledEnd"],
     statusKeys: ["status"],
     fields: {
-      customerId: ["customer.customerId", "customer.id"],
-      customerName: ["customer.displayName", "customer.name"],
-      technicianId: ["assignment.technicianId"],
-      technicianName: ["assignment.techName"],
+      customerId: ["customerId"],
+      customerName: ["customerName"],
+      technicianId: ["primaryAssignment.employeeId"],
+      technicianName: ["primaryAssignment.name"],
       jobTotal: ["total", "invoiceTotal"],
-      scheduledOn: ["assignment.scheduledStart"],
-      serviceAddress: ["serviceLocation", "address"]
+      scheduledOn: ["scheduledStart"],
+      serviceAddress: ["serviceAddress"],
+      invoiceId: ["invoiceId"]
     },
-    children: [
-      { keys: ["assignment"], entity: "appointment", idKeys: ["assignmentId", "id"], observedKeys: ["scheduledStart"], fields: { technicianId: ["technicianId"], technicianName: ["techName"] } },
-      { keys: ["customer"], entity: "customer", idKeys: ["customerId", "id"], fields: { customerName: ["displayName", "name"] } },
-      { keys: ["equipment"], entity: "equipment", idKeys: ["equipmentId", "serialNumber", "id"] }
-    ]
+    children: [FE_ASSIGNMENT, { keys: ["equipment"], entity: "equipment", idKeys: ["equipmentId", "serialNumber", "id"] }]
   },
-  { keys: ["customers"], entity: "customer", idKeys: ["customerId", "id"], fields: { customerName: ["displayName", "name"] } },
-  { keys: ["invoices"], entity: "invoice", idKeys: ["invoiceId", "invoiceNumber", "id"], observedKeys: ["invoiceDate"], statusKeys: ["status"], fields: { invoiceTotal: ["total"], customerId: ["customerId"] } },
-  { keys: ["estimates"], entity: "estimate", idKeys: ["estimateId", "id"], statusKeys: ["status"], fields: { jobTotal: ["total"], customerId: ["customerId"] } },
-  { keys: ["technicians"], entity: "technician", idKeys: ["technicianId", "id"], fields: { technicianName: ["name", "techName"] } },
+  FE_ASSIGNMENT,
+  { keys: ["customers"], entity: "customer", idKeys: ["id", "customerId"], observedKeys: ["updatedAt"], fields: { customerName: ["displayName", "companyName", "lastName"] } },
+  { keys: ["invoices"], entity: "invoice", idKeys: ["invoiceId"], observedKeys: ["dateAdded"], statusKeys: ["status"], fields: { invoiceTotal: ["total"], customerId: ["customerId"], customerName: ["customerName"], jobId: ["workOrderId"] } },
+  { keys: ["quotes", "estimates"], entity: "estimate", idKeys: ["id"], statusKeys: ["status"], fields: { jobTotal: ["total"], customerId: ["customerId"], customerName: ["customerName"], jobId: ["workOrderId"] } },
+  { keys: ["employees", "technicians"], entity: "technician", idKeys: ["id"], fields: { technicianName: ["name"] } },
   { keys: ["equipment"], entity: "equipment", idKeys: ["equipmentId", "serialNumber", "id"] }
 ];
 
@@ -233,10 +242,46 @@ export const PLATFORM_MAPPINGS: Record<PlatformKind, CollectionMap[]> = {
   ...WAVE2_MAPPINGS
 };
 
+/**
+ * Platform CSV columns that a vendor (or a competitor's migration guide) publishes.
+ * Only published column lists live here; everything else uses the generic header aliases.
+ */
+export const PLATFORM_CSV_COLUMNS: Partial<Record<PlatformKind, CsvColumnOverrides>> = {
+  // FieldPulse Job Report default columns: https://help.fieldpulse.com/reporting/raw-data/job-reports.md
+  fieldpulse: {
+    job: {
+      id: ["#id"],
+      customerName: ["customer"],
+      status: ["status"],
+      observed: ["start date/time", "created at"],
+      serviceAddress: ["location"],
+      technicianName: ["assigned team members"],
+      jobTotal: ["total invoice amount"]
+    }
+  },
+  // mHelpDesk CustomerList.csv / ContactsList.csv / InvoiceList.csv report columns:
+  // https://help.servicetitan.com/docs/export-your-mhelpdesk-data
+  // Customer import template: http://forum.mhelpdesk.com/en/articles/854355-import-your-customer-and-service-location-databases
+  mhelpdesk: {
+    customer: {
+      id: ["id"],
+      customerName: ["name", "customername", "customer"],
+      serviceAddress: ["address 1", "address1"],
+      observed: ["creation date"]
+    },
+    invoice: {
+      id: ["invoice number"],
+      customerName: ["customer name"],
+      observed: ["issued date"],
+      jobTotal: ["amount"]
+    }
+  }
+};
+
 /** Map a platform export or live-pull document. CSV rows arrive as { records: [...] }. */
 export function mapPlatformDocument(kind: PlatformKind, doc: Record<string, unknown>, fileName?: string): PlatformRecord[] {
   const mapped = mapCollections(doc, PLATFORM_MAPPINGS[kind]);
   if (mapped.length) return mapped;
   const records = Array.isArray(doc.records) ? doc.records.filter(isRecord) : [];
-  return records.length ? mapCsvRows(records, fileName) : [];
+  return records.length ? mapCsvRows(records, fileName, PLATFORM_CSV_COLUMNS[kind]) : [];
 }

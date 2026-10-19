@@ -208,7 +208,12 @@ export function csvEntityForFile(fileName: string | undefined): PlatformEntity {
   return "job";
 }
 
-const CSV_ALIASES: Record<string, string[]> = {
+export type CsvField = "id" | "status" | "observed" | "technicianName" | "technicianId" | "customerName" | "customerId" | "jobTotal" | "serviceAddress";
+
+/** Published, platform-specific CSV columns (lower-cased headers), per entity. Tried before the generic aliases. */
+export type CsvColumnOverrides = Partial<Record<PlatformEntity, Partial<Record<CsvField, string[]>>>>;
+
+const CSV_ALIASES: Record<CsvField, string[]> = {
   id: ["id", "job #", "job number", "job_number", "job id", "job_id", "work order", "work order #", "work_order_number", "wo #", "wo number", "work order no", "workorderno", "ticket #", "ticket id", "invoice #", "invoice number", "invoice_id", "estimate #", "quote #", "quote number", "customer id", "client id", "employee id", "transaction id", "payment id", "number"],
   status: ["status", "job status", "work status", "work_status", "invoice status", "quote status"],
   observed: ["date", "scheduled", "scheduled date", "scheduled start", "start", "start date", "visit date", "created", "created at", "issued date", "txn date", "completed"],
@@ -228,25 +233,27 @@ function csvPick(row: Record<string, unknown>, aliases: string[]): string {
   return "";
 }
 
-export function mapCsvRows(rows: Record<string, unknown>[], fileName: string | undefined): PlatformRecord[] {
+export function mapCsvRows(rows: Record<string, unknown>[], fileName: string | undefined, overrides?: CsvColumnOverrides): PlatformRecord[] {
   const entity = csvEntityForFile(fileName);
+  const own = overrides?.[entity] ?? {};
+  const aliases = (field: CsvField): string[] => [...(own[field] ?? []), ...CSV_ALIASES[field]];
   return rows.map((row, index) => {
     const raw: Record<string, unknown> = { ...row };
     for (const key of ["technicianName", "technicianId", "customerName", "customerId", "serviceAddress"] as const) {
       if (entity === "technician" && key === "technicianName") continue;
-      const value = csvPick(row, CSV_ALIASES[key]!);
+      const value = csvPick(row, aliases(key));
       if (value && raw[key] == null) raw[key] = value;
     }
-    const total = csvPick(row, CSV_ALIASES.jobTotal!);
+    const total = csvPick(row, aliases("jobTotal"));
     if (total) {
       const money = moneyValue(total, false);
       if (money !== undefined) raw[entity === "job" ? "jobTotal" : "amount"] = money;
     }
     return {
       entity,
-      externalId: csvPick(row, CSV_ALIASES.id!) || `row-${entity}-${index + 1}`,
-      observedAt: csvPick(row, CSV_ALIASES.observed!) || undefined,
-      status: csvPick(row, CSV_ALIASES.status!) || undefined,
+      externalId: csvPick(row, aliases("id")) || `row-${entity}-${index + 1}`,
+      observedAt: csvPick(row, aliases("observed")) || undefined,
+      status: csvPick(row, aliases("status")) || undefined,
       raw
     };
   });

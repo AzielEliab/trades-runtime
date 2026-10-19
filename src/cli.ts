@@ -286,6 +286,7 @@ export function platformsText(): string {
     const spec = PLATFORM_SPECS[kind];
     lines.push(`${kind} — ${spec.label}`);
     lines.push(`    folder ${spec.inboundDir}/  live pull ${spec.api.livePull ? "documented public API (read-only, optional)" : "none (file drop only)"}  write-back ${spec.writebackPermission} (approval gate, default off)`);
+    lines.push(`    mapping ${spec.mappingConfidence}${spec.mappingConfidence === "documented" ? "" : " (confirm with a real export)"}: ${spec.mappingSources.join(", ")}`);
     lines.push(`    ${spec.honesty}`);
   }
   lines.push("");

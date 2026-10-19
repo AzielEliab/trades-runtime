@@ -4,6 +4,7 @@ import type { AgreementBoard } from "../modules/agreements.js";
 import type { WarrantyClaimBoard } from "../modules/warranty-claims.js";
 import type { TruckStockBoard } from "../modules/truck-stock-plan.js";
 import type { CallbackRootCauseBoard, Rollup } from "../modules/callback-root-cause.js";
+import { PLATFORM_KINDS, PLATFORM_SPECS } from "../spine/platforms/catalog.js";
 
 function esc(value: unknown): string {
   return String(value ?? "")
@@ -153,6 +154,27 @@ export function renderCallbacksPanel(board: CallbackRootCauseBoard): string {
     </section>`;
 }
 
+/** Platform peers with their mode and mapping confidence, so an adopter sees which mappers need a real export to confirm. */
+export function renderPlatformPeersPanel(): string {
+  const rows = PLATFORM_KINDS.map((kind) => {
+    const spec = PLATFORM_SPECS[kind];
+    const confirm = spec.mappingConfidence === "documented" ? "—" : "yes: drop a real export and check the mapped fields";
+    return `<tr data-platform="${esc(kind)}" data-mapping-confidence="${esc(spec.mappingConfidence)}">
+        <td>${esc(spec.label)}</td><td><code>${esc(spec.inboundDir)}/</code></td><td>${spec.api.livePull ? "file drop + read-only pull" : "file drop only"}</td>
+        <td><strong>${esc(spec.mappingConfidence)}</strong></td><td>${confirm}</td>
+        <td>${spec.mappingSources.map((url) => `<a href="${esc(url)}" rel="noreferrer">${esc(url.replace(/^https?:\/\//, "").split("/")[0])}</a>`).join(", ")}</td>
+      </tr>`;
+  }).join("");
+  return `<section class="panel lift" id="platform-peers" data-view="section:platform-peers">
+      <h2>Platform peers and mapping confidence</h2>
+      <p class="quiet">documented: the mapper's field names were checked against the vendor's published schema. partial: some field names come from a published source. guessed: no published field list was found. None of these has been tested against a live tenant. Every admitted row is MEDIUM, UNVERIFIED.</p>
+      <div class="table-scroll"><table>
+        <thead><tr><th>Platform</th><th>Folder</th><th>Mode</th><th>Mapping</th><th>Needs a real export to confirm</th><th>Sources</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table></div>
+    </section>`;
+}
+
 export function renderModulePanels(boards: Record<string, unknown>): string {
   const out: string[] = [];
   if (boards.refrigerant) out.push(renderRefrigerantPanel(boards.refrigerant as RefrigerantBoard));
@@ -161,5 +183,6 @@ export function renderModulePanels(boards: Record<string, unknown>): string {
   if (boards.warranty_claims) out.push(renderWarrantyClaimsPanel(boards.warranty_claims as WarrantyClaimBoard));
   if (boards.truck_stock) out.push(renderTruckStockPanel(boards.truck_stock as TruckStockBoard));
   if (boards.callbacks) out.push(renderCallbacksPanel(boards.callbacks as CallbackRootCauseBoard));
+  out.push(renderPlatformPeersPanel());
   return out.join("\n    ");
 }

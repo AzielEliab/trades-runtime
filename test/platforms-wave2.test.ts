@@ -161,7 +161,7 @@ describe("wave-2 live pull (fake fetch only; never a live tenant)", () => {
       now: () => new Date(RECEIVED)
     });
     expect(ok.outcome).toBe("pulled");
-    expect(seen[0]!.url).toBe("https://synthetic.simprosuite.com/api/v1.0/companies/0/jobs/?pageSize=25");
+    expect(seen[0]!.url).toBe("https://synthetic.simprosuite.com/api/v1.0/companies/0/jobs/?pageSize=25&columns=ID,Name,Stage,Status,Customer,Site,Technician,DateIssued,CompletedDate,DateModified,Total");
     expect(seen[0]!.headers.Authorization).toBe("Bearer x");
   });
 
