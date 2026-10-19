@@ -1,3 +1,4 @@
+import { buildMappingCheckBoard, renderMappingCheckPanel } from "./mapping-check.js";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { join } from "node:path";
 import { defaultCoverageLayersPath, writeCoverageLayer } from "../domain/coverage-map.js";
@@ -1027,6 +1028,7 @@ export function startOperatorDesk(options: DeskServerOptions = {}): Promise<Desk
       let modulesHtml = "";
       try {
         modulesHtml = renderModulePanels(buildModuleBoards({ cwd, instanceId, now: options.now ?? new Date().toISOString(), config: options.config }));
+        modulesHtml += `\n    ${renderMappingCheckPanel(buildMappingCheckBoard(cwd, instanceId, options.config))}`;
       } catch (error) {
         modulesHtml = `<section class="panel"><p class="quiet">Local modules not shown: ${String(error instanceof Error ? error.message : error).replaceAll("<", "&lt;")}</p></section>`;
       }

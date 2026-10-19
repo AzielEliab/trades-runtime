@@ -301,3 +301,20 @@ Kickserv's API is XML over HTTP. It is documented in its Swagger definition (`ht
 - The token is the employee API token from Kickserv's employee management page, and it needs the Premium plan. It is sent as HTTP Basic, with the token as both user name and password. Kickserv documents that changing the employee's password changes the token.
 - `accountSlug` is the name right after `app.kickserv.com/`. It is not a secret.
 - The pull makes only GET requests: jobs (with `include=customer,employees`), customers, employees, and items. Each returns the first page of 30. The Swagger lists parameters and fields, but it does not publish the XML envelope. The reader therefore accepts both `<jobs type="array"><job/></jobs>` and `<jobs><job/></jobs>`.
+
+## Your own export (TR-PLATFORMS-USER-EXPORTS-2026-10-19)
+
+The export path is adopter-driven. This repo ships no shop exports. Each shop drops its own CSV or JSON export into `data/inbound/<kind>/`, where it stays local and gitignored. Fixtures under `test/fixtures/` are synthetic.
+
+Guessed and partial mappings are confirmed by each shop's own export, not by this repo. Mapping confidence (documented / partial / guessed) describes the built-in mapper only.
+
+How to add or fix a mapping:
+
+1. Drop your export into `data/inbound/<kind>/` (for example `data/inbound/successware/calls.csv`).
+2. Run `npm run mapping:check -- <kind> <file>`. It lists the matched fields (with the column each came from and whether it came from your override, the platform's published columns, or the generic aliases), the unmatched columns, and any missing required fields (`id` always; also `observed` for jobs, appointments, and invoices). It exits 2 while a required field is missing. It writes a starter override from the file's headers to `data/runtime/<instanceId>/mappings/<kind>.json`. If that file already exists, the starter goes to `<kind>.starter.json` instead; an existing override is never overwritten. Use `--no-write` to skip the starter.
+3. Edit the override. For CSV, `csv.<entity>.<field>` lists your lower-cased header names. The fields are `id`, `status`, `observed`, `technicianName`, `technicianId`, `customerName`, `customerId`, `jobTotal`, and `serviceAddress`. `csvEntity` maps part of a file name to an entity. For JSON, `collections[]` gives the `path` to your list, the `entity`, the `id` and `observed`/`status` paths, and `fields` (normalized key → your paths). See `data/runtime/mapping-override.json.example` (synthetic).
+4. Re-run the check. The override takes priority over the built-in mapper in the desk, the modules, and every admit. Admitted files show profile `<kind>+local-override` (or `<kind>-csv+local-override`). A malformed override is reported and ignored, never guessed at.
+
+The desk shows the same check in "Your exports: mapping check" for every file in a platform folder. That panel is read-only and never writes a starter.
+
+Override files live under `data/runtime/`, which is gitignored (`data/**`). No tenant data is committed. Everything stays local: `live_backends` is false, it has not been tested against a live tenant, and admitted rows stay UNVERIFIED.

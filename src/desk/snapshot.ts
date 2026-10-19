@@ -1,3 +1,4 @@
+import { loadMappingOverrides } from "../spine/platforms/mapping-override.js";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describeConfidence, type ConfidenceSeparation } from "../core/confidence.js";
@@ -937,7 +938,8 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
     options.folders ??
     inboundFolders(cwd, config);
 
-  const admitted = folders.flatMap((folder) => admitDropInFolder(folder.dir, { preferClass: folder.preferClass }).files);
+  const mappingOverrides = loadMappingOverrides(cwd, options.instanceId ?? config?.instanceId ?? defaultLocalInboundConfig().instanceId).overrides;
+  const admitted = folders.flatMap((folder) => admitDropInFolder(folder.dir, { preferClass: folder.preferClass, mappingOverrides }).files);
   const collected = collect(admitted, now);
   const hasByo = collected.inbound.length > 0;
   const syntheticFiles = hasByo && collected.inbound.every((row) => row.synthetic);

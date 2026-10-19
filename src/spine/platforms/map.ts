@@ -217,7 +217,7 @@ export type CsvField = "id" | "status" | "observed" | "technicianName" | "techni
 /** Published, platform-specific CSV columns (lower-cased headers), per entity. Tried before the generic aliases. */
 export type CsvColumnOverrides = Partial<Record<PlatformEntity, Partial<Record<CsvField, string[]>>>>;
 
-const CSV_ALIASES: Record<CsvField, string[]> = {
+export const CSV_ALIASES: Record<CsvField, string[]> = {
   id: ["id", "job #", "job number", "job_number", "job id", "job_id", "work order", "work order #", "work_order_number", "wo #", "wo number", "work order no", "workorderno", "call id", "call_id", "call #", "ticket #", "ticket id", "invoice #", "invoice number", "invoice_id", "estimate #", "quote #", "quote number", "customer id", "client id", "employee id", "transaction id", "payment id", "number"],
   status: ["status", "job status", "work status", "work_status", "invoice status", "quote status"],
   observed: ["date", "scheduled", "scheduled date", "scheduled_date", "scheduled start", "start", "start date", "visit date", "created", "created at", "issued date", "txn date", "completed"],
@@ -237,8 +237,13 @@ function csvPick(row: Record<string, unknown>, aliases: string[]): string {
   return "";
 }
 
-export function mapCsvRows(rows: Record<string, unknown>[], fileName: string | undefined, overrides?: CsvColumnOverrides): PlatformRecord[] {
-  const entity = csvEntityForFile(fileName);
+export function mapCsvRows(
+  rows: Record<string, unknown>[],
+  fileName: string | undefined,
+  overrides?: CsvColumnOverrides,
+  entityOverride?: PlatformEntity
+): PlatformRecord[] {
+  const entity = entityOverride ?? csvEntityForFile(fileName);
   const own = overrides?.[entity] ?? {};
   const aliases = (field: CsvField): string[] => [...(own[field] ?? []), ...CSV_ALIASES[field]];
   return rows.map((row, index) => {

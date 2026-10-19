@@ -268,6 +268,8 @@ You can also pull data yourself with `npm run pull -- <platform>`. This is a rea
 
 Each platform also carries a mapping confidence: `documented`, `partial`, or `guessed`. Documented: FieldEdge, Workiz, ServiceTrade. Partial: FieldPulse, Kickserv, mHelpDesk, Simpro, and the platforms not re-checked in this pass. Guessed: Successware, BuildOps, Wintac. The desk platform list shows which mappers need a real shop export to confirm. Sources and details are in `data/inbound/README.md`.
 
+Shop exports are supplied by each shop; none ship in this repo. Drop your own export into `data/inbound/<kind>/`, then run `npm run mapping:check -- <kind> <file>`. It reports the matched, unmatched, and missing required fields and writes a starter override to `data/runtime/<instanceId>/mappings/<kind>.json`. That file is local and gitignored, and it wins over the built-in mapper. Guessed mappings are confirmed by your export, not by this repo. See "Your own export" in `data/inbound/README.md`.
+
 All of this is tested against fixtures only. **Not tested against a live tenant.** Each platform's `<kind>.writeback` goes through the approval gate. It is off by default and asks yes or no on every call. When no backend is configured, it returns `no-backend-configured`. It never reports a success that didn't happen. Run `npm run platforms` to list them.
 
 ## Local compliance, revenue, and ops modules (TR-MODULES-2026-10-19)

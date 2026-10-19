@@ -3,7 +3,8 @@ import { dirname, isAbsolute, join } from "node:path";
 import { admitDropInFolder } from "../spine/drop-in.js";
 import { sanitizeInstanceId } from "../spine/runtime-isolate.js";
 import { parseLocalInboundConfig, type LocalInboundConfig } from "../spine/local-inbound-config.js";
-import { inboundFolders } from "../desk/snapshot.js";
+import { inboundFolders, resolveOperatorInstanceId } from "../desk/snapshot.js";
+import { loadMappingOverrides } from "../spine/platforms/mapping-override.js";
 
 /**
  * Shared plumbing for the local compliance, revenue, and ops modules.
@@ -165,11 +166,12 @@ function loadConfig(cwd: string): LocalInboundConfig | undefined {
 }
 
 /** Admitted inbound rows with their mapped payload. Re-admits through FragGate; never verified. */
-export function readInboundRows(ctx: Pick<ModuleContext, "cwd" | "config">): InboundRow[] {
+export function readInboundRows(ctx: Pick<ModuleContext, "cwd" | "config"> & { instanceId?: string }): InboundRow[] {
   const config = ctx.config ?? loadConfig(ctx.cwd);
+  const mappingOverrides = loadMappingOverrides(ctx.cwd, ctx.instanceId ?? resolveOperatorInstanceId(ctx.cwd, config)).overrides;
   const out: InboundRow[] = [];
   for (const folder of inboundFolders(ctx.cwd, config)) {
-    for (const file of admitDropInFolder(folder.dir, { preferClass: folder.preferClass, keepRaw: true }).files) {
+    for (const file of admitDropInFolder(folder.dir, { preferClass: folder.preferClass, keepRaw: true, mappingOverrides }).files) {
       if (!file.result.ok) continue;
       for (const record of file.result.records) {
         out.push({
