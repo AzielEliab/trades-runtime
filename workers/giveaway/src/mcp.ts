@@ -16,7 +16,8 @@ interface JsonRpcRequest {
 const TOOLS = [
   {
     name: "trades_runtime_health",
-    description: "Trades-Runtime giveaway health. Read-only. Does not increment counters.",
+    description:
+      "Trades-Runtime giveaway health. Read-only. Does not increment counters. This public Worker holds no tenant data and never writes. Writes exist only in the local runtime on the operator machine, where each write requires operator approval and is off by default.",
     inputSchema: { type: "object", properties: {}, additionalProperties: false }
   },
   {

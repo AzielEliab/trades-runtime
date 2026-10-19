@@ -36,9 +36,13 @@ export interface ServiceTitanShadowIngest {
   stId: string;
 }
 
+/**
+ * This shadow ingest client never writes. Write-back goes only through the approval gate
+ * (src/approvals/gate.ts): writes require operator approval; default off.
+ */
 export const SERVICE_TITAN_WRITES_ENABLED = false;
 
-/** Read-only client. Write methods are not part of the compiled surface. */
+/** Ingest-only client. Write methods are not part of this compiled surface; approved write-back lives in src/approvals/. */
 export interface ServiceTitanShadowClient {
   ingest(record: ServiceTitanShadowRecord): ServiceTitanShadowIngest;
   readonly writes: false;
@@ -128,11 +132,11 @@ export function openServiceTitanShadowClient(): ServiceTitanShadowClient {
 }
 
 export function refuseServiceTitanWrite(op: string): never {
-  throw new Error(`live ServiceTitan writes are refused (${op})`);
+  throw new Error(`live ServiceTitan writes are refused without operator approval (${op}); request the write through the approval gate (src/approvals/gate.ts)`);
 }
 
 export function refuseServiceTitanWriteMethod(method: ServiceTitanWriteMethod): never {
-  throw new Error(`live ServiceTitan writes are refused (${method})`);
+  throw new Error(`live ServiceTitan writes are refused without operator approval (${method}); request the write through the approval gate (src/approvals/gate.ts)`);
 }
 
 export function mayWriteServiceTitan(): false {

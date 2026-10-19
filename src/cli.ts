@@ -13,6 +13,17 @@ import { runOptionCPilotStart } from "./spine/option-c-pilot-start.js";
 import { runOptionCPrep } from "./spine/option-c-prep.js";
 import { printFieldShadow } from "./shadow/field-try.js";
 import { printOfficeShadow } from "./shadow/office-try.js";
+import { userInfo } from "node:os";
+import { ApprovalGate } from "./approvals/gate.js";
+import {
+  enabledPermissions,
+  isWritePermission,
+  loadPermissionSettings,
+  PERMISSIONS_NOTE,
+  savePermissionSettings,
+  type WritePermission
+} from "./approvals/permissions.js";
+import { resolveOperatorInstanceId } from "./desk/snapshot.js";
 
 function flagValue(argv: string[], name: string): string | undefined {
   const index = argv.indexOf(name);
@@ -62,9 +73,14 @@ export function helpText(): string {
     "  npx tsx src/cli.ts pilot-prep            Option C box prep receipt (does not start the pilot)",
     "  npx tsx src/cli.ts pilot-start --branch <branchId>",
     "                                    human Option C start on this isolate only",
+    "  npx tsx src/cli.ts approvals [--all]     list write approvals (pending by default)",
+    "  npx tsx src/cli.ts approve <id> yes|no   operator yes/no for one pending write (npm run approve -- <id> yes|no)",
+    "  npx tsx src/cli.ts permissions [--mode all|selected] [--enable p] [--disable p] [--auto-approve on|off] [--ttl seconds]",
+    "                                    show or change write permissions (data/runtime/<instanceId>/permissions.json)",
     "",
+    "Writes require operator approval; default off. Default is selected mode with nothing enabled.",
     "softwares also accepts Softwares in any letter case.",
-    "BYO local ServiceTitan, ProBooks, and trades-app inbound. No live writes. Credentials stay on this machine.",
+    "BYO local ServiceTitan, ProBooks, and trades-app inbound. Write-back only after operator approval and only with a locally configured backend. Credentials stay on this machine.",
     "Local Softwares 1.0 is not a Field 1.0 claim and it is not a live company OS.",
     "shadow-field and shadow-office read the operator desk snapshot. They share data/runtime/<instanceId>/field-events.jsonl and the job price record. They do not start a pilot.",
     "Option C code-ready / pilot not started until a human runs pilot-start --branch <branchId> on this box.",
@@ -122,7 +138,18 @@ export type CliPlan =
   | { kind: "pilot-prep"; cwd: string }
   | { kind: "pilot-start"; cwd: string; branchIds: string[]; claimCompany: boolean }
   | { kind: "shadow-desk"; role: "field" | "office"; cwd: string }
-  | { kind: "desk"; port: number; cwd: string };
+  | { kind: "desk"; port: number; cwd: string }
+  | { kind: "approvals"; cwd: string; all: boolean }
+  | { kind: "approve"; cwd: string; approvalId: string; decision: string; by: string }
+  | {
+      kind: "permissions";
+      cwd: string;
+      mode?: string;
+      enable: string[];
+      disable: string[];
+      autoApprove?: string;
+      ttl?: string;
+    };
 
 function commandName(raw: string | undefined): string | undefined {
   if (raw === undefined || raw === "help" || raw === "--help" || raw === "-h") return "help";
@@ -141,7 +168,10 @@ function commandName(raw: string | undefined): string | undefined {
     raw === "pilot-start" ||
     raw === "shadow-field" ||
     raw === "shadow-office" ||
-    raw === "desk"
+    raw === "desk" ||
+    raw === "approvals" ||
+    raw === "approve" ||
+    raw === "permissions"
   ) {
     return raw;
   }
@@ -204,6 +234,30 @@ export function planCli(argv: string[]): CliPlan {
       cwd: flagValue(argv, "--root") ?? process.cwd(),
       branchIds: flagValues(argv, "--branch"),
       claimCompany: argv.includes("--claim-company")
+    };
+  }
+  if (name === "approvals") {
+    return { kind: "approvals", cwd: flagValue(argv, "--root") ?? process.cwd(), all: argv.includes("--all") };
+  }
+  if (name === "approve") {
+    const positional = argv.slice(3).filter((value, index, list) => !value.startsWith("--") && !(list[index - 1] ?? "").startsWith("--"));
+    return {
+      kind: "approve",
+      cwd: flagValue(argv, "--root") ?? process.cwd(),
+      approvalId: positional[0] ?? "",
+      decision: (positional[1] ?? "").toLowerCase(),
+      by: flagValue(argv, "--by") ?? ""
+    };
+  }
+  if (name === "permissions") {
+    return {
+      kind: "permissions",
+      cwd: flagValue(argv, "--root") ?? process.cwd(),
+      mode: flagValue(argv, "--mode"),
+      enable: flagValues(argv, "--enable"),
+      disable: flagValues(argv, "--disable"),
+      autoApprove: flagValue(argv, "--auto-approve"),
+      ttl: flagValue(argv, "--ttl")
     };
   }
   const port = Number(flagValue(argv, "--port") ?? "4174");
@@ -283,11 +337,19 @@ function main(argv: string[]): void {
     }
     return;
   }
+  if (plan.kind === "approvals" || plan.kind === "approve" || plan.kind === "permissions") {
+    runApprovalCommand(plan).catch((error: unknown) => {
+      process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
+      process.exitCode = 1;
+    });
+    return;
+  }
   startOperatorDesk({ port: plan.port, cwd: plan.cwd })
     .then((desk) => {
       process.stdout.write(
         [
-          `trades-runtime operator desk ${desk.url} (local only, live_backends false, writes refused)`,
+          `trades-runtime operator desk ${desk.url} (local only, live_backends false, writes require operator approval; default off)`,
+          "  /mcp (local MCP, write tools return a pending approval id)  /api/approvals  /api/permissions",
           "  /api/receipt  /api/huddle  /api/huddle.json  /api/stock  /api/drive  /api/performance  /api/work-together  /api/friction  /api/calls/week.json",
           "  /api/inbound-quality  /api/inbound-quality.txt  /api/alert-actions  /api/monitoring  /api/time-tracking  /api/coverage  /api/right-tech  /api/option-c-start-gate",
           "  filters: ?calls=callback | warranty | not-classified",
@@ -301,6 +363,62 @@ function main(argv: string[]): void {
       process.stderr.write(`${message}\n`);
       process.exitCode = 1;
     });
+}
+
+type ApprovalPlan = Extract<CliPlan, { kind: "approvals" | "approve" | "permissions" }>;
+
+export function cliOperatorName(by: string): string {
+  const name = by.trim() || (() => {
+    try {
+      return userInfo().username;
+    } catch {
+      return "operator";
+    }
+  })();
+  return `cli:${name.slice(0, 80)}`;
+}
+
+export async function runApprovalCommand(plan: ApprovalPlan, out: (text: string) => void = (text) => process.stdout.write(text)): Promise<void> {
+  const instanceId = resolveOperatorInstanceId(plan.cwd);
+  if (plan.kind === "approvals") {
+    const gate = new ApprovalGate({ cwd: plan.cwd, instanceId });
+    out(`${JSON.stringify({ approvals: gate.list({ includeClosed: plan.all }) }, null, 2)}\n`);
+    return;
+  }
+  if (plan.kind === "approve") {
+    if (!plan.approvalId || (plan.decision !== "yes" && plan.decision !== "no")) {
+      throw new Error("usage: npm run approve -- <approvalId> yes|no");
+    }
+    const gate = new ApprovalGate({ cwd: plan.cwd, instanceId });
+    const decided = await gate.decide({
+      approvalId: plan.approvalId,
+      decision: plan.decision,
+      decidedBy: cliOperatorName(plan.by),
+      via: "cli"
+    });
+    out(`${JSON.stringify(decided, null, 2)}\n`);
+    return;
+  }
+  const current = loadPermissionSettings(plan.cwd, instanceId).settings;
+  const changing = plan.mode !== undefined || plan.enable.length || plan.disable.length || plan.autoApprove !== undefined || plan.ttl !== undefined;
+  if (!changing) {
+    out(`${JSON.stringify({ ...current, enabled: enabledPermissions(current), note: PERMISSIONS_NOTE }, null, 2)}\n`);
+    return;
+  }
+  for (const permission of [...plan.enable, ...plan.disable]) {
+    if (!isWritePermission(permission)) throw new Error(`unknown write permission: ${permission}`);
+  }
+  const selected = new Set<WritePermission>(current.selected);
+  for (const permission of plan.enable) selected.add(permission as WritePermission);
+  for (const permission of plan.disable) selected.delete(permission as WritePermission);
+  const auto = plan.autoApprove === undefined ? current.autoApprove : plan.autoApprove === "on" || plan.autoApprove === "true";
+  const saved = savePermissionSettings(plan.cwd, instanceId, {
+    mode: plan.mode ?? current.mode,
+    selected: [...selected],
+    autoApprove: auto,
+    approvalTtlSeconds: plan.ttl === undefined ? current.approvalTtlSeconds : Number(plan.ttl)
+  });
+  out(`${JSON.stringify({ saved: saved.path, ...saved.settings, enabled: enabledPermissions(saved.settings), note: PERMISSIONS_NOTE }, null, 2)}\n`);
 }
 
 const entry = process.argv[1] ? basename(process.argv[1]) : "";

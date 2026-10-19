@@ -63,7 +63,7 @@ export function explainBookingBlock(args: {
 }): BookingBlockExplanation {
   const block = recommendBlock(args);
   const pace = `Completed calls are ${args.actual}. Expected pace at this clock is ${args.expectedPace.toFixed(2)}. Day fraction is ${args.elapsedFraction.toFixed(2)}.`;
-  const tail = "This is a local recommendation on this desk. Writes stay refused. It is not a forecast percent.";
+  const tail = "This is a local recommendation on this desk. Writes require operator approval; default off. It is not a forecast percent.";
   if (block === "CLOSED") {
     return {
       block,

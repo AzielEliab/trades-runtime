@@ -86,7 +86,7 @@ const ITEMS: readonly LocalSoftwaresGateItem[] = [
     state: "green",
     label: "Honesty flags stay off",
     detail:
-      "live_backends false. pilot_started false. field_launch false. Pages off. ServiceTitan and ProBooks writes stay refused. No fake telematics and no hosted analytics."
+      "live_backends false. pilot_started false. field_launch false. Pages off. ServiceTitan and ProBooks writes require operator approval; default off. No fake telematics and no hosted analytics."
   },
   {
     id: "desk-kept",

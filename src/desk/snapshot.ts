@@ -1115,8 +1115,8 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
   }
   alerts.push({
     severity: "info",
-    title: "Writes refused",
-    detail: "live_backends is false. ServiceTitan, ProBooks, and trades-app POST/PUT/PATCH stay refused."
+    title: "Writes require operator approval",
+    detail: "Writes require operator approval; default off. live_backends is false. ServiceTitan, ProBooks, and trades-app POST/PUT/PATCH run only after an operator yes on that one call, and only with a locally configured backend."
   });
   alerts.push({
     severity: "info",
@@ -1279,7 +1279,7 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
     formula: capacityFormula,
     assumptions: [
       "live_backends false",
-      "writes refused",
+      "writes require operator approval; default off",
       "wrapper admission is not verification",
       "prediction confidence is withheld on BYO drops",
       "callback and warranty counts are explicit labels; unknown stays not classified",
@@ -1294,7 +1294,7 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
       "collaboration suggestions come from Chain D, cross-trade, and recognition flags; revenue alone does not name a pair or a handoff",
       "employee friction is a local aggregate of handoff failures, coordination flags, explicit callbacks, and delayed handoffs; a silent export stays unknown; it is not a hosted HR system and it does not set trainingNeeded",
       "inbound quality is a local checklist for ServiceTitan and ProBooks fragments already on this machine; it is not an accuracy percent and not a tenant pull",
-      "alert action stubs are proposals only; write-back stays refused",
+      "alert action stubs are proposals only; write-back requires operator approval; default off",
       "the Option C start gate is prep only; every gate stays blocked-until; the pilot is not started",
       "monitoring pins come from an optional local file or a labeled synthetic demo; mile totals still ignore coordinates; no telematics vendor is claimed",
       "time cards, coverage shapes, and right-tech suggestions recompute from local files or a labeled synthetic demo; they are not a live GPS feed and suggestions are not a dispatch"
@@ -1485,8 +1485,8 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
     dataLabel === "synthetic-demo"
       ? "Synthetic demo on this machine. Not BYO company data. Not a live GM pilot. Miles, the ranked board, collaboration suggestions, and friction are a labeled fixture, not a telematics feed, not a company export, and not a hosted HR system. Inbound quality is a shadow checklist, not an accuracy percent and not a tenant pull. Alert actions are stubs. Option C remains prep. Monitoring is local pins, time cards, coverage, right-tech suggestions, scores, a call board, and charts on this machine. Not a live GPS feed. Suggestions are not a dispatch."
       : dataLabel === "byo-admitted-synthetic"
-        ? "BYO-admitted synthetic drill. Local files only. UNVERIFIED. Writes refused. Inbound quality stays on this machine. Alert actions are stubs. Option C remains prep. Monitoring stays on this machine. Not a live GPS feed. Suggestions are not a dispatch."
-        : "BYO-admitted local export. UNVERIFIED. Writes refused. Authoring node is not a custodian of this desk. Inbound quality stays on this machine. Alert actions are stubs. Option C remains prep. Monitoring stays on this machine. Not a live GPS feed. Suggestions are not a dispatch.";
+        ? "BYO-admitted synthetic drill. Local files only. UNVERIFIED. Writes require operator approval; default off. Inbound quality stays on this machine. Alert actions are stubs. Option C remains prep. Monitoring stays on this machine. Not a live GPS feed. Suggestions are not a dispatch."
+        : "BYO-admitted local export. UNVERIFIED. Writes require operator approval; default off. Authoring node is not a custodian of this desk. Inbound quality stays on this machine. Alert actions are stubs. Option C remains prep. Monitoring stays on this machine. Not a live GPS feed. Suggestions are not a dispatch.";
 
   return {
     product: "trades-runtime",

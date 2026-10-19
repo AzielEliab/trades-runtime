@@ -46,7 +46,7 @@ npm run pilot:prep
 npm run pilot:start -- --branch <branchId>
 ```
 
-That is the only software path that sets `pilot_started` true, and it does it on your isolate only. It refuses a missing or bad branch, prep that is not ready, and `--claim-company` when inbound is empty or only synthetic. The shipped catalog stays `pilot_started` false. Mode stays SHADOW-SEALED. Writes stay refused. The receipt is not a live company OS, not Office Softwares 1.0, and not Field 1.0.
+That is the only software path that sets `pilot_started` true, and it does it on your isolate only. It refuses a missing or bad branch, prep that is not ready, and `--claim-company` when inbound is empty or only synthetic. The shipped catalog stays `pilot_started` false. Mode stays SHADOW-SEALED. Writes require operator approval; default off. The receipt is not a live company OS, not Office Softwares 1.0, and not Field 1.0.
 
 ## Install, test, demo
 
@@ -116,12 +116,12 @@ CI (`.github/workflows/ci.yml`) runs `npm ci`, `npm run typecheck`, and `npm tes
 | Engagement rules (not an order) | `src/core/engagement-rules.ts` | live-pure |
 | One-branch shadow config | `src/core/shadow-branch.ts` | live-pure |
 | Settlement harness | `src/core/settlement-harness.ts` | live-pure |
-| ServiceTitan shadow (read-only) | `src/spine/servicetitan-shadow.ts` | live-pure |
-| ProBooks shadow (read-only, peer inbound) | `src/spine/probooks-shadow.ts` | live-pure |
+| ServiceTitan shadow (ingest-only; write-back via approval gate) | `src/spine/servicetitan-shadow.ts` | live-pure |
+| ProBooks shadow (ingest-only, peer inbound; write-back via approval gate) | `src/spine/probooks-shadow.ts` | live-pure |
 | Local BYO inbound layout | `src/spine/inbound-layout.ts` | live-pure |
 | Local inbound config (no cloud account) | `src/spine/local-inbound-config.ts` | live-pure |
 | Universal trades-app drop-in | `src/spine/drop-in.ts` | live-pure |
-| Trades-app shadow (read-only) | `src/spine/trades-app-shadow.ts` | live-pure |
+| Trades-app shadow (ingest-only; write-back via approval gate) | `src/spine/trades-app-shadow.ts` | live-pure |
 | Local human operator desk | `src/desk/` | live-pure |
 | Synthetic drop-in demo | `src/demo/drop-in.ts` | live-pure |
 | Runtime isolate (per-instance receipts) | `src/spine/runtime-isolate.ts` | live-pure |
@@ -133,7 +133,85 @@ CI (`.github/workflows/ci.yml`) runs `npm ci`, `npm run typecheck`, and `npm tes
 | Mission board clock | `src/domain/mission-board.ts` | live-pure |
 | PI wired to jobs | `src/domain/property-jobs.ts` | live-pure |
 | §18 freeze + v0.2 governing rules | `src/rules/constitution.ts` | live-pure |
-| ServiceTitan / ProBooks live writes | — | refused |
+| Write permissions (all / selected, autoApprove off) | `src/approvals/permissions.ts` | live-pure |
+| Approval gate (per-call yes/no, single-use, expiring, hash-chained log) | `src/approvals/gate.ts` | live-pure |
+| Operator-configured write-back backends | `src/approvals/backends.ts` | live-pure (no backend ships) |
+| Local MCP with approval-gated write tools | `src/approvals/local-mcp.ts` | live-pure |
+| ServiceTitan / ProBooks live writes | `src/approvals/` | operator approval required; default off; no backend configured in this repo |
+
+## Approval-gated writes
+
+Writes require operator approval; default off.
+
+Every write the runtime can make from a tool call or action goes through one gate, `src/approvals/gate.ts`. Nothing writes without an approval.
+
+1. A write tool call creates a **pending approval request** that lists the tool, the target, and a payload summary. Nothing is written yet.
+2. A local human operator answers **yes or no**, either in the **Write permissions and approvals** panel on the loopback desk (`http://127.0.0.1:4174/#approvals-board`) or from a terminal:
+
+   ```bash
+   npm run approvals                 # list pending requests
+   npm run approve -- <id> yes       # run that one call once
+   npm run approve -- <id> no        # refuse it; the refusal is recorded
+   ```
+
+3. A yes runs that one call **once**. Approvals are single-use. A pending request expires after `approvalTtlSeconds` (default 900). An expired approval fails.
+4. Every request, refusal, decision, expiry, and result is appended to `data/runtime/<instanceId>/approvals.jsonl`. That file is a hash chain built on the existing durable receipt store (`src/spine/durable-receipts.ts`). Credentials are never written to it.
+5. The requester can never approve its own request. The local MCP has no approve or deny tool. The desk's approve/deny and settings endpoints are loopback only. They need the per-process desk token embedded in the desk page, refuse any request that carries an `mcp-session-id`, and refuse cross-origin browser requests.
+
+### Permission settings
+
+The settings live in the desk panel, in `data/runtime/<instanceId>/permissions.json` (copy `data/runtime/permissions.json.example`), and in `npm run permissions`.
+
+| Mode | What it does |
+|---|---|
+| `selected` (default) | Only the permissions you pick are on. **The default is `selected` with nothing picked, which is the same as read-only.** |
+| `all` | Every write permission is on, and **each call still asks yes or no**. It skips the prompt only if you also set `autoApprove: true`. |
+
+`autoApprove` is **off by default** and only works in `all` mode. In `selected` mode it is ignored. With it on, enabled writes run without a per-call yes or no, and each one is still logged.
+
+```bash
+npm run permissions                                        # show current settings
+npm run permissions -- --enable field_events.write         # selected mode: turn one on
+npm run permissions -- --disable field_events.write
+npm run permissions -- --mode all                          # every permission on, still asks per call
+npm run permissions -- --mode all --auto-approve on        # no per-call prompt (off by default)
+```
+
+Each permission maps to one real write path in this repo:
+
+| Permission | Tool | Writes |
+|---|---|---|
+| `servicetitan.writeback` | `trades_runtime_servicetitan_writeback` | ServiceTitan API, only through an operator-configured local backend |
+| `probooks.writeback` | `trades_runtime_probooks_writeback` | ProBooks API, only through an operator-configured local backend |
+| `tradesapp.writeback` | `trades_runtime_tradesapp_writeback` | Another trades app API, only through an operator-configured local backend |
+| `alerts.ack` | `trades_runtime_alert_ack` | Acknowledges a local desk alert (`alert-state.json`) |
+| `field_flags.write` | `trades_runtime_field_flag_raise` | A local field flag under `field-flags/` |
+| `field_events.write` | `trades_runtime_field_event_record` | A clock, meal, or drive event in `field-events.jsonl` |
+
+A permission that is off returns a clear refusal, and that refusal is logged.
+
+The desk's own buttons, such as job price, clock events, flags, coverage switches, and alert acknowledge, are the operator acting directly on this machine, so they don't go through the gate. The gate covers tool calls and agent actions.
+
+### Write-back backends and credentials
+
+No backend and no credential ship in this repo. `live_backends` stays false in the committed catalog. A ServiceTitan, ProBooks, or trades-app write-back runs only when both of these are true:
+
+- the operator wrote `data/runtime/<instanceId>/write-backends.json` on their own machine (copy `data/runtime/write-backends.json.example`). It holds an https `baseUrl` and the **name** of an environment variable, never the secret itself. Inline tokens are refused.
+- the operator approved that one call.
+
+Otherwise the call returns `no-backend-configured` and writes nothing. A vendor error is reported as `vendor-error`. Neither one is ever turned into a success. The request shape (`method`, `path`, `body`) is passed to the vendor as given. This repo has not been tested against a live ServiceTitan or ProBooks tenant.
+
+### Local MCP
+
+`npm run desk` also serves JSON-RPC MCP at `POST http://127.0.0.1:4174/mcp`, loopback only. A stdio client can bridge to it:
+
+```bash
+TRADES_RUNTIME_URL=http://127.0.0.1:4174 npm run mcp
+```
+
+In `tools/list`, write tools carry `requiresApproval: true`, their `permission`, and `permissionEnabled`. Calling one returns `{ "status": "pending", "approvalId": ... }`, or a refusal when the permission is off. `trades_runtime_approvals_list` and `trades_runtime_approval_status` are read-only. The public giveaway Worker (`trades-runtime.vibelock.workers.dev`) stays read-only. It holds no tenant data, so it has nothing to write.
+
+This does not claim Field 1.0 or Office Softwares 1.0, and it does not start a pilot. `pilot_started` stays false.
 
 ## BYO inbound (TR-BYO-2026-09-17)
 
@@ -164,14 +242,14 @@ Real exports stay in the gitignored drop folders. `data/inbound/local.json` (cop
 
 ## Human operator desk
 
-The desk is the human surface. Agent MCP stays a read-only bridge without this chrome.
+The desk is the human surface. The public Worker MCP stays a read-only bridge without this chrome. On the operator machine, the desk's loopback `POST /mcp` lets an agent request writes. Writes require operator approval; default off. See [Approval-gated writes](#approval-gated-writes).
 
 ```bash
 npm run desk
 # http://127.0.0.1:4174/
 ```
 
-`npm run shadow:field` and `npm run shadow:office` print one local shadow read of that same desk snapshot. Both commands, and the desk page, read `data/runtime/<instanceId>/field-events.jsonl` (Clock in, Clock out, Start Meal, End Meal, Drive time home) and the job price record in `data/runtime/<instanceId>/job-prices.json` (typed part cost, labor, task fees, margin, locked discount). They do not keep a second event log. `live_backends` stays false. `pilot_started` stays false. This is not a Field 1.0 claim and not Office Softwares 1.0. ServiceTitan, Jobber, and other bring-your-own profiles stay read-only. Writes stay refused. A SupplyHouse price is present only when the stored sheet already has one. This read does not invent a price and does not add an order path. Property listing facts stay empty until a permitted source exists.
+`npm run shadow:field` and `npm run shadow:office` print one local shadow read of that same desk snapshot. Both commands, and the desk page, read `data/runtime/<instanceId>/field-events.jsonl` (Clock in, Clock out, Start Meal, End Meal, Drive time home) and the job price record in `data/runtime/<instanceId>/job-prices.json` (typed part cost, labor, task fees, margin, locked discount). They do not keep a second event log. `live_backends` stays false. `pilot_started` stays false. This is not a Field 1.0 claim and not Office Softwares 1.0. ServiceTitan, Jobber, and other bring-your-own profiles are ingested read-only. Writes require operator approval; default off. A SupplyHouse price is present only when the stored sheet already has one. This read does not invent a price and does not add an order path. Property listing facts stay empty until a permitted source exists.
 
 It binds to `127.0.0.1` only. The page shows job/completion charts, a capacity chart, a mission board and a tech board, a morning huddle, fulfillment progress, alerts, and scores. Callback calls, warranty calls, and a not-classified bucket sit on the metrics and the mission board. Each call row carries the classify reason when the export named a label, and says not classified when the export is silent. Filters are `?calls=callback`, `?calls=warranty`, and `?calls=not-classified` on the page, `/api/snapshot`, `/api/view`, `/api/receipt`, and the SSE stream. `/api/calls/week.json` is the trailing-week callback rate by trade lane. `/api/huddle` prints the morning huddle and `/api/huddle.json` is the same board as JSON. The huddle names trainingNeeded (severity and reason) from procedure observations. It is not a skill score. Part cost, department behavior, and truck counts are on the same page. `/api/stock` reads on-van and warehouse counts. Miles driven and drive performance sit beside a ranked employee and department performance board. `/api/drive` and `/api/performance` are the loopback JSON for those boards. An optional miles file is `data/runtime/<instanceId>/drive-miles.json` or `data/inbound/drive-miles.json`. A missing file stays unknown once a local export is admitted. The empty-folder desk labels a synthetic demo. That demo is not a company export and not a telematics feed. The rank is not a skill score and it does not set trainingNeeded. No GPS vendor is claimed. Work together lists positive collaboration from Chain D, cross-trade, and recognition flags and names who or which lane should pair or hand off for service techs when needed and for install. `/api/work-together` is that board. Employee friction rate sits on the same performance board and at `/api/friction`. It counts handoff failures, coordination flags, explicit callbacks, and delayed handoffs on this machine. A silent export stays unknown. Friction rank 1 is the highest known friction, not the best performance. It is not a hosted HR system and it does not set trainingNeeded. Those routes stay on this machine. Each score and pace band includes a short why. Current alert-rule hits export as JSON or CSV from `/api/alerts/digest.json` and `/api/alerts/digest.csv` on this machine. `/api/receipt` prints what blocked booking when a block is present, and says when nothing is blocking. [`TR-DESK-POLISH-2026-09-25`](specs/TR-DESK-POLISH-2026-09-25.txt) adds spacing and type, a light/dark theme stored in this browser (`trades-desk-theme`), a lane view, and a printable snapshot at `/api/receipt`. The lane is a slot count, or a known trade token when the export names one (`hvac`, `plumbing`, `electrical`, `sewer`, `cross-trades`). A city name is not a lane. No map is drawn. The snapshot is HTML the operator can print or save as PDF. It cites local receipt identifiers and does not include receipt bodies. Nothing on that page phones home. Scores use mission pace, the evidence trust band, verification (`UNVERIFIED`), and `recommendBlock`. Prediction confidence stays withheld on a BYO drop. The recorded synthetic shadow-day confidence appears only on the synthetic demo, labeled as a fixture. An empty inbound folder shows that synthetic demo. Dropping a file updates the next SSE tick (about 2s) and the label switches to BYO-admitted, or BYO-admitted synthetic drill when every file declares `synthetic: true`.
 
@@ -222,7 +300,7 @@ Software for Option C exists (named branch, engagement rules, sealed settlement 
 
 [`TR-OPTION-C-PREP-2026-09-25`](specs/TR-OPTION-C-PREP-2026-09-25.txt) is the operator-box checklist: local install, inbound drop folders, example config, synthetic admit, desk and alerts, SHADOW-SEALED expectations, refuse-write proof, and what not to do. `npm run pilot:prep` runs those checks and prints a receipt. `ready: true` means the machine passed. That receipt keeps `pilot_started` false. The command does not open a sealed day against company actuals and does not write to ServiceTitan, ProBooks, or a trades app.
 
-[`TR-OPTION-C-PILOT-RUNBOOK-2026-10-02`](specs/TR-OPTION-C-PILOT-RUNBOOK-2026-10-02.txt) is how an operator starts a real pilot with the shipped command. After prep is green, a person on the operator box runs `npm run pilot:start -- --branch <branchId>` (CLI `pilot-start`). One named branch is required. The command reuses the prep checks. It refuses a missing or bad branch, prep that is not ready, and `--claim-company` when inbound is empty or only synthetic. Success writes `data/runtime/<instanceId>/pilot.json` and a line on `receipts.jsonl` for that isolate only. The shipped catalog, default health, `glama.json`, and the giveaway Worker pin stay `1.0.0-local` with `pilot_started` false. Mode stays SHADOW-SEALED. `live_backends` stays false. Writes stay refused. An explicit mode change does not start the pilot. The receipt says this is not a live company OS, not Field 1.0, and not Office Softwares 1.0. Merging this documentation does not start a pilot. A human must run the command on a real prep-ready branch. [`TR-PILOT-START-2026-10-02`](specs/TR-PILOT-START-2026-10-02.txt) is the cut that shipped the command. This repository does not deploy the Worker and does not Make Release.
+[`TR-OPTION-C-PILOT-RUNBOOK-2026-10-02`](specs/TR-OPTION-C-PILOT-RUNBOOK-2026-10-02.txt) is how an operator starts a real pilot with the shipped command. After prep is green, a person on the operator box runs `npm run pilot:start -- --branch <branchId>` (CLI `pilot-start`). One named branch is required. The command reuses the prep checks. It refuses a missing or bad branch, prep that is not ready, and `--claim-company` when inbound is empty or only synthetic. Success writes `data/runtime/<instanceId>/pilot.json` and a line on `receipts.jsonl` for that isolate only. The shipped catalog, default health, `glama.json`, and the giveaway Worker pin stay `1.0.0-local` with `pilot_started` false. Mode stays SHADOW-SEALED. `live_backends` stays false. Writes require operator approval; default off. An explicit mode change does not start the pilot. The receipt says this is not a live company OS, not Field 1.0, and not Office Softwares 1.0. Merging this documentation does not start a pilot. A human must run the command on a real prep-ready branch. [`TR-PILOT-START-2026-10-02`](specs/TR-PILOT-START-2026-10-02.txt) is the cut that shipped the command. This repository does not deploy the Worker and does not Make Release.
 
 Still human/operator-only: a real ServiceTitan path on their box, a named GM, and sealed days against their actuals. The authoring node does not hold that dump. A prep receipt is not that pilot.
 

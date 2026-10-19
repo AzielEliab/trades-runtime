@@ -61,6 +61,12 @@ Env:
 
 Read-only tools on the Worker: trades_runtime_health, trades_runtime_stats,
 trades_runtime_cite, trades_runtime_skill. Not a hosted company OS.
+
+Local runtime (operator machine): start the desk (npm run desk) and bridge to
+it with TRADES_RUNTIME_URL=http://127.0.0.1:4174. Write tools there return a
+pending approval id. Writes require operator approval; default off. The
+operator answers yes or no on the desk or with npm run approve -- <id> yes|no.
+This bridge cannot approve its own requests.
 `;
 }
 

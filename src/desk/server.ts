@@ -48,17 +48,74 @@ import {
 } from "./job-price.js";
 import type { AuthorityRole } from "../core/actor-registry.js";
 import { AUTHORITY_ROLES } from "../core/actor-registry.js";
+import { randomBytes, timingSafeEqual } from "node:crypto";
+import { ApprovalGate, ApprovalRefused, type ApprovalDecision } from "../approvals/gate.js";
+import { handleLocalMcp } from "../approvals/local-mcp.js";
+import {
+  enabledPermissions,
+  loadPermissionSettings,
+  PERMISSIONS_NOTE,
+  savePermissionSettings,
+  skipsPrompt,
+  WRITE_PERMISSIONS
+} from "../approvals/permissions.js";
 
 export interface DeskServerOptions extends DeskSnapshotOptions {
   port?: number;
   host?: string;
+  /** Approval gate override (tests). Defaults to the gate for this cwd + instance. */
+  approvalGate?: ApprovalGate;
 }
 
 export interface DeskServer {
   url: string;
   port: number;
   host: string;
+  /** Per-process operator token embedded in the desk page. Required for approve/deny and settings changes. */
+  deskToken: string;
   close(): Promise<void>;
+}
+
+function tokenMatches(expected: string, given: unknown): boolean {
+  if (typeof given !== "string" || given.length !== expected.length) return false;
+  return timingSafeEqual(Buffer.from(given), Buffer.from(expected));
+}
+
+/**
+ * Operator-only desk mutation guard: loopback peer, no MCP session header,
+ * same-origin (when the browser sends Origin), and the per-process desk token.
+ */
+function operatorGuard(req: IncomingMessage, deskToken: string, port: () => number): string | null {
+  if (!isLoopbackPeer(req)) return "loopback only";
+  if (req.headers["mcp-session-id"]) return "an MCP session cannot approve, deny, or change permissions";
+  const origin = req.headers.origin;
+  if (origin) {
+    const allowed = [`http://127.0.0.1:${port()}`, `http://localhost:${port()}`];
+    if (!allowed.includes(String(origin))) return "cross-origin request refused";
+  }
+  if (!tokenMatches(deskToken, req.headers["x-trades-desk-token"])) return "desk operator token missing or wrong";
+  return null;
+}
+
+function permissionsView(cwd: string, instanceId: string) {
+  const loaded = loadPermissionSettings(cwd, instanceId);
+  return {
+    product: "trades-runtime",
+    live_backends: false,
+    pilot_started: false,
+    loopback: true,
+    path: loaded.path,
+    source: loaded.source,
+    error: loaded.error ?? null,
+    mode: loaded.settings.mode,
+    selected: loaded.settings.selected,
+    enabled: enabledPermissions(loaded.settings),
+    known: WRITE_PERMISSIONS,
+    autoApprove: loaded.settings.autoApprove,
+    perCallApproval: !skipsPrompt(loaded.settings),
+    approvalTtlSeconds: loaded.settings.approvalTtlSeconds,
+    note: PERMISSIONS_NOTE
+  };
 }
 
 function send(res: ServerResponse, status: number, body: string, type: string, extra?: Record<string, string>): void {
@@ -249,9 +306,100 @@ export function startOperatorDesk(options: DeskServerOptions = {}): Promise<Desk
     persistLocalReports: options.persistLocalReports ?? true,
     instanceId
   };
+  const gate = options.approvalGate ?? new ApprovalGate({ cwd, instanceId });
+  const deskToken = randomBytes(24).toString("hex");
+  let boundPort = port;
+  const json = "application/json; charset=utf-8";
 
   const server = createServer((req: IncomingMessage, res: ServerResponse) => {
     const url = new URL(req.url ?? "/", "http://127.0.0.1");
+    if (url.pathname === "/mcp") {
+      if (!isLoopbackPeer(req)) {
+        send(res, 403, JSON.stringify({ error: "loopback only" }), json);
+        return;
+      }
+      if (req.method !== "POST") {
+        send(res, 405, JSON.stringify({ error: "POST JSON-RPC to /mcp" }), json);
+        return;
+      }
+      const given = req.headers["mcp-session-id"];
+      const sessionId =
+        typeof given === "string" && /^[A-Za-z0-9._-]{1,128}$/.test(given) ? given : randomBytes(12).toString("hex");
+      void readBody(req, 65536)
+        .then(async (raw) => {
+          let message: unknown;
+          try {
+            message = JSON.parse(raw);
+          } catch {
+            send(res, 200, JSON.stringify({ jsonrpc: "2.0", id: null, error: { code: -32700, message: "Parse error" } }), json, {
+              "mcp-session-id": sessionId
+            });
+            return;
+          }
+          const reply = await handleLocalMcp(message as Parameters<typeof handleLocalMcp>[0], gate, sessionId);
+          if (reply === null) {
+            res.writeHead(202, { "mcp-session-id": sessionId });
+            res.end();
+            return;
+          }
+          send(res, 200, JSON.stringify(reply), json, { "mcp-session-id": sessionId });
+        })
+        .catch((error: unknown) => {
+          if (!res.headersSent) send(res, 400, JSON.stringify({ error: error instanceof Error ? error.message : String(error) }), json);
+        });
+      return;
+    }
+    if (url.pathname === "/api/permissions" && (req.method === "GET" || req.method === "HEAD")) {
+      send(res, 200, JSON.stringify(permissionsView(cwd, instanceId)), json);
+      return;
+    }
+    if (url.pathname === "/api/permissions" && req.method === "POST") {
+      const refused = operatorGuard(req, deskToken, () => boundPort);
+      if (refused) {
+        send(res, 403, JSON.stringify({ error: refused, changed: false }), json);
+        return;
+      }
+      void readBody(req, 4096)
+        .then((raw) => {
+          savePermissionSettings(cwd, instanceId, raw ? JSON.parse(raw) : {});
+          send(res, 200, JSON.stringify({ ok: true, ...permissionsView(cwd, instanceId) }), json);
+        })
+        .catch((error: unknown) => {
+          if (!res.headersSent) send(res, 400, JSON.stringify({ error: error instanceof Error ? error.message : String(error), changed: false }), json);
+        });
+      return;
+    }
+    if (url.pathname === "/api/approvals" && (req.method === "GET" || req.method === "HEAD")) {
+      const includeClosed = url.searchParams.get("all") === "1";
+      send(res, 200, JSON.stringify({ live_backends: false, loopback: true, approvals: gate.list({ includeClosed }) }), json);
+      return;
+    }
+    if (url.pathname === "/api/approvals/decide" && req.method === "POST") {
+      const refused = operatorGuard(req, deskToken, () => boundPort);
+      if (refused) {
+        send(res, 403, JSON.stringify({ error: refused, decided: false }), json);
+        return;
+      }
+      void readBody(req, 2048)
+        .then(async (raw) => {
+          const body = raw ? (JSON.parse(raw) as { approvalId?: unknown; decision?: unknown; by?: unknown }) : {};
+          const by = typeof body.by === "string" && body.by.trim() ? body.by.trim().slice(0, 80) : "operator";
+          const decided = await gate.decide({
+            approvalId: typeof body.approvalId === "string" ? body.approvalId : "",
+            // The gate rejects anything other than "yes" or "no".
+            decision: String(body.decision ?? "") as ApprovalDecision,
+            decidedBy: `desk:${by}`,
+            via: "desk"
+          });
+          send(res, 200, JSON.stringify({ ok: true, approval: decided }), json);
+        })
+        .catch((error: unknown) => {
+          const status = error instanceof ApprovalRefused ? 409 : 400;
+          const code = error instanceof ApprovalRefused ? error.code : "bad-request";
+          if (!res.headersSent) send(res, status, JSON.stringify({ error: error instanceof Error ? error.message : String(error), code, decided: false }), json);
+        });
+      return;
+    }
     if (req.method === "POST" && url.pathname === "/api/alerts/ack") {
       void readBody(req)
         .then((raw) => {
@@ -868,7 +1016,7 @@ export function startOperatorDesk(options: DeskServerOptions = {}): Promise<Desk
       return;
     }
     if (url.pathname === "/" || url.pathname === "/desk") {
-      const page = renderDeskPage(snapshotFor(deskOptions, url, req));
+      const page = renderDeskPage(snapshotFor(deskOptions, url, req), { deskToken });
       if (req.method === "HEAD") {
         res.writeHead(200, { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" });
         res.end();
@@ -885,9 +1033,11 @@ export function startOperatorDesk(options: DeskServerOptions = {}): Promise<Desk
     server.listen(port, host, () => {
       const address = server.address();
       const bound = typeof address === "object" && address ? address.port : port;
+      boundPort = bound;
       resolve({
         host,
         port: bound,
+        deskToken,
         url: `http://${host}:${bound}/`,
         close: () =>
           new Promise((done, fail) => {

@@ -42,6 +42,9 @@
     "pilot:prep": "tsx src/cli.ts pilot-prep",
     "pilot:start": "tsx src/cli.ts pilot-start",
     "health:local": "tsx src/cli.ts health-local",
+    "approvals": "tsx src/cli.ts approvals",
+    "approve": "tsx src/cli.ts approve",
+    "permissions": "tsx src/cli.ts permissions",
     "shadow:sealed-demo": "tsx src/cli.ts shadow-sealed-demo",
     "giveaway:pack": "node workers/giveaway/scripts/pack-release.mjs",
     "giveaway:test": "npm test --prefix workers/giveaway"

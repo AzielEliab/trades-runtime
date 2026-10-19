@@ -19,7 +19,9 @@ export interface HealthLocal {
   identity: "Aziel Eliab";
   surface: "health-local";
   live_backends: false;
+  /** No write runs by default. A write runs only through the approval gate after an operator yes. */
   writes: false;
+  write_policy: "Writes require operator approval; default off.";
   pages: "off";
   phone_home: false;
   central_dump: false;
@@ -72,6 +74,7 @@ function catalogHealth(): HealthLocal {
     surface: "health-local",
     live_backends: false,
     writes: false,
+    write_policy: "Writes require operator approval; default off.",
     pages: "off",
     phone_home: false,
     central_dump: false,

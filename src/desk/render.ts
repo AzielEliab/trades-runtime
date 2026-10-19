@@ -591,7 +591,7 @@ export function renderInboundQuality(snapshot: OperatorSnapshot): string {
     .join("");
   const mean = report.meanScore == null ? "none" : String(report.meanScore);
   return `<p class="quiet">${esc(report.note)}</p>
-    <p class="quiet">Source ${esc(report.source)}. Shadow / local. live_backends false. tenant pull false. checklist, not an accuracy percent. refused write-back.</p>
+    <p class="quiet">Source ${esc(report.source)}. Shadow / local. live_backends false. tenant pull false. checklist, not an accuracy percent. write-back requires operator approval; default off.</p>
     <p>Fragments <strong>${report.fragmentCount}</strong>. Mean checklist score <strong>${mean}</strong>.</p>
     <div class="charts">
       <section class="chart-card" data-view="chart:volume"><header><h3>Volume by sourceKind</h3></header>${volume}</section>
@@ -1313,7 +1313,96 @@ const DESK_STYLES = `
     }
 `;
 
-export function renderDeskPage(snapshot: OperatorSnapshot): string {
+/** Static shell for the write settings + approvals panel. The script below fills it from /api/permissions and /api/approvals. */
+export function renderApprovalsPanel(): string {
+  return `<section class="panel lift" id="approvals-board" data-az="office management" data-view="section:approvals-board">
+      <h2>Write permissions and approvals</h2>
+      <p>Writes require operator approval; default off. Default is <strong>Selected permissions</strong> with nothing selected, the same as read-only.
+      <strong>All permissions</strong> turns on every write, but each call still asks yes or no unless you also turn on auto-approve (off by default).
+      Auto-approve is ignored in Selected mode. An MCP caller can never approve its own request. Changes here are loopback only.
+      The same settings live in <code>data/runtime/&lt;instanceId&gt;/permissions.json</code>. live_backends stays false.</p>
+      <form id="permissions-form" aria-label="Write permission settings">
+        <fieldset>
+          <legend>Mode</legend>
+          <label><input type="radio" name="perm-mode" value="selected"> Selected permissions</label>
+          <label><input type="radio" name="perm-mode" value="all"> All permissions</label>
+        </fieldset>
+        <fieldset id="perm-list"><legend>Selected permissions</legend></fieldset>
+        <label><input type="checkbox" id="perm-auto"> Auto-approve every enabled write (All mode only; off by default)</label>
+        <p><button type="submit">Save settings</button> <span id="perm-state" role="status"></span></p>
+      </form>
+      <h3>Pending approvals</h3>
+      <div id="approvals-list" role="list"><p>Loading.</p></div>
+    </section>`;
+}
+
+function approvalsClientScript(): string {
+  return `
+    (function () {
+      const tokenMeta = document.querySelector('meta[name="trades-desk-token"]');
+      const token = tokenMeta ? tokenMeta.getAttribute("content") || "" : "";
+      const headers = { "content-type": "application/json", "x-trades-desk-token": token };
+      const form = document.getElementById("permissions-form");
+      const list = document.getElementById("perm-list");
+      const auto = document.getElementById("perm-auto");
+      const state = document.getElementById("perm-state");
+      const approvals = document.getElementById("approvals-list");
+      function text(value) { const span = document.createElement("span"); span.textContent = String(value); return span.innerHTML; }
+      function syncAuto() {
+        const mode = form.querySelector('input[name="perm-mode"]:checked');
+        auto.disabled = !mode || mode.value !== "all";
+        list.querySelectorAll("input").forEach((box) => { box.disabled = !!mode && mode.value === "all"; });
+      }
+      function loadPermissions() {
+        fetch("/api/permissions").then((r) => r.json()).then((view) => {
+          form.querySelectorAll('input[name="perm-mode"]').forEach((radio) => { radio.checked = radio.value === view.mode; });
+          list.innerHTML = '<legend>Selected permissions</legend>' + view.known.map((name) =>
+            '<label><input type="checkbox" data-perm="' + text(name) + '"' + (view.selected.includes(name) ? " checked" : "") + '> ' + text(name) + '</label>'
+          ).join(" ");
+          auto.checked = !!view.autoApprove;
+          state.textContent = view.perCallApproval ? "Each write asks yes or no." : "Auto-approve is on: enabled writes run without asking (still logged).";
+          syncAuto();
+        }).catch(() => { state.textContent = "Could not read settings."; });
+      }
+      function loadApprovals() {
+        fetch("/api/approvals").then((r) => r.json()).then((view) => {
+          if (!view.approvals.length) { approvals.innerHTML = "<p>No pending approvals.</p>"; return; }
+          approvals.innerHTML = view.approvals.map((a) =>
+            '<article role="listitem" data-approval="' + text(a.approvalId) + '"><strong>' + text(a.tool) + '</strong> · ' + text(a.permission) +
+            '<br>Target: ' + text(a.target) + '<br>Payload: <code>' + text(a.summary) + '</code><br>Requested by ' + text(a.requestedBy) +
+            ' · expires ' + text(a.expiresAt) + '<br><button type="button" data-decide="yes" data-id="' + text(a.approvalId) + '">Yes, run once</button> ' +
+            '<button type="button" data-decide="no" data-id="' + text(a.approvalId) + '">No</button></article>'
+          ).join("");
+        }).catch(() => { approvals.innerHTML = "<p>Could not read approvals.</p>"; });
+      }
+      form.addEventListener("change", syncAuto);
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const mode = form.querySelector('input[name="perm-mode"]:checked');
+        const selected = Array.from(list.querySelectorAll("input[data-perm]:checked")).map((box) => box.getAttribute("data-perm"));
+        fetch("/api/permissions", {
+          method: "POST",
+          headers: headers,
+          body: JSON.stringify({ mode: mode ? mode.value : "selected", selected: selected, autoApprove: auto.checked && !!mode && mode.value === "all" })
+        }).then((r) => r.json()).then((view) => { state.textContent = view.error ? view.error : "Saved."; loadPermissions(); });
+      });
+      approvals.addEventListener("click", (event) => {
+        const button = event.target instanceof Element ? event.target.closest("[data-decide]") : null;
+        if (!(button instanceof HTMLButtonElement)) return;
+        button.disabled = true;
+        fetch("/api/approvals/decide", {
+          method: "POST",
+          headers: headers,
+          body: JSON.stringify({ approvalId: button.getAttribute("data-id"), decision: button.getAttribute("data-decide"), by: "operator" })
+        }).then((r) => r.json()).then(() => loadApprovals()).catch(() => { button.disabled = false; });
+      });
+      loadPermissions();
+      loadApprovals();
+      setInterval(loadApprovals, 5000);
+    })();`;
+}
+
+export function renderDeskPage(snapshot: OperatorSnapshot, extras: { deskToken?: string } = {}): string {
   const embedded = JSON.stringify({ generatedAt: snapshot.generatedAt, dataLabel: snapshot.dataLabel }).replaceAll("<", "\\u003c");
   return `<!DOCTYPE html>
 <html lang="en" data-theme="dark" data-hints="on">
@@ -1321,6 +1410,7 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex">
+  ${extras.deskToken ? `<meta name="trades-desk-token" content="${esc(extras.deskToken)}">` : ""}
   <title>Operator desk · Trades-Runtime</title>
   <style>${DESK_STYLES}</style>
   <script>
@@ -1401,6 +1491,7 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
       <a href="#inbound-board" data-view="section:inbound-board">Inbound</a>
       <a href="#inbound-quality-board" data-view="section:inbound-quality-board">Quality</a>
       <a href="#option-c-board" data-view="section:option-c-board">Start gate</a>
+      <a href="#approvals-board" data-view="section:approvals-board">Approvals</a>
     </nav>
     ${renderDeskViewPanel(snapshot)}
     <section class="panel lift" id="aztrades" data-az="field office management" data-view="section:aztrades">
@@ -1495,8 +1586,9 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
       <h2>Option C start gate</h2>
       <div id="option-c">${renderOptionCStartGate(snapshot)}</div>
     </section>
+    ${extras.deskToken ? renderApprovalsPanel() : ""}
     <footer>
-      Human surface. Agent MCP stays a separate read-only bridge and does not carry this desk.
+      Human surface. Agent MCP on this machine (POST /mcp) can request writes; writes require operator approval; default off. The public Worker MCP stays read-only.
       Drop folders: <code>data/inbound/servicetitan</code>, <code>data/inbound/probooks</code>, <code>data/inbound/trades-app</code>.
       Optional miles file: <code>data/runtime/&lt;instanceId&gt;/drive-miles.json</code> or <code>data/inbound/drive-miles.json</code>. Copy <code>data/runtime/drive-miles.json.example</code>. No GPS vendor.
       Optional positions file: <code>data/runtime/&lt;instanceId&gt;/positions.json</code> or <code>data/inbound/positions.json</code>. Copy <code>data/runtime/positions.json.example</code>. Local or demo pins only. Not a live GPS vendor.
@@ -1517,6 +1609,7 @@ export function renderDeskPage(snapshot: OperatorSnapshot): string {
     ${deskViewClientScript()}
     ${deskHintClientScript()}
     ${aztradesActionScript()}
+    ${extras.deskToken ? approvalsClientScript() : ""}
     const THEME_KEY = "trades-desk-theme";
     function applyTheme(theme) {
       const next = theme === "light" ? "light" : "dark";
