@@ -1,6 +1,6 @@
 # MCP directory log
 
-Updated 2026-10-12 10:24 AM ET. This is the update list. Do not mark a host live until its page actually shows the server.
+Updated 2026-10-19 10:05 AM ET. This is the update list. Do not mark a host live until its page actually shows the server.
 
 Forms on 2026-10-04 used collinhorton95@gmail.com. Free plans only. No payments.
 
@@ -13,7 +13,7 @@ Forms on 2026-10-04 used collinhorton95@gmail.com. Free plans only. No payments.
 | Docker MCP Catalog | Pull request open. Remote streamable-http, no OAuth. trades-runtime only, not merged. Do not open a new Docker PR from this log. | https://github.com/docker/mcp-registry/pull/5417 |
 | mcp.directory | Submitted 2026-10-03. On 2026-10-04 the site said "This repository has already been submitted. We'll review it soon!" Public page https://mcp.directory/servers/trades-runtime is 404. Not live. | https://mcp.directory/submit |
 | mcpservers.org | Live. Public page shows the server. | https://mcpservers.org/servers/azieleliab/trades-runtime |
-| MCP Market | Submitted to the free queue 2026-10-04. Site: wait about 4–6 weeks, email when live. Public page https://mcpmarket.com/server/trades-runtime is 404. Not live. | https://mcpmarket.com/submit |
+| MCP Market | Live (confirmed 2026-10-19). Public page shows the server as "Trades Runtime" linked to github.com/AzielEliab/trades-runtime. | https://mcpmarket.com/server/trades-runtime |
 | MCPHub.space | Live. Public page shows the server. | https://www.mcphub.space/servers/trades-runtime |
 | Cursor Directory | Not live. Not publicly listed. Could not verify a public page. | https://cursor.directory/plugins/new |
 | Smithery | Not live. https://smithery.ai/servers/@AzielEliab/trades-runtime is an empty SPA shell, no real listing. | https://smithery.ai/servers/@AzielEliab/trades-runtime |
