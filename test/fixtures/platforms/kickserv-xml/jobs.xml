@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Synthetic Kickserv-shaped XML (Rails to_xml conventions). Not customer data. -->
+<jobs type="array">
+  <job>
+    <id type="integer">90001</id>
+    <job_number type="integer">1077</job_number>
+    <name>Synthetic sewer line jetting &amp; camera</name>
+    <status>scheduled</status>
+    <scheduled_on type="datetime">2026-10-20T13:00:00Z</scheduled_on>
+    <total type="decimal">145.00</total>
+    <invoice_status nil="true"/>
+    <description><![CDATA[Synthetic <main line> backup]]></description>
+    <customer>
+      <id type="integer">5001</id>
+      <customer_number type="integer">201</customer_number>
+      <name>Synthetic Customer K</name>
+      <service_address>3 Synthetic Rd</service_address>
+    </customer>
+    <employees type="array">
+      <employee>
+        <id type="integer">31</id>
+        <employee_number type="integer">7</employee_number>
+        <name>Synthetic Tech K</name>
+        <tech type="boolean">true</tech>
+      </employee>
+    </employees>
+  </job>
+  <job>
+    <id type="integer">90002</id>
+    <job_number type="integer">1078</job_number>
+    <name>Synthetic water heater swap</name>
+    <status>unscheduled</status>
+    <total type="decimal"></total>
+  </job>
+</jobs>

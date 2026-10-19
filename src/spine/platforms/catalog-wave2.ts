@@ -10,8 +10,8 @@ import type { PlatformSpec } from "./catalog.js";
  * pages that informed the pick. Review counts quoted below are counts shown
  * on those pages on 2026-10-19, not usage figures.
  *
- * Live pull ships only where the vendor documents a self-serve REST API that
- * returns JSON. Everything else is file drop only, and each spec says why.
+ * Live pull ships only where the vendor documents a self-serve REST API
+ * (JSON, or Kickserv's XML). Everything else is file drop only, and each spec says why.
  * None of these has been tested against a live tenant.
  */
 
@@ -161,17 +161,18 @@ export const WAVE2_SPECS: Record<Wave2Kind, Omit<PlatformSpec, "kind" | "writeba
     label: "Kickserv",
     idPrefix: "ks",
     inboundDir: "data/inbound/kickserv",
-    entities: ["job", "appointment", "customer", "invoice", "estimate", "technician"],
-    objectMap: { job: "job", "job.scheduled_on": "appointment", customer: "customer", invoice: "invoice", estimate: "estimate", employee: "technician" },
+    entities: ["job", "appointment", "customer", "invoice", "estimate", "technician", "pricebook"],
+    objectMap: { job: "job", "job.scheduled_on": "appointment", customer: "customer", invoice: "invoice", estimate: "estimate", employee: "technician", item: "pricebook" },
     api: {
       status: "documented-public-api",
-      livePull: false,
-      docsUrl: "https://help.kickserv.com/article/4-developer-api",
-      auth: "Employee API token over HTTP Basic auth; Premium plan only.",
-      access: "Kickserv documents an XML-over-HTTP REST API. This runtime's pull reads JSON only, so it ships file drop (CSV or JSON export) and no live pull."
+      livePull: true,
+      docsUrl: "https://app.kickserv.com/api-docs",
+      defaultBaseUrl: "https://app.kickserv.com",
+      auth: "Employee API token (Premium plan) over HTTP Basic auth, sent as both user name and password. Every path is under the account slug, so local config names accountSlug.",
+      access: "Kickserv documents an XML-over-HTTP REST API (Swagger definition at https://app.kickserv.com/api-def). This runtime reads it with a small dependency-free XML reader that refuses DOCTYPE/ENTITY declarations. 30 records per page; first page only."
     },
     writebackPermission: "kickserv.writeback",
-    honesty: `File drop only. Kickserv's documented API is XML (Premium plan); this runtime does not parse XML pulls. ${NOT_LIVE}`,
+    honesty: `File drop + documented XML REST GET pull (jobs with customer and employees, customers, employees, items; first page of 30). Needs the Premium plan and the account slug. ${NOT_LIVE}`,
     selection: {
       reason: "Small-shop service software listed among plumbing products with 387 reviews shown on Software Advice.",
       sources: [SA_PLUMBING, "https://help.kickserv.com/article/4-developer-api"]

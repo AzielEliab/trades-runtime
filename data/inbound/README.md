@@ -49,7 +49,7 @@ Six more platforms are named peer classes with their own FragGate `sourceKind` a
 | `data/inbound/servicetrade/` | ServiceTrade | job (+ location), appointment, location, invoice, quote, user, asset. Unix-second times converted. | Optional. `GET /api/job`, `GET /api/location` with an OAuth2 bearer token. |
 | `data/inbound/buildops/` | BuildOps | jobs (+ visits), customers/properties, invoices, quotes, employees, assets | None. API docs are invite-gated. |
 | `data/inbound/fieldpulse/` | FieldPulse | jobs, customers, invoices, estimates, users | Optional. REST GETs with the `x-api-key` header (token from FieldPulse support). |
-| `data/inbound/kickserv/` | Kickserv | jobs (+ customer), customers, invoices, estimates, employees | None. The documented API is XML (Premium plan); this runtime pulls JSON only. |
+| `data/inbound/kickserv/` | Kickserv | jobs (+ customer, employees), customers, invoices, estimates, employees, items | Documented XML REST GETs (`/{accountSlug}/jobs.xml`, `customers.xml`, `employees.xml`, `items.xml`; first page of 30). HTTP Basic with the employee API token as user name and password. Premium plan. |
 | `data/inbound/mhelpdesk/` | mHelpDesk | tickets, appointments, customers, invoices, estimates | None. No public API documentation found. |
 | `data/inbound/servicem8/` | ServiceM8 | Job, JobActivity (scheduled only), Company, Staff, Material | Optional. `GET /api_1.0/<object>.json` with the `X-API-Key` header. |
 | `data/inbound/simpro/` | Simpro | Job, Customer, Invoice, Quote, Employee | Optional. `GET /api/v1.0/companies/<companyId>/jobs/` on your build host with an OAuth2 bearer token. |
@@ -241,8 +241,23 @@ Successware was named by the owner. The other ten are field-service booking, dis
 | Platform | Mode |
 | --- | --- |
 | Workiz, ServiceTrade, FieldPulse, ServiceM8, Simpro, Commusoft | file drop + documented API pull (read-only GETs, first page) |
+| Kickserv | file drop + documented XML API pull (read-only GETs, first page of 30; see below) |
 | Successware, BuildOps | file drop only (no public API docs / invite-gated) |
-| Kickserv | file drop only (documented API is XML; pull reads JSON) |
 | mHelpDesk, Wintac | file drop only (no public API) |
 
 Every platform here is fixture-tested only. None has been tested against a live tenant.
+
+### Kickserv XML pull (TR-PLATFORMS-KICKSERV-2026-10-19)
+
+Kickserv's API is XML over HTTP. It is documented in its Swagger definition (`https://app.kickserv.com/api-def`, shown at `https://app.kickserv.com/api-docs`). The pull reads it with `src/spine/platforms/xml.ts`, a small reader with no dependencies. The reader refuses `DOCTYPE` and `ENTITY` declarations, so there is no external-entity fetch and no entity expansion. It caps response size and nesting depth. It follows Rails `to_xml` hints: `type="array"` becomes a list, `nil="true"` becomes null, and integer, decimal, and boolean values are coerced.
+
+```json
+"kickserv": {
+  "path": "data/inbound/kickserv",
+  "pull": { "tokenEnv": "TRADES_RUNTIME_KICKSERV_TOKEN", "accountSlug": "your-account-slug" }
+}
+```
+
+- The token is the employee API token from Kickserv's employee management page, and it needs the Premium plan. It is sent as HTTP Basic, with the token as both user name and password. Kickserv documents that changing the employee's password changes the token.
+- `accountSlug` is the name right after `app.kickserv.com/`. It is not a secret.
+- The pull makes only GET requests: jobs (with `include=customer,employees`), customers, employees, and items. Each returns the first page of 30. The Swagger lists parameters and fields, but it does not publish the XML envelope. The reader therefore accepts both `<jobs type="array"><job/></jobs>` and `<jobs><job/></jobs>`.

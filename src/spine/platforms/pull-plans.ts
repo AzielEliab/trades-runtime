@@ -22,11 +22,16 @@ export interface PullRequestPlan {
   requires?: string;
   /** Documented read-only POST (search / GraphQL query). */
   readOnlyPost?: true;
+  /** Response format. Default JSON; "xml" is parsed by the dependency-free reader in xml.ts. */
+  format?: "json" | "xml";
 }
 
 export interface PullPlan {
-  /** "Bearer" or "Token" in the Authorization header, or "Header": the token goes in authHeader (e.g. X-API-Key). */
-  authScheme: "Bearer" | "Token" | "Header";
+  /**
+   * "Bearer" or "Token" in the Authorization header; "Header": the token goes in authHeader (e.g. X-API-Key);
+   * "BasicTokenTwice": HTTP Basic with the token as both user name and password (Kickserv's documented scheme).
+   */
+  authScheme: "Bearer" | "Token" | "Header" | "BasicTokenTwice";
   /** Header that carries the token when authScheme is "Header". */
   authHeader?: string;
   /** Header name → local config field that must hold its (non-secret) value. */
@@ -114,7 +119,7 @@ export const PULL_PLANS: Partial<Record<PlatformKind, PullPlan>> = {
       { key: "invoices", method: "GET", path: "/v1/invoices?per-page={pageSize}", collect: "items" }
     ]
   },
-  // Wave 2 (TR-PLATFORMS-2-2026-10-19). Successware, BuildOps, Kickserv, mHelpDesk, and Wintac have no plan (file drop only).
+  // Wave 2 (TR-PLATFORMS-2-2026-10-19). Successware, BuildOps, mHelpDesk, and Wintac have no plan (file drop only).
   workiz: {
     authScheme: "Bearer",
     docs: "https://developer.workiz.com/v2/",
@@ -155,6 +160,19 @@ export const PULL_PLANS: Partial<Record<PlatformKind, PullPlan>> = {
     requiredFields: ["companyId"],
     docs: "https://developer.simprogroup.com/apidoc/",
     requests: [{ key: "jobs", method: "GET", path: "/api/v1.0/companies/{companyId}/jobs/?pageSize={pageSize}", collect: "" }]
+  },
+  kickserv: {
+    // Documented in Kickserv's Swagger definition (https://app.kickserv.com/api-def): XML over HTTP, Basic auth with
+    // the employee API token as user name and password, every path under the account slug, 30 records per page.
+    authScheme: "BasicTokenTwice",
+    requiredFields: ["accountSlug"],
+    docs: "https://app.kickserv.com/api-docs",
+    requests: [
+      { key: "jobs", method: "GET", path: "/{accountSlug}/jobs.xml?page=1&include=customer,employees", collect: "jobs", format: "xml" },
+      { key: "customers", method: "GET", path: "/{accountSlug}/customers.xml?page=1", collect: "customers", format: "xml" },
+      { key: "employees", method: "GET", path: "/{accountSlug}/employees.xml", collect: "employees", format: "xml" },
+      { key: "items", method: "GET", path: "/{accountSlug}/items.xml?page=1", collect: "items", format: "xml" }
+    ]
   },
   commusoft: {
     authScheme: "Bearer",
