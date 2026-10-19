@@ -21,8 +21,11 @@ import {
   type TradesAppEntity
 } from "./trades-app-shadow.js";
 import { isPlatformKind, PLATFORM_KINDS, type PlatformEntity, type PlatformKind } from "./platforms/catalog.js";
-import { mapPlatformDocument } from "./platforms/mappings.js";
+import { mapPlatformDocument, type MapperOverride } from "./platforms/mappings.js";
 import { ingestPlatformShadow } from "./platforms/shadow.js";
+
+/** Local per-platform mapping overrides (data/runtime/<instanceId>/mappings/<kind>.json), loaded by mapping-override.ts. */
+export type MappingOverrides = Partial<Record<PlatformKind, MapperOverride>>;
 
 export const DROP_IN_PEER_CLASSES = ["servicetitan", "probooks", "trades-app", ...PLATFORM_KINDS] as const;
 export type DropInPeerClass = "servicetitan" | "probooks" | "trades-app" | PlatformKind;
@@ -1281,12 +1284,14 @@ function platformTarget(doc: Record<string, unknown>, preferClass: DropInPeerCla
 function admitPlatformDocument(
   kind: PlatformKind,
   doc: Record<string, unknown>,
-  options: { receivedAt: string; fileName?: string; keepRaw?: boolean }
+  options: { receivedAt: string; fileName?: string; keepRaw?: boolean; mappingOverrides?: MappingOverrides }
 ): DropInResult {
-  const mapped = mapPlatformDocument(kind, doc, options.fileName);
+  const override = options.mappingOverrides?.[kind];
+  const mapped = mapPlatformDocument(kind, doc, options.fileName, override);
   if (!mapped.length) return refuse("FG-REFUSE-EMPTY", `${kind} drop-in contained no ${kind} records this mapper knows`);
   const via = doc.livePull === true ? "live-pull" : "file-drop";
-  const profileId = text(doc.vendor) === "generic-csv" ? `${kind}-csv` : kind;
+  const baseProfile = text(doc.vendor) === "generic-csv" ? `${kind}-csv` : kind;
+  const profileId = override ? `${baseProfile}+local-override` : baseProfile;
   const records = mapped.map((record) => admitRecord(record, kind, options.receivedAt, profileId, kind, { via, keepRaw: options.keepRaw }));
   return {
     ok: true,
@@ -1306,7 +1311,7 @@ function admitPlatformDocument(
 
 export function admitDropInDocument(
   input: unknown,
-  options: { receivedAt: string; preferClass?: DropInPeerClass; fileName?: string; keepRaw?: boolean }
+  options: { receivedAt: string; preferClass?: DropInPeerClass; fileName?: string; keepRaw?: boolean; mappingOverrides?: MappingOverrides }
 ): DropInResult {
   const detected = detectDropIn(input, { preferClass: options.preferClass, fileName: options.fileName });
   const platformDoc = coerceDoc(input);
@@ -1420,7 +1425,7 @@ export function parseCsv(text: string): { synthetic: boolean; rows: Record<strin
 
 export function admitDropInText(
   text: string,
-  options: { receivedAt: string; fileName: string; preferClass?: DropInPeerClass; keepRaw?: boolean }
+  options: { receivedAt: string; fileName: string; preferClass?: DropInPeerClass; keepRaw?: boolean; mappingOverrides?: MappingOverrides }
 ): DropInResult {
   const ext = extname(options.fileName).toLowerCase();
   if (ext === ".csv") {
@@ -1460,7 +1465,7 @@ export function listDropInFiles(dir: string): string[] {
 
 export function admitDropInFile(
   filePath: string,
-  options: { receivedAt?: string; preferClass?: DropInPeerClass; keepRaw?: boolean } = {}
+  options: { receivedAt?: string; preferClass?: DropInPeerClass; keepRaw?: boolean; mappingOverrides?: MappingOverrides } = {}
 ): DropInFileResult {
   const file = basename(filePath);
   let size = 0;
@@ -1488,13 +1493,13 @@ export function admitDropInFile(
   return {
     file,
     receivedAt,
-    result: admitDropInText(text, { receivedAt, fileName: file, preferClass: options.preferClass, keepRaw: options.keepRaw })
+    result: admitDropInText(text, { receivedAt, fileName: file, preferClass: options.preferClass, keepRaw: options.keepRaw, mappingOverrides: options.mappingOverrides })
   };
 }
 
 export function admitDropInFolder(
   dir: string,
-  options: { preferClass?: DropInPeerClass; receivedAt?: string; keepRaw?: boolean } = {}
+  options: { preferClass?: DropInPeerClass; receivedAt?: string; keepRaw?: boolean; mappingOverrides?: MappingOverrides } = {}
 ): { files: DropInFileResult[]; live: false; write: false } {
   const files = listDropInFiles(dir).map((filePath) => admitDropInFile(filePath, options));
   return { files, live: false, write: false };

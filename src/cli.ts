@@ -1,5 +1,8 @@
 #!/usr/bin/env node
-import { basename } from "node:path";
+import { asPlatformKind, checkMappingText, loadMappingOverrides, writeStarterOverride } from "./spine/platforms/mapping-override.js";
+import { existsSync, readFileSync } from "node:fs";
+import { basename, isAbsolute, join } from "node:path";
+import { parseCsv } from "./spine/drop-in.js";
 import { RUNTIME_MANIFEST } from "./manifest.js";
 import { runRecordedShadowDays } from "./demo/shadow-day.js";
 import { printByoAdmitDemo } from "./demo/byo-admit.js";
@@ -61,6 +64,8 @@ export function helpText(): string {
     "  npx tsx src/cli.ts shadow-office         local office shadow on sample branch sample-shop (fixtures, no tenant)",
     "  npx tsx src/cli.ts shadow-field          local field shadow on sample branch sample-shop (fixtures, no tenant)",
     "  npx tsx src/cli.ts desk [--port 4174]    local human operator desk (127.0.0.1)",
+    "  npm run mapping:check -- <kind> <file>   check your own export against the mapper; writes a starter",
+    "                                    data/runtime/<instanceId>/mappings/<kind>.json (local, gitignored, wins over built-in)",
     "  npx tsx src/cli.ts shadow-field [--root dir]",
     "                                    local shadow read of the desk field-events list and job price",
     "  npx tsx src/cli.ts shadow-office [--root dir]",
@@ -179,6 +184,7 @@ function commandName(raw: string | undefined): string | undefined {
     raw === "approve" ||
     raw === "permissions" ||
     raw === "platforms" ||
+    raw === "mapping-check" ||
     raw === "pull"
   ) {
     return raw;
@@ -245,6 +251,10 @@ export function planCli(argv: string[]): CliPlan {
     };
   }
   if (name === "platforms") return { kind: "text", exitCode: 0, text: platformsText() };
+  if (name === "mapping-check") {
+    const positional = argv.slice(3).filter((value, index, list) => !value.startsWith("--") && list[index - 1] !== "--root");
+    return mappingCheckPlan(positional[0] ?? "", positional[1] ?? "", flagValue(argv, "--root") ?? process.cwd(), argv.includes("--no-write"));
+  }
   if (name === "pull") {
     const platform = argv.slice(3).find((value) => !value.startsWith("--")) ?? "";
     return { kind: "pull", cwd: flagValue(argv, "--root") ?? process.cwd(), platform };
@@ -278,6 +288,36 @@ export function planCli(argv: string[]): CliPlan {
     throw new Error("desk --port must be an integer from 0 to 65535");
   }
   return { kind: "desk", port, cwd: flagValue(argv, "--root") ?? process.cwd() };
+}
+
+/** `npm run mapping:check -- <kind> <file>`: matched / unmatched / missing-required fields, plus a starter override. */
+export function mappingCheckPlan(kindArg: string, fileArg: string, cwd: string, noWrite: boolean): CliPlan {
+  const usage = "Usage: npm run mapping:check -- <kind> <file> [--root dir] [--no-write]\nKinds: " + PLATFORM_KINDS.join(", ");
+  const kind = asPlatformKind(kindArg);
+  if (!kind || !fileArg) return { kind: "text", exitCode: 1, text: `${usage}\n` };
+  const path = isAbsolute(fileArg) ? fileArg : join(cwd, fileArg);
+  if (!existsSync(path)) return { kind: "text", exitCode: 1, text: `File not found: ${fileArg}\n${usage}\n` };
+  const instanceId = resolveOperatorInstanceId(cwd);
+  const loaded = loadMappingOverrides(cwd, instanceId);
+  let check;
+  try {
+    check = checkMappingText(kind, path, readFileSync(path, "utf8"), loaded.overrides[kind], parseCsv);
+  } catch (error) {
+    return { kind: "text", exitCode: 1, text: `${(error as Error).message}\n` };
+  }
+  const lines = [
+    `mapping check: ${PLATFORM_SPECS[kind].label} (${kind}), file ${check.file}, ${check.format}${check.entity ? `, entity ${check.entity}` : ""}${check.collection ? `, list ${check.collection}` : ""}, ${check.rows} rows`,
+    `built-in mapping confidence: ${check.mappingConfidence}${check.overrideFile ? `; local override in use: ${check.overrideFile}` : "; no local override"}`,
+    ...loaded.errors.map((row) => `override error (ignored): ${row.file}: ${row.error}`),
+    "matched:",
+    ...(check.matched.length ? check.matched.map((row) => `  ${row}`) : ["  none"]),
+    `unmatched columns: ${check.unmatchedColumns.join(", ") || "none"}`,
+    `missing required: ${check.missingRequired.join(", ") || "none"}`,
+    ...check.notes.map((note) => `note: ${note}`)
+  ];
+  if (!noWrite) lines.push(`starter override written: ${writeStarterOverride(cwd, instanceId, check)} (local, gitignored; edit it, then re-run)`);
+  lines.push("Local only. Not tested against a live tenant.");
+  return { kind: "text", exitCode: check.missingRequired.length ? 2 : 0, text: `${lines.join("\n")}\n` };
 }
 
 export function platformsText(): string {

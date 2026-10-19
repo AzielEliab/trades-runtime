@@ -1,0 +1,24 @@
+{
+  "note": "EXAMPLE (synthetic). Copy to data/runtime/<instanceId>/mappings/<kind>.json (here: successware.json) and replace the column names with your own export's. Local and gitignored; wins over the built-in mapper. Or run: npm run mapping:check -- <kind> <your export file> to write a starter from your headers.",
+  "kind": "successware",
+  "csv": {
+    "job": {
+      "id": ["call #"],
+      "observed": ["booked for"],
+      "status": ["stage"],
+      "technicianName": ["tech"],
+      "jobTotal": ["ticket total"]
+    }
+  },
+  "csvEntity": { "calls": "job" },
+  "collections": [
+    {
+      "path": "calls",
+      "entity": "job",
+      "id": ["callNo"],
+      "observed": ["bookedFor"],
+      "status": ["stage"],
+      "fields": { "technicianName": ["tech.name"], "jobTotal": ["ticketTotal"] }
+    }
+  ]
+}

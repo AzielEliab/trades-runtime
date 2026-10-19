@@ -71,3 +71,4 @@ data/**
 !data/runtime/warranty-claims.json.example
 !data/runtime/truck-stock.json.example
 !data/runtime/callbacks.json.example
+!data/runtime/mapping-override.json.example

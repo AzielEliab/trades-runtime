@@ -1,6 +1,6 @@
-import type { PlatformKind } from "./catalog.js";
+import type { PlatformEntity, PlatformKind } from "./catalog.js";
 import { WAVE2_MAPPINGS } from "./mappings-wave2.js";
-import { isRecord, mapCollections, mapCsvRows, type CollectionMap, type CsvColumnOverrides, type PlatformRecord } from "./map.js";
+import { isRecord, mapCollections, mapCsvRows, type CollectionMap, type CsvColumnOverrides, type CsvField, type PlatformRecord } from "./map.js";
 
 /**
  * Per-platform collection maps. Object and field names follow each vendor's
@@ -279,9 +279,32 @@ export const PLATFORM_CSV_COLUMNS: Partial<Record<PlatformKind, CsvColumnOverrid
 };
 
 /** Map a platform export or live-pull document. CSV rows arrive as { records: [...] }. */
-export function mapPlatformDocument(kind: PlatformKind, doc: Record<string, unknown>, fileName?: string): PlatformRecord[] {
+/** Shape of a local override as the mapper needs it (see mapping-override.ts). */
+export interface MapperOverride {
+  collections: CollectionMap[];
+  csv: CsvColumnOverrides;
+  csvEntity: Array<[string, PlatformEntity]>;
+}
+
+/** A shop's local override (data/runtime/<instanceId>/mappings/<kind>.json) wins over the built-in mapper. */
+export function mapPlatformDocument(kind: PlatformKind, doc: Record<string, unknown>, fileName?: string, override?: MapperOverride): PlatformRecord[] {
+  if (override?.collections.length) {
+    const own = mapCollections(doc, override.collections);
+    if (own.length) return own;
+  }
   const mapped = mapCollections(doc, PLATFORM_MAPPINGS[kind]);
   if (mapped.length) return mapped;
   const records = Array.isArray(doc.records) ? doc.records.filter(isRecord) : [];
-  return records.length ? mapCsvRows(records, fileName, PLATFORM_CSV_COLUMNS[kind]) : [];
+  if (!records.length) return [];
+  if (!override) return mapCsvRows(records, fileName, PLATFORM_CSV_COLUMNS[kind]);
+  const base = PLATFORM_CSV_COLUMNS[kind] ?? {};
+  const columns: CsvColumnOverrides = { ...base };
+  for (const [entity, own] of Object.entries(override.csv) as Array<[PlatformEntity, Partial<Record<CsvField, string[]>>]>) {
+    const merged: Partial<Record<CsvField, string[]>> = { ...(base[entity] ?? {}) };
+    for (const [field, headers] of Object.entries(own) as Array<[CsvField, string[]]>) merged[field] = [...headers, ...(merged[field] ?? [])];
+    columns[entity] = merged;
+  }
+  const name = (fileName ?? "").toLowerCase();
+  const entity = override.csvEntity.find(([part]) => name.includes(part))?.[1];
+  return mapCsvRows(records, fileName, columns, entity);
 }
