@@ -51,6 +51,8 @@ import { AUTHORITY_ROLES } from "../core/actor-registry.js";
 import { randomBytes, timingSafeEqual } from "node:crypto";
 import { ApprovalGate, ApprovalRefused, type ApprovalDecision } from "../approvals/gate.js";
 import { handleLocalMcp } from "../approvals/local-mcp.js";
+import { buildModuleBoards, MODULE_READ_TOOLS } from "../modules/registry.js";
+import { renderModulePanels } from "./modules-render.js";
 import {
   enabledPermissions,
   loadPermissionSettings,
@@ -826,6 +828,12 @@ export function startOperatorDesk(options: DeskServerOptions = {}): Promise<Desk
       send(res, 405, JSON.stringify({ error: "method not allowed", write: false }), "application/json; charset=utf-8");
       return;
     }
+    const moduleRoute = MODULE_READ_TOOLS.find((tool) => url.pathname === tool.route || url.pathname === `${tool.route}.json`);
+    if (moduleRoute) {
+      const board = moduleRoute.build({ cwd, instanceId, now: options.now ?? new Date().toISOString(), config: options.config });
+      send(res, 200, JSON.stringify(board), "application/json; charset=utf-8");
+      return;
+    }
     if (url.pathname === "/api/health") {
       send(res, 200, JSON.stringify(healthLocal({ cwd })), "application/json; charset=utf-8");
       return;
@@ -1016,7 +1024,13 @@ export function startOperatorDesk(options: DeskServerOptions = {}): Promise<Desk
       return;
     }
     if (url.pathname === "/" || url.pathname === "/desk") {
-      const page = renderDeskPage(snapshotFor(deskOptions, url, req), { deskToken });
+      let modulesHtml = "";
+      try {
+        modulesHtml = renderModulePanels(buildModuleBoards({ cwd, instanceId, now: options.now ?? new Date().toISOString(), config: options.config }));
+      } catch (error) {
+        modulesHtml = `<section class="panel"><p class="quiet">Local modules not shown: ${String(error instanceof Error ? error.message : error).replaceAll("<", "&lt;")}</p></section>`;
+      }
+      const page = renderDeskPage(snapshotFor(deskOptions, url, req), { deskToken, modulesHtml });
       if (req.method === "HEAD") {
         res.writeHead(200, { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" });
         res.end();

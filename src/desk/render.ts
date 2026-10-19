@@ -1402,7 +1402,7 @@ function approvalsClientScript(): string {
     })();`;
 }
 
-export function renderDeskPage(snapshot: OperatorSnapshot, extras: { deskToken?: string } = {}): string {
+export function renderDeskPage(snapshot: OperatorSnapshot, extras: { deskToken?: string; modulesHtml?: string } = {}): string {
   const embedded = JSON.stringify({ generatedAt: snapshot.generatedAt, dataLabel: snapshot.dataLabel }).replaceAll("<", "\\u003c");
   return `<!DOCTYPE html>
 <html lang="en" data-theme="dark" data-hints="on">
@@ -1586,6 +1586,7 @@ export function renderDeskPage(snapshot: OperatorSnapshot, extras: { deskToken?:
       <h2>Option C start gate</h2>
       <div id="option-c">${renderOptionCStartGate(snapshot)}</div>
     </section>
+    ${extras.modulesHtml ?? ""}
     ${extras.deskToken ? renderApprovalsPanel() : ""}
     <footer>
       Human surface. Agent MCP on this machine (POST /mcp) can request writes; writes require operator approval; default off. The public Worker MCP stays read-only.

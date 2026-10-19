@@ -4,6 +4,7 @@ import { FIELD_EVENT_KINDS, recordFieldEvent, type FieldEventKind } from "../des
 import { parseWriteBackRequest, runWriteBack, type FetchLike, type WriteBackendKind } from "./backends.js";
 import type { WritePermission } from "./permissions.js";
 import { PLATFORM_KINDS, PLATFORM_SPECS } from "../spine/platforms/catalog.js";
+import { MODULE_WRITE_TOOLS } from "../modules/write-tools.js";
 
 /**
  * Every write the local runtime can perform from a tool call.
@@ -186,7 +187,8 @@ export const WRITE_TOOLS: readonly WriteToolSpec[] = [
       });
       return { ok: true, outcome: "written", detail: `${event.label} recorded on this machine`, data: { eventId: event.id } };
     }
-  }
+  },
+  ...MODULE_WRITE_TOOLS
 ];
 
 export function findWriteTool(name: string): WriteToolSpec | undefined {

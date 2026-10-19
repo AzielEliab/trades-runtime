@@ -1,0 +1,8 @@
+{
+  "note": "Example only (synthetic). Copy to data/runtime/<instanceId>/permits.json. status pending | pulled | scheduled | passed | failed | cancelled. settings are this shop's aging thresholds in days. Nothing is filed with a jurisdiction. Writes from tools need permits.write and an operator yes.",
+  "settings": { "pendingDays": 7, "pulledNoInspectionDays": 14, "failedDays": 3 },
+  "permits": [
+    { "permitId": "SYN-PRM-1", "jobId": "SYN-JOB-1", "jurisdiction": "Synthetic City", "permitType": "mechanical", "status": "scheduled", "appliedOn": "2026-10-01", "pulledOn": "2026-10-03", "inspectionScheduledFor": "2026-10-20" }
+  ],
+  "synthetic": true
+}

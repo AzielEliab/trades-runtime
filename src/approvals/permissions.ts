@@ -29,7 +29,13 @@ export const WRITE_PERMISSIONS = [
   /** Raise a local field flag (data/runtime/<instanceId>/field-flags/). */
   "field_flags.write",
   /** Record a clock / meal / drive event (data/runtime/<instanceId>/field-events.jsonl). */
-  "field_events.write"
+  "field_events.write",
+  /** Append a refrigerant log entry (data/runtime/<instanceId>/refrigerant.json). */
+  "refrigerant.write",
+  /** Create or update a permit / inspection record (data/runtime/<instanceId>/permits.json). */
+  "permits.write",
+  /** Record an agreement visit, renewal, or upsert (data/runtime/<instanceId>/agreements.json). */
+  "agreements.write"
 ] as const;
 
 export type WritePermission = (typeof WRITE_PERMISSIONS)[number];

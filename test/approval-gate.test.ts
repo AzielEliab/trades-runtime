@@ -69,7 +69,10 @@ describe("approval-gated writes", () => {
       "servicefusion.writeback",
       "alerts.ack",
       "field_flags.write",
-      "field_events.write"
+      "field_events.write",
+      "refrigerant.write",
+      "permits.write",
+      "agreements.write"
     ]);
     for (const permission of WRITE_PERMISSIONS) {
       expect(WRITE_TOOLS.filter((tool) => tool.permission === permission)).toHaveLength(1);

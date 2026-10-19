@@ -1,0 +1,16 @@
+{
+  "note": "Example only (synthetic). Copy to data/runtime/<instanceId>/refrigerant.json. Record-keeping aid, not an EPA filing. Leak rate per 40 CFR 82.152 (annualizing or rolling-average, one method per facility). Section 608 leak repair: ODS refrigerant, full charge >= 50 lb (40 CFR 82.157). AIM Act: HFC refrigerant, full charge >= 15 lb, from 2026-01-01, not residential/light-commercial AC and heat pumps (40 CFR 84.106). Trigger rates 20% commercial refrigeration, 30% industrial process, 10% comfort cooling / other. refrigerantClass ods | hfc | other overrides the built-in code list. Writes from tools need refrigerant.write and an operator yes.",
+  "appliances": [
+    { "applianceId": "SYN-RTU-1", "label": "Synthetic rooftop unit", "applianceType": "comfort-cooling", "refrigerant": "R-22", "fullChargeLbs": 60, "leakRateMethod": "annualizing" },
+    { "applianceId": "SYN-WALKIN-1", "label": "Synthetic walk-in cooler", "applianceType": "commercial-refrigeration", "refrigerant": "R-404A", "fullChargeLbs": 22 }
+  ],
+  "cylinders": [
+    { "cylinderId": "SYN-CYL-1", "refrigerant": "R-22", "kind": "virgin", "startLbs": 30 },
+    { "cylinderId": "SYN-CYL-REC-1", "refrigerant": "R-404A", "kind": "recovery", "startLbs": 0 }
+  ],
+  "events": [
+    { "eventId": "SYN-RF-1", "at": "2026-04-01T15:00:00Z", "applianceId": "SYN-RTU-1", "action": "charge", "refrigerant": "R-22", "pounds": 4, "jobId": "SYN-JOB-1", "technicianId": "SYN-TECH-1", "technicianName": "Synthetic Tech", "techCertNumber": "SYN-608-0001", "cylinderId": "SYN-CYL-1" },
+    { "eventId": "SYN-RF-2", "at": "2026-07-01T15:00:00Z", "applianceId": "SYN-RTU-1", "action": "charge", "refrigerant": "R-22", "pounds": 5, "jobId": "SYN-JOB-2", "technicianId": "SYN-TECH-1", "techCertNumber": "SYN-608-0001", "cylinderId": "SYN-CYL-1" }
+  ],
+  "synthetic": true
+}
