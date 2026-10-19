@@ -1,0 +1,40 @@
+{
+  "synthetic": true,
+  "sourceKind": "servicetrade",
+  "note": "Synthetic servicetrade-shaped export. Not customer data.",
+  "data": {
+    "jobs": [
+      {
+        "id": 91001,
+        "number": "SYN-ST-900",
+        "status": "scheduled",
+        "type": "repair",
+        "customer": {
+          "id": 81,
+          "name": "Synthetic Grocer Co"
+        },
+        "location": {
+          "id": 71,
+          "name": "Synthetic Store 12"
+        },
+        "currentAppointment": {
+          "windowStart": 1792843200,
+          "techs": [
+            {
+              "id": 61,
+              "name": "Synthetic Tech T"
+            }
+          ]
+        },
+        "estimatedPrice": 1250,
+        "trade": "hvac"
+      }
+    ],
+    "locations": [
+      {
+        "id": 71,
+        "name": "Synthetic Store 12"
+      }
+    ]
+  }
+}

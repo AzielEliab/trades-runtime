@@ -52,7 +52,7 @@ export interface CallbackRootCauseBoard {
   note: string;
 }
 
-const ORIGINAL_KEYS = ["originalJobId", "original_job_id", "parentJobId", "parent_job_id", "callbackOf", "callback_of", "relatedJobId", "related_job_id", "recallOf"];
+const ORIGINAL_KEYS = ["originalJobId", "original_job_id", "parentJobId", "parent_job_id", "callbackOf", "callback_of", "relatedJobId", "related_job_id", "recallOf", "recallOfParentJobID"];
 
 function category(value: string): RootCauseCategory {
   const folded = value.trim().toLowerCase().replace(/[\s_]+/g, "-");

@@ -1,0 +1,23 @@
+{
+  "synthetic": true,
+  "sourceKind": "mhelpdesk",
+  "note": "Synthetic mhelpdesk-shaped export. Not customer data.",
+  "tickets": [
+    {
+      "ticketId": "SYN-MHD-T1",
+      "status": "Scheduled",
+      "customerId": "SYN-MHD-C1",
+      "customerName": "Synthetic Customer M",
+      "assignedTo": "Synthetic Tech M",
+      "scheduledDate": "2026-10-18T16:00:00Z",
+      "total": 99,
+      "trade": "plumbing"
+    }
+  ],
+  "customers": [
+    {
+      "customerId": "SYN-MHD-C1",
+      "customerName": "Synthetic Customer M"
+    }
+  ]
+}

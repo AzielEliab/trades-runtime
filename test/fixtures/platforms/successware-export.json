@@ -1,0 +1,46 @@
+{
+  "synthetic": true,
+  "sourceKind": "successware",
+  "note": "Synthetic successware-shaped export. Not customer data.",
+  "calls": [
+    {
+      "callId": "SYN-SW-C1",
+      "customerId": "SYN-SW-CU1",
+      "customerName": "Synthetic Home",
+      "status": "Completed",
+      "scheduledDate": "2026-10-14T13:00:00Z",
+      "technicianId": "SYN-SW-T1",
+      "technician": "Synthetic Tech S",
+      "invoiceTotal": "412.00",
+      "trade": "hvac",
+      "jobType": "No Cool",
+      "equipment": [
+        {
+          "equipmentId": "SYN-SW-EQ1",
+          "model": "SYN-AC-3T"
+        }
+      ]
+    }
+  ],
+  "customers": [
+    {
+      "customerId": "SYN-SW-CU1",
+      "customerName": "Synthetic Home"
+    }
+  ],
+  "invoices": [
+    {
+      "invoiceNumber": "SYN-SW-INV1",
+      "invoiceDate": "2026-10-14",
+      "status": "Paid",
+      "total": 412,
+      "customerId": "SYN-SW-CU1"
+    }
+  ],
+  "technicians": [
+    {
+      "technicianId": "SYN-SW-T1",
+      "name": "Synthetic Tech S"
+    }
+  ]
+}

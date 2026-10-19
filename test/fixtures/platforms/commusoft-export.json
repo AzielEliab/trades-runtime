@@ -1,0 +1,53 @@
+{
+  "synthetic": true,
+  "sourceKind": "commusoft",
+  "note": "Synthetic commusoft-shaped export. Not customer data.",
+  "jobs": [
+    {
+      "id": 3001,
+      "propertyID": 2001,
+      "description": "Synthetic boiler service",
+      "jobType": "Service",
+      "status": "open",
+      "expectedOnsiteDateTime": "2026-10-19T09:00:00Z",
+      "usersCurrentlyAssignedToJob": [
+        {
+          "id": 1001,
+          "name": "Synthetic Engineer C"
+        }
+      ],
+      "trade": "hvac"
+    },
+    {
+      "id": 3002,
+      "propertyID": 2001,
+      "description": "Synthetic boiler recall",
+      "jobType": "Recall",
+      "status": "open",
+      "expectedOnsiteDateTime": "2026-10-21T09:00:00Z",
+      "usersCurrentlyAssignedToJob": [
+        {
+          "id": 1002,
+          "name": "Synthetic Engineer D"
+        }
+      ],
+      "recallOfParentJobID": 3001,
+      "tags": [
+        "callback"
+      ],
+      "trade": "hvac"
+    }
+  ],
+  "properties": [
+    {
+      "id": 2001,
+      "name": "Synthetic Property C"
+    }
+  ],
+  "users": [
+    {
+      "id": 1001,
+      "name": "Synthetic Engineer C"
+    }
+  ]
+}
