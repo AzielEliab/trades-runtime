@@ -46,3 +46,6 @@ data/**
 !data/runtime/refrigerant.json.example
 !data/runtime/permits.json.example
 !data/runtime/agreements.json.example
+!data/runtime/warranty-claims.json.example
+!data/runtime/truck-stock.json.example
+!data/runtime/callbacks.json.example

@@ -35,7 +35,13 @@ export const WRITE_PERMISSIONS = [
   /** Create or update a permit / inspection record (data/runtime/<instanceId>/permits.json). */
   "permits.write",
   /** Record an agreement visit, renewal, or upsert (data/runtime/<instanceId>/agreements.json). */
-  "agreements.write"
+  "agreements.write",
+  /** Create or update a manufacturer warranty claim (data/runtime/<instanceId>/warranty-claims.json). */
+  "warranty_claims.write",
+  /** Record an on-van stock count (data/runtime/<instanceId>/stock-counts.json). */
+  "truck_stock.write",
+  /** Link a callback to its original job and root cause (data/runtime/<instanceId>/callbacks.json). */
+  "callbacks.write"
 ] as const;
 
 export type WritePermission = (typeof WRITE_PERMISSIONS)[number];

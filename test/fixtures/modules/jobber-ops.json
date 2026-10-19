@@ -1,0 +1,48 @@
+{
+  "synthetic": true,
+  "sourceKind": "jobber",
+  "note": "Synthetic Jobber-shaped jobs with parts, warranty, and callback references. Not customer data.",
+  "jobs": [
+    {
+      "id": "SYN-OPS-A",
+      "jobStatus": "completed",
+      "trade": "hvac",
+      "jobType": "install",
+      "equipment": { "manufacturer": "SynBrand", "model": "SYN-M1", "serialNumber": "SYN-SN-1" },
+      "parts": [{ "sku": "CAP-45", "quantity": 1, "underWarranty": true }, { "sku": "FLT-16", "quantity": 1 }],
+      "visits": { "nodes": [{ "id": "SYN-OPS-VA", "startAt": "2026-09-01T14:00:00Z", "assignedUsers": { "nodes": [{ "id": "SYN-T1", "name": { "full": "Synthetic Tech One" } }] } }] }
+    },
+    {
+      "id": "SYN-OPS-B",
+      "jobStatus": "completed",
+      "trade": "hvac",
+      "jobType": "callback",
+      "originalJobId": "SYN-OPS-A",
+      "rootCause": "part-failure",
+      "visits": { "nodes": [{ "id": "SYN-OPS-VB", "startAt": "2026-09-20T14:00:00Z", "assignedUsers": { "nodes": [{ "id": "SYN-T2", "name": { "full": "Synthetic Tech Two" } }] } }] }
+    },
+    {
+      "id": "SYN-OPS-C",
+      "jobStatus": "completed",
+      "trade": "plumbing",
+      "tags": ["callback"],
+      "visits": { "nodes": [{ "id": "SYN-OPS-VC", "startAt": "2026-10-02T14:00:00Z" }] }
+    },
+    {
+      "id": "SYN-OPS-D",
+      "jobStatus": "completed",
+      "trade": "hvac",
+      "jobType": "warranty",
+      "equipment": { "manufacturer": "SynBrand", "model": "SYN-M1" },
+      "parts": [{ "sku": "MTR-1", "quantity": 1 }],
+      "visits": { "nodes": [{ "id": "SYN-OPS-VD", "startAt": "2026-10-05T14:00:00Z", "assignedUsers": { "nodes": [{ "id": "SYN-T1", "name": { "full": "Synthetic Tech One" } }] } }] }
+    },
+    {
+      "id": "SYN-OPS-E",
+      "jobStatus": "upcoming",
+      "trade": "hvac",
+      "partsNeeded": [{ "sku": "CAP-45", "quantity": 2 }, { "sku": "FLT-16", "quantity": 3 }, { "sku": "TXV-2", "quantity": 1 }],
+      "visits": { "nodes": [{ "id": "SYN-OPS-VE", "startAt": "2026-10-20T14:00:00Z", "assignedUsers": { "nodes": [{ "id": "SYN-T1", "name": { "full": "Synthetic Tech One" } }] } }] }
+    }
+  ]
+}

@@ -210,3 +210,15 @@ Refrigerant class comes only from a built-in list of common ODS/HFC codes. Any o
 Revenue at risk adds up only the `price` written on each agreement. An agreement with no price is counted as "price unknown". Nothing is estimated.
 
 Every write goes through the approval gate. Permissions are off by default, and the operator says yes or no each time.
+
+## Ops modules (TR-MODULES-C-2026-10-19)
+
+| Module | Local file | Inbound fields read on admitted job rows | Read tool / desk route | Write permission |
+| --- | --- | --- | --- | --- |
+| Manufacturer warranty claims | `data/runtime/<instanceId>/warranty-claims.json` | `parts` / `partsUsed` / `warrantyParts` / `lineItems` with `underWarranty`, or every part on a job labeled warranty; `equipment` manufacturer, model, serial | `trades_runtime_warranty_claims`, `/api/warranty-claims` | `warranty_claims.write` |
+| Truck stock vs tomorrow | `data/runtime/<instanceId>/truck-stock.json` (vans, par, demand) plus `stock-counts.json` | `partsNeeded` / `parts` / `materials` / `lineItems` on jobs scheduled for tomorrow; `vanId` / `truckId`, or tech → van mapping | `trades_runtime_truck_stock`, `/api/truck-stock` | `truck_stock.write` |
+| Callback root cause | `data/runtime/<instanceId>/callbacks.json` | callback / warranty labels (same rules as the weekly count); `originalJobId` / `parentJobId` / `callbackOf` / `relatedJobId`; `rootCause`, `installStep`, `failedPart` | `trades_runtime_callbacks`, `/api/callbacks` | `callbacks.write` |
+
+- Manufacturer filing windows are not guessed. A days-left figure appears only for manufacturers listed in `settings.filingWindowDays`.
+- On-van stock that was never counted is shown as unknown, not zero, and gets no restock suggestion. The suggested restock is need plus par minus the count. Nothing is ordered.
+- A callback is linked to its original job only through an explicit reference or a local link. It is never linked by a time gap or an address. The roll-ups count by the original job's tech, and they are a list to review, not a skill score.

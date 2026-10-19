@@ -1,0 +1,11 @@
+{
+  "note": "Example only (synthetic). Copy to data/runtime/<instanceId>/warranty-claims.json. parts lists parts replaced under warranty that are not already on an admitted job. claims status draft | submitted | approved | denied | paid | closed. filingWindowDays only for manufacturers whose window you have confirmed. Nothing is submitted to a manufacturer. Writes from tools need warranty_claims.write and an operator yes.",
+  "settings": { "unclaimedDays": 7, "claimAgingDays": 30, "filingWindowDays": {} },
+  "parts": [
+    { "partUseId": "SYN-PU-1", "jobId": "SYN-JOB-9", "partNumber": "SYN-CAP-45", "manufacturer": "SynBrand", "equipmentModel": "SYN-M1", "serialNumber": "SYN-SN-9", "replacedOn": "2026-10-01" }
+  ],
+  "claims": [
+    { "claimId": "SYN-CLM-1", "partUseId": "SYN-PU-1", "manufacturer": "SynBrand", "status": "submitted", "submittedOn": "2026-10-03" }
+  ],
+  "synthetic": true
+}

@@ -1,0 +1,7 @@
+{
+  "note": "Example only (synthetic). Copy to data/runtime/<instanceId>/callbacks.json. Each link ties a callback job to its original job, with an optional root cause. category is part-failure | install | diagnosis | workmanship | customer | not-related | unknown. Writes from tools need callbacks.write and an operator yes.",
+  "links": [
+    { "callbackJobId": "SYN-JOB-12", "originalJobId": "SYN-JOB-11", "originalTechnicianId": "SYN-TECH-1", "partNumber": "SYN-CAP-45", "equipmentModel": "SYN-M1", "installStep": "capacitor sizing", "category": "install" }
+  ],
+  "synthetic": true
+}

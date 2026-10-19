@@ -72,7 +72,10 @@ describe("approval-gated writes", () => {
       "field_events.write",
       "refrigerant.write",
       "permits.write",
-      "agreements.write"
+      "agreements.write",
+      "warranty_claims.write",
+      "truck_stock.write",
+      "callbacks.write"
     ]);
     for (const permission of WRITE_PERMISSIONS) {
       expect(WRITE_TOOLS.filter((tool) => tool.permission === permission)).toHaveLength(1);
