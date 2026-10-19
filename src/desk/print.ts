@@ -378,7 +378,7 @@ export function renderPrintableSnapshot(snapshot: OperatorSnapshot): string {
     <ul>${receipts}</ul>
     <footer>
       Human surface. Printed from local state on 127.0.0.1. Agent MCP does not carry this page.
-      live_backends false. Writes refused. pilot_started ${snapshot.pilot_started ? "true" : "false"}. Option D is not started.
+      live_backends false. Writes require operator approval; default off. pilot_started ${snapshot.pilot_started ? "true" : "false"}. Option D is not started.
     </footer>
   </main>
 </body>

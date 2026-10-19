@@ -36,7 +36,7 @@ export const OPTION_C_START_REFUSAL = {
 } as const;
 
 const SUCCESS_CLAIM =
-  "Local isolate Option C pilot started for one named branch. SHADOW-SEALED. live_backends false. Writes refused. This is not a company OS live claim. This is not Field 1.0. This is not Office Softwares 1.0.";
+  "Local isolate Option C pilot started for one named branch. SHADOW-SEALED. live_backends false. Writes require operator approval; default off. This is not a company OS live claim. This is not Field 1.0. This is not Office Softwares 1.0.";
 
 export interface OptionCPilotStartOptions {
   cwd?: string;

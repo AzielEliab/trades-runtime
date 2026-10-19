@@ -299,3 +299,24 @@ export {
   refuseTradesAppWrite
 } from "./spine/trades-app-shadow.js";
 export { admitDropInDocument, admitDropInFolder, detectDropIn } from "./spine/drop-in.js";
+
+export {
+  WRITE_PERMISSIONS,
+  PERMISSION_MODES,
+  PERMISSIONS_NOTE,
+  defaultPermissionSettings,
+  parsePermissionSettings,
+  loadPermissionSettings,
+  savePermissionSettings,
+  enabledPermissions,
+  isPermissionEnabled,
+  skipsPrompt,
+  defaultPermissionsPath,
+  type PermissionSettings,
+  type PermissionMode,
+  type WritePermission
+} from "./approvals/permissions.js";
+export { ApprovalGate, ApprovalRefused, openApprovalGate, defaultApprovalLogPath, type ApprovalRequest, type WriteCallResult } from "./approvals/gate.js";
+export { WRITE_TOOLS, findWriteTool, type WriteToolSpec } from "./approvals/tools.js";
+export { runWriteBack, parseWriteBackends, defaultWriteBackendsPath, type WriteBackResult } from "./approvals/backends.js";
+export { handleLocalMcp, localToolsList } from "./approvals/local-mcp.js";

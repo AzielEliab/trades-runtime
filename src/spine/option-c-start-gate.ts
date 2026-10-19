@@ -70,8 +70,8 @@ const GATE_COPY: readonly Omit<OptionCStartGateItem, "state" | "required">[] = [
   },
   {
     id: "writes-refused",
-    label: "ServiceTitan and ProBooks writes stay refused",
-    detail: "POST, PUT, and PATCH still throw. A visible checklist is not a write client."
+    label: "ServiceTitan and ProBooks writes require operator approval; default off",
+    detail: "Direct POST, PUT, and PATCH still throw. Write-back runs only through the approval gate after an operator yes, and only with a locally configured backend. A visible checklist is not a write client."
   },
   {
     id: "shadow-sealed",

@@ -6,7 +6,7 @@ import { parseCsv } from "../spine/drop-in.js";
 /**
  * Local inbound quality report for FragGate peer classes servicetitan and probooks.
  * Files already on this machine are scored. Nothing is pulled from a tenant API.
- * The checklist score is not an accuracy percent. Writes stay refused.
+ * The checklist score is not an accuracy percent. Writes require operator approval; default off.
  */
 
 export const INBOUND_QUALITY_PEERS = ["servicetitan", "probooks"] as const;
@@ -739,7 +739,7 @@ export function formatInboundQualityReport(report: Omit<InboundQualityReport, "h
     "Author: Aziel Eliab",
     "Shadow / local. live_backends false. Not a live tenant pull.",
     "Quality score is a local checklist. It is not an accuracy percent.",
-    "Writes: refused. ServiceTitan write false. ProBooks write false.",
+    "Writes: operator approval required; default off. ServiceTitan write false. ProBooks write false.",
     `Source: ${report.source}`,
     `Fragments: ${report.fragmentCount}`,
     `Mean checklist score: ${report.meanScore == null ? "none" : report.meanScore}`,
@@ -805,10 +805,10 @@ export function buildInboundQualityReport(args: {
     written: false,
     digest: digestFor(source, fragments),
     note: useSynthetic
-      ? "Synthetic demo on this machine. Shadow and local. Not a company export and not a live tenant pull. live_backends false. The checklist score is not an accuracy percent. Writes stay refused."
+      ? "Synthetic demo on this machine. Shadow and local. Not a company export and not a live tenant pull. live_backends false. The checklist score is not an accuracy percent. Writes require operator approval; default off."
       : fragments.length
-        ? "Local ServiceTitan and ProBooks files already on this machine. Shadow report. Not a live tenant pull. live_backends false. The checklist score is not an accuracy percent. Writes stay refused."
-        : "No ServiceTitan or ProBooks fragments on this machine. Empty stays empty. Not a live tenant pull. live_backends false. Writes stay refused.",
+        ? "Local ServiceTitan and ProBooks files already on this machine. Shadow report. Not a live tenant pull. live_backends false. The checklist score is not an accuracy percent. Writes require operator approval; default off."
+        : "No ServiceTitan or ProBooks fragments on this machine. Empty stays empty. Not a live tenant pull. live_backends false. Writes require operator approval; default off.",
     fragmentCount: fragments.length,
     meanScore,
     volumeBySourceKind: volumeFor(fragments),

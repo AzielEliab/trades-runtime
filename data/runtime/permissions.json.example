@@ -1,0 +1,7 @@
+{
+  "mode": "selected",
+  "selected": [],
+  "autoApprove": false,
+  "approvalTtlSeconds": 900,
+  "note": "Writes require operator approval; default off. Copy to data/runtime/<instanceId>/permissions.json. mode selected with an empty list is the same as read-only. mode all enables every write permission (servicetitan.writeback, probooks.writeback, tradesapp.writeback, alerts.ack, field_flags.write, field_events.write) but each call still asks yes or no unless autoApprove is true. autoApprove is off by default and ignored in selected mode. Change from the loopback desk, npm run permissions, or this file."
+}

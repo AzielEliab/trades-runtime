@@ -27,9 +27,13 @@ export interface ProBooksShadowIngest {
   pbId: string;
 }
 
+/**
+ * This shadow ingest client never writes. Write-back goes only through the approval gate
+ * (src/approvals/gate.ts): writes require operator approval; default off.
+ */
 export const PROBOOKS_WRITES_ENABLED = false;
 
-/** Read-only client. Write methods are not part of the compiled surface. */
+/** Ingest-only client. Write methods are not part of this compiled surface; approved write-back lives in src/approvals/. */
 export interface ProBooksShadowClient {
   ingest(record: ProBooksShadowRecord): ProBooksShadowIngest;
   readonly writes: false;
@@ -119,11 +123,11 @@ export function openProBooksShadowClient(): ProBooksShadowClient {
 }
 
 export function refuseProBooksWrite(op: string): never {
-  throw new Error(`live ProBooks writes are refused (${op})`);
+  throw new Error(`live ProBooks writes are refused without operator approval (${op}); request the write through the approval gate (src/approvals/gate.ts)`);
 }
 
 export function refuseProBooksWriteMethod(method: ProBooksWriteMethod): never {
-  throw new Error(`live ProBooks writes are refused (${method})`);
+  throw new Error(`live ProBooks writes are refused without operator approval (${method}); request the write through the approval gate (src/approvals/gate.ts)`);
 }
 
 export function mayWriteProBooks(): false {

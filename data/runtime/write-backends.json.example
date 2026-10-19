@@ -1,0 +1,12 @@
+{
+  "servicetitan": {
+    "baseUrl": "https://api.servicetitan.io",
+    "tokenEnv": "TRADES_RUNTIME_ST_TOKEN",
+    "appKeyEnv": "TRADES_RUNTIME_ST_APP_KEY"
+  },
+  "probooks": {
+    "baseUrl": "https://probooks.example.invalid",
+    "tokenEnv": "TRADES_RUNTIME_PROBOOKS_TOKEN"
+  },
+  "note": "Example only. Copy to data/runtime/<instanceId>/write-backends.json on the operator machine. This file names environment variables; it never holds a token, secret, password, or key (inline credentials are refused). The probooks baseUrl is a placeholder: set your vendor's real API origin. Write-back still runs only after an operator yes on each call and only when the permission is enabled. Without this file or the env vars, write-back returns no-backend-configured and writes nothing. Not tested against a live tenant."
+}

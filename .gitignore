@@ -29,3 +29,5 @@ data/**
 !data/runtime/positions.json.example
 !data/runtime/time-cards.json.example
 !data/runtime/coverage.json.example
+!data/runtime/permissions.json.example
+!data/runtime/write-backends.json.example

@@ -5,11 +5,12 @@ import type { AlertDataLabel, AlertRuleKind, StoredAlert } from "./alerts.js";
 
 /**
  * Proposed actions for a firing local alert.
- * Stubs only. Nothing calls ServiceTitan or ProBooks.
+ * Stubs only. A stub never calls ServiceTitan or ProBooks. Write-back is a
+ * separate call through the approval gate (src/approvals/gate.ts).
  */
 
 export const HUMAN_AUTHORITY_RULE =
-  "Human Authority Rule: a person with the registered role must decide. This stub is not an order, not a ticket, and not a dispatch write. ServiceTitan and ProBooks stay read-only.";
+  "Human Authority Rule: a person with the registered role must decide. This stub is not an order, not a ticket, and not a dispatch write. ServiceTitan and ProBooks write-back requires operator approval; default off.";
 
 const RULE_STUBS: Record<AlertRuleKind, { label: string; role: string; rationale: string }> = {
   capacity: {
@@ -133,7 +134,7 @@ export function proposeAlertActions(alerts: readonly StoredAlert[]): AlertAction
       alertId: alert.id,
       rule: alert.rule,
       label: "Hold ServiceTitan and ProBooks unchanged",
-      rationale: "This alert does not authorize a tenant mutation. Write-back stays refused.",
+      rationale: "This alert does not authorize a tenant mutation. The stub itself never writes. Any write-back is a separate tool call that waits for an operator yes or no, and stays off unless the operator enabled that permission.",
       requiredHumanAuthority: `operator — registered authority role. ${HUMAN_AUTHORITY_RULE}`,
       refused: "write-back",
       servicetitanWrite: false,
