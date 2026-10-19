@@ -1,4 +1,5 @@
 import type { PlatformKind } from "./catalog.js";
+import { WAVE2_MAPPINGS } from "./mappings-wave2.js";
 import { isRecord, mapCollections, mapCsvRows, type CollectionMap, type PlatformRecord } from "./map.js";
 
 /**
@@ -228,7 +229,8 @@ export const PLATFORM_MAPPINGS: Record<PlatformKind, CollectionMap[]> = {
   square: SQUARE,
   quickbooks: QUICKBOOKS,
   fieldedge: FIELDEDGE,
-  servicefusion: SERVICEFUSION
+  servicefusion: SERVICEFUSION,
+  ...WAVE2_MAPPINGS
 };
 
 /** Map a platform export or live-pull document. CSV rows arrive as { records: [...] }. */

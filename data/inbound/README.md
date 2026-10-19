@@ -44,16 +44,27 @@ Six more platforms are named peer classes with their own FragGate `sourceKind` a
 | `data/inbound/quickbooks/` | QuickBooks Online | Customer, Invoice, Payment, Estimate, Employee, Item | Optional. `GET /v3/company/<realmId>/query` with `select` only. |
 | `data/inbound/fieldedge/` | FieldEdge | work orders (+ assignment, customer, equipment), customers, invoices, estimates, technicians | None. FieldEdge API access is partner/member-gated through its developer portal, so this runtime ships file drop only. |
 | `data/inbound/servicefusion/` | Service Fusion | jobs (+ techs), customers, estimates, invoices, equipment | Optional. REST GETs (`/v1/jobs` always sorted). Vendor says the API needs the Pro plan. |
+| `data/inbound/successware/` | Successware | calls (+ equipment), customers/locations, invoices, technicians | None. No public API documentation; partner integrations only. |
+| `data/inbound/workiz/` | Workiz | Job (+ Team), Client, Invoice, Estimate, User | Optional. v2 `GET /jobs` with a Bearer API key (Developer API add-on). |
+| `data/inbound/servicetrade/` | ServiceTrade | job (+ location), appointment, location, invoice, quote, user, asset. Unix-second times converted. | Optional. `GET /api/job`, `GET /api/location` with an OAuth2 bearer token. |
+| `data/inbound/buildops/` | BuildOps | jobs (+ visits), customers/properties, invoices, quotes, employees, assets | None. API docs are invite-gated. |
+| `data/inbound/fieldpulse/` | FieldPulse | jobs, customers, invoices, estimates, users | Optional. REST GETs with the `x-api-key` header (token from FieldPulse support). |
+| `data/inbound/kickserv/` | Kickserv | jobs (+ customer), customers, invoices, estimates, employees | None. The documented API is XML (Premium plan); this runtime pulls JSON only. |
+| `data/inbound/mhelpdesk/` | mHelpDesk | tickets, appointments, customers, invoices, estimates | None. No public API documentation found. |
+| `data/inbound/servicem8/` | ServiceM8 | Job, JobActivity (scheduled only), Company, Staff, Material | Optional. `GET /api_1.0/<object>.json` with the `X-API-Key` header. |
+| `data/inbound/simpro/` | Simpro | Job, Customer, Invoice, Quote, Employee | Optional. `GET /api/v1.0/companies/<companyId>/jobs/` on your build host with an OAuth2 bearer token. |
+| `data/inbound/commusoft/` | Commusoft | job (`recallOfParentJobID` feeds callback root cause), property, user, asset | Optional. v2 `GET /jobs`, `/properties`, `/users` with a Bearer API key (US or UK base). |
+| `data/inbound/wintac/` | Wintac | work orders, customers, invoices, technicians, equipment (Excel → CSV) | None. Desktop software with no public API. |
 
 CSV exports work in each folder. The entity comes from the file name (`customers.csv`, `invoices.csv`, `payments.csv`, `estimates.csv` / `quotes.csv`, `employees.csv` / `techs.csv`, anything else is jobs) and common column headers.
 
 Live pull is off until you add `platforms.<kind>.pull` to `local.json` (see `local.json.example`). It names an environment variable that holds the token. Inline tokens, secrets, passwords, and keys are refused. `npm run pull -- <kind>` fetches the first page of each documented read, writes one `live-pull-<time>.json` into the platform folder on this machine, and the desk admits it like any drop (MEDIUM, UNVERIFIED). `npm run platforms` lists the peers. None of this has been tested against a live tenant.
 
-Write-back for each platform is its own permission (`jobber.writeback`, `housecallpro.writeback`, `square.writeback`, `quickbooks.writeback`, `fieldedge.writeback`, `servicefusion.writeback`). Default off. Each call asks the operator yes or no. Without a backend in `data/runtime/<instanceId>/write-backends.json` and a token in the named env var the call returns `no-backend-configured` and writes nothing.
+Write-back for each platform is its own permission (`jobber.writeback`, `housecallpro.writeback`, `square.writeback`, `quickbooks.writeback`, `fieldedge.writeback`, `servicefusion.writeback`, and one `<kind>.writeback` for each wave-2 platform). Default off. Each call asks the operator yes or no. Without a backend in `data/runtime/<instanceId>/write-backends.json` and a token in the named env var the call returns `no-backend-configured` and writes nothing.
 
 ## Law
 
-- FragGate admits `servicetitan`, `probooks`, `trades-app`, and the platform peers `jobber`, `housecallpro`, `square`, `quickbooks`, `fieldedge`, `servicefusion` as inbound (MEDIUM, hashed, `live:false`, `write:false`).
+- FragGate admits `servicetitan`, `probooks`, `trades-app`, and the platform peers `jobber`, `housecallpro`, `square`, `quickbooks`, `fieldedge`, `servicefusion`, `successware`, `workiz`, `servicetrade`, `buildops`, `fieldpulse`, `kickserv`, `mhelpdesk`, `servicem8`, `simpro`, `commusoft`, `wintac` as inbound (MEDIUM, hashed, `live:false`, `write:false`).
 - `operator-file` stays LOW until origin is tagged `servicetitan`, `probooks`, or `trades-app`. Still hashed. Still not truth.
 - `human` manager corrections go on Chain C with actor id.
 - Wrapper ≠ verified. No silent promotion to VERIFIED.
@@ -222,3 +233,16 @@ Every write goes through the approval gate. Permissions are off by default, and 
 - Manufacturer filing windows are not guessed. A days-left figure appears only for manufacturers listed in `settings.filingWindowDays`.
 - On-van stock that was never counted is shown as unknown, not zero, and gets no restock suggestion. The suggested restock is need plus par minus the count. Nothing is ordered.
 - A callback is linked to its original job only through an explicit reference or a local link. It is never linked by a time gap or an address. The roll-ups count by the original job's tech, and they are a list to review, not a skill score.
+
+## Platform peers, wave 2 (TR-PLATFORMS-2-2026-10-19)
+
+Successware was named by the owner. The other ten are field-service booking, dispatch, and job platforms that HVAC, plumbing, electrical, and sewer shops use. They were picked from public research, not usage data. No reliable market-share figures were found, so none are claimed. Each spec in `src/spine/platforms/catalog-wave2.ts` gives the reason for its pick and the public pages that informed it. The main ones are the Software Advice 2026 plumbing software list, an independent HVAC dispatch ranking (FieldServiceScout), and each vendor's own developer docs. Review counts quoted in a reason are the counts those pages showed on 2026-10-19.
+
+| Platform | Mode |
+| --- | --- |
+| Workiz, ServiceTrade, FieldPulse, ServiceM8, Simpro, Commusoft | file drop + documented API pull (read-only GETs, first page) |
+| Successware, BuildOps | file drop only (no public API docs / invite-gated) |
+| Kickserv | file drop only (documented API is XML; pull reads JSON) |
+| mHelpDesk, Wintac | file drop only (no public API) |
+
+Every platform here is fixture-tested only. None has been tested against a live tenant.

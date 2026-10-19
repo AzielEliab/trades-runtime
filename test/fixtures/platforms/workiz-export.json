@@ -1,0 +1,41 @@
+{
+  "synthetic": true,
+  "sourceKind": "workiz",
+  "note": "Synthetic workiz-shaped export. Not customer data.",
+  "jobs": [
+    {
+      "UUID": "SYN-WZ-J1",
+      "SerialId": 1001,
+      "JobDateTime": "2026-10-15 09:00:00",
+      "Status": "Submitted",
+      "SubStatus": "Scheduled",
+      "ClientId": "SYN-WZ-CL1",
+      "ClientName": "Synthetic Client W",
+      "JobType": "Drain clog",
+      "JobTotalPrice": 189.5,
+      "Address": "1 Synthetic Ave",
+      "Team": [
+        {
+          "id": "SYN-WZ-U1",
+          "Name": "Synthetic Tech W"
+        }
+      ],
+      "trade": "plumbing"
+    }
+  ],
+  "clients": [
+    {
+      "UUID": "SYN-WZ-CL1",
+      "ClientName": "Synthetic Client W"
+    }
+  ],
+  "invoices": [
+    {
+      "UUID": "SYN-WZ-INV1",
+      "Status": "Paid",
+      "Total": 189.5,
+      "ClientId": "SYN-WZ-CL1",
+      "CreatedDate": "2026-10-15"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "synthetic": true,
+  "sourceKind": "wintac",
+  "note": "Synthetic wintac-shaped export. Not customer data.",
+  "workOrders": [
+    {
+      "WorkOrderNo": "SYN-WT-5001",
+      "Status": "Open",
+      "ScheduleDate": "2026-10-20",
+      "CustomerNo": "SYN-WT-C1",
+      "CustomerName": "Synthetic Customer T",
+      "Technician": "Synthetic Tech T",
+      "Total": "260.00",
+      "ServiceAddress": "7 Synthetic Ct",
+      "trade": "hvac"
+    }
+  ]
+}

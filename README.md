@@ -242,7 +242,7 @@ Real exports stay in the gitignored drop folders. `data/inbound/local.json` (cop
 
 ## Platform peers (TR-PLATFORMS-2026-10-19)
 
-Jobber, Housecall Pro, Square, QuickBooks Online, FieldEdge, and Service Fusion are first-class inbound peers. Each one has its own folder, `data/inbound/<kind>/`. Drop a JSON or CSV export into that folder, and it is mapped to the vendor's documented object names, then admitted as MEDIUM, unverified, `live: false`.
+Jobber, Housecall Pro, Square, QuickBooks Online, FieldEdge, Service Fusion, and (wave 2, TR-PLATFORMS-2-2026-10-19) Successware, Workiz, ServiceTrade, BuildOps, FieldPulse, Kickserv, mHelpDesk, ServiceM8, Simpro, Commusoft, and Wintac are first-class inbound peers. Successware was named by the owner. The other ten were picked from public research (Software Advice 2026 plumbing list, an independent HVAC dispatch ranking, vendor developer docs), not usage data. No market share is claimed. The reasons and sources for each are in `src/spine/platforms/catalog-wave2.ts`. Each one has its own folder, `data/inbound/<kind>/`. Drop a JSON or CSV export into that folder, and it is mapped to the vendor's documented object names, then admitted as MEDIUM, unverified, `live: false`.
 
 You can also pull data yourself with `npm run pull -- <platform>`. This is a read-only call against the vendor's documented public API. The env var that holds the token is named in `data/inbound/local.json`. No credential is kept in the repo, in Pages, or in the Worker.
 
@@ -254,6 +254,17 @@ You can also pull data yourself with `npm run pull -- <platform>`. This is a rea
 | QuickBooks Online | file drop + documented API pull | Public Accounting API query endpoint. |
 | Service Fusion | file drop + documented API pull | Public REST API; the vendor offers it on the Pro plan. |
 | FieldEdge | file drop only | The API is gated behind a partner program, so no pull is shipped. |
+| Workiz | file drop + documented API pull | Public REST API v2 (Bearer key; Developer API add-on). |
+| ServiceTrade | file drop + documented API pull | Public REST API (OAuth2 bearer). |
+| FieldPulse | file drop + documented API pull | Public REST API (`x-api-key`, token from FieldPulse support). |
+| ServiceM8 | file drop + documented API pull | Public JSON REST API (`X-API-Key`). |
+| Simpro | file drop + documented API pull | Public REST API per build; you set your build URL and company id. |
+| Commusoft | file drop + documented API pull | Public REST API v2 (Bearer key); recall jobs link to their parent job. |
+| Successware | file drop only | No public API documentation; integrations only through partners. |
+| BuildOps | file drop only | API docs are invite-gated. |
+| Kickserv | file drop only | The documented API is XML, and the pull reads JSON. |
+| mHelpDesk | file drop only | No public API found. |
+| Wintac | file drop only | Desktop software; export to CSV. |
 
 All of this is tested against fixtures only. **Not tested against a live tenant.** Each platform's `<kind>.writeback` goes through the approval gate. It is off by default and asks yes or no on every call. When no backend is configured, it returns `no-backend-configured`. It never reports a success that didn't happen. Run `npm run platforms` to list them.
 

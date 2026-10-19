@@ -27,6 +27,8 @@ export interface PlatformPullConfig {
   realmId?: string;
   realmIdEnv?: string;
   minorVersion?: string;
+  /** Simpro company id (non-secret). */
+  companyId?: string;
 }
 
 export type PullOutcome = "pulled" | "partial" | "no-pull-configured" | "file-drop-only" | "vendor-error";
@@ -89,7 +91,8 @@ export function parsePlatformPullConfig(kind: PlatformKind, raw: unknown): Platf
     locationId: str("locationId"),
     realmId: str("realmId"),
     realmIdEnv: str("realmIdEnv"),
-    minorVersion: str("minorVersion")
+    minorVersion: str("minorVersion"),
+    companyId: str("companyId")
   };
 }
 
@@ -168,11 +171,13 @@ export async function runPlatformPull(args: {
   if (!token) {
     return result(kind, "no-pull-configured", `no ${spec.label} credential: environment variable ${config.tokenEnv} is empty on this machine. Nothing was fetched.`);
   }
-  const headers: Record<string, string> = {
-    Authorization: `${plan.authScheme} ${token}`,
-    Accept: "application/json",
-    "Content-Type": "application/json"
-  };
+  const headers: Record<string, string> = { Accept: "application/json", "Content-Type": "application/json" };
+  if (plan.authScheme === "Header") {
+    if (!plan.authHeader) throw new Error(`${kind} pull plan names no auth header`);
+    headers[plan.authHeader] = token;
+  } else {
+    headers.Authorization = `${plan.authScheme} ${token}`;
+  }
   for (const [header, field] of Object.entries(plan.requiredHeaders ?? {})) {
     const value = (config as unknown as Record<string, string | undefined>)[field];
     if (!value) return result(kind, "no-pull-configured", `${spec.label} pull needs platforms.${kind}.pull.${field} (sent as ${header}). Nothing was fetched.`);
@@ -183,6 +188,7 @@ export async function runPlatformPull(args: {
     pageSize: String(config.pageSize),
     locationId: config.locationId,
     realmId,
+    companyId: config.companyId,
     minorVersionParam: config.minorVersion ? `&minorversion=${encodeURIComponent(config.minorVersion)}` : ""
   };
   for (const field of plan.requiredFields ?? []) {
@@ -225,7 +231,7 @@ export async function runPlatformPull(args: {
       if (isRecord(parsed) && Array.isArray(parsed.errors) && parsed.errors.length) {
         errors[request.key] = `GraphQL errors: ${JSON.stringify(parsed.errors).slice(0, 200)}`;
       }
-      const rows = rowsOf(getPath(parsed, request.collect));
+      const rows = rowsOf(request.collect ? getPath(parsed, request.collect) : parsed);
       doc[request.key] = rows;
       counts[request.key] = rows.length;
     } catch (error) {

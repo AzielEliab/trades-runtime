@@ -1,0 +1,46 @@
+{
+  "synthetic": true,
+  "sourceKind": "servicem8",
+  "note": "Synthetic servicem8-shaped export. Not customer data.",
+  "jobs": [
+    {
+      "uuid": "SYN-SM8-J1",
+      "generated_job_id": "2001",
+      "status": "Work Order",
+      "date": "2026-10-18",
+      "company_uuid": "SYN-SM8-CO1",
+      "company_name": "Synthetic Co M8",
+      "job_address": "5 Synthetic Ln",
+      "total_invoice_amount": "320.00",
+      "trade": "plumbing"
+    }
+  ],
+  "jobactivity": [
+    {
+      "uuid": "SYN-SM8-A1",
+      "job_uuid": "SYN-SM8-J1",
+      "staff_uuid": "SYN-SM8-S1",
+      "start_date": "2026-10-18 08:00:00",
+      "activity_was_scheduled": "1"
+    },
+    {
+      "uuid": "SYN-SM8-A2",
+      "job_uuid": "SYN-SM8-J1",
+      "staff_uuid": "SYN-SM8-S1",
+      "start_date": "2026-10-18 08:05:00",
+      "activity_was_scheduled": "0"
+    }
+  ],
+  "company": [
+    {
+      "uuid": "SYN-SM8-CO1",
+      "name": "Synthetic Co M8"
+    }
+  ],
+  "staff": [
+    {
+      "uuid": "SYN-SM8-S1",
+      "first": "Synthetic"
+    }
+  ]
+}

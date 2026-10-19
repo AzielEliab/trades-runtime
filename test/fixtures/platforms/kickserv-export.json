@@ -1,0 +1,31 @@
+{
+  "synthetic": true,
+  "sourceKind": "kickserv",
+  "note": "Synthetic kickserv-shaped export. Not customer data.",
+  "jobs": [
+    {
+      "job_number": "SYN-KS-77",
+      "status": "Scheduled",
+      "scheduled_on": "2026-10-18T13:00:00Z",
+      "customer": {
+        "customer_number": "SYN-KS-C1",
+        "name": "Synthetic Customer K"
+      },
+      "employees": [
+        {
+          "name": "Synthetic Tech K"
+        }
+      ],
+      "total": "145.00",
+      "service_address": "3 Synthetic Rd",
+      "trade": "sewer"
+    }
+  ],
+  "invoices": [
+    {
+      "invoice_number": "SYN-KS-I1",
+      "status": "Open",
+      "total": 145
+    }
+  ]
+}

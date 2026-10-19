@@ -1,0 +1,39 @@
+{
+  "synthetic": true,
+  "sourceKind": "simpro",
+  "note": "Synthetic simpro-shaped export. Not customer data.",
+  "jobs": [
+    {
+      "ID": 7001,
+      "Description": "Synthetic RTU repair",
+      "Stage": "Progress",
+      "Status": {
+        "Name": "Scheduled"
+      },
+      "DateIssued": "2026-10-12",
+      "Customer": {
+        "ID": 601,
+        "CompanyName": "Synthetic Builder Pty"
+      },
+      "Technician": {
+        "ID": 501,
+        "Name": "Synthetic Tech P"
+      },
+      "Total": {
+        "ExTax": 900,
+        "IncTax": 990
+      },
+      "Site": {
+        "ID": 401,
+        "Name": "Synthetic Site 4"
+      },
+      "trade": "hvac"
+    }
+  ],
+  "customers": [
+    {
+      "ID": 601,
+      "CompanyName": "Synthetic Builder Pty"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "synthetic": true,
+  "sourceKind": "buildops",
+  "note": "Synthetic buildops-shaped export. Not customer data.",
+  "jobs": [
+    {
+      "jobNumber": "SYN-BO-J1",
+      "status": "In Progress",
+      "customerName": "Synthetic Tower LLC",
+      "customerId": "SYN-BO-CU1",
+      "scheduledDate": "2026-10-16",
+      "primaryTechnician": "Synthetic Tech B",
+      "totalAmount": "3,400.00",
+      "propertyAddress": "9 Synthetic Plaza",
+      "trade": "hvac",
+      "visits": [
+        {
+          "visitNumber": "SYN-BO-V1",
+          "scheduledFor": "2026-10-16T14:00:00Z",
+          "primaryTechnician": "Synthetic Tech B"
+        }
+      ]
+    }
+  ],
+  "quotes": [
+    {
+      "quoteNumber": "SYN-BO-Q1",
+      "status": "Sent",
+      "totalAmount": 8800
+    }
+  ]
+}

@@ -23,6 +23,8 @@ export interface CollectionMap {
   entity: PlatformEntity;
   idKeys: string[];
   observedKeys?: string[];
+  /** Vendor times are Unix seconds (ServiceTrade); numeric observed values become ISO strings. */
+  observedEpochSeconds?: boolean;
   statusKeys?: string[];
   /** Normalized key → vendor paths. */
   fields?: Record<string, string[]>;
@@ -119,6 +121,19 @@ function normalizedRow(row: Record<string, unknown>, map: CollectionMap): Record
   return out;
 }
 
+function observedText(row: Record<string, unknown>, map: CollectionMap): string {
+  if (map.observedEpochSeconds) {
+    for (const path of map.observedKeys ?? []) {
+      const value = getPath(row, path);
+      if (typeof value === "number" && Number.isFinite(value) && value > 0) return new Date(value * 1000).toISOString();
+      const text = scalarText(value);
+      if (text) return /^\d{9,11}$/.test(text) ? new Date(Number(text) * 1000).toISOString() : text;
+    }
+    return "";
+  }
+  return firstPathText(row, map.observedKeys);
+}
+
 function mapOne(
   rows: Record<string, unknown>[],
   map: CollectionMap,
@@ -133,7 +148,7 @@ function mapOne(
     out.push({
       entity: map.entity,
       externalId,
-      observedAt: firstPathText(row, map.observedKeys) || undefined,
+      observedAt: observedText(row, map) || undefined,
       status: firstPathText(row, map.statusKeys) || undefined,
       raw
     });
@@ -194,7 +209,7 @@ export function csvEntityForFile(fileName: string | undefined): PlatformEntity {
 }
 
 const CSV_ALIASES: Record<string, string[]> = {
-  id: ["id", "job #", "job number", "job_number", "job id", "job_id", "work order", "work order #", "work_order_number", "invoice #", "invoice number", "invoice_id", "estimate #", "quote #", "quote number", "customer id", "client id", "employee id", "transaction id", "payment id", "number"],
+  id: ["id", "job #", "job number", "job_number", "job id", "job_id", "work order", "work order #", "work_order_number", "wo #", "wo number", "work order no", "workorderno", "ticket #", "ticket id", "invoice #", "invoice number", "invoice_id", "estimate #", "quote #", "quote number", "customer id", "client id", "employee id", "transaction id", "payment id", "number"],
   status: ["status", "job status", "work status", "work_status", "invoice status", "quote status"],
   observed: ["date", "scheduled", "scheduled date", "scheduled start", "start", "start date", "visit date", "created", "created at", "issued date", "txn date", "completed"],
   technicianName: ["technician", "tech", "assigned to", "assigned employees", "team member", "visit assigned to", "employee", "employee name", "name"],

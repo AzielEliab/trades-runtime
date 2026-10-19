@@ -13,7 +13,28 @@
  * pulled document is still admitted as MEDIUM, UNVERIFIED.
  */
 
-export const PLATFORM_KINDS = ["jobber", "housecallpro", "square", "quickbooks", "fieldedge", "servicefusion"] as const;
+import { WAVE2_SPECS } from "./catalog-wave2.js";
+
+export const PLATFORM_KINDS = [
+  "jobber",
+  "housecallpro",
+  "square",
+  "quickbooks",
+  "fieldedge",
+  "servicefusion",
+  // Wave 2 (TR-PLATFORMS-2-2026-10-19); see catalog-wave2.ts for why each was picked.
+  "successware",
+  "workiz",
+  "servicetrade",
+  "buildops",
+  "fieldpulse",
+  "kickserv",
+  "mhelpdesk",
+  "servicem8",
+  "simpro",
+  "commusoft",
+  "wintac"
+] as const;
 export type PlatformKind = (typeof PLATFORM_KINDS)[number];
 
 /** Normalized entities a platform can carry. Same names as the trades-app class plus payment and estimate. */
@@ -30,7 +51,7 @@ export const PLATFORM_ENTITIES = [
 ] as const;
 export type PlatformEntity = (typeof PLATFORM_ENTITIES)[number];
 
-export type PlatformApiStatus = "documented-public-api" | "partner-gated";
+export type PlatformApiStatus = "documented-public-api" | "partner-gated" | "no-public-api";
 
 export interface PlatformSpec {
   kind: PlatformKind;
@@ -53,6 +74,8 @@ export interface PlatformSpec {
   };
   writebackPermission: `${PlatformKind}.writeback`;
   honesty: string;
+  /** Why this platform was added and which public pages informed the pick. No market-share figures. */
+  selection?: { reason: string; sources: string[] };
 }
 
 const NOT_LIVE = "Not tested against a live tenant.";
@@ -173,7 +196,8 @@ export const PLATFORM_SPECS: Readonly<Record<PlatformKind, PlatformSpec>> = {
     },
     writebackPermission: "servicefusion.writeback",
     honesty: `File drop + documented REST GET pull. Vendor API requires the Pro plan. ${NOT_LIVE}`
-  }
+  },
+  ...WAVE2_SPECS
 };
 
 export function isPlatformKind(value: unknown): value is PlatformKind {
