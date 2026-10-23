@@ -11,7 +11,7 @@ TRADES-RUNTIME · OFFICE SOFTWARES 1.0 GATE                                     
  live_backends remains false. pilot_started remains false. Pages remain off.
  No ServiceTitan or ProBooks live writes. No Make Release. This paper does not deploy the Worker.
  This paper does not bump the package, the manifest, glama.json, or the Worker source pin.
- Local Softwares 1.0 (Track L, 1.0.0-local) is already shipped. This paper does not re-ship it.
+ Local Softwares 1.0 (Track L, 1.0.0) is already shipped. This paper does not re-ship it.
 
 
  Product law (verbatim)
@@ -19,7 +19,7 @@ TRADES-RUNTIME · OFFICE SOFTWARES 1.0 GATE                                     
 OFFICE — Office Softwares 1.0 after a real Option C pilot on the local desk
 - Goal: claimable Office Softwares 1.0 after a real Option C pilot on the local desk (npm run desk → 127.0.0.1:4174).
 - BLOCKED until pilot_started true with real Option C. Same shared gate as Field.
-- KEEP: live_backends=false; no ST/ProBooks live writes; Pages off; Glama Latest 1.0.0-local matches the Softwares tip (this paper does not Make Release).
+- KEEP: live_backends=false; no ST/ProBooks live writes; Pages off; Glama Latest still measures 1.0.0-local and is behind the in-repo Softwares pin 1.0.0. Catch-up pending (this paper does not Make Release).
 - Messaging: Office Softwares 1.0 (local / pilot) — never Field 1.0, never company OS live.
 - Do NOT flip pilot_started or live_backends in this paper or in code.
 - Do NOT mix Field flags, Field 1.0, or other Track F waves into an Office PR.
@@ -33,20 +33,20 @@ Ladder today: A done, B done-in-software, C code-ready / pilot not started, D no
 
 
  Version
-    Package, manifest, glama.json claim file, and the giveaway Worker source pin stay 1.0.0-local.
+    Package, manifest, glama.json claim file, and the giveaway Worker source pin stay 1.0.0.
     The product label already shipped is Local Softwares 1.0 (installable). That label is Track L.
     Office Softwares 1.0 is not that label.
     TR-1.0-GATE-2026-09-28 recorded the already-running Worker as 0.4.12 at that cut's check.
     This paper does not rewrite that check and does not deploy.
     A read of https://trades-runtime.vibelock.workers.dev/v1/health on 2026-09-28
-    returned version 1.0.0-local, product_label Local Softwares 1.0,
+    returned version 1.0.0, product_label Local Softwares 1.0,
     pilot_started false, live_backends false.
     That read is Local Softwares 1.0 on the giveaway Worker. It is not an Office 1.0 claim
     and it is not a version bump.
     Checked 2026-10-02: Glama Latest/releaseVersion is 1.0.0-local.
-    The badge matches the Softwares cite tip. Local Softwares 1.0.
+    The public badge is still 1.0.0-local and does not match the in-repo Softwares cite tip 1.0.0. Catch-up pending. Local Softwares 1.0.
     This paper does not Make Release and does not deploy.
-    glama.json version is the in-repo claim file and matches that badge.
+    glama.json version is the in-repo claim file at 1.0.0 and does not yet match the public badge 1.0.0-local. Catch-up pending.
 
 
  Checklist
@@ -110,7 +110,7 @@ Ladder today: A done, B done-in-software, C code-ready / pilot not started, D no
     Ladder: A done, B done-in-software, C code-ready / pilot not started, D not started.
 
  GREEN local-softwares-shipped
-    Track L Local Softwares 1.0 is already the installable label at 1.0.0-local.
+    Track L Local Softwares 1.0 is already the installable label at 1.0.0.
     Common commands (help, softwares, version, health) stay.
     This Office paper does not bump that pin and does not treat Track L as Office 1.0.
 
@@ -124,7 +124,7 @@ Ladder today: A done, B done-in-software, C code-ready / pilot not started, D no
 
  GREEN glama-latest-match
     Checked 2026-10-02: Glama Latest/releaseVersion is 1.0.0-local.
-    The badge matches the Softwares cite tip. It is not an Office Softwares 1.0 label.
+    The public badge is still 1.0.0-local and does not match the in-repo Softwares cite tip 1.0.0. Catch-up pending. It is not an Office Softwares 1.0 label.
     This paper does not Make Release.
 
  OPEN office-messaging
@@ -189,7 +189,7 @@ Ladder today: A done, B done-in-software, C code-ready / pilot not started, D no
 
  BLOCKED glama-make-release
     No Glama admin Deploy. No Make Release.
-    This paper does not move Glama. Latest/releaseVersion 1.0.0-local matches the Softwares cite tip and is not an Office Softwares 1.0 label.
+    This paper does not move Glama. Latest/releaseVersion 1.0.0-local is still 1.0.0-local and is behind the in-repo Softwares cite tip 1.0.0. Catch-up pending and is not an Office Softwares 1.0 label.
 
  BLOCKED field-in-office
     Field flags and Field 1.0 stay out of Office PRs.

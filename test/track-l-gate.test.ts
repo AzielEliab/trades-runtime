@@ -18,7 +18,7 @@ describe("Track L Local Softwares 1.0 gate", () => {
     expect(spec).toMatch(/Aziel Eliab only/);
 
     const gate = localSoftwaresGate();
-    expect(gate.version).toBe("1.0.0-local");
+    expect(gate.version).toBe("1.0.0");
     expect(gate.version).toBe(RUNTIME_MANIFEST.version);
     expect(gate.product_label).toBe("Local Softwares 1.0");
     expect(gate.live_backends).toBe(false);
@@ -36,11 +36,11 @@ describe("Track L Local Softwares 1.0 gate", () => {
       "honesty-flags",
       "desk-kept",
       "suite-card",
-      "glama-latest-match",
-      "glama-public-badge",
       "pages-off"
     ]);
     expect(gate.items.filter((item) => item.state === "open").map((item) => item.id)).toEqual([
+      "glama-latest-match",
+      "glama-public-badge",
       "live-worker-deploy",
       "azinterface-live-shell"
     ]);
@@ -80,7 +80,7 @@ describe("Track L Local Softwares 1.0 gate", () => {
     expect(softwaresText().startsWith(lead)).toBe(true);
     expect(helpText()).toMatch(/Local Softwares 1\.0 \(installable\)/);
     expect(helpText()).toMatch(/without downloading first/);
-    expect(versionText()).toMatch(/trades-runtime 1\.0\.0-local/);
+    expect(versionText()).toMatch(/trades-runtime 1\.0\.0\n/);
     expect(versionText()).toMatch(/Not a Field 1\.0 claim/);
     expect(versionText()).toMatch(/live_backends false\. pilot_started false\./);
     const health = healthLocal();

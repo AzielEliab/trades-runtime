@@ -7,7 +7,7 @@ TRADES-RUNTIME · OFFICE SHADOW TRY                                             
  Identity: Aziel Eliab only. Author of the free software. Not the operator. Not a customer.
  Local shadow office software. Not Office Softwares 1.0. Not a live company OS.
  live_backends remains false. Catalog pilot_started remains false. Pages remain off.
- This paper does not deploy the Worker, does not Make Release, and does not bump 1.0.0-local.
+ This paper does not deploy the Worker, does not Make Release, and does not bump 1.0.0.
  Glama Latest/releaseVersion is 1.0.0-local.
  Field flags are not this paper. They are TR-FIELD-FLAGS-2026-09-27 and npm run shadow:field.
 

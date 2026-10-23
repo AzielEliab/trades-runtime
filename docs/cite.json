@@ -2,7 +2,7 @@
   "product": "trades-runtime",
   "name": "Trades-Runtime",
   "title": "Trades-Runtime",
-  "version": "1.0.0-local",
+  "version": "1.0.0",
   "product_label": "Local Softwares 1.0",
   "track": "L",
   "pilot_started": false,
@@ -21,12 +21,12 @@
   "glama_listing": false,
   "glama_public_version": "1.0.0-local",
   "glama_public_latest": "1.0.0-local",
-  "glama_listing_stale": false,
-  "deployed_worker_version": "1.0.0-local",
+  "glama_listing_stale": true,
+  "deployed_worker_version": "1.0.0",
   "observed_live_worker_version": "0.4.12",
   "observed_live_worker_checked": "2026-09-28",
   "suite_card": "https://trades-runtime.vibelock.workers.dev/suite-card.json",
-  "glama_note": "Checked 2026-10-02 on https://glama.ai/mcp/servers/@AzielEliab/trades-runtime: Glama Latest/releaseVersion is 1.0.0-local (latestRelease.version). The badge matches the Softwares cite tip 1.0.0-local. Local Softwares 1.0. That match is not a Field 1.0 claim and not Office Softwares 1.0. The version field above is this repo and the Worker source, and it is the same string as the Glama Latest badge. glama.json version is the in-repo claim file and matches that badge. The giveaway Worker source pin in this repo is 1.0.0-local and matches the package and the manifest. Checked 2026-09-28: the already-running Worker /v1/health is still 0.4.12. This cite does not deploy. This cut does not Make Release. pilot_started false. live_backends false.",
+  "glama_note": "Checked 2026-10-02 on https://glama.ai/mcp/servers/@AzielEliab/trades-runtime: Glama Latest/releaseVersion is 1.0.0-local (latestRelease.version). The Official MCP Registry still measures 1.0.0-local. Those public mirrors are behind the in-repo Softwares pin 1.0.0. Catch-up pending. The public badge does not match this cite tip yet. Local Softwares 1.0. That gap is not a Field 1.0 claim and not Office Softwares 1.0. The version field above is this repo and the Worker source pin 1.0.0. glama.json version is the in-repo claim file at 1.0.0 and does not yet match the public badge. The giveaway Worker source pin in this repo is 1.0.0 and matches the package and the manifest. Checked 2026-09-28: the already-running Worker /v1/health is still 0.4.12. This cite does not deploy. This cut does not Make Release and does not republish the registry. pilot_started false. live_backends false.",
   "doi": null,
   "repository": "https://github.com/AzielEliab/trades-runtime",
   "public_surface": "https://trades-runtime.vibelock.workers.dev",
@@ -55,6 +55,6 @@
     "ProBooks",
     "Aziel Eliab"
   ],
-  "how_to_cite": "Aziel Eliab, Trades-Runtime 1.0.0-local (Local Softwares 1.0), https://trades-runtime.vibelock.workers.dev/cite.json (Person @id https://www.azieleliab.com/#aziel)",
+  "how_to_cite": "Aziel Eliab, Trades-Runtime 1.0.0 (Local Softwares 1.0), https://trades-runtime.vibelock.workers.dev/cite.json (Person @id https://www.azieleliab.com/#aziel)",
   "description": "Installable Local Softwares 1.0. Local-first TypeScript runtime for shadow-first field-trades operating intelligence. BYO local ServiceTitan + ProBooks inbound. Pages off. Humans use the giveaway Worker UI on the VibeLock host without downloading first. The counted tarball is optional. pilot_started false. live_backends false. Field 1.0 is a later track."
 }

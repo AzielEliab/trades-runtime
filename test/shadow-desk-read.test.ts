@@ -173,7 +173,7 @@ describe("shadow desk read", () => {
     expect(office.office_claim).toBe(false);
     expect(field.writes).toBe(false);
     expect(field.ordersEnabled).toBe(false);
-    expect(field.version).toBe("1.0.0-local");
+    expect(field.version).toBe("1.0.0");
     expect(field.version).toBe(RUNTIME_MANIFEST.version);
     expect(RUNTIME_MANIFEST.pilot_started).toBe(false);
     expect(RUNTIME_MANIFEST.live_backends).toBe(false);
