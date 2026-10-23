@@ -118,12 +118,12 @@ export const FIELD_HINTS: readonly FieldHint[] = [
   {
     id: "property",
     control: "Property card",
-    text: "The property card is the job's service address when this desk already has one, kept as company service history. Zillow, Redfin, and a county assessor are not connected. Listing numbers are not invented and those sites are not scraped."
+    text: "The property card is the job's service address when this desk already has one, kept as company service history. Zillow, Redfin, and a county assessor are not connected until a permitted source. Listing numbers are not invented and those sites are not scraped."
   },
   {
     id: "price",
     control: "Job price",
-    text: "Immediate price is part cost plus labor plus task costs, times the profit-margin multiplier the company types. Discounts apply after that. A typed cost stays typed. SupplyHouse is a read-only public product page: a number is used only when that page returns one, and otherwise the live price is unavailable. Johnstone, Ruud, Rheem, Bryant, Carrier, Duncan, Gustave A. Larson, Habegger, Lee Supply, Lowe's, and Home Depot are named and not connected. No supplier order is placed. Prices are not written to ServiceTitan or Jobber."
+    text: "Immediate price is part cost plus labor plus task costs, times the profit-margin multiplier the company types. Discounts apply after that. A typed cost stays typed. SupplyHouse is a public GET: a number is used only when that page returns one. A 403 or a page with no number leaves the typed cost and says the live price is unavailable. There is no order path. Johnstone, Ruud, Rheem, Bryant, Carrier, Duncan, Gustave A. Larson, Habegger, Lee Supply, Lowe's, and Home Depot stay empty until a permitted account. Prices are not written to ServiceTitan or Jobber."
   },
   {
     id: "kpi",

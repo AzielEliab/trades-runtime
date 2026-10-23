@@ -234,7 +234,7 @@ export function renderAztrades(snapshot: {
     <section id="aztrades-price" data-az="field office management">
       <h3>Job price</h3>
       <p class="quiet">${esc(prices.note)}</p>
-      <p class="hint" data-hint="price">Type a part cost when SupplyHouse does not return a number. The typed cost remains, and the card says the live price is unavailable. Other named sources stay empty. Sign-in records a view request and does not order.</p>
+      <p class="hint" data-hint="price">Type a part cost when SupplyHouse does not return a number, including a 403. The typed cost remains, and the card says the live price is unavailable. Other named suppliers stay empty until a permitted account. Sign-in records a view request and does not order.</p>
       <label>Job
         <select id="price-job">${jobs || `<option value="">No job id</option>`}</select>
       </label>
@@ -257,7 +257,7 @@ export function renderAztrades(snapshot: {
       </label>
       <button type="button" data-price-action="lookup">Look up price</button>
       <button type="button" data-price-action="signin">Sign in to view price and stock only</button>
-      <p class="quiet">When SupplyHouse does not return a number, the typed cost remains and the card says the live price is unavailable.</p>
+      <p class="quiet">When SupplyHouse does not return a number, including a 403, the typed cost remains and the card says the live price is unavailable. There is no order path.</p>
       <p class="quiet">Sign-in does not order. No permitted account is connected, so the button records a local view request and does not open a browser session that can order.</p>
       <p class="quiet">Image is missing until a file is dropped on this machine or a permitted catalog returns one. A photo is not invented.</p>
       <label>Image file already in job-images

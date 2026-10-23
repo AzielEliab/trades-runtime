@@ -821,7 +821,7 @@ export function loadJobPriceBoard(args: {
     pilot_started: false,
     field_claim: false,
     path,
-    note: "Job prices stay on this machine. Typed costs and typed labor are marked typed. SupplyHouse is a read-only public product page: a number is kept only when that page returns one, otherwise the live price is unavailable and the typed cost remains. Johnstone, Ruud, Rheem, Bryant, Carrier, Duncan, Gustave A. Larson, Habegger, Lee Supply, Lowe's, and Home Depot stay named and empty. No supplier order is placed. The same sheet is what field, office, and management read. ServiceTitan, Jobber, and ProBooks writes stay false. The part-cost board remains current, last, and adapted cost. It is not this sell price and not a skill score.",
+    note: "Job prices stay on this machine. Typed costs and typed labor are marked typed. SupplyHouse is a public GET: a number is kept only when that page returns one. A 403 or a page with no number leaves the live price unavailable and the typed cost remains. There is no order path. Johnstone, Ruud, Rheem, Bryant, Carrier, Duncan, Gustave A. Larson, Habegger, Lee Supply, Lowe's, and Home Depot stay empty until a permitted account. The same sheet is what field, office, and management read. ServiceTitan, Jobber, and ProBooks writes stay false. The part-cost board remains current, last, and adapted cost. It is not this sell price and not a skill score.",
     sources: CATALOG_SOURCES,
     jobs: views
   };
