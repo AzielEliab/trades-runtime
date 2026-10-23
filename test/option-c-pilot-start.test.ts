@@ -40,7 +40,7 @@ function pilotPath(box: string): string {
 }
 
 describe("Option C human pilot start", () => {
-  it("keeps the start paper honest and the 1.0.0-local pin", () => {
+  it("keeps the start paper honest and the 1.0.0 pin", () => {
     const spec = readFileSync("specs/TR-PILOT-START-2026-10-02.txt", "utf8");
     expect(spec).toMatch(/Aziel Eliab only/);
     expect(spec).toMatch(/npm run pilot:start -- --branch <branchId>/);
@@ -82,15 +82,15 @@ describe("Option C human pilot start", () => {
     expect(specsIndex).not.toMatch(/That flip is OPEN/);
     expect(readFileSync("docs/llms.txt", "utf8")).toMatch(/npm run pilot:start -- --branch <branchId>/);
     const pkg = JSON.parse(readFileSync("package.json", "utf8")) as { version: string; scripts: Record<string, string> };
-    expect(pkg.version).toBe("1.0.0-local");
+    expect(pkg.version).toBe("1.0.0");
     expect(pkg.scripts["pilot:start"]).toBe("tsx src/cli.ts pilot-start");
-    expect(RUNTIME_MANIFEST.version).toBe("1.0.0-local");
+    expect(RUNTIME_MANIFEST.version).toBe("1.0.0");
     expect(RUNTIME_MANIFEST.pilot_started).toBe(false);
     expect(RUNTIME_MANIFEST.product_label).toBe("Local Softwares 1.0");
     const worker = JSON.parse(readFileSync("workers/giveaway/package.json", "utf8")) as { version: string };
     const glama = JSON.parse(readFileSync("glama.json", "utf8")) as { version: string };
-    expect(worker.version).toBe("1.0.0-local");
-    expect(glama.version).toBe("1.0.0-local");
+    expect(worker.version).toBe("1.0.0");
+    expect(glama.version).toBe("1.0.0");
   });
 
   it("routes pilot-start and refuses a missing branch", async () => {

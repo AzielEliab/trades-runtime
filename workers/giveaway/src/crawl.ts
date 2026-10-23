@@ -2,6 +2,7 @@ import {
   AUTHOR,
   CITE_SAME_AS,
   GLAMA_LISTING_NOTE,
+  GLAMA_LISTING_STALE,
   GLAMA_PUBLIC_LATEST,
   COMPATIBLE_AI_CLIENTS,
   CRAWL_USER_AGENTS,
@@ -73,7 +74,7 @@ Version: ${VERSION} (Worker source). License: ${LICENSE}.
 Product label: ${PRODUCT_LABEL} (installable). pilot_started false. Field 1.0 is a later track.
 Worker source pin is ${VERSION}. x-product-version and /v1/health in this source match that pin.
 Already-running Worker checked ${OBSERVED_LIVE_WORKER_CHECKED} is ${OBSERVED_LIVE_WORKER_VERSION}. This source does not deploy.
-Public Glama listing: Latest/releaseVersion ${GLAMA_PUBLIC_LATEST}. The badge matches the Softwares cite tip ${VERSION}. Local Softwares 1.0. Not a Field 1.0 claim. Not Office Softwares 1.0. ${GLAMA_LISTING_NOTE}
+Public Glama listing: Latest/releaseVersion ${GLAMA_PUBLIC_LATEST} (observed). Repo cite tip ${VERSION}. glama_listing_stale ${GLAMA_LISTING_STALE}. Local Softwares 1.0. Not a Field 1.0 claim. Not Office Softwares 1.0. ${GLAMA_LISTING_NOTE}
 Worker: ${PUBLIC_ORIGIN}
 GitHub: ${REPOSITORY}
 Softwares tab: ${SOFTWARES_TAB}

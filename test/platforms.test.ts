@@ -337,6 +337,6 @@ describe("platform write-back through the approval gate", () => {
   it("keeps catalog honesty flags", () => {
     expect(RUNTIME_MANIFEST.live_backends).toBe(false);
     expect(RUNTIME_MANIFEST.pilot_started).toBe(false);
-    expect(RUNTIME_MANIFEST.version).toBe("1.0.0-local");
+    expect(RUNTIME_MANIFEST.version).toBe("1.0.0");
   });
 });

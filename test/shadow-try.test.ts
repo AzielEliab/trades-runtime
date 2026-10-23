@@ -7,13 +7,13 @@ import { runOfficeShadow } from "../src/shadow/office-try.js";
 
 describe("local shadow try", () => {
   it("keeps the shipped catalog from starting a pilot", () => {
-    expect(RUNTIME_MANIFEST.version).toBe("1.0.0-local");
+    expect(RUNTIME_MANIFEST.version).toBe("1.0.0");
     expect(RUNTIME_MANIFEST.live_backends).toBe(false);
     expect(RUNTIME_MANIFEST.pilot_started).toBe(false);
     expect(RUNTIME_MANIFEST.field_claim).toBe(false);
     expect(RUNTIME_MANIFEST.company_os_live).toBe(false);
     const glama = JSON.parse(readFileSync("glama.json", "utf8")) as { version: string; description: string };
-    expect(glama.version).toBe("1.0.0-local");
+    expect(glama.version).toBe("1.0.0");
     expect(glama.description).toMatch(/1\.0\.0-local/);
     expect(glama.description).not.toMatch(/pre-0\.4\.4/);
     expect(glama.description).not.toMatch(/stays parked/);

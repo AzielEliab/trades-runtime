@@ -1,19 +1,19 @@
 export const PRODUCT = "trades-runtime";
 export const PRODUCT_TITLE = "Trades-Runtime";
-export const VERSION = "1.0.0-local";
+export const VERSION = "1.0.0";
 export const PRODUCT_LABEL = "Local Softwares 1.0";
-/** Public Glama Latest. Same version string as this Worker source pin. Not a Field or Office claim. */
+/** Public Glama Latest observed on the listing (checked 2026-10-02). Not a Field or Office claim. */
 export const GLAMA_PUBLIC_VERSION = "1.0.0-local";
 export const GLAMA_PUBLIC_LATEST = "1.0.0-local";
-/** Checked 2026-10-02. latestRelease.version is 1.0.0-local and matches the cite tip. */
-export const GLAMA_LISTING_STALE = false;
+/** Repo and Worker source pin are 1.0.0; Glama Latest is still 1.0.0-local until a human Make Release. */
+export const GLAMA_LISTING_STALE = true;
 /** Giveaway Worker source pin. Moves with this repo. Not the Glama listing and not a deploy claim. */
-export const DEPLOYED_WORKER_VERSION = "1.0.0-local";
+export const DEPLOYED_WORKER_VERSION = "1.0.0";
 /** Already-running Worker /v1/health. Checked 2026-09-28. This source does not deploy. */
 export const OBSERVED_LIVE_WORKER_VERSION = "0.4.12";
 export const OBSERVED_LIVE_WORKER_CHECKED = "2026-09-28";
 export const GLAMA_LISTING_NOTE =
-  "Checked 2026-10-02 on https://glama.ai/mcp/servers/@AzielEliab/trades-runtime: Glama Latest/releaseVersion is 1.0.0-local (latestRelease.version). The badge matches the Softwares cite tip 1.0.0-local. Local Softwares 1.0. That match is not a Field 1.0 claim and not Office Softwares 1.0. The version field is this repo and the Worker source, and it is the same string as the Glama Latest badge. glama.json version is the in-repo claim file and matches that badge. The giveaway Worker source pin in this repo is 1.0.0-local and matches the package and the manifest. Checked 2026-09-28: the already-running Worker /v1/health is still 0.4.12. This cite does not deploy. This cut does not Make Release. pilot_started false. live_backends false.";
+  "Public product version is 1.0.0 (Local Softwares 1.0). package.json, the runtime manifest, glama.json, and the giveaway Worker source pin share 1.0.0. Checked 2026-10-02 on https://glama.ai/mcp/servers/@AzielEliab/trades-runtime: Glama Latest/releaseVersion is still 1.0.0-local (latestRelease.version) until an operator runs Make Release for 1.0.0. glama_listing_stale true. That is not a Field 1.0 claim and not Office Softwares 1.0. Checked 2026-09-28: the already-running Worker /v1/health is still 0.4.12. This cite does not deploy. pilot_started false. live_backends false.";
 export const AUTHOR = "Aziel Eliab";
 export const IDENTITY = "Aziel Eliab";
 export const LICENSE = "Apache-2.0";

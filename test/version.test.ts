@@ -2,7 +2,7 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { RUNTIME_MANIFEST } from "../src/manifest.js";
 
-const PRODUCT = "1.0.0-local";
+const PRODUCT = "1.0.0";
 const IDENTITY = "Aziel Eliab";
 const PRODUCT_SURFACES = [
   "README.md",
@@ -25,7 +25,7 @@ const PRODUCT_SURFACES = [
 ];
 
 describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", () => {
-  it("keeps package, manifest, and catalog on 1.0.0-local", () => {
+  it("keeps package, manifest, and catalog on 1.0.0", () => {
     const pkg = JSON.parse(readFileSync("package.json", "utf8")) as {
       version: string;
       author: string;
@@ -92,7 +92,8 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
     expect(RUNTIME_MANIFEST.honesty).toMatch(/Option D stays out of scope/);
     expect(RUNTIME_MANIFEST.honesty).toMatch(/0\.4\.10 adds local time tracking/);
     expect(RUNTIME_MANIFEST.honesty).toMatch(/Suggestions are not a dispatch/);
-    expect(RUNTIME_MANIFEST.honesty).toMatch(/The Glama listing Latest is 1\.0\.0-local and matches this cite tip/);
+    expect(RUNTIME_MANIFEST.honesty).toMatch(/Glama listing Latest is still 1\.0\.0-local until Make Release/);
+    expect(RUNTIME_MANIFEST.honesty).toMatch(/glama_listing_stale true/);
     expect(RUNTIME_MANIFEST.honesty).toMatch(/Local Softwares 1\.0/);
     expect(RUNTIME_MANIFEST.honesty).toMatch(/not a Field 1\.0 claim/);
     expect(RUNTIME_MANIFEST.honesty).toMatch(/not a live company OS/);
@@ -102,22 +103,22 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
     expect(RUNTIME_MANIFEST.company_os_live).toBe(false);
     expect(RUNTIME_MANIFEST.pilot_started).toBe(false);
     expect(RUNTIME_MANIFEST.honesty).toMatch(/without downloading first/);
-    expect(RUNTIME_MANIFEST.honesty).toMatch(/Glama Latest\/releaseVersion is 1\.0\.0-local/);
-    expect(RUNTIME_MANIFEST.honesty).toMatch(/The badge matches the Softwares cite tip 1\.0\.0-local/);
+    expect(RUNTIME_MANIFEST.honesty).toMatch(/Glama Latest\/releaseVersion is still 1\.0\.0-local until Make Release/);
+    expect(RUNTIME_MANIFEST.honesty).toMatch(/glama_listing_stale true/);
     expect(RUNTIME_MANIFEST.honesty).toMatch(/not Office Softwares 1\.0/);
     expect(RUNTIME_MANIFEST.honesty).not.toMatch(/0\.4\.7 redeploy is separately in flight/);
     expect(RUNTIME_MANIFEST.honesty).not.toMatch(/Glama Latest is 0\.4/);
-    expect(runtime.honesty).toMatch(/giveaway Worker version pin in this repo moves with the package, the manifest, and glama\.json and is 1\.0\.0-local/);
-    expect(runtime.honesty).toMatch(/The Glama listing Latest is 1\.0\.0-local and matches this cite tip/);
+    expect(runtime.honesty).toMatch(/giveaway Worker version pin in this repo moves with the package, the manifest, and glama\.json and is 1\.0\.0/);
+    expect(runtime.honesty).toMatch(/Glama listing Latest is still 1\.0\.0-local until Make Release/);
     expect(runtime.honesty).toMatch(/without downloading first/);
     expect(RUNTIME_MANIFEST.honesty).toMatch(/trainingNeeded/);
     expect(RUNTIME_MANIFEST.honesty).toMatch(/not a hosted inventory ERP/);
-    expect(RUNTIME_MANIFEST.honesty).toMatch(/The giveaway Worker version pin in this repo moves with the package, the manifest, and glama\.json and is 1\.0\.0-local/);
+    expect(RUNTIME_MANIFEST.honesty).toMatch(/The giveaway Worker version pin in this repo moves with the package, the manifest, and glama\.json and is 1\.0\.0/);
     expect(RUNTIME_MANIFEST.honesty).toMatch(/This cut does not Make Release/);
     expect(RUNTIME_MANIFEST.honesty).not.toMatch(/pre-0\.4\.4/);
     expect(RUNTIME_MANIFEST.honesty).not.toMatch(/Version remains 0\.3\.4/);
-    expect(runtime.honesty).toMatch(/Glama Latest\/releaseVersion is 1\.0\.0-local/);
-    expect(runtime.honesty).toMatch(/The badge matches the Softwares cite tip 1\.0\.0-local/);
+    expect(runtime.honesty).toMatch(/Glama Latest\/releaseVersion is still 1\.0\.0-local until Make Release/);
+    expect(runtime.honesty).toMatch(/glama_listing_stale true/);
     expect(runtime.honesty).toMatch(/BYO local ServiceTitan \+ ProBooks/);
     expect(runtime.honesty).toMatch(/Option C code-ready \/ pilot not started/);
     expect(runtime.honesty).toMatch(/Option D not started/);
@@ -131,7 +132,7 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
     expect(RUNTIME_MANIFEST.launch_options.C.pilot_started).toBe(false);
     expect(RUNTIME_MANIFEST.launch_options.C.prep).toBe("local-runbook");
     expect(RUNTIME_MANIFEST.launch_options.D.status).toBe("not-started");
-    expect(readFileSync("README.md", "utf8")).toMatch(/\*\*Version:\*\* 1\.0\.0-local/);
+    expect(readFileSync("README.md", "utf8")).toMatch(/\*\*Version:\*\* 1\.0\.0/);
     expect(readFileSync("README.md", "utf8")).toMatch(/TR-VENDOR-2026-09-25/);
     expect(readFileSync("README.md", "utf8")).toMatch(/TR-BOT-2026-09-17/);
     expect(readFileSync("README.md", "utf8")).toMatch(/TR-BYO-2026-09-17/);
@@ -158,11 +159,11 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
     expect(readFileSync("README.md", "utf8")).toMatch(/\/api\/stock/);
     expect(readFileSync("README.md", "utf8")).toMatch(/\/api\/huddle/);
     expect(readFileSync("README.md", "utf8")).toMatch(/\/api\/calls\/week\.json/);
-    expect(readFileSync("README.md", "utf8")).toMatch(/Latest\/releaseVersion is \*\*1\.0\.0-local\*\*/);
-    expect(readFileSync("README.md", "utf8")).toMatch(/The badge matches the Softwares cite tip/);
+    expect(readFileSync("README.md", "utf8")).toMatch(/Glama Latest\/releaseVersion is still \*\*1\.0\.0-local\*\*/);
+    expect(readFileSync("README.md", "utf8")).toMatch(/glama_listing_stale/);
     expect(readFileSync("README.md", "utf8")).not.toMatch(/pre-0\.4\.4/);
     expect(readFileSync("README.md", "utf8")).not.toMatch(/\*\*0\.3\.4\*\*/);
-    expect(readFileSync("README.md", "utf8")).toMatch(/giveaway Worker version pin is 1\.0\.0-local/);
+    expect(readFileSync("README.md", "utf8")).toMatch(/giveaway Worker version pin is 1\.0\.0/);
     expect(readFileSync("README.md", "utf8")).toMatch(/TR-1\.0-GATE-2026-09-28/);
     expect(readFileSync("README.md", "utf8")).toMatch(/\/api\/time-tracking/);
     expect(readFileSync("README.md", "utf8")).toMatch(/\/api\/coverage/);
@@ -211,12 +212,12 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
     expect(workerPkg.author).toBe(IDENTITY);
     expect(workerWrangler).toMatch(/"name": "trades-runtime"/);
     expect(workerWrangler).toMatch(/"binding": "COUNTS"/);
-    expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/export const VERSION = "1\.0\.0-local"/);
+    expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/export const VERSION = "1\.0\.0"/);
     expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/GLAMA_PUBLIC_VERSION = "1\.0\.0-local"/);
     expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/GLAMA_PUBLIC_LATEST = "1\.0\.0-local"/);
-    expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/DEPLOYED_WORKER_VERSION = "1\.0\.0-local"/);
+    expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/DEPLOYED_WORKER_VERSION = "1\.0\.0"/);
     expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/OBSERVED_LIVE_WORKER_VERSION = "0\.4\.12"/);
-    expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/GLAMA_LISTING_STALE = false/);
+    expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/GLAMA_LISTING_STALE = true/);
     expect(readFileSync("README.md", "utf8")).toMatch(/Public giveaway Worker/);
     expect(readFileSync("README.md", "utf8")).toMatch(/glama\.ai\/mcp\/servers\/AzielEliab\/trades-runtime/);
     expect(readFileSync("README.md", "utf8")).toMatch(/docs\/GLAMA\.md/);
@@ -246,10 +247,10 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
     expect(cite.glama_listing).toBe(false);
     expect(cite.glama_public_version).toBe("1.0.0-local");
     expect(cite.glama_public_latest).toBe("1.0.0-local");
-    expect(cite.glama_public_version).toBe(cite.version);
-    expect(cite.deployed_worker_version).toBe("1.0.0-local");
+    expect(cite.glama_public_version).not.toBe(cite.version);
+    expect(cite.deployed_worker_version).toBe("1.0.0");
     expect(cite.observed_live_worker_version).toBe("0.4.12");
-    expect(cite.glama_listing_stale).toBe(false);
+    expect(cite.glama_listing_stale).toBe(true);
     expect(cite.version).toBe(cite.deployed_worker_version);
     expect(pkg.scripts).toMatchObject({
       mcp: "node cli/mcp-stdio.mjs",
@@ -262,9 +263,9 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
     expect(readFileSync("Dockerfile", "utf8")).toMatch(/npm install --omit=dev/);
     expect(readFileSync("Dockerfile", "utf8")).toMatch(/CMD \["node", "cli\/mcp-stdio\.mjs"\]/);
     expect(readFileSync("Dockerfile", "utf8")).toMatch(/Mozilla\/5\.0|TRADES_RUNTIME_URL/);
-    expect(glamaDocs).toMatch(/claim-file version \(`1\.0\.0-local`\)/);
-    expect(glamaDocs).toMatch(/Glama Latest\/releaseVersion is 1\.0\.0-local/);
-    expect(glamaDocs).toMatch(/The badge matches the Softwares cite tip/);
+    expect(glamaDocs).toMatch(/claim-file version \(`1\.0\.0`\)/);
+    expect(glamaDocs).toMatch(/Glama Latest\/releaseVersion is still 1\.0\.0-local until Make Release/);
+    expect(glamaDocs).toMatch(/glama_listing_stale true/);
     expect(glamaDocs).toMatch(/not Office Softwares 1\.0/);
     expect(glamaDocs).not.toMatch(/pre-0\.4\.4/);
     expect(glamaDocs).not.toMatch(/stays parked/);

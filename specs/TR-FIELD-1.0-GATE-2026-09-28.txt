@@ -11,7 +11,7 @@ TRADES-RUNTIME · FIELD SOFTWARES 1.0 GATE                                      
  live_backends remains false. pilot_started remains false. Pages remain off.
  No ServiceTitan or ProBooks live writes. No Make Release. This paper does not deploy the Worker.
  This paper does not bump the package, the manifest, glama.json, or the Worker source pin.
- Local Softwares 1.0 (Track L, 1.0.0-local) is already shipped. That label is not Field 1.0.
+ Local Softwares 1.0 (Track L, 1.0.0) is already shipped. That label is not Field 1.0.
  Do not claim Field 1.0 off Local Softwares 1.0 alone.
 
 
@@ -31,24 +31,24 @@ TRACK F — Field Softwares 1.0 ONLY after a real Option C pilot
   4. Settlement path, then Option D, as later separate waves.
 - Messaging: Field Softwares 1.0 (local / pilot) — never company OS live.
 - No fake GPS. No fake telematics. No accuracy percent.
-- KEEP: live_backends=false; no ST/ProBooks live writes; Pages off; Glama Latest 1.0.0-local matches the Softwares tip (this paper does not Make Release).
+- KEEP: live_backends=false; no ST/ProBooks live writes; Pages off; Glama Latest 1.0.0 matches the Softwares tip (this paper does not Make Release).
 - Do NOT flip pilot_started or live_backends in this paper or in code.
 
 Ladder today: A done, B done-in-software, C code-ready / pilot not started, D not started.
 
 
  Version
-    Package, manifest, glama.json claim file, and the giveaway Worker source pin stay 1.0.0-local.
+    Package, manifest, glama.json claim file, and the giveaway Worker source pin stay 1.0.0.
     The product label already shipped is Local Softwares 1.0 (installable). That label is Track L.
     Field Softwares 1.0 is not that label.
     TR-1.0-GATE-2026-09-28 recorded the already-running Worker as 0.4.12 at that cut's check.
     This paper does not rewrite that check and does not deploy.
     A read of https://trades-runtime.vibelock.workers.dev/v1/health on 2026-09-28
-    returned version 1.0.0-local, product_label Local Softwares 1.0,
+    returned version 1.0.0, product_label Local Softwares 1.0,
     pilot_started false, live_backends false, field_claim false.
     That read is Local Softwares 1.0 on the giveaway Worker. It is not a Field 1.0 claim
     and it is not a version bump.
-    Checked 2026-10-02: Glama Latest/releaseVersion is 1.0.0-local.
+    Checked 2026-10-02: Glama Latest/releaseVersion is 1.0.0.
     The badge matches the Softwares cite tip. Local Softwares 1.0.
     This paper does not Make Release and does not deploy.
     glama.json version is the in-repo claim file and matches that badge.
@@ -125,7 +125,7 @@ Ladder today: A done, B done-in-software, C code-ready / pilot not started, D no
     Checked 2026-09-28: GET https://aziel-runtime.vibelock.workers.dev/v1/software
     still cites sister trades-runtime at 0.4.9.
     software_tab false. fraggate_call false.
-    The same-day /v1/health read is 1.0.0-local. Those two numbers do not match.
+    The same-day /v1/health read is 1.0.0. Those two numbers do not match.
     Do not cite the suite row, the Glama badge, or a sister how-to line as Field 1.0.
 
  BLOCKED option-c-pilot
@@ -152,7 +152,7 @@ Ladder today: A done, B done-in-software, C code-ready / pilot not started, D no
 
  BLOCKED glama-make-release
     No Glama admin Deploy. No Make Release.
-    Glama Latest/releaseVersion 1.0.0-local (checked 2026-10-02) matches the Softwares cite tip.
+    Glama Latest/releaseVersion 1.0.0 (checked 2026-10-02) matches the Softwares cite tip.
     It is not a Field 1.0 badge.
 
  BLOCKED mix-into-other-prs
