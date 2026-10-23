@@ -15,7 +15,7 @@ TRADES-RUNTIME · LOCAL SOFTWARES 1.0 GATE                                      
 
 TRACK L — Local Softwares 1.0 first
 - Goal: installable local product at 1.0 feel: common commands already in 0.4.12 (help/softwares/version/health); plain Softwares list; Option C prep green; cite lockstep package/manifest/Worker; AZInterface suite card when ready.
-- KEEP: live_backends=false; pilot_started=false; no ST/ProBooks live writes; Pages off; Glama Latest 1.0.0 matches the Softwares tip (this paper does not Make Release).
+- KEEP: live_backends=false; pilot_started=false; no ST/ProBooks live writes; Pages off; Glama Latest still measures 1.0.0-local and is behind the in-repo Softwares pin 1.0.0. Catch-up pending (this paper does not Make Release).
 - Messaging: Local Softwares 1.0 / installable — never “company OS live” or Field 1.0 claims.
 - Do NOT flip pilot_started or live_backends for a version bump.
 
@@ -33,11 +33,11 @@ Ladder today: A done, B done-in-software, C code-ready / pilot not started, D no
     Checked 2026-09-28: the already-running Worker at
     https://trades-runtime.vibelock.workers.dev/v1/health is still 0.4.12.
     This cut does not deploy. Do not cite that live Worker as 1.0.0.
-    Checked 2026-10-02: Glama Latest/releaseVersion is 1.0.0.
-    The badge matches the Softwares cite tip 1.0.0.
+    Checked 2026-10-02: Glama Latest/releaseVersion is 1.0.0-local.
+    The public badge is still 1.0.0-local and does not match the in-repo Softwares cite tip 1.0.0. Catch-up pending.
     Local Softwares 1.0. Not a Field 1.0 claim. Not Office Softwares 1.0.
     This paper does not Make Release.
-    glama.json version is the in-repo claim file and matches that badge.
+    glama.json version is the in-repo claim file at 1.0.0 and does not yet match the public badge 1.0.0-local. Catch-up pending.
 
 
  Checklist
@@ -75,14 +75,17 @@ Ladder today: A done, B done-in-software, C code-ready / pilot not started, D no
     are a suite shell entry for this separate package.
     FragGate door is none. fraggate_call does not execute this product.
 
- GREEN glama-latest-match
-    Checked 2026-10-02: Glama Latest/releaseVersion is 1.0.0.
-    The badge matches the Softwares cite tip and the Worker source pin.
+ OPEN glama-latest-match
+    Public Glama Latest/releaseVersion still measures 1.0.0-local.
+    The Official MCP Registry still measures 1.0.0-local.
+    The in-repo Softwares pin is 1.0.0. The badge does not match yet. Catch-up pending.
     Local Softwares 1.0. Not a Field 1.0 claim. Not Office Softwares 1.0.
-    This cut does not Make Release and does not deploy.
+    This cut does not Make Release, does not republish the registry, and does not deploy.
 
- GREEN glama-public-badge
-    Public Glama latestRelease.version is 1.0.0 (checked 2026-10-02).
+ OPEN glama-public-badge
+    Public Glama latestRelease.version is 1.0.0-local (checked 2026-10-02).
+    The Official MCP Registry still measures 1.0.0-local.
+    Catch-up to the in-repo pin 1.0.0 is pending.
     pilot_started false. live_backends false.
 
  GREEN pages-off

@@ -8,7 +8,7 @@ TRADES-RUNTIME · FIELD FLAGS ON THE LOCAL DESK                                 
  Extends the local alert rules of TR-ALERTS-2026-09-25.
  live_backends remains false. Pages remain off. Catalog pilot_started remains false.
  This cut does not deploy the public Worker and does not Make Release.
- Package version stays 1.0.0. Glama Latest/releaseVersion is 1.0.0.
+ Package version stays 1.0.0. Glama Latest/releaseVersion is 1.0.0-local.
  This is local shadow field software. It is not a Field 1.0 claim.
  It is not mixed into the office shadow command (npm run shadow:office).
 

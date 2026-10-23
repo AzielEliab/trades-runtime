@@ -14,13 +14,13 @@ This repo ships:
 
 | File | Role |
 |------|------|
-| [`glama.json`](../glama.json) | Claim file. Schema requires `maintainers` (GitHub username `AzielEliab`). Listing `name` (`Trades Runtime`), claim-file version (`1.0.0`), designed-purpose `description` (local-first BYO field-trades; `live_backends` false), `keywords`, `homepage` (`https://glama.ai/mcp/servers/AzielEliab/trades-runtime`), and `documentation` (`https://github.com/AzielEliab/trades-runtime/blob/main/docs/GLAMA.md`) are additional properties. The claim-file version matches the public Glama Latest badge. |
+| [`glama.json`](../glama.json) | Claim file. Schema requires `maintainers` (GitHub username `AzielEliab`). Listing `name` (`Trades Runtime`), claim-file version (`1.0.0`), designed-purpose `description` (local-first BYO field-trades; `live_backends` false), `keywords`, `homepage` (`https://glama.ai/mcp/servers/AzielEliab/trades-runtime`), and `documentation` (`https://github.com/AzielEliab/trades-runtime/blob/main/docs/GLAMA.md`) are additional properties. The claim-file version is the in-repo pin 1.0.0. The public Glama Latest badge is still 1.0.0-local. Catch-up pending. |
 | [`cli/mcp-stdio.mjs`](../cli/mcp-stdio.mjs) | Stdio MCP server. Bridges to the hosted Worker `/mcp` with `User-Agent: Mozilla/5.0`. |
 | [`Dockerfile`](../Dockerfile) | Local / “from Dockerfile” image. Glama admin often **generates** its own image from CMD args — still ship this file. |
 
 Do not invent Glama TDQS scores. Do not claim the listing or Install Server is already live.
 
-Checked 2026-10-02: the listing machine payload `latestRelease.version` is 1.0.0, so Glama Latest/releaseVersion is 1.0.0. The badge matches the Softwares cite tip. Local Softwares 1.0. That match is not a Field 1.0 claim and not Office Softwares 1.0. The Worker source in this repo is 1.0.0. The giveaway Worker version pin in this repo is 1.0.0. Checked 2026-09-28: the already-running Worker is still 0.4.12. This cut does not deploy and does not Make Release. Product label: Local Softwares 1.0 (installable). pilot_started false. live_backends false. Author: Aziel Eliab only.
+Checked 2026-10-02: the listing machine payload `latestRelease.version` is 1.0.0-local, so Glama Latest/releaseVersion is 1.0.0-local. The public badge is still 1.0.0-local and does not match the in-repo Softwares cite tip 1.0.0. Catch-up pending. The Official MCP Registry still measures 1.0.0-local. This cut does not republish it. Local Softwares 1.0. That gap is not a Field 1.0 claim and not Office Softwares 1.0. The Worker source in this repo is 1.0.0. The giveaway Worker version pin in this repo is 1.0.0. Checked 2026-09-28: the already-running Worker is still 0.4.12. This cut does not deploy and does not Make Release. Product label: Local Softwares 1.0 (installable). pilot_started false. live_backends false. Author: Aziel Eliab only.
 
 ## Honesty
 

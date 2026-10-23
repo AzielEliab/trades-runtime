@@ -19,7 +19,7 @@ TRADES-RUNTIME · OFFICE SOFTWARES 1.0 GATE                                     
 OFFICE — Office Softwares 1.0 after a real Option C pilot on the local desk
 - Goal: claimable Office Softwares 1.0 after a real Option C pilot on the local desk (npm run desk → 127.0.0.1:4174).
 - BLOCKED until pilot_started true with real Option C. Same shared gate as Field.
-- KEEP: live_backends=false; no ST/ProBooks live writes; Pages off; Glama Latest 1.0.0 matches the Softwares tip (this paper does not Make Release).
+- KEEP: live_backends=false; no ST/ProBooks live writes; Pages off; Glama Latest still measures 1.0.0-local and is behind the in-repo Softwares pin 1.0.0. Catch-up pending (this paper does not Make Release).
 - Messaging: Office Softwares 1.0 (local / pilot) — never Field 1.0, never company OS live.
 - Do NOT flip pilot_started or live_backends in this paper or in code.
 - Do NOT mix Field flags, Field 1.0, or other Track F waves into an Office PR.
@@ -43,10 +43,10 @@ Ladder today: A done, B done-in-software, C code-ready / pilot not started, D no
     pilot_started false, live_backends false.
     That read is Local Softwares 1.0 on the giveaway Worker. It is not an Office 1.0 claim
     and it is not a version bump.
-    Checked 2026-10-02: Glama Latest/releaseVersion is 1.0.0.
-    The badge matches the Softwares cite tip. Local Softwares 1.0.
+    Checked 2026-10-02: Glama Latest/releaseVersion is 1.0.0-local.
+    The public badge is still 1.0.0-local and does not match the in-repo Softwares cite tip 1.0.0. Catch-up pending. Local Softwares 1.0.
     This paper does not Make Release and does not deploy.
-    glama.json version is the in-repo claim file and matches that badge.
+    glama.json version is the in-repo claim file at 1.0.0 and does not yet match the public badge 1.0.0-local. Catch-up pending.
 
 
  Checklist
@@ -123,8 +123,8 @@ Ladder today: A done, B done-in-software, C code-ready / pilot not started, D no
     No Pages workflow. docs/ remains a local catalog. PDFs stay offline.
 
  GREEN glama-latest-match
-    Checked 2026-10-02: Glama Latest/releaseVersion is 1.0.0.
-    The badge matches the Softwares cite tip. It is not an Office Softwares 1.0 label.
+    Checked 2026-10-02: Glama Latest/releaseVersion is 1.0.0-local.
+    The public badge is still 1.0.0-local and does not match the in-repo Softwares cite tip 1.0.0. Catch-up pending. It is not an Office Softwares 1.0 label.
     This paper does not Make Release.
 
  OPEN office-messaging
@@ -156,7 +156,7 @@ Ladder today: A done, B done-in-software, C code-ready / pilot not started, D no
     Checked 2026-09-28: GET https://aziel-runtime.vibelock.workers.dev/v1/software
     still cites sister trades-runtime at 0.4.9 (version_source named as that health URL).
     software_tab false. fraggate_call false. FragGate door is none.
-    The same-day /v1/health read is 1.0.0. Those two numbers do not match.
+    The same-day /v1/health read is 1.0.0-local. Those two numbers do not match.
     Do not cite the suite row as lockstep.
 
  OPEN azinterface-suite-row
@@ -189,7 +189,7 @@ Ladder today: A done, B done-in-software, C code-ready / pilot not started, D no
 
  BLOCKED glama-make-release
     No Glama admin Deploy. No Make Release.
-    This paper does not move Glama. Latest/releaseVersion 1.0.0 matches the Softwares cite tip and is not an Office Softwares 1.0 label.
+    This paper does not move Glama. Latest/releaseVersion 1.0.0-local is still 1.0.0-local and is behind the in-repo Softwares cite tip 1.0.0. Catch-up pending and is not an Office Softwares 1.0 label.
 
  BLOCKED field-in-office
     Field flags and Field 1.0 stay out of Office PRs.

@@ -103,17 +103,17 @@ const ITEMS: readonly LocalSoftwaresGateItem[] = [
   },
   {
     id: "glama-latest-match",
-    state: "green",
-    label: "Glama Latest matches the cite tip",
+    state: "open",
+    label: "Glama Latest catch-up is pending",
     detail:
-      "Checked 2026-10-02: Glama Latest/releaseVersion is 1.0.0. The badge matches the Softwares cite tip and the Worker source pin. Local Softwares 1.0. Not a Field 1.0 claim. Not Office Softwares 1.0. This cut does not Make Release and does not deploy."
+      "Public Glama Latest/releaseVersion still measures 1.0.0-local. The Official MCP Registry still measures 1.0.0-local. The in-repo Softwares pin is 1.0.0. The badge does not match yet. Catch-up pending. This cut does not Make Release, does not republish the registry, and does not deploy. Not a Field 1.0 claim. Not Office Softwares 1.0."
   },
   {
     id: "glama-public-badge",
-    state: "green",
-    label: "Public Glama Latest is 1.0.0",
+    state: "open",
+    label: "Public Glama Latest is still 1.0.0-local",
     detail:
-      "Checked 2026-10-02: https://glama.ai/mcp/servers/@AzielEliab/trades-runtime latestRelease.version is 1.0.0. pilot_started false. live_backends false."
+      "Checked 2026-10-02: https://glama.ai/mcp/servers/@AzielEliab/trades-runtime latestRelease.version is 1.0.0-local. The Official MCP Registry still measures 1.0.0-local. Catch-up to the in-repo pin 1.0.0 is pending. pilot_started false. live_backends false."
   },
   {
     id: "pages-off",
