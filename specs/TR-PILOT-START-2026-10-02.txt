@@ -11,7 +11,7 @@ TRADES-RUNTIME · OPTION C HUMAN PILOT START                                    
  live_backends remains false. Pages remain off. Option D remains not started.
  This cut does not deploy the public Worker. No tenant data is placed on the Worker.
  This cut does not bump the package, the manifest version, glama.json, or the Worker source pin.
- Local Softwares 1.0 stays the shipped label. The pin stays 1.0.0-local.
+ Local Softwares 1.0 stays the shipped label. The pin stays 1.0.0.
  This cut does not claim Field Softwares 1.0.
  This cut does not claim Office Softwares 1.0.
  This cut does not claim a live company OS.
@@ -42,10 +42,10 @@ TRADES-RUNTIME · OPTION C HUMAN PILOT START                                    
 
 
  Version
-    Package, manifest, glama.json claim file, and the giveaway Worker source pin stay 1.0.0-local.
+    Package, manifest, glama.json claim file, and the giveaway Worker source pin stay 1.0.0.
     Product label stays Local Softwares 1.0 (installable). That label is Track L.
     This cut is not a version bump and it is not an Office 1.0 or Field 1.0 claim.
-    Checked 2026-10-02: Glama Latest/releaseVersion is 1.0.0-local. The badge matches the Softwares cite tip. No Make Release in this paper.
+    Checked 2026-10-02: Glama Latest/releaseVersion is 1.0.0. The badge matches the Softwares cite tip. No Make Release in this paper.
     This paper does not deploy. TradesBot redeploys via GitBaby/Chief when a human asks.
     Checked pattern: the already-running Worker cite in tree stays the prior observation.
     This paper does not rewrite that observation.
@@ -65,7 +65,7 @@ TRADES-RUNTIME · OPTION C HUMAN PILOT START                                    
     It does not add a ServiceTitan or ProBooks write client.
     It does not publish Pages.
     It does not run a Glama admin Deploy or Make Release.
-    It does not bump 1.0.0-local.
+    It does not bump 1.0.0.
     It does not deploy the Worker.
     It does not flip pilot_started in the shipped catalog.
     It does not start Option D.

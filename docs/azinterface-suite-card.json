@@ -10,7 +10,7 @@
   "name": "Trades-Runtime",
   "slug": "trades-runtime",
   "product_label": "Local Softwares 1.0",
-  "version": "1.0.0-local",
+  "version": "1.0.0",
   "track": "L",
   "author": "Aziel Eliab",
   "identity": "Aziel Eliab",
@@ -40,6 +40,6 @@
   "observed_live_worker_version": "0.4.12",
   "observed_live_worker_checked": "2026-09-28",
   "one_line": "Installable Local Softwares 1.0 for field trades. Humans use the VibeLock Worker UI without downloading first. The operator desk stays on the operator machine. live_backends false. pilot_started false.",
-  "lead": "trades-runtime — Local Softwares 1.0 (installable)\nversion 1.0.0-local. Author: Aziel Eliab.\nHumans use the giveaway Worker UI on the VibeLock host without downloading first.\nThis list is the installable local catalog. The operator desk still installs on this machine.\nCommon commands: help, softwares, version, health.\nlive_backends false. pilot_started false.\nLocal Softwares 1.0 is not a Field 1.0 claim and it is not a live company OS.",
+  "lead": "trades-runtime — Local Softwares 1.0 (installable)\nversion 1.0.0. Author: Aziel Eliab.\nHumans use the giveaway Worker UI on the VibeLock host without downloading first.\nThis list is the installable local catalog. The operator desk still installs on this machine.\nCommon commands: help, softwares, version, health.\nlive_backends false. pilot_started false.\nLocal Softwares 1.0 is not a Field 1.0 claim and it is not a live company OS.",
   "note": "Suite shell entry only. This product stays a separate package. AZInterface may show the card. fraggate_call does not execute it. Field 1.0 is not this card. pilot_started false. live_backends false."
 }
