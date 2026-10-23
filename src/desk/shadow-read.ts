@@ -110,7 +110,7 @@ export function shadowDeskFromSnapshot(role: ShadowDeskRole, snapshot: OperatorS
     events: shell.events,
     jobPrices,
     property: propertyFromSnapshot(snapshot),
-    note: "The local desk, shadow:field, and shadow:office read this operator desk snapshot. Clock in, Clock out, Start Meal, End Meal, and Drive time home stay in field-events.jsonl. Typed part cost, labor, task fees, margin, and locked discounts stay on the job price record. There is no second event log. This is a local shadow read. It is not a Field 1.0 claim and not Office Softwares 1.0. pilot_started false. live_backends false. Provider writes stay refused. A SupplyHouse number is present only when the stored sheet already has one. This read does not invent a price and does not place an order."
+    note: "The local desk, shadow:field, and shadow:office read this operator desk snapshot. Clock in, Clock out, Start Meal, End Meal, and Drive time home stay in field-events.jsonl. Typed part cost, labor, task fees, margin, and locked discounts stay on the job price record. There is no second event log. This is a local shadow read. It is not a Field 1.0 claim and not Office Softwares 1.0. pilot_started false. live_backends false. Provider writes stay refused. A SupplyHouse number is present only when the stored sheet already has one from a public GET. A 403 or a page with no number leaves the typed cost. This read does not invent a price, does not open a supplier account, and does not place an order. Zillow, Redfin, and a county assessor are not connected until a permitted source."
   };
 }
 

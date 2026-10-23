@@ -44,7 +44,7 @@ export interface PropertyCard {
 }
 
 const LISTING_NOTE =
-  "No permitted listing or assessor feed is connected on this desk. Zillow is not connected. Redfin is not connected. A county assessor is not connected. Public listing facts stay empty. This is not a live pull and not a scrape. Values are not invented.";
+  "No permitted listing or assessor feed is connected on this desk. Zillow is not connected. Redfin is not connected. A county assessor is not connected until a permitted source. Public listing facts stay empty. This is not a live pull and not a scrape. Values are not invented.";
 
 function knownTrade(lane: string | null): KnownTrade | null {
   if (!lane) return null;
