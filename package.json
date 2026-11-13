@@ -27,6 +27,7 @@
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
+    "check": "npm run typecheck && npm test && npm run giveaway:test",
     "mcp": "node cli/mcp-stdio.mjs",
     "help": "tsx src/cli.ts help",
     "softwares": "tsx src/cli.ts softwares",

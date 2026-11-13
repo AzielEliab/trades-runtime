@@ -96,7 +96,8 @@ describe("local desk login", () => {
       const page = await (await fetch(`${desk.url}`)).text();
       expect(page).toContain("Trying is not a commit");
       expect(page).toContain("The first local user is already okayed");
-      expect(page).not.toContain("Field Softwares 1.0");
+      expect(page).toContain("Field Softwares 1.0");
+      expect(page).toContain("ready for a shop");
       expect(page).not.toContain("Office Softwares 1.0 is live");
 
       const created = await fetch(`${desk.url}api/local-login`, {

@@ -91,10 +91,11 @@ export function helpText(): string {
     "Writes require operator approval; default off. Default is selected mode with nothing enabled.",
     "softwares also accepts Softwares in any letter case.",
     "BYO local ServiceTitan, ProBooks, and trades-app inbound. Write-back only after operator approval and only with a locally configured backend. Credentials stay on this machine.",
-    "Local Softwares 1.0 is not a Field 1.0 claim and it is not a live company OS.",
-    "shadow-field and shadow-office read the operator desk snapshot. They share data/runtime/<instanceId>/field-events.jsonl and the job price record. They do not start a pilot.",
-    "Option C code-ready / pilot not started until a human runs pilot-start --branch <branchId> on this box.",
-    "That command does not claim Field 1.0, Office Softwares 1.0, or a live company OS.",
+    "Local Softwares 1.0 is the installable label. It is not a hosted company OS.",
+    "Field Softwares 1.0 and Office Softwares 1.0 are ready for shop self-implementation.",
+    "shadow-field and shadow-office read the operator desk snapshot. They share data/runtime/<instanceId>/field-events.jsonl and the job price record. They do not start a shop.",
+    "Option C code-ready / pilot not started on the public catalog until a shop runs pilot-start --branch <branchId> on its own machine.",
+    "That command starts this shop's Field Softwares 1.0 and Office Softwares 1.0 on this isolate. It does not claim a live company OS.",
     "shadow-office and shadow-field use fixtures in test/fixtures/sample-branch. They do not start a pilot.",
     "Merging this repo does not start a pilot. Aziel Eliab is the author, not the operator.",
     "Option D not started. Pages intentionally disabled.",
@@ -129,6 +130,7 @@ export function versionText(): string {
   return [
     `${RUNTIME_MANIFEST.product} ${RUNTIME_MANIFEST.version}`,
     `${RUNTIME_MANIFEST.product_label} (installable). Not a Field 1.0 claim. Not a live company OS.`,
+    "Field Softwares 1.0 and Office Softwares 1.0 are ready for shop self-implementation.",
     `live_backends ${live}. pilot_started ${pilot}.`,
     ""
   ].join("\n");

@@ -342,7 +342,8 @@ describe("AZTrades field shell", () => {
     expect(html).toContain("Coupon amount");
     expect(html).toContain("Johnstone Supply · johnstone.com · not connected");
     expect(html).toContain("public page, read-only");
-    expect(html).not.toContain("Field Softwares 1.0");
+    expect(html).toContain("Field Softwares 1.0");
+    expect(html).toContain("ready for a shop");
     expect(html).not.toContain("Office Softwares 1.0 is live");
     for (const source of ["supplyhouse.com", "johnstone.com", "carrier.com", "Home Depot", "Gustave A. Larson"]) {
       expect(html).toContain(source);

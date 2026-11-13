@@ -4,9 +4,10 @@ import { parseLocalInboundConfig } from "./local-inbound-config.js";
 import { isolateRoot, sanitizeInstanceId } from "./runtime-isolate.js";
 
 /**
- * Per-runtime isolate record for a human Option C start.
+ * Per-runtime isolate record for a shop's Field and Office 1.0 start.
  * The shipped catalog stays pilot_started false. Only pilot-start writes this file.
- * A record that claims a company OS, Field 1.0, Office Softwares 1.0, live backends, or writes is ignored.
+ * A successful record is shop-local Field Softwares 1.0 and Office Softwares 1.0.
+ * A record that claims a company OS, a hosted field launch, public live backends, or writes is ignored.
  */
 
 export type IsolateInboundKind = "empty" | "synthetic-only" | "operator-drop";
@@ -30,8 +31,10 @@ export interface IsolatePilotRecord {
   field_claim: false;
   field_launch: false;
   company_os_live: false;
-  office_softwares_1_0: false;
-  field_softwares_1_0: false;
+  office_softwares_1_0: "shop-local";
+  field_softwares_1_0: "shop-local";
+  implementation: "shop-self-serve";
+  central_operator_pilot: false;
   phone_home: false;
   central_dump: false;
   inbound: IsolateInboundKind;
@@ -84,8 +87,10 @@ export function isIsolatePilotRecord(value: unknown): value is IsolatePilotRecor
     value.field_claim === false &&
     value.field_launch === false &&
     value.company_os_live === false &&
-    value.office_softwares_1_0 === false &&
-    value.field_softwares_1_0 === false &&
+    value.office_softwares_1_0 === "shop-local" &&
+    value.field_softwares_1_0 === "shop-local" &&
+    value.implementation === "shop-self-serve" &&
+    value.central_operator_pilot === false &&
     value.phone_home === false &&
     value.central_dump === false &&
     (inbound === "empty" || inbound === "synthetic-only" || inbound === "operator-drop") &&
@@ -117,7 +122,7 @@ export function readIsolatePilot(cwd: string, instanceId?: string): IsolatePilot
 
 export function writeIsolatePilot(cwd: string, record: IsolatePilotRecord): string {
   if (!isIsolatePilotRecord(record)) {
-    throw new Error("isolate pilot record refused: honesty flags did not stay closed");
+    throw new Error("isolate pilot record refused: shop-local Field and Office flags did not stay honest");
   }
   const rel = isolatePilotPath(record.instanceId);
   const path = join(cwd, rel);

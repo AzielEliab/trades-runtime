@@ -36,7 +36,7 @@ export const OPTION_C_START_REFUSAL = {
 } as const;
 
 const SUCCESS_CLAIM =
-  "Local isolate Option C pilot started for one named branch. SHADOW-SEALED. live_backends false. Writes require operator approval; default off. This is not a company OS live claim. This is not Field 1.0. This is not Office Softwares 1.0.";
+  "This shop started Field Softwares 1.0 and Office Softwares 1.0 on this isolate. Self-serve. SHADOW-SEALED. live_backends false on this receipt. Writes require operator approval; default off. This is not a live company OS. The public demo is not this shop.";
 
 export interface OptionCPilotStartOptions {
   cwd?: string;
@@ -76,8 +76,10 @@ export interface OptionCPilotStartReceipt {
   field_claim: false;
   field_launch: false;
   company_os_live: false;
-  office_softwares_1_0: false;
-  field_softwares_1_0: false;
+  office_softwares_1_0: false | "shop-local";
+  field_softwares_1_0: false | "shop-local";
+  implementation: "shop-self-serve";
+  central_operator_pilot: false;
   phone_home: false;
   central_dump: false;
   customer_data: false;
@@ -135,6 +137,8 @@ function baseReceipt(at: string, branchId: string | null): OptionCPilotStartRece
     company_os_live: false,
     office_softwares_1_0: false,
     field_softwares_1_0: false,
+    implementation: "shop-self-serve",
+    central_operator_pilot: false,
     phone_home: false,
     central_dump: false,
     customer_data: false,
@@ -143,7 +147,7 @@ function baseReceipt(at: string, branchId: string | null): OptionCPilotStartRece
     inbound: "not-checked",
     synthetic_inbound: false,
     prep_ready: false,
-    claim: "Pilot start refused. Not a company OS. Not Field 1.0. Not Office Softwares 1.0.",
+    claim: "Pilot start refused. Not a live company OS. This attempt did not start Field 1.0 or Office Softwares 1.0.",
     ledger: emptyLedger()
   };
 }
@@ -247,8 +251,10 @@ function appendLedger(
     field_claim: false,
     field_launch: false,
     company_os_live: false,
-    office_softwares_1_0: false,
-    field_softwares_1_0: false,
+    office_softwares_1_0: receipt.office_softwares_1_0,
+    field_softwares_1_0: receipt.field_softwares_1_0,
+    implementation: "shop-self-serve",
+    central_operator_pilot: false,
     inbound: receipt.inbound,
     customer_data: false,
     wrapper_is_verification: false,
@@ -280,6 +286,8 @@ function fromRecord(record: IsolatePilotRecord, already: boolean): OptionCPilotS
   receipt.inbound = record.inbound;
   receipt.synthetic_inbound = record.inbound === "synthetic-only";
   receipt.prep_ready = true;
+  receipt.field_softwares_1_0 = "shop-local";
+  receipt.office_softwares_1_0 = "shop-local";
   receipt.claim = record.claim;
   return receipt;
 }
@@ -370,6 +378,8 @@ export async function runOptionCPilotStart(options: OptionCPilotStartOptions = {
   receipt.instanceId = startedInstance;
   receipt.pilot_started = true;
   receipt.accepted = true;
+  receipt.field_softwares_1_0 = "shop-local";
+  receipt.office_softwares_1_0 = "shop-local";
   receipt.claim = successClaim(inbound);
   const record: IsolatePilotRecord = {
     kind: "option-c-pilot-isolate",
@@ -390,8 +400,10 @@ export async function runOptionCPilotStart(options: OptionCPilotStartOptions = {
     field_claim: false,
     field_launch: false,
     company_os_live: false,
-    office_softwares_1_0: false,
-    field_softwares_1_0: false,
+    office_softwares_1_0: "shop-local",
+    field_softwares_1_0: "shop-local",
+    implementation: "shop-self-serve",
+    central_operator_pilot: false,
     phone_home: false,
     central_dump: false,
     inbound,
@@ -403,6 +415,8 @@ export async function runOptionCPilotStart(options: OptionCPilotStartOptions = {
   if (!receipt.ledger.verified) {
     receipt.pilot_started = false;
     receipt.accepted = false;
+    receipt.field_softwares_1_0 = false;
+    receipt.office_softwares_1_0 = false;
     receipt.refused = "isolate receipt was not verified";
     receipt.claim = "Pilot start refused. The isolate receipt did not verify. Not a company OS. Not Field 1.0. Not Office Softwares 1.0.";
     return receipt;

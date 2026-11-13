@@ -44,7 +44,7 @@ export interface LocalSoftwaresGate {
 }
 
 const CLAIM =
-  "Local Softwares 1.0 is the installable product label. It is not a Field 1.0 claim and it is not a live company OS. pilot_started stays false. live_backends stays false. Track F stays blocked until a human starts a real Option C pilot.";
+  "Local Softwares 1.0 is the installable product label. It is not a hosted company OS. pilot_started stays false on this catalog. live_backends stays false on the public demo. Field Softwares 1.0 and Office Softwares 1.0 are ready for a shop to implement on its own machine.";
 
 const ITEMS: readonly LocalSoftwaresGateItem[] = [
   {
@@ -140,7 +140,7 @@ const ITEMS: readonly LocalSoftwaresGateItem[] = [
     state: "blocked",
     label: "Option C pilot has not started",
     detail:
-      "The catalog stays blocked. npm run pilot:start can set pilot_started on one operator isolate after a human names a branch. This checklist does not flip that flag. Field 1.0 stays out of this label."
+      "The public catalog stays pilot_started false. A shop starts Field and Office 1.0 with npm run pilot:start on its own isolate. This checklist does not flip the public flag."
   },
   {
     id: "option-d",
@@ -151,8 +151,9 @@ const ITEMS: readonly LocalSoftwaresGateItem[] = [
   {
     id: "field-1-0",
     state: "blocked",
-    label: "Track F Field 1.0 is blocked",
-    detail: "Field 1.0 waits on a real Option C pilot. It is not mixed into this Track L cut."
+    label: "Track L does not host the shop",
+    detail:
+      "This Track L checklist does not host a shop. Field Softwares 1.0 and Office Softwares 1.0 are ready for shop self-implementation. The public catalog stays pilot_started false."
   }
 ];
 
@@ -186,6 +187,7 @@ export function plainSoftwaresLead(): string {
     "This list is the installable local catalog. The operator desk still installs on this machine.",
     "Common commands: help, softwares, version, health.",
     "live_backends false. pilot_started false.",
-    "Local Softwares 1.0 is not a Field 1.0 claim and it is not a live company OS."
+    "Local Softwares 1.0 is not a hosted company OS.",
+    "Field Softwares 1.0 and Office Softwares 1.0 are ready for shop self-implementation."
   ].join("\n");
 }

@@ -74,6 +74,10 @@ export function healthBody(releaseReady: boolean, releaseBytes: number | null): 
     live_backends: false,
     pilot_started: false,
     field_claim: false,
+    field_softwares_1_0: "ready",
+    office_softwares_1_0: "ready",
+    implementation: "shop-self-serve",
+    central_operator_pilot: false,
     hosted_company_os: false,
     tenant_data: false,
     servicetitan_write: false,
@@ -104,6 +108,10 @@ export function citeBody(): Record<string, unknown> {
     live_backends: false,
     pilot_started: false,
     field_claim: false,
+    field_softwares_1_0: "ready",
+    office_softwares_1_0: "ready",
+    implementation: "shop-self-serve",
+    central_operator_pilot: false,
     hosted_company_os: false,
     pages: "off",
     glama_listing: false,
@@ -154,7 +162,7 @@ export function llmsTxt(): string {
 > Author / identity: Aziel Eliab only. Person @id ${PERSON_ID}
 > X / Twitter: ${X_HANDLE} ${X_URL}
 > Version: ${VERSION} (Worker source in this repo)
-> Product label: ${PRODUCT_LABEL} (installable). pilot_started false. live_backends false. Field 1.0 is a later track.
+> Product label: ${PRODUCT_LABEL} (installable). Field Softwares 1.0 and Office Softwares 1.0 are ready for shop self-implementation. This Worker is the public demo. pilot_started false. live_backends false. No tenant data on this Worker.
 > Worker source pin is ${VERSION}. x-product-version and /v1/health in this source match that pin.
 > Already-running Worker checked ${OBSERVED_LIVE_WORKER_CHECKED} is ${OBSERVED_LIVE_WORKER_VERSION}. This source does not deploy.
 > Public Glama listing: Latest/releaseVersion ${GLAMA_PUBLIC_LATEST}. The Official MCP Registry still measures 1.0.0-local. Those public mirrors are behind the in-repo Softwares cite tip ${VERSION}. Catch-up pending. Local Softwares 1.0. Not a Field 1.0 claim. Not Office Softwares 1.0.

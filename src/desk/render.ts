@@ -330,8 +330,8 @@ export function renderTech(snapshot: OperatorSnapshot): string {
     ["Tracking", `${snapshot.tracking.transport} · ${snapshot.tracking.intervalMs}ms`],
     ["Receipt lines", String(snapshot.receiptDigest.lines)],
     ["Writes", "false"],
-    ["live_backends", "false"],
-    ["pilot_started", "false"]
+    ["live_backends", snapshot.live_backends ? "true" : "false"],
+    ["pilot_started", snapshot.pilot_started ? "true" : "false"]
   ];
   return `<dl class="tech">${rows
     .map(([label, value]) => `<div><dt>${esc(label)}</dt><dd>${esc(value)}</dd></div>`)
@@ -797,7 +797,7 @@ export function renderOptionCStartGate(snapshot: OperatorSnapshot): string {
     )
     .join("");
   return `<p class="quiet">${esc(gate.claim)}</p>
-    <p class="quiet">option C ${esc(gate.optionC)}. pilot ${esc(gate.pilot)}. pilot_started ${gate.pilot_started ? "true" : "false"}. pilot may start ${gate.pilotMayStart ? "true" : "false"}. option D ${esc(gate.optionD)}. cutover false. live_backends false. Pages ${esc(gate.pages)}.</p>
+    <p class="quiet">option C ${esc(gate.optionC)}. pilot ${esc(gate.pilot)}. pilot_started ${gate.pilot_started ? "true" : "false"}. pilot may start ${gate.pilotMayStart ? "true" : "false"}. option D ${esc(gate.optionD)}. cutover false. live_backends ${snapshot.live_backends ? "true" : "false"}. Pages ${esc(gate.pages)}.</p>
     <ul class="gates">${items}</ul>
     <p class="quiet"><a href="/api/option-c-start-gate">Start-gate JSON</a>. This panel does not start a pilot.</p>`;
 }
@@ -1436,7 +1436,7 @@ export function renderDeskPage(snapshot: OperatorSnapshot, extras: { deskToken?:
       <div>
         <p class="kicker">Trades-Runtime ${esc(snapshot.version)} · ${esc(RUNTIME_MANIFEST.product_label)} · ${esc(snapshot.author)} · local operator desk</p>
         <h1>The day, on this machine.</h1>
-        <p class="quiet">AZTrades · local field shell · ${esc(RUNTIME_MANIFEST.product_label)}. Not a Field 1.0 claim. Not Office Softwares 1.0.</p>
+        <p class="quiet">AZTrades · local field shell · ${esc(RUNTIME_MANIFEST.product_label)}. Field and office 1.0 are ready for this shop. Not a live company OS.</p>
       </div>
       <div class="actions">
         <button type="button" class="text-btn" id="theme-toggle">Light theme</button>
