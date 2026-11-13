@@ -31,8 +31,9 @@ Ladder today: A done, B done-in-software, C code-ready / pilot not started, D no
     Product label is Local Softwares 1.0 (installable).
     That label is not a Field 1.0 claim and it is not a live company OS.
     Checked 2026-09-28: the already-running Worker at
-    https://trades-runtime.vibelock.workers.dev/v1/health is still 0.4.12.
-    This cut does not deploy. Do not cite that live Worker as 1.0.0.
+    https://trades-runtime.vibelock.workers.dev/v1/health was 0.4.12.
+    Checked 2026-11-13: that same /v1/health is 1.0.0.
+    This update records the observation. It does not deploy.
     Checked 2026-10-02: Glama Latest/releaseVersion is 1.0.0-local.
     The public badge is still 1.0.0-local and does not match the in-repo Softwares cite tip 1.0.0. Catch-up pending.
     Local Softwares 1.0. Not a Field 1.0 claim. Not Office Softwares 1.0.
@@ -91,9 +92,10 @@ Ladder today: A done, B done-in-software, C code-ready / pilot not started, D no
  GREEN pages-off
     No Pages workflow. docs/ remains a local catalog.
 
- OPEN live-worker-deploy
-    The already-running Worker is still 0.4.12 (checked 2026-09-28).
-    This cut does not deploy.
+ GREEN live-worker-deploy
+    Checked 2026-11-13: https://trades-runtime.vibelock.workers.dev/v1/health is 1.0.0.
+    The 2026-09-28 check was 0.4.12.
+    This update records that observation and does not deploy.
 
  OPEN azinterface-live-shell
     The card is in this package.
@@ -122,6 +124,6 @@ Ladder today: A done, B done-in-software, C code-ready / pilot not started, D no
     It does not add a ServiceTitan or ProBooks write client.
     It does not publish Pages.
     It does not run a Glama admin Deploy or Make Release.
-    It does not claim the already-running Worker is 1.0.0.
+    It records the 2026-11-13 observation that /v1/health is 1.0.0. It does not deploy the Worker.
     It does not claim Field 1.0.
     It does not claim a live company OS.

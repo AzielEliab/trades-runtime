@@ -56,6 +56,7 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
       glama_public_latest?: string;
       deployed_worker_version?: string;
       observed_live_worker_version?: string;
+      observed_live_worker_checked?: string;
       glama_listing_stale?: boolean;
     };
 
@@ -218,7 +219,8 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
     expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/GLAMA_PUBLIC_VERSION = "1\.0\.0-local";/);
     expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/GLAMA_PUBLIC_LATEST = "1\.0\.0-local";/);
     expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/DEPLOYED_WORKER_VERSION = "1\.0\.0";/);
-    expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/OBSERVED_LIVE_WORKER_VERSION = "0\.4\.12"/);
+    expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/OBSERVED_LIVE_WORKER_VERSION = "1\.0\.0"/);
+    expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/OBSERVED_LIVE_WORKER_CHECKED = "2026-11-13"/);
     expect(readFileSync("workers/giveaway/src/identity.ts", "utf8")).toMatch(/GLAMA_LISTING_STALE = true/);
     expect(readFileSync("README.md", "utf8")).toMatch(/Public giveaway Worker/);
     expect(readFileSync("README.md", "utf8")).toMatch(/glama\.ai\/mcp\/servers\/AzielEliab\/trades-runtime/);
@@ -252,7 +254,8 @@ describe("TR-AUDIT-2026-09-18B Option C scaffold + identity version lockstep", (
     expect(cite.glama_public_latest).toBe("1.0.0-local");
     expect(cite.glama_public_version).not.toBe(cite.version);
     expect(cite.deployed_worker_version).toBe("1.0.0");
-    expect(cite.observed_live_worker_version).toBe("0.4.12");
+    expect(cite.observed_live_worker_version).toBe("1.0.0");
+    expect(cite.observed_live_worker_checked).toBe("2026-11-13");
     expect(cite.glama_listing_stale).toBe(true);
     expect(cite.version).toBe(cite.deployed_worker_version);
     expect(pkg.scripts).toMatchObject({

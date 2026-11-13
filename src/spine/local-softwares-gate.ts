@@ -10,9 +10,9 @@ import { RUNTIME_MANIFEST } from "../manifest.js";
 export const LOCAL_SOFTWARES_LABEL = "Local Softwares 1.0" as const;
 export const LOCAL_SOFTWARES_TRACK = "L" as const;
 
-/** Already-running giveaway Worker, checked 2026-09-28. This cut does not deploy. */
-export const OBSERVED_LIVE_WORKER_VERSION = "0.4.12" as const;
-export const OBSERVED_LIVE_WORKER_CHECKED = "2026-09-28" as const;
+/** Already-running giveaway Worker /v1/health, checked 2026-11-13. This cut does not deploy. */
+export const OBSERVED_LIVE_WORKER_VERSION = "1.0.0" as const;
+export const OBSERVED_LIVE_WORKER_CHECKED = "2026-11-13" as const;
 
 export type LocalSoftwaresGateState = "green" | "open" | "blocked";
 
@@ -123,10 +123,10 @@ const ITEMS: readonly LocalSoftwaresGateItem[] = [
   },
   {
     id: "live-worker-deploy",
-    state: "open",
-    label: "Already-running Worker is still the previous pin",
+    state: "green",
+    label: "Already-running Worker health matches 1.0.0",
     detail:
-      "Checked 2026-09-28: https://trades-runtime.vibelock.workers.dev/v1/health is still 0.4.12. This cut does not deploy. Do not cite that live Worker as 1.0.0."
+      "Checked 2026-11-13: https://trades-runtime.vibelock.workers.dev/v1/health is 1.0.0. The 2026-09-28 check was 0.4.12. This update records that observation and does not deploy."
   },
   {
     id: "azinterface-live-shell",

@@ -9,11 +9,11 @@ export const GLAMA_PUBLIC_LATEST = "1.0.0-local";
 export const GLAMA_LISTING_STALE = true;
 /** Giveaway Worker source pin. Moves with this repo. Not the Glama listing and not a deploy claim. */
 export const DEPLOYED_WORKER_VERSION = "1.0.0";
-/** Already-running Worker /v1/health. Checked 2026-09-28. This source does not deploy. */
-export const OBSERVED_LIVE_WORKER_VERSION = "0.4.12";
-export const OBSERVED_LIVE_WORKER_CHECKED = "2026-09-28";
+/** Already-running Worker /v1/health. Checked 2026-11-13. This source does not deploy. */
+export const OBSERVED_LIVE_WORKER_VERSION = "1.0.0";
+export const OBSERVED_LIVE_WORKER_CHECKED = "2026-11-13";
 export const GLAMA_LISTING_NOTE =
-  "Checked 2026-10-02 on https://glama.ai/mcp/servers/@AzielEliab/trades-runtime: Glama Latest/releaseVersion is 1.0.0-local (latestRelease.version). The Official MCP Registry still measures 1.0.0-local. Those public mirrors are behind the in-repo Softwares pin 1.0.0. Catch-up pending. The public badge does not match this cite tip yet. Local Softwares 1.0. That gap is not a Field 1.0 claim and not Office Softwares 1.0. The version field is this repo and the Worker source pin 1.0.0. glama.json version is the in-repo claim file at 1.0.0 and does not yet match the public badge. The giveaway Worker source pin in this repo is 1.0.0 and matches the package and the manifest. Checked 2026-09-28: the already-running Worker /v1/health is still 0.4.12. This cite does not deploy. This cut does not Make Release and does not republish the registry. pilot_started false. live_backends false.";
+  "Checked 2026-10-02 on https://glama.ai/mcp/servers/@AzielEliab/trades-runtime: Glama Latest/releaseVersion is 1.0.0-local (latestRelease.version). The Official MCP Registry still measures 1.0.0-local. Those public mirrors are behind the in-repo Softwares pin 1.0.0. Catch-up pending. The public badge does not match this cite tip yet. Local Softwares 1.0. That gap is not a Field 1.0 claim and not Office Softwares 1.0. The version field is this repo and the Worker source pin 1.0.0. glama.json version is the in-repo claim file at 1.0.0 and does not yet match the public badge. The giveaway Worker source pin in this repo is 1.0.0 and matches the package and the manifest. Checked 2026-11-13: the already-running Worker /v1/health is 1.0.0. This cite does not deploy. This cut does not Make Release and does not republish the registry. pilot_started false. live_backends false.";
 export const AUTHOR = "Aziel Eliab";
 export const IDENTITY = "Aziel Eliab";
 export const LICENSE = "Apache-2.0";
