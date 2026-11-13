@@ -20,7 +20,7 @@ This repo ships:
 
 Do not invent Glama TDQS scores. Do not claim the listing or Install Server is already live.
 
-Checked 2026-10-02: the listing machine payload `latestRelease.version` is 1.0.0-local, so Glama Latest/releaseVersion is 1.0.0-local. The public badge is still 1.0.0-local and does not match the in-repo Softwares cite tip 1.0.0. Catch-up pending. The Official MCP Registry still measures 1.0.0-local. This cut does not republish it. Local Softwares 1.0. That gap is not a Field 1.0 claim and not Office Softwares 1.0. The Worker source in this repo is 1.0.0. The giveaway Worker version pin in this repo is 1.0.0. Checked 2026-09-28: the already-running Worker is still 0.4.12. This cut does not deploy and does not Make Release. Product label: Local Softwares 1.0 (installable). pilot_started false. live_backends false. Author: Aziel Eliab only.
+Checked 2026-10-02: the listing machine payload `latestRelease.version` is 1.0.0-local, so Glama Latest/releaseVersion is 1.0.0-local. The public badge is still 1.0.0-local and does not match the in-repo Softwares cite tip 1.0.0. Catch-up pending. The Official MCP Registry still measures 1.0.0-local. This cut does not republish it. Local Softwares 1.0. That gap is not a Field 1.0 claim and not Office Softwares 1.0. The Worker source in this repo is 1.0.0. The giveaway Worker version pin in this repo is 1.0.0. Checked 2026-11-13: the already-running Worker /v1/health is 1.0.0. This cut does not deploy and does not Make Release. Product label: Local Softwares 1.0 (installable). pilot_started false. live_backends false. Author: Aziel Eliab only.
 
 ## Honesty
 

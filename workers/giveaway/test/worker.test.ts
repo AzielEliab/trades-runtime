@@ -201,7 +201,8 @@ describe("giveaway Worker routes", () => {
     expect((cite as { glama_public_version?: string }).glama_public_version).toBe("1.0.0-local");
     expect((cite as { glama_public_latest?: string }).glama_public_latest).toBe("1.0.0-local");
     expect((cite as { deployed_worker_version?: string }).deployed_worker_version).toBe("1.0.0");
-    expect((cite as { observed_live_worker_version?: string }).observed_live_worker_version).toBe("0.4.12");
+    expect((cite as { observed_live_worker_version?: string }).observed_live_worker_version).toBe("1.0.0");
+    expect((cite as { observed_live_worker_checked?: string }).observed_live_worker_checked).toBe("2026-11-13");
     expect((cite as { product_label?: string }).product_label).toBe("Local Softwares 1.0");
     expect((cite as { pilot_started?: boolean }).pilot_started).toBe(false);
     expect((cite as { glama_listing_stale?: boolean }).glama_listing_stale).toBe(true);
@@ -405,7 +406,7 @@ describe("giveaway Worker routes", () => {
 
     const llms = await (await hit(env, "/llms.txt")).text();
     expect(llms).toContain("Worker source pin is 1.0.0");
-    expect(llms).toContain("Already-running Worker checked 2026-09-28 is 0.4.12");
+    expect(llms).toContain("Already-running Worker checked 2026-11-13 is 1.0.0");
     expect(llms).toContain("without downloading first");
     expect(llms).toContain("Catch-up pending");
     expect(llms).toContain("Latest/releaseVersion 1.0.0-local");
@@ -413,7 +414,7 @@ describe("giveaway Worker routes", () => {
     expect(llms).not.toContain("pre-0.4.4");
     expect(llms).not.toMatch(/does not claim the public Worker is already/);
     expect(ai).toContain("Worker source pin is 1.0.0");
-    expect(ai).toContain("Already-running Worker checked 2026-09-28 is 0.4.12");
+    expect(ai).toContain("Already-running Worker checked 2026-11-13 is 1.0.0");
     expect(ai).toContain("without downloading first");
     expect(ai).not.toMatch(/does not claim the public Worker is already/);
     expect(llms).toContain("/ai.txt");

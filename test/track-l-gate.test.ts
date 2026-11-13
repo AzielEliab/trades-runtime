@@ -26,7 +26,8 @@ describe("Track L Local Softwares 1.0 gate", () => {
     expect(gate.field_claim).toBe(false);
     expect(gate.company_os_live).toBe(false);
     expect(gate.glama_make_release).toBe(false);
-    expect(gate.observed_live_worker_version).toBe("0.4.12");
+    expect(gate.observed_live_worker_version).toBe("1.0.0");
+    expect(gate.observed_live_worker_checked).toBe("2026-11-13");
     expect(gate.items.filter((item) => item.state === "green").map((item) => item.id)).toEqual([
       "common-commands",
       "plain-softwares-list",
@@ -36,12 +37,12 @@ describe("Track L Local Softwares 1.0 gate", () => {
       "honesty-flags",
       "desk-kept",
       "suite-card",
-      "pages-off"
+      "pages-off",
+      "live-worker-deploy"
     ]);
     expect(gate.items.filter((item) => item.state === "open").map((item) => item.id)).toEqual([
       "glama-latest-match",
       "glama-public-badge",
-      "live-worker-deploy",
       "azinterface-live-shell"
     ]);
     expect(gate.items.filter((item) => item.state === "blocked").map((item) => item.id)).toEqual([
