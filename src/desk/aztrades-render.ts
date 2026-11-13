@@ -184,8 +184,8 @@ export function renderAztrades(snapshot: {
     <p class="quiet">Surface ${esc(shell.surface)}. Product label ${esc(shell.productLabel)}. field_claim false. office_claim false. pilot_started false. live_backends false. live GPS false. Provider writes false. Pages off. Data ${esc(snapshot.dataLabel)}.</p>
     <div class="chips">
       <span class="chip">Local Softwares 1.0</span>
-      <span class="chip">not a Field 1.0 claim</span>
-      <span class="chip">not Office Softwares 1.0</span>
+      <span class="chip">field and office 1.0 ready</span>
+      <span class="chip">shop self-serve</span>
       <span class="chip">not a live company OS</span>
     </div>
     <section id="aztrades-home" data-az="field office management">

@@ -1,3 +1,4 @@
+import { localBackendsConfigured } from "../spine/field-office-release.js";
 import { loadMappingOverrides } from "../spine/platforms/mapping-override.js";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -216,7 +217,8 @@ export interface OperatorSnapshot {
   version: string;
   author: "Aziel Eliab";
   generatedAt: string;
-  live_backends: false;
+  /** False unless this shop configured local backends on this machine. */
+  live_backends: boolean;
   writes: false;
   dataLabel: DeskDataLabel;
   honesty: string;
@@ -1302,7 +1304,7 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
       "employee friction is a local aggregate of handoff failures, coordination flags, explicit callbacks, and delayed handoffs; a silent export stays unknown; it is not a hosted HR system and it does not set trainingNeeded",
       "inbound quality is a local checklist for ServiceTitan and ProBooks fragments already on this machine; it is not an accuracy percent and not a tenant pull",
       "alert action stubs are proposals only; write-back requires operator approval; default off",
-      "the Option C start gate is prep only; every gate stays blocked-until; the pilot is not started",
+      "Field and Office 1.0 are ready for this shop; standing gate rows stay standing; shop rows start on this machine; the public catalog pilot is not started",
       "monitoring pins come from an optional local file or a labeled synthetic demo; mile totals still ignore coordinates; no telematics vendor is claimed",
       "time cards, coverage shapes, and right-tech suggestions recompute from local files or a labeled synthetic demo; they are not a live GPS feed and suggestions are not a dispatch"
     ],
@@ -1500,7 +1502,7 @@ export function buildOperatorSnapshot(options: DeskSnapshotOptions = {}): Operat
     version: RUNTIME_MANIFEST.version,
     author: "Aziel Eliab",
     generatedAt: now,
-    live_backends: false,
+    live_backends: localBackendsConfigured(cwd, instanceId),
     writes: false,
     dataLabel,
     honesty,

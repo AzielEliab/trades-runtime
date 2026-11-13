@@ -1,5 +1,14 @@
 import { engagementNotice } from "../core/engagement-rules.js";
 import { RUNTIME_MANIFEST } from "../manifest.js";
+import {
+  FIELD_OFFICE_SHOP_LOCAL,
+  FIELD_SOFTWARES_1_0_READY,
+  liveBackendsScope,
+  localBackendsConfigured,
+  OFFICE_SOFTWARES_1_0_READY,
+  SHOP_IMPLEMENTATION,
+  type LiveBackendsScope
+} from "./field-office-release.js";
 import { LOCAL_SOFTWARES_LABEL, LOCAL_SOFTWARES_TRACK } from "./local-softwares-gate.js";
 import { readIsolatePilot } from "./pilot-isolate.js";
 
@@ -18,7 +27,14 @@ export interface HealthLocal {
   author: "Aziel Eliab";
   identity: "Aziel Eliab";
   surface: "health-local";
-  live_backends: false;
+  /** False on the public catalog. True on a shop machine only when that shop configured local backends. */
+  live_backends: boolean;
+  local_backends_configured: boolean;
+  live_backends_scope: LiveBackendsScope;
+  field_softwares_1_0: typeof FIELD_SOFTWARES_1_0_READY | typeof FIELD_OFFICE_SHOP_LOCAL;
+  office_softwares_1_0: typeof OFFICE_SOFTWARES_1_0_READY | typeof FIELD_OFFICE_SHOP_LOCAL;
+  implementation: typeof SHOP_IMPLEMENTATION;
+  central_operator_pilot: false;
   /** No write runs by default. A write runs only through the approval gate after an operator yes. */
   writes: false;
   write_policy: "Writes require operator approval; default off.";
@@ -40,18 +56,28 @@ export interface HealthLocal {
   isolate_pilot?: true;
 }
 
-const NOT_STARTED_CLAIM = "Option C prep only. Pilot not started. Not a live company pilot.";
+const NOT_STARTED_CLAIM =
+  "Option C prep only. Pilot not started. Not a live company pilot. Field Softwares 1.0 and Office Softwares 1.0 are ready for shop self-implementation.";
 const STARTED_CLAIM =
-  "Option C pilot started on this isolate by an explicit human command. SHADOW-SEALED. Not a live company pilot. Not Field 1.0. Not Office Softwares 1.0.";
+  "This shop started Field Softwares 1.0 and Office Softwares 1.0 on this isolate. Self-serve. SHADOW-SEALED. Not a live company OS. The public demo is not this shop.";
 
 export function healthLocal(options?: { cwd?: string; instanceId?: string }): HealthLocal {
   const card = catalogHealth();
   if (!options?.cwd) return card;
-  const record = readIsolatePilot(options.cwd, options.instanceId);
-  if (!record) return card;
-  return {
+  const configured = localBackendsConfigured(options.cwd, options.instanceId);
+  const shopCard: HealthLocal = {
     ...card,
+    live_backends: configured,
+    local_backends_configured: configured,
+    live_backends_scope: liveBackendsScope(configured, "shop")
+  };
+  const record = readIsolatePilot(options.cwd, options.instanceId);
+  if (!record) return shopCard;
+  return {
+    ...shopCard,
     pilot_started: true,
+    field_softwares_1_0: FIELD_OFFICE_SHOP_LOCAL,
+    office_softwares_1_0: FIELD_OFFICE_SHOP_LOCAL,
     option_c: "pilot-started-shadow-sealed",
     claim: STARTED_CLAIM,
     branch_id: record.branchId,
@@ -73,6 +99,12 @@ function catalogHealth(): HealthLocal {
     identity: "Aziel Eliab",
     surface: "health-local",
     live_backends: false,
+    local_backends_configured: false,
+    live_backends_scope: "public-demo",
+    field_softwares_1_0: FIELD_SOFTWARES_1_0_READY,
+    office_softwares_1_0: OFFICE_SOFTWARES_1_0_READY,
+    implementation: SHOP_IMPLEMENTATION,
+    central_operator_pilot: false,
     writes: false,
     write_policy: "Writes require operator approval; default off.",
     pages: "off",

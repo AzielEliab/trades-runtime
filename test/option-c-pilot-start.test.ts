@@ -184,16 +184,18 @@ describe("Option C human pilot start", () => {
     expect(receipt.field_claim).toBe(false);
     expect(receipt.field_launch).toBe(false);
     expect(receipt.company_os_live).toBe(false);
-    expect(receipt.office_softwares_1_0).toBe(false);
-    expect(receipt.field_softwares_1_0).toBe(false);
+    expect(receipt.office_softwares_1_0).toBe("shop-local");
+    expect(receipt.field_softwares_1_0).toBe("shop-local");
+    expect(receipt.implementation).toBe("shop-self-serve");
+    expect(receipt.central_operator_pilot).toBe(false);
     expect(receipt.customer_data).toBe(false);
     expect(receipt.wrapper_is_verification).toBe(false);
     expect(receipt.verification_status).toBe("UNVERIFIED");
     expect(receipt.inbound).toBe("empty");
     expect(receipt.author).toBe("Aziel Eliab");
-    expect(receipt.claim).toMatch(/not a company OS live claim/i);
-    expect(receipt.claim).toMatch(/not Field 1\.0/);
-    expect(receipt.claim).toMatch(/not Office Softwares 1\.0/);
+    expect(receipt.claim).toMatch(/not a live company OS/i);
+    expect(receipt.claim).toMatch(/Field Softwares 1\.0/);
+    expect(receipt.claim).toMatch(/Office Softwares 1\.0/);
     expect(receipt.claim).toMatch(/Empty is not a company drop/);
     expect(receipt.ledger.verified).toBe(true);
     expect(receipt.ledger.hash).toMatch(/^[a-f0-9]{64}$/);
@@ -219,8 +221,11 @@ describe("Option C human pilot start", () => {
     expect(health.field_launch).toBe(false);
     expect(health.company_os_live).toBe(false);
     expect(health.branch_id).toBe("midwest-1");
-    expect(health.claim).toMatch(/Not Field 1\.0/);
-    expect(health.claim).toMatch(/Not Office Softwares 1\.0/);
+    expect(health.field_softwares_1_0).toBe("shop-local");
+    expect(health.office_softwares_1_0).toBe("shop-local");
+    expect(health.claim).toMatch(/Field Softwares 1\.0/);
+    expect(health.claim).toMatch(/Office Softwares 1\.0/);
+    expect(health.claim).toMatch(/Not a live company OS/);
     expect(healthLocal().pilot_started).toBe(false);
 
     const gate = optionCStartGate("2026-10-02T15:02:00.000Z", { cwd: box });
@@ -231,9 +236,12 @@ describe("Option C human pilot start", () => {
     expect(gate.field_claim).toBe(false);
     expect(gate.company_os_live).toBe(false);
     expect(gate.optionD).toBe("out-of-scope");
-    expect(gate.gates.every((item) => item.state === "blocked-until")).toBe(true);
-    expect(gate.claim).toMatch(/Not Field 1\.0/);
-    expect(gate.claim).toMatch(/Not Office Softwares 1\.0/);
+    expect(gate.field_softwares_1_0).toBe("shop-local");
+    expect(gate.office_softwares_1_0).toBe("shop-local");
+    expect(gate.gates.some((item) => item.state === "shop-started")).toBe(true);
+    expect(gate.gates.every((item) => item.state === "standing" || item.state === "shop-started")).toBe(true);
+    expect(gate.claim).toMatch(/Field Softwares 1\.0/);
+    expect(gate.claim).toMatch(/Office Softwares 1\.0/);
     expect(optionCStartGate("2026-10-02T15:02:00.000Z").pilot_started).toBe(false);
 
     expect(RUNTIME_MANIFEST.pilot_started).toBe(false);
@@ -299,7 +307,7 @@ describe("Option C human pilot start", () => {
       };
       expect(deskGate.pilot_started).toBe(true);
       expect(deskGate.pilotMayStart).toBe(false);
-      expect(deskGate.gates.every((item) => item.state === "blocked-until")).toBe(true);
+      expect(deskGate.gates.every((item) => item.state === "standing" || item.state === "shop-started")).toBe(true);
     } finally {
       await desk.close();
     }
@@ -359,7 +367,7 @@ describe("Option C human pilot start", () => {
     expect(drill.company_os_live).toBe(false);
     expect(drill.customer_data).toBe(false);
     expect(drill.claim).toMatch(/Synthetic inbound is not their books/);
-    expect(drill.claim).toMatch(/not a company OS live claim/i);
+    expect(drill.claim).toMatch(/not a live company OS/i);
   });
 
   it("does not let an explicit mode change start the pilot", () => {

@@ -170,7 +170,7 @@ describe("0.4.9 alert action stubs", () => {
 });
 
 describe("0.4.9 Option C start gate", () => {
-  it("stays prep, blocked-until, with Option D out of scope", () => {
+  it("stays prep on the public catalog, with shop rows and Option D out of scope", () => {
     const gate = optionCStartGate(NOW);
     expect(gate.pilot_started).toBe(false);
     expect(gate.pilotMayStart).toBe(false);
@@ -182,8 +182,10 @@ describe("0.4.9 Option C start gate", () => {
     expect(gate.writes).toBe(false);
     expect(gate.pages).toBe("off");
     expect(gate.author).toBe("Aziel Eliab");
+    expect(gate.field_softwares_1_0).toBe("ready");
+    expect(gate.office_softwares_1_0).toBe("ready");
     expect(gate.gates.length).toBeGreaterThanOrEqual(8);
-    expect(gate.gates.every((item) => item.state === "blocked-until" && item.required)).toBe(true);
+    expect(gate.gates.every((item) => (item.state === "standing" || item.state === "shop-starts") && item.required)).toBe(true);
     expect(gate.claim).toMatch(/remains prep/);
     expect(gate.claim).toMatch(/Option D is out of scope/);
     expect(JSON.stringify(gate)).not.toMatch(/pilot_started":true/);
@@ -227,7 +229,8 @@ describe("0.4.9 desk surfaces", () => {
     expect(html).toContain("Human Authority Rule");
     expect(html).toContain("refused: write-back");
     expect(html).toContain("Option C start gate");
-    expect(html).toContain("blocked-until");
+    expect(html).toContain("shop-starts");
+    expect(html).toContain("standing");
     expect(html).toContain("Option C remains prep");
     expect(html).not.toContain("live_backends true");
     expect(html).not.toContain("Glama Latest");
@@ -235,7 +238,7 @@ describe("0.4.9 desk surfaces", () => {
     expect(receipt).toContain("Inbound quality");
     expect(receipt).toContain("Alert action stubs");
     expect(receipt).toContain("Option C start gate");
-    expect(receipt).toContain("blocked-until");
+    expect(receipt).toContain("shop-starts");
 
     const desk = await startOperatorDesk({
       port: 0,
@@ -287,7 +290,7 @@ describe("0.4.9 desk surfaces", () => {
       expect(gate.pilotMayStart).toBe(false);
       expect(gate.optionD).toBe("out-of-scope");
       expect(gate.cutover).toBe(false);
-      expect(gate.gates.every((item) => item.state === "blocked-until")).toBe(true);
+      expect(gate.gates.every((item) => item.state === "standing" || item.state === "shop-starts")).toBe(true);
     } finally {
       await desk.close();
     }

@@ -367,7 +367,7 @@ export function renderPrintableSnapshot(snapshot: OperatorSnapshot): string {
     <h2>Inbound quality</h2>
     <p>${esc(snapshot.inboundQuality.note)} Mean checklist score ${snapshot.inboundQuality.meanScore == null ? "none" : snapshot.inboundQuality.meanScore}. Not an accuracy percent.</p>
     <h2>Option C start gate</h2>
-    <p>${esc(snapshot.optionCStartGate.claim)} pilot_started ${snapshot.pilot_started ? "true" : "false"}. Every gate is blocked-until.</p>
+    <p>${esc(snapshot.optionCStartGate.claim)} pilot_started ${snapshot.pilot_started ? "true" : "false"}. Shop rows are ${snapshot.pilot_started ? "shop-started" : "shop-starts"}. Standing rows stay standing.</p>
     <h2>Inbound</h2>
     <table>
       <thead><tr><th>File</th><th>Peer</th><th>Profile</th><th>Verification</th><th>Hash</th></tr></thead>

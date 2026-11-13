@@ -44,6 +44,10 @@ export interface AzInterfaceSuiteCard {
   live_backends: false;
   pilot_started: false;
   field_claim: false;
+  field_softwares_1_0: "ready";
+  office_softwares_1_0: "ready";
+  implementation: "shop-self-serve";
+  central_operator_pilot: false;
   company_os_live: false;
   pages: "off";
   glama_make_release: false;
@@ -58,7 +62,7 @@ const ONE_LINE =
   "Installable Local Softwares 1.0 for field trades. Humans use the VibeLock Worker UI without downloading first. The operator desk stays on the operator machine. live_backends false. pilot_started false.";
 
 const NOTE =
-  "Suite shell entry only. This product stays a separate package. AZInterface may show the card. fraggate_call does not execute it. Field 1.0 is not this card. pilot_started false. live_backends false.";
+  "Suite shell entry only. This product stays a separate package. AZInterface may show the card. fraggate_call does not execute it. Field Softwares 1.0 and Office Softwares 1.0 are ready for shop self-implementation. This card is not a shop's books. pilot_started false. live_backends false.";
 
 export function azInterfaceSuiteCard(): AzInterfaceSuiteCard {
   return {
@@ -92,6 +96,10 @@ export function azInterfaceSuiteCard(): AzInterfaceSuiteCard {
     live_backends: false,
     pilot_started: false,
     field_claim: false,
+    field_softwares_1_0: "ready",
+    office_softwares_1_0: "ready",
+    implementation: "shop-self-serve",
+    central_operator_pilot: false,
     company_os_live: false,
     pages: "off",
     glama_make_release: false,

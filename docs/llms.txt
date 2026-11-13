@@ -4,7 +4,7 @@
 > Author / identity: Aziel Eliab only.
 X / Twitter: @AzielEliab https://x.com/AzielEliab
 > Version: 1.0.0 (repo and Worker source)
-> Product label: Local Softwares 1.0 (installable). pilot_started false. live_backends false. Field 1.0 is a later track.
+> Product label: Local Softwares 1.0 (installable). Field Softwares 1.0 and Office Softwares 1.0 are ready for shop self-implementation. The public demo stays pilot_started false and live_backends false. No tenant data on the public Worker.
 > Worker source pin is 1.0.0. x-product-version and /v1/health in this source match that pin.
 > Already-running Worker checked 2026-09-28 is 0.4.12. This source does not deploy.
 > Public Glama listing: Latest/releaseVersion 1.0.0-local. The Official MCP Registry still measures 1.0.0-local. The public badge is still 1.0.0-local and does not match the in-repo Softwares cite tip 1.0.0. Catch-up pending. Local Softwares 1.0. Not a Field 1.0 claim. Not Office Softwares 1.0. glama.json version is the in-repo claim file at 1.0.0. The public Glama Latest badge is still 1.0.0-local. Catch-up pending.
@@ -26,7 +26,7 @@ Product is src/. docs/ is a thin local UI. Implementer specs are at repo-root sp
 - npm run desk — local human operator desk at http://127.0.0.1:4174/
 - AZTrades desk shell on that desk (Local Softwares only): clock, meal, drive, job price, local login, property card, SupplyHouse public GET, shell render, hint prefs. live_backends false. pilot_started false. Not Field 1.0. SupplyHouse is a public GET when a number returns; the typed cost remains when unavailable (403 or no number); no order path. Other named suppliers stay empty until a permitted account. The property card is company history only. Zillow, Redfin, and a county assessor are not connected until a permitted source. Local login: the first user is okayed; later users need higher approval. No ServiceTitan or Jobber write-back from this shell.
 - npm run pilot:prep — Option C box prep receipt (pilot_started false; does not start the pilot)
-- npm run pilot:start -- --branch <branchId> — human Option C start (CLI pilot-start). Sets pilot_started true on this isolate only after prep is ready. Refuses a bad or missing branch, prep that is not ready, and --claim-company without real inbound. Catalog and default health stay pilot_started false. SHADOW-SEALED. live_backends false. Not Field 1.0. Not Office Softwares 1.0. Merging docs does not start a pilot.
+- npm run pilot:start -- --branch <branchId> — shop Field and Office 1.0 start (CLI pilot-start). Sets pilot_started true on this isolate only after prep is ready and marks Field Softwares 1.0 and Office Softwares 1.0 shop-local. Refuses a bad or missing branch, prep that is not ready, and --claim-company without real inbound. A refused start is not Field 1.0 and not Office Softwares 1.0. Catalog and default health stay pilot_started false. SHADOW-SEALED. live_backends false on the public demo. Merging docs does not start a pilot.
 - npm run health:local — local honesty card
 - npm run shadow:sealed-demo — synthetic N-day sealed settlement (pilot not started)
 - Manifest: /v1/runtime.json and /modules/

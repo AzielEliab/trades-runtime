@@ -93,6 +93,8 @@ describe("Track L Local Softwares 1.0 gate", () => {
     expect(start.pilot_started).toBe(false);
     expect(start.pilotMayStart).toBe(false);
     expect(start.product_label).toBe("Local Softwares 1.0");
-    expect(start.gates.every((item) => item.state === "blocked-until")).toBe(true);
+    expect(start.gates.every((item) => item.state === "standing" || item.state === "shop-starts")).toBe(true);
+    expect(start.field_softwares_1_0).toBe("ready");
+    expect(start.office_softwares_1_0).toBe("ready");
   });
 });

@@ -216,7 +216,7 @@ export function renderLanding(views: number, downloads: number): string {
         This page is the VibeLock Worker UI. You can use it without downloading first.
         The plain command list is help, softwares, version, and health.
         pilot_started is false. live_backends is false.
-        Field 1.0 is a later track.
+        Field Softwares 1.0 and Office Softwares 1.0 are ready for a shop to implement on its own machine. This Worker holds no tenant data.
       </p>
       <pre>npx tsx src/cli.ts help
 npx tsx src/cli.ts softwares
@@ -346,10 +346,10 @@ cd package
 npm install
 npx tsx src/cli.ts desk</pre>
     <p>Drop your own exports in <code>data/inbound/servicetitan/</code>, <code>data/inbound/probooks/</code>, or <code>data/inbound/trades-app/</code>. The desk binds to 127.0.0.1:4174 and labels synthetic demo data until a local file is admitted. Local alert rules stay on that machine. Copy <code>data/runtime/alerts.json.example</code>. Webhook hooks accept loopback only. This page does not receive them.</p>
-    <p class="notice">A clone can try the local shadow with fixtures already in the repo: <code>npm run shadow:office</code> and <code>npm run shadow:field</code> on sample branch <code>sample-shop</code>. That is not Office Softwares 1.0 and not Field 1.0. Field flags stay under <code>data/runtime/&lt;instanceId&gt;/field-flags/</code> on that machine. This Worker does not receive them and is not an alert bus. Merging the repo does not start a pilot. Aziel Eliab is the author, not the operator.</p>
+    <p class="notice">A clone can try the local shadow with fixtures already in the repo: <code>npm run shadow:office</code> and <code>npm run shadow:field</code> on sample branch <code>sample-shop</code>. That fixture is not the shop start. Field Softwares 1.0 and Office Softwares 1.0 are ready when that shop runs <code>npm run pilot:start -- --branch &lt;branchId&gt;</code> on its own machine. Field flags stay under <code>data/runtime/&lt;instanceId&gt;/field-flags/</code> on that machine. This Worker does not receive them and is not an alert bus. Merging the repo does not start a pilot. Aziel Eliab is the author, not the operator.</p>
     <p class="notice">On that machine the desk can switch a light or dark theme and open a printable snapshot. Both stay local. The lane view counts slots or a known trade token. It does not draw a map. Call filters, <code>/api/calls/week.json</code>, and <code>/api/huddle</code> also stay on that machine. This page still does not load company jobs.</p>
-    <p>Option C prep on that machine is <code>npm run pilot:prep</code>. The receipt keeps <code>pilot_started false</code>. It does not start a company pilot, and this Worker does not run that prep.</p>
-    <p class="notice">ServiceTitan, ProBooks, and trades-app writes stay refused. Option C pilot is not started. Option D is not started.</p>
+    <p>Option C prep on that machine is <code>npm run pilot:prep</code>. The receipt keeps <code>pilot_started false</code>. It does not start a company pilot. After prep is green, that shop runs <code>npm run pilot:start -- --branch &lt;branchId&gt;</code> on its own machine. This Worker does not run that prep and does not hold the shop's exports or credentials.</p>
+    <p class="notice">Writes require operator approval and are off by default. They run only on the shop machine, and only with that shop's local backends. The public demo keeps live_backends false. Option D is not started.</p>
     <p><a class="btn" href="/#workspace">Use on Worker</a></p>
   </main>
 </body>

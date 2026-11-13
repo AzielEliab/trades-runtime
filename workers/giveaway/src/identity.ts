@@ -191,9 +191,13 @@ export const SITEMAP_ENTRIES = [
 
 export const SITEMAP_PATHS = SITEMAP_ENTRIES.map((entry) => entry.path);
 
+export const FIELD_SOFTWARES_1_0 = "ready" as const;
+export const OFFICE_SOFTWARES_1_0 = "ready" as const;
+export const SHOP_IMPLEMENTATION = "shop-self-serve" as const;
+
 export const HONESTY = {
   product:
-    "Local-first BYO runtime. People bring their own ServiceTitan and ProBooks. Humans use this giveaway Worker UI on the VibeLock host (browser / PWA) without downloading first. Agents use OpenAPI and MCP. The optional counted pack is GET /download. Trades-app drop-in and the operator desk run on the operator machine. No tenant data on this Worker. No ST/ProBooks write-back. live_backends false.",
+    "Local-first BYO runtime. People bring their own ServiceTitan and ProBooks. Field Softwares 1.0 and Office Softwares 1.0 are ready for a shop to implement on its own machine. Humans use this giveaway Worker UI on the VibeLock host (browser / PWA) without downloading first. Agents use OpenAPI and MCP. The optional counted pack is GET /download. Trades-app drop-in and the operator desk run on the operator machine. No tenant data on this Worker. No ST/ProBooks write-back. live_backends false unless a shop configures local backends on its own machine, which this Worker does not hold. Writes on a shop machine require operator approval and are off by default.",
   counters:
     "Honest Workers KV counts. views increments exactly once per successful GET / HTML homepage 200. Health-check user-agents and non-GET / requests are not counted. downloads increments exactly once per successful GET /download 200 after the release tarball is verified as gzip. Assets, /v1/health, /v1/stats, /openapi.json, /mcp, /cite.json, /llms.txt, /robots.txt, and /v1/skill do not increment. No sampling. No inflation. No estimated unique visitors. Start at 0. Each increment writes one unique COUNTS key (views:<uuid> or downloads:<uuid>) and also does value = (parseInt(await kv.get(name))||0)+1 with put on the name key. GET /v1/stats lists the unique keys (source of truth) and never seeds or rounds up. KV list is eventually consistent — a just-written key may take up to ~60s to appear in another colo. Failed downloads never increment."
 } as const;

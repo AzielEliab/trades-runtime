@@ -70,7 +70,7 @@ Trades-Runtime is a shadow-first, local-first TypeScript runtime for HVAC, plumb
 
 Public name: Trades-Runtime (trades-runtime). Author / identity: Aziel Eliab only (Person @id ${PERSON_ID}).
 Version: ${VERSION} (Worker source). License: ${LICENSE}.
-Product label: ${PRODUCT_LABEL} (installable). pilot_started false. Field 1.0 is a later track.
+Product label: ${PRODUCT_LABEL} (installable). Field Softwares 1.0 and Office Softwares 1.0 are ready for shop self-implementation. This Worker is the public demo. pilot_started false. live_backends false. No tenant data on this Worker.
 Worker source pin is ${VERSION}. x-product-version and /v1/health in this source match that pin.
 Already-running Worker checked ${OBSERVED_LIVE_WORKER_CHECKED} is ${OBSERVED_LIVE_WORKER_VERSION}. This source does not deploy.
 Public Glama listing: Latest/releaseVersion ${GLAMA_PUBLIC_LATEST}. The Official MCP Registry still measures 1.0.0-local. Those public mirrors are behind the in-repo Softwares cite tip ${VERSION}. Catch-up pending. Local Softwares 1.0. Not a Field 1.0 claim. Not Office Softwares 1.0. ${GLAMA_LISTING_NOTE}

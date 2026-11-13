@@ -204,6 +204,11 @@ describe("giveaway Worker routes", () => {
     expect((cite as { observed_live_worker_version?: string }).observed_live_worker_version).toBe("0.4.12");
     expect((cite as { product_label?: string }).product_label).toBe("Local Softwares 1.0");
     expect((cite as { pilot_started?: boolean }).pilot_started).toBe(false);
+    expect((cite as { field_softwares_1_0?: string }).field_softwares_1_0).toBe("ready");
+    expect((cite as { office_softwares_1_0?: string }).office_softwares_1_0).toBe("ready");
+    expect((cite as { implementation?: string }).implementation).toBe("shop-self-serve");
+    expect((cite as { central_operator_pilot?: boolean }).central_operator_pilot).toBe(false);
+    expect((cite as { tenant_data?: unknown }).tenant_data).toBeUndefined();
     expect((cite as { glama_listing_stale?: boolean }).glama_listing_stale).toBe(true);
     expect(cite.version).toBe((cite as { deployed_worker_version?: string }).deployed_worker_version);
     expect(cite.version).not.toBe((cite as { glama_public_version?: string }).glama_public_version);
@@ -231,6 +236,8 @@ describe("giveaway Worker routes", () => {
     expect(suite.fraggate_call).toBe(false);
     expect(suite.pilot_started).toBe(false);
     expect(suite.live_backends).toBe(false);
+    expect((suite as { field_softwares_1_0?: string }).field_softwares_1_0).toBe("ready");
+    expect((suite as { office_softwares_1_0?: string }).office_softwares_1_0).toBe("ready");
     expect(suite.product_label).toBe("Local Softwares 1.0");
     expect(suite.version).toBe(VERSION);
     expect(suite.door).toBe("none");

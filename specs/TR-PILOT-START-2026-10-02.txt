@@ -4,7 +4,10 @@ TRADES-RUNTIME · OPTION C HUMAN PILOT START                                    
 
 
  Receipt ID TR-PILOT-START-2026-10-02 · 2026-10-02
+ Amended 2026-11-13 by TR-FIELD-OFFICE-SELF-SERVE-2026-11-13.
  Identity: Aziel Eliab only.
+ Current law: a successful shop start claims shop-local Field Softwares 1.0 and Office Softwares 1.0.
+ The 2026-10-02 body below recorded the command before that claim. Read the amendment first.
  This cut shipped the human start command. TR-OPTION-C-PILOT-RUNBOOK-2026-10-02 documents how to run it.
  It does not start a pilot by itself.
  A person must run the command on the operator box.

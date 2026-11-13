@@ -378,7 +378,7 @@ export function buildFieldShell(args: {
     dataLabel: args.dataLabel,
     missionDay: args.missionDay,
     generatedAt: args.now,
-    note: `AZTrades is the local field shell on this operator desk. trades-runtime is the bridge. Point A stays the company's current provider through the existing drop-in profiles. Point B is this desk. Clock, meal, and drive events are local records the field, office, and management read together. This is Local Softwares 1.0 (installable). It is not a Field 1.0 claim, not Office Softwares 1.0, and not a live company OS. pilot_started false. live_backends false. Provider writes stay refused. ${AZTRADES_TRY_PATH}`,
+    note: `AZTrades is the local field shell on this shop desk. trades-runtime is the bridge. Point A stays the company's current provider through the existing drop-in profiles. Point B is this desk. Clock, meal, and drive events are local records the field, office, and management read together. This is Local Softwares 1.0 (installable). Field and office 1.0 are ready for this shop to implement here. It is not a Field 1.0 claim on the public demo, not Office Softwares 1.0 as a hosted company, and not a live company OS. pilot_started false until this shop runs pilot:start. live_backends false unless this shop configured local backends. Provider writes stay approval-gated and default off. ${AZTRADES_TRY_PATH}`,
     hints: FIELD_HINTS,
     techs: [...techs.entries()].map(([id, name]) => ({ id, name })).sort((a, b) => a.id.localeCompare(b.id)),
     todayJob: todayJob

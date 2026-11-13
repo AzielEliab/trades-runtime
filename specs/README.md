@@ -1,5 +1,7 @@
 # Trades-Runtime private specs (not published)
 
+[`TR-FIELD-OFFICE-SELF-SERVE-2026-11-13`](TR-FIELD-OFFICE-SELF-SERVE-2026-11-13.txt) is the current Field and Office law. Field Softwares 1.0 and Office Softwares 1.0 are ready. Each shop implements on its own machine: local setup, exports, and credentials. There is no central operator pilot. `npm run pilot:start -- --branch <branchId>` starts that shop's isolate and marks both releases shop-local. The public catalog and the giveaway Worker stay `pilot_started` false and `live_backends` false. No tenant data on public Workers or Pages. Writes require operator approval; default off. Option D stays not started. Version stays 1.0.0.
+
 These text extracts drive implementation. Original PDFs stay offline / in chat attachments only — never serve PDFs from GitHub Pages.
 
 Standing rule: every PDF becomes coded software (current, prior, future).

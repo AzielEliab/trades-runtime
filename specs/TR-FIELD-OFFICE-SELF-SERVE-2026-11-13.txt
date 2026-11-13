@@ -1,0 +1,59 @@
+TRADES-RUNTIME · FIELD AND OFFICE 1.0 SELF-SERVE                                                                          TR-FIELD-OFFICE-SELF-SERVE-2026-11-13
+
+
+
+
+ Receipt ID TR-FIELD-OFFICE-SELF-SERVE-2026-11-13 · 2026-11-13
+ Identity: Aziel Eliab only.
+ Field Softwares 1.0 and Office Softwares 1.0 are ready.
+ Each shop implements on its own machine.
+ There is no central operator-run pilot to wait for.
+ This paper does not deploy the public Worker. No tenant data is placed on the Worker or on Pages.
+ live_backends stays false on the public demo. A shop may configure local backends on its own machine.
+ Writes require operator approval; default off.
+ This paper does not bump the package, the manifest version, glama.json, or the Worker source pin.
+ This paper does not Make Release. Option D stays not started.
+ This paper does not claim a live company OS.
+
+
+ Product law
+
+FIELD AND OFFICE — ready for shop self-implementation
+- Field Softwares 1.0 is ready. Office Softwares 1.0 is ready.
+- implementation is shop-self-serve. central_operator_pilot is false.
+- Each shop runs its own local setup, its own exports, and its own credentials.
+- npm run pilot:prep still checks the box and does not start the shop.
+- npm run pilot:start -- --branch <branchId> is the shop start on that isolate only.
+- A successful start writes data/runtime/<instanceId>/pilot.json with field_softwares_1_0 and office_softwares_1_0 set to shop-local.
+- A missing branch, prep that is not ready, and --claim-company on empty or synthetic inbound still refuse.
+- A refused start is not Field 1.0 and not Office Softwares 1.0.
+- The shipped catalog, default health, and the public giveaway Worker stay pilot_started false.
+- The public demo stays live_backends false. It holds no tenant data and no shop credentials.
+- live_backends is true only on a shop machine that configured its own local backends.
+- Writes require operator approval; default off. The public Worker has no write-back.
+- SHADOW-SEALED stays until a human on that machine changes the mode. A mode change does not start the shop.
+- Fixture commands npm run shadow:field and npm run shadow:office stay samples. They are not the shop start.
+- Option D is not started. No cutover. No fake GPS, telematics, or accuracy percent.
+- Pages stay off. No Glama Make Release. Version stays 1.0.0.
+
+Ladder today: A done, B done-in-software, C ready for shop self-implementation / public catalog pilot not started, D not started.
+
+
+ What a shop does
+    1. Clone this repo on the shop machine. npm install. npm test.
+    2. npm run pilot:prep. The receipt keeps pilot_started false.
+    3. Place that shop's own exports under data/inbound/servicetitan, data/inbound/probooks, or data/inbound/trades-app when they choose to. Empty stays empty. Do not commit a customer file.
+    4. Credentials stay in environment variables on that machine. write-backends.json names those variables and does not hold a token.
+    5. npm run pilot:start -- --branch <branchId>
+    6. npm run desk on 127.0.0.1:4174. That desk is the shop's office. It is not served by the public Worker.
+
+
+ What this paper does not do
+    It does not start a shop by being merged.
+    It does not put tenant data on a public Worker or on Pages.
+    It does not turn live_backends true in the shipped catalog.
+    It does not add a write that runs without an operator yes.
+    It does not start Option D.
+    It does not claim a live company OS.
+    It does not deploy the Worker.
+    It does not Make Release.
