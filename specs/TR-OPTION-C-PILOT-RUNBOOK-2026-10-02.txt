@@ -4,7 +4,13 @@ TRADES-RUNTIME · OPTION C HUMAN PILOT RUNBOOK                                  
 
 
  Receipt ID TR-OPTION-C-PILOT-RUNBOOK-2026-10-02 · 2026-10-02
+ Amended 2026-11-13 by TR-FIELD-OFFICE-SELF-SERVE-2026-11-13.
  Identity: Aziel Eliab only.
+ Current law: Field Softwares 1.0 and Office Softwares 1.0 are ready for shop self-implementation.
+ A successful npm run pilot:start -- --branch <branchId> on this isolate is that shop's start.
+ A refused start is not Field 1.0 and not Office Softwares 1.0.
+ The public catalog stays pilot_started false. live_backends stays false on the public demo.
+ Merging this paper does not start a pilot. Version stays 1.0.0.
  Human steps to START a real Option C pilot on an operator box after prep is green.
  The start command is shipped. This paper tells the operator how to run it.
  Prep already exists. Option D stays a separate wave.
@@ -208,18 +214,18 @@ TRADES-RUNTIME · OPTION C HUMAN PILOT RUNBOOK                                  
         Success writes data/runtime/<instanceId>/pilot.json for that instance only
         and appends a lifecycle line to data/runtime/<instanceId>/receipts.jsonl.
         Mode stays SHADOW-SEALED. autoPromote stays false. field_launch stays false.
-        live_backends stays false. Pages stay off. Writes stay refused.
-        The receipt says this is not a company OS live claim, not Field 1.0,
-        and not Office Softwares 1.0.
+        The public catalog live_backends stays false. Pages stay off. Writes require operator approval; default off.
+        The receipt says this shop started Field Softwares 1.0 and Office Softwares 1.0 on this isolate.
+        It is not a live company OS. A refused start is not Field 1.0 and not Office Softwares 1.0.
         health-local and the Option C start gate read that isolate file when given the operator root.
         Running the command on a checkout that is not prep-ready does not start a pilot.
         Merging this runbook does not start a pilot.
         A human must run it on their box against one real prep-ready branch.
         Do not tell a GM the pilot has begun because this paper merged.
 
- 4. After start — next Softwares waves
-    These waves wait until pilot_started is true with a real Option C.
-    They are not done in this paper. This paper does not retitle the desk.
+ 4. After start
+    A successful start is this shop's Field Softwares 1.0 and Office Softwares 1.0.
+    Option D stays a later wave. This paper does not retitle the public demo into a hosted company.
 
     Office messaging path.
     TR-OFFICE-1.0-GATE-2026-09-28.

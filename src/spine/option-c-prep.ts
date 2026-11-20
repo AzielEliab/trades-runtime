@@ -10,6 +10,7 @@ import { parseAlertConfig } from "../desk/alerts.js";
 import { admitDropInFile } from "./drop-in.js";
 import { DurableReceiptStore } from "./durable-receipts.js";
 import { recordEngagementDrop } from "./engagement-receipt.js";
+import { liveBackendsStayHonest } from "./field-office-release.js";
 import { healthLocal, type HealthLocal } from "./health-local.js";
 import { LOCAL_SOFTWARES_LABEL, LOCAL_SOFTWARES_TRACK, localSoftwaresGate } from "./local-softwares-gate.js";
 import { BYO_INBOUND_ROOT, HOSTED_TENANT_LAYOUT, isHostedTenantLayout } from "./inbound-layout.js";
@@ -244,19 +245,20 @@ export async function runOptionCPrep(options: OptionCPrepOptions = {}): Promise<
   }
 
   check(checks, "author", RUNTIME_MANIFEST.author === "Aziel Eliab" && RUNTIME_MANIFEST.identity === "Aziel Eliab", "author is Aziel Eliab only");
+  const backendsHonest = liveBackendsStayHonest(receipt.health);
   const isolateAlreadyStarted =
     receipt.health.pilot_started === true &&
     receipt.health.company_os_live === false &&
     receipt.health.field_claim === false &&
     receipt.health.field_launch === false &&
-    receipt.health.live_backends === false &&
+    backendsHonest &&
     receipt.health.mode === "SHADOW-SEALED";
   check(
     checks,
     "honesty-flags",
     RUNTIME_MANIFEST.live_backends === false &&
       RUNTIME_MANIFEST.pilot_started === false &&
-      receipt.health.live_backends === false &&
+      backendsHonest &&
       receipt.health.writes === false &&
       receipt.health.pages === "off" &&
       receipt.health.field_claim === false &&
@@ -264,7 +266,7 @@ export async function runOptionCPrep(options: OptionCPrepOptions = {}): Promise<
       (receipt.health.pilot_started === false || isolateAlreadyStarted),
     isolateAlreadyStarted
       ? "manifest keeps pilot_started false; this isolate already records a human pilot-start"
-      : "manifest and health-local keep live_backends false and pilot_started false"
+      : "manifest keeps live_backends false; this machine reports shop-local backends only when configured"
   );
 
   const trackGate = localSoftwaresGate();
@@ -493,16 +495,24 @@ export async function runOptionCPrep(options: OptionCPrepOptions = {}): Promise<
       const html = await page.text();
       const healthResponse = await fetch(new URL("/api/health", desk.url));
       const health = (await healthResponse.json()) as Partial<HealthLocal>;
+      const backendsHonest =
+        typeof health.live_backends === "boolean" &&
+        (health.live_backends_scope === "public-demo" || health.live_backends_scope === "shop-local" || health.live_backends_scope === "none") &&
+        liveBackendsStayHonest({
+          live_backends: health.live_backends,
+          live_backends_scope: health.live_backends_scope,
+          company_os_live: Boolean(health.company_os_live)
+        });
       const isolateHealth =
         health.pilot_started === true &&
         health.company_os_live === false &&
         health.field_claim === false &&
         health.field_launch === false &&
-        health.live_backends === false;
+        backendsHonest;
       const healthHonest =
         healthResponse.ok &&
         (health.pilot_started === false || isolateHealth) &&
-        health.live_backends === false &&
+        backendsHonest &&
         health.writes === false &&
         health.mode === "SHADOW-SEALED" &&
         health.surface === "health-local" &&

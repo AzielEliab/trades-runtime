@@ -129,7 +129,7 @@ Receipt: [`specs/TR-QUALITY-2026-09-27.txt`](../../specs/TR-QUALITY-2026-09-27.t
 - The report scores ServiceTitan and ProBooks fragments already on this machine: completeness, schema fit, stale or missing fields, conflicting keys, thin evidence, and refused writes. The checklist score is not an accuracy percent.
 - `/api/inbound-quality` is the machine JSON. `/api/inbound-quality.txt` is the human report. Both stay loopback. The desk also writes `data/runtime/<instanceId>/inbound-quality.json`, `.txt`, and `.jsonl`. Those copies are gitignored.
 - A firing alert lists proposed actions as stubs: a label, a rationale, the required human authority, and `refused: write-back`. `/api/alert-actions` returns stubs only. Nothing calls ServiceTitan or ProBooks.
-- The Option C start-gate panel lists what must be true before a real pilot may start. Every gate stays blocked-until. Option C remains prep until a human operator starts a real pilot. Option D is out of scope. There is no cutover.
+- The Option C start-gate panel lists what a shop keeps and what that shop starts. Standing rows stay standing. Shop rows are shop-starts until `npm run pilot:start` on this machine. Option C remains prep on the public catalog until that shop starts. Option D is out of scope. There is no cutover.
 
 `pilot_started` stays false. `live_backends` stays false. Nothing here writes to ServiceTitan or ProBooks.
 
