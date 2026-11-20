@@ -16,10 +16,12 @@ import {
   PERSON_URL,
   PRODUCT,
   PRODUCT_TITLE,
+  CONTENT_SIGNAL,
   PUBLIC_ORIGIN,
   RELEASE_FILENAME,
   REPOSITORY,
   SITEMAP_ENTRIES,
+  ecosystemCrossReference,
   SOFTWARES_TAB,
   VERSION,
   X_HANDLE,
@@ -36,7 +38,7 @@ export function robotsTxt(): string {
 
 User-agent: *
 Allow: /
-Content-Signal: search=yes, ai-input=yes, ai-train=yes
+Content-Signal: ${CONTENT_SIGNAL}
 
 ${agents}
 Sitemap: ${PUBLIC_ORIGIN}/sitemap.xml
@@ -44,7 +46,7 @@ Sitemap: ${PUBLIC_ORIGIN}/sitemap.xml
 }
 
 export function sitemapXml(): string {
-  const lastmod = "2026-09-19";
+  const lastmod = "2026-11-20";
   const urls = SITEMAP_ENTRIES.map((entry) => {
     const loc = entry.path === "/" ? `${PUBLIC_ORIGIN}/` : `${PUBLIC_ORIGIN}${entry.path}`;
     return `  <url>
@@ -101,6 +103,8 @@ Softwares tab: ${SOFTWARES_TAB}
 - llms.txt / ai.txt / humans.txt
 - cite.json / person.jsonld / graph.jsonld
 - .well-known/mcp.json
+- .well-known/ai.txt (same lead as /ai.txt)
+- /doors — live public ecosystem
 - /v1/stats and /count (honest KV; human/bot fleet split)
 
 ## Compatible AI clients
@@ -108,6 +112,8 @@ Softwares tab: ${SOFTWARES_TAB}
 ${COMPATIBLE_AI_CLIENTS.map((name) => `- ${name}`).join("\n")}
 
 Identity: Aziel Eliab only. Person @id ${PERSON_ID}. X / Twitter: ${X_HANDLE} ${X_URL}.
+
+${ecosystemCrossReference()}
 `;
 }
 
@@ -124,6 +130,7 @@ Human UI: ${PUBLIC_ORIGIN}/ (browser / PWA on this VibeLock host, without downlo
 Optional counted pack: ${PUBLIC_ORIGIN}/download
 Softwares: ${SOFTWARES_TAB}
 Agents: ${PUBLIC_ORIGIN}/mcp · ${PUBLIC_ORIGIN}/openapi.json · ${PUBLIC_ORIGIN}/llms.txt
+Ecosystem: ${PUBLIC_ORIGIN}/doors
 `;
 }
 

@@ -58,7 +58,9 @@ Classification (per counted request): health-check UA is skipped on homepage vie
 | GET | `/download` | downloads, on verified gzip 200 |
 | GET | `/v1/health` | no |
 | GET | `/v1/stats`, `/stats`, `/count` | no |
-| GET | `/cite.json`, `/llms.txt`, `/ai.txt`, `/humans.txt`, `/robots.txt` | no |
+| GET | `/cite.json`, `/llms.txt`, `/ai.txt`, `/.well-known/ai.txt`, `/humans.txt`, `/robots.txt` | no |
+| GET | `/<indexnow-key>.txt`, `/.well-known/indexnow-key.txt` | no |
+| GET | `/doors` | no |
 | GET | `/sitemap.xml` | no |
 | GET | `/person.jsonld`, `/graph.jsonld` | no |
 | GET | `/.well-known/mcp.json` | no |

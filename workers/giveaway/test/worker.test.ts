@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { FleetStats } from "../src/counters.js";
-import { AUTHOR, COMPATIBLE_AI_CLIENTS, RELEASE_FILENAME, VERSION } from "../src/identity.js";
+import { AUTHOR, COMPATIBLE_AI_CLIENTS, CONTENT_SIGNAL, INDEXNOW_KEY, RELEASE_FILENAME, VERSION, ecosystemCrossReference } from "../src/identity.js";
 import { handleRequest } from "../src/index.js";
 import { isGzipTarball } from "../src/release.js";
 import { gzipBytes, makeEnv, MemoryKV, requestWithCf } from "./helpers.js";
@@ -340,6 +340,8 @@ describe("giveaway Worker routes", () => {
       "/suite-card.json",
       "/llms.txt",
       "/ai.txt",
+      "/.well-known/ai.txt",
+      "/doors",
       "/humans.txt",
       "/openapi.json",
       "/robots.txt",
@@ -441,6 +443,118 @@ describe("giveaway Worker routes", () => {
     const stats = await (await hit(env, "/v1/stats")).json() as { views: number; downloads: number };
     expect(stats.views).toBe(1);
     expect(stats.downloads).toBe(0);
+  });
+
+  it("serves ecosystem doors, IndexNow, and Content-Signal without flipping the public demo", async () => {
+    const env = makeEnv();
+    const block = ecosystemCrossReference();
+    const doors = [
+      "https://www.azieleliab.com/",
+      "https://www.azielcorpuslibrary.net/",
+      "https://godlock.uk/",
+      "https://hedidntjump.com/",
+      "https://furnaceisntfree.com/",
+      "https://timetounsealthebook.net/",
+      "https://whitestone.vibelock.workers.dev/",
+      "https://aziel-runtime.vibelock.workers.dev/",
+      "https://glama.ai/mcp/servers/AzielEliab/aziel-runtime",
+      "https://trades-runtime.vibelock.workers.dev/",
+      "https://glama.ai/mcp/servers/AzielEliab/trades-runtime",
+      "https://miragegrid.vibelock.workers.dev/"
+    ];
+
+    const home = await hit(env, "/");
+    const desk = await hit(env, "/local-desk");
+    const door = await hit(env, "/doors");
+    const head = await hit(env, "/doors", { method: "HEAD" });
+    const llmsRes = await hit(env, "/llms.txt");
+    const aiRes = await hit(env, "/ai.txt");
+    const wellAiRes = await hit(env, "/.well-known/ai.txt");
+    const robotsRes = await hit(env, "/robots.txt");
+    const citeRes = await hit(env, "/cite.json");
+    const sitemapRes = await hit(env, "/sitemap.xml");
+    const keyRes = await hit(env, `/${INDEXNOW_KEY}.txt`);
+    const wellKeyRes = await hit(env, "/.well-known/indexnow-key.txt");
+
+    expect(INDEXNOW_KEY).toMatch(/^[0-9a-f]{32}$/);
+    expect(keyRes.status).toBe(200);
+    expect(keyRes.headers.get("content-type")).toMatch(/^text\/plain/);
+    expect(keyRes.headers.get("content-signal")).toBe(CONTENT_SIGNAL);
+    expect(await keyRes.text()).toBe(INDEXNOW_KEY);
+    expect(wellKeyRes.status).toBe(200);
+    expect(wellKeyRes.headers.get("content-type")).toMatch(/^text\/plain/);
+    expect(wellKeyRes.headers.get("content-signal")).toBe(CONTENT_SIGNAL);
+    expect(await wellKeyRes.text()).toBe(INDEXNOW_KEY);
+    expect((await hit(env, "/0123456789abcdef0123456789abcdef.txt")).status).toBe(404);
+
+    expect(home.headers.get("content-type")).toMatch(/^text\/html/);
+    expect(home.headers.get("content-signal")).toBe(CONTENT_SIGNAL);
+    expect(desk.headers.get("content-signal")).toBe(CONTENT_SIGNAL);
+    expect(door.status).toBe(200);
+    expect(door.headers.get("content-type")).toMatch(/^text\/html/);
+    expect(door.headers.get("content-signal")).toBe(CONTENT_SIGNAL);
+    expect(head.status).toBe(200);
+    expect(head.headers.get("content-signal")).toBe(CONTENT_SIGNAL);
+    expect(await head.text()).toBe("");
+    expect((await hit(env, "/doors", { method: "POST" })).status).toBe(405);
+
+    expect(llmsRes.headers.get("content-signal")).toBe(CONTENT_SIGNAL);
+    expect(aiRes.headers.get("content-signal")).toBe(CONTENT_SIGNAL);
+    expect(wellAiRes.headers.get("content-type")).toMatch(/^text\/plain/);
+    expect(wellAiRes.headers.get("content-signal")).toBe(CONTENT_SIGNAL);
+    expect(robotsRes.headers.get("content-signal")).toBe(CONTENT_SIGNAL);
+    expect(citeRes.headers.get("content-signal")).toBeNull();
+    expect(sitemapRes.headers.get("content-type")).toMatch(/^application\/xml/);
+    expect(sitemapRes.headers.get("content-signal")).toBeNull();
+
+    const homeHtml = await home.text();
+    const deskHtml = await desk.text();
+    const doorHtml = await door.text();
+    const llms = await llmsRes.text();
+    const ai = await aiRes.text();
+    const wellAi = await wellAiRes.text();
+    const robots = await robotsRes.text();
+    expect(wellAi).toBe(ai);
+    expect(llms).toContain(block);
+    expect(ai).toContain(block);
+    expect(robots).toContain(`Content-Signal: ${CONTENT_SIGNAL}`);
+    expect(robots).toMatch(/Allow: \//);
+    expect(robots).not.toMatch(/Disallow:/);
+
+    for (const url of doors) {
+      expect(homeHtml).toContain(`href="${url}"`);
+      expect(deskHtml).toContain(`href="${url}"`);
+      expect(doorHtml).toContain(`href="${url}"`);
+      expect(block).toContain(url);
+    }
+    expect(doorHtml).toContain("Ecosystem / Doors");
+    expect(doorHtml).toContain("Mesh-only");
+    expect(doorHtml).toContain("public_icann: false");
+    expect(doorHtml).toContain("Not an ICANN registrar");
+    expect(doorHtml).toContain("pilot_started is false");
+    expect(doorHtml).toContain("field_claim is false");
+    expect(doorHtml).toContain("live_backends is false");
+    expect(doorHtml).toContain("Pages stay off");
+    const visible = doorHtml.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "");
+    expect(visible).not.toMatch(/1 Chronicles/);
+    expect(visible).not.toMatch(/15:20/);
+
+    for (const body of [homeHtml, deskHtml, doorHtml, llms, ai]) {
+      expect(body).not.toContain("thefurnaceisntfree.com");
+      expect(body).not.toContain("download-tracker.vibelock.workers.dev");
+      expect(body).not.toContain("ark-private");
+      expect(body).not.toMatch(/github\.com\/AzielEliab\/lumen\b/);
+    }
+
+    const cite = await citeRes.json() as { person_id: string; pilot_started: boolean; field_claim: boolean; live_backends: boolean; pages: string };
+    expect(cite.person_id).toBe("https://www.azieleliab.com/#aziel");
+    expect(cite.pilot_started).toBe(false);
+    expect(cite.field_claim).toBe(false);
+    expect(cite.live_backends).toBe(false);
+    expect(cite.pages).toBe("off");
+
+    const stats = await (await hit(env, "/v1/stats")).json() as { views: number };
+    expect(stats.views).toBe(1);
   });
 
   it("refuses unknown routes and does not claim ST write-back", async () => {

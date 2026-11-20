@@ -18,8 +18,8 @@ import {
   shouldCountHomepageView,
   type CountStore
 } from "./counters.js";
-import { RELEASE_FILENAME, VERSION } from "./identity.js";
-import { renderLanding, renderLocalDesk } from "./landing.js";
+import { CONTENT_SIGNAL, INDEXNOW_KEY, RELEASE_FILENAME, VERSION } from "./identity.js";
+import { renderDoors, renderLanding, renderLocalDesk } from "./landing.js";
 import { handleMcp } from "./mcp.js";
 import { loadReleaseBytes, releaseHeaders } from "./release.js";
 
@@ -40,7 +40,23 @@ export default {
   }
 };
 
-export async function handleRequest(request: Request, env: Env, _ctx?: WorkerContext): Promise<Response> {
+export async function handleRequest(request: Request, env: Env, ctx?: WorkerContext): Promise<Response> {
+  return stampContentSignal(await routeRequest(request, env, ctx));
+}
+
+function stampContentSignal(response: Response): Response {
+  const type = response.headers.get("Content-Type") ?? "";
+  if (!type.toLowerCase().startsWith("text/")) return response;
+  const headers = new Headers(response.headers);
+  headers.set("Content-Signal", CONTENT_SIGNAL);
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers
+  });
+}
+
+async function routeRequest(request: Request, env: Env, _ctx?: WorkerContext): Promise<Response> {
   const url = new URL(request.url);
   const pathname = url.pathname === "/index.html" ? "/" : url.pathname;
   const kv = env.COUNTS as unknown as CountStore;
@@ -68,7 +84,10 @@ export async function handleRequest(request: Request, env: Env, _ctx?: WorkerCon
   if (pathname === "/cite.json") return json(citeBody());
   if (pathname === "/suite-card.json") return json(suiteCardBody());
   if (pathname === "/llms.txt") return text(llmsTxt(), "text/plain; charset=utf-8");
-  if (pathname === "/ai.txt") return text(aiTxt(), "text/plain; charset=utf-8");
+  if (pathname === "/ai.txt" || pathname === "/.well-known/ai.txt") return text(aiTxt(), "text/plain; charset=utf-8");
+  if (pathname === `/${INDEXNOW_KEY}.txt` || pathname === "/.well-known/indexnow-key.txt") {
+    return text(INDEXNOW_KEY, "text/plain; charset=utf-8");
+  }
   if (pathname === "/humans.txt") return text(humansTxt(), "text/plain; charset=utf-8");
   if (pathname === "/robots.txt") return text(robotsTxt(), "text/plain; charset=utf-8");
   if (pathname === "/sitemap.xml") return text(sitemapXml(), "application/xml; charset=utf-8");
@@ -111,6 +130,20 @@ export async function handleRequest(request: Request, env: Env, _ctx?: WorkerCon
     return new Response(bytes, {
       status: 200,
       headers: releaseHeaders(filename, bytes.byteLength)
+    });
+  }
+
+  if (pathname === "/doors") {
+    if (request.method !== "GET" && request.method !== "HEAD") {
+      return json({ error: "method not allowed" }, 405);
+    }
+    return new Response(request.method === "HEAD" ? null : renderDoors(), {
+      status: 200,
+      headers: {
+        "Content-Type": "text/html; charset=utf-8",
+        "Cache-Control": "no-store",
+        "X-Product-Version": env.PRODUCT_VERSION || VERSION
+      }
     });
   }
 
