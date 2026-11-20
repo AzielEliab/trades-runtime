@@ -24,7 +24,8 @@ import {
   SOFTWARES_TAB,
   VERSION,
   X_HANDLE,
-  X_URL
+  X_URL,
+  ecosystemCrossReference
 } from "./identity.js";
 import { STATS_NOTE, type FleetStats } from "./counters.js";
 import { LOCAL_CATALOG_NOTE, LOCAL_MODULES, LOCAL_PLATFORM_PEERS } from "./local-catalog.js";
@@ -183,6 +184,8 @@ ${HONESTY.product}
 - sitemap.xml
 - cite.json · person.jsonld · graph.jsonld
 - .well-known/mcp.json
+- .well-known/ai.txt
+- /doors — live public ecosystem
 - Softwares tab: ${SOFTWARES_TAB}
 - Stats: ${PUBLIC_ORIGIN}/v1/stats · ${PUBLIC_ORIGIN}/count
 
@@ -199,6 +202,8 @@ Platform peers: ${LOCAL_PLATFORM_PEERS.map((p) => `${p.label} (${p.mode}, mappin
 
 ## AI clients
 ${COMPATIBLE_AI_CLIENTS.map((name) => `- ${name}`).join("\n")}
+
+${ecosystemCrossReference()}
 `;
 }
 
@@ -290,6 +295,8 @@ export function openApiSpec(): Record<string, unknown> {
       },
       "/llms.txt": { get: { summary: "LLM-oriented product text." } },
       "/ai.txt": { get: { summary: "Honest trades product lead for agents and crawlers." } },
+      "/.well-known/ai.txt": { get: { summary: "Same lead as /ai.txt, including the live public ecosystem." } },
+      "/doors": { get: { summary: "Ecosystem / Doors. Clickable sister sites and runtimes. HTML." } },
       "/humans.txt": { get: { summary: "Short human pointer to the Worker UI, with the optional counted pack at /download." } },
       "/robots.txt": { get: { summary: "Open crawl Allow list + Content-Signal." } },
       "/sitemap.xml": { get: { summary: "Absolute URLs for this Worker." } },

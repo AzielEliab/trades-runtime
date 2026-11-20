@@ -27,6 +27,68 @@ export const PERSON_URL = "https://www.azieleliab.com/";
 export const SOFTWARES_TAB = "https://www.azielcorpuslibrary.net/software";
 export const SISTER_CORPUS = "https://www.azielcorpuslibrary.net/";
 export const SISTER_GODLOCK = "https://godlock.uk/";
+/** IndexNow key. Served at /<key>.txt and /.well-known/indexnow-key.txt. */
+export const INDEXNOW_KEY = "8d576bf227418cff6c81f59ed9df598b";
+/** HTTP Content-Signal on HTML and text responses. Same value as robots.txt. */
+export const CONTENT_SIGNAL = "search=yes, ai-input=yes, ai-train=yes";
+
+export interface EcosystemDoor {
+  name: string;
+  role: string;
+  url: string;
+  glama?: string;
+}
+
+/** Live public ecosystem. Canonical URLs only. No download-tracker hosts. */
+export const ECOSYSTEM_DOORS: readonly EcosystemDoor[] = [
+  { name: "Aziel Eliab", role: "Identity Hub", url: "https://www.azieleliab.com/" },
+  { name: "Aziel Corpus Library", role: "Public corpus", url: "https://www.azielcorpuslibrary.net/" },
+  { name: "GodLock", role: "Public site", url: "https://godlock.uk/" },
+  { name: "He Didn't Jump", role: "Marion Zioncheck Archive", url: "https://hedidntjump.com/" },
+  { name: "Furnace Isn't Free", role: "Public site", url: "https://furnaceisntfree.com/" },
+  { name: "Time to Unseal the Book", role: "Public site", url: "https://timetounsealthebook.net/" },
+  { name: "Whitestone", role: "Live pro se web app", url: "https://whitestone.vibelock.workers.dev/" },
+  {
+    name: "Aziel Runtime",
+    role: "MCP/Softwares",
+    url: "https://aziel-runtime.vibelock.workers.dev/",
+    glama: "https://glama.ai/mcp/servers/AzielEliab/aziel-runtime"
+  },
+  {
+    name: "Trades Runtime",
+    role: "Public MCP runtime",
+    url: PUBLIC_ORIGIN + "/",
+    glama: "https://glama.ai/mcp/servers/AzielEliab/trades-runtime"
+  },
+  {
+    name: "MirageGrid",
+    role: "Cap-7 mesh DNS factory Worker. Mesh-only. public_icann: false. Not an ICANN registrar",
+    url: "https://miragegrid.vibelock.workers.dev/"
+  }
+];
+
+function punctuate(text: string): string {
+  return /[.!?]$/.test(text) ? text : `${text}.`;
+}
+
+export function ecosystemCrossReference(): string {
+  const lines = ECOSYSTEM_DOORS.map((door) => {
+    const glama = door.glama ? ` Glama: ${door.glama}.` : "";
+    return `- ${door.name}: ${door.url} — ${punctuate(door.role)}${glama}`;
+  });
+  return [
+    "## Ecosystem / Doors",
+    "",
+    "Part of the Aziel Eliab ecosystem. Live public sites and runtimes. Canonical URLs only.",
+    `Doors page: ${PUBLIC_ORIGIN}/doors`,
+    "The same list is on /ai.txt and /.well-known/ai.txt.",
+    "This public Worker stays the 1.0.0 demo: pilot_started false, field_claim false, live_backends false, Pages off.",
+    "MirageGrid is a Cap-7 mesh DNS factory Worker. It is mesh-only. public_icann: false. It is not an ICANN registrar.",
+    "",
+    ...lines
+  ].join("\n");
+}
+
 export const GITHUB_AUTHOR = "https://github.com/AzielEliab";
 export const X_URL = "https://x.com/AzielEliab";
 export const X_HANDLE = "@AzielEliab";
@@ -171,10 +233,12 @@ export const SITEMAP_ENTRIES = [
   { path: "/", changefreq: "daily", priority: "1.0" },
   { path: "/download", changefreq: "daily", priority: "0.95" },
   { path: "/local-desk", changefreq: "weekly", priority: "0.8" },
+  { path: "/doors", changefreq: "weekly", priority: "0.8" },
   { path: "/cite.json", changefreq: "daily", priority: "0.9" },
   { path: "/suite-card.json", changefreq: "daily", priority: "0.85" },
   { path: "/llms.txt", changefreq: "daily", priority: "0.9" },
   { path: "/ai.txt", changefreq: "daily", priority: "0.9" },
+  { path: "/.well-known/ai.txt", changefreq: "daily", priority: "0.85" },
   { path: "/humans.txt", changefreq: "weekly", priority: "0.7" },
   { path: "/openapi.json", changefreq: "daily", priority: "0.9" },
   { path: "/robots.txt", changefreq: "weekly", priority: "0.6" },

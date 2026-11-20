@@ -42,3 +42,22 @@ A Full-Day Trajectory · B Call-to-Call Ledger · C Human Override / Recalibrati
 ## Public surface
 
 https://trades-runtime.vibelock.workers.dev — giveaway Worker UI on this VibeLock host (browser / PWA) without downloading first. Optional counted tarball at /download. The git source is free to clone. GitHub Pages stays off. Aziel Eliab is the author, not the operator.
+
+## Ecosystem / Doors
+
+Part of the Aziel Eliab ecosystem. Live public sites and runtimes. Canonical URLs only.
+Doors page: https://trades-runtime.vibelock.workers.dev/doors
+The same list is on /ai.txt and /.well-known/ai.txt.
+This public Worker stays the 1.0.0 demo: pilot_started false, field_claim false, live_backends false, Pages off.
+MirageGrid is a Cap-7 mesh DNS factory Worker. It is mesh-only. public_icann: false. It is not an ICANN registrar.
+
+- Aziel Eliab: https://www.azieleliab.com/ — Identity Hub.
+- Aziel Corpus Library: https://www.azielcorpuslibrary.net/ — Public corpus.
+- GodLock: https://godlock.uk/ — Public site.
+- He Didn't Jump: https://hedidntjump.com/ — Marion Zioncheck Archive.
+- Furnace Isn't Free: https://furnaceisntfree.com/ — Public site.
+- Time to Unseal the Book: https://timetounsealthebook.net/ — Public site.
+- Whitestone: https://whitestone.vibelock.workers.dev/ — Live pro se web app.
+- Aziel Runtime: https://aziel-runtime.vibelock.workers.dev/ — MCP/Softwares. Glama: https://glama.ai/mcp/servers/AzielEliab/aziel-runtime.
+- Trades Runtime: https://trades-runtime.vibelock.workers.dev/ — Public MCP runtime. Glama: https://glama.ai/mcp/servers/AzielEliab/trades-runtime.
+- MirageGrid: https://miragegrid.vibelock.workers.dev/ — Cap-7 mesh DNS factory Worker. Mesh-only. public_icann: false. Not an ICANN registrar.

@@ -14,7 +14,8 @@ import {
   PUBLIC_ORIGIN,
   RELEASE_FILENAME,
   REPOSITORY,
-  VERSION
+  VERSION,
+  ECOSYSTEM_DOORS
 } from "./identity.js";
 
 const GIVEAWAY_CSS = `
@@ -144,6 +145,11 @@ const GIVEAWAY_CSS = `
     code { overflow-wrap: anywhere; }
     .badge { display: inline-block; border: 1px solid var(--line); border-radius: 999px; padding: 0.15rem 0.6rem; margin: 0.15rem; font-size: 0.8rem; color: var(--muted); }
     footer { color: var(--muted); margin-top: 2.5rem; font-size: 0.92rem; overflow-wrap: anywhere; }
+    .eco { list-style: none; padding: 0; margin: 0.4rem 0 0; }
+    .eco li { margin: 0.1rem 0; }
+    .eco a { display: inline-flex; align-items: center; min-height: 44px; margin-right: 0.35rem; }
+    .eco span { color: var(--muted); }
+    footer nav p { margin: 0.8rem 0 0; }
     input, select, textarea { font-size: 1rem; min-height: 44px; max-width: 100%; }
     @media (max-width: 40rem) {
       .counts { grid-template-columns: minmax(0, 1fr); }
@@ -151,16 +157,38 @@ const GIVEAWAY_CSS = `
     }
 `;
 
-function humanNav(current: "home" | "desk"): string {
+function humanNav(current: "home" | "desk" | "doors"): string {
   const onDesk = current === "desk";
-  return `<a class="skip" href="${onDesk ? "#notes" : "#workspace"}">Skip to ${onDesk ? "local-desk notes" : "the Worker UI"}</a>
+  const onDoors = current === "doors";
+  const offHome = current !== "home";
+  const skipHref = onDesk ? "#notes" : onDoors ? "#doors-list" : "#workspace";
+  const skipLabel = onDesk ? "local-desk notes" : onDoors ? "ecosystem doors" : "the Worker UI";
+  return `<a class="skip" href="${skipHref}">Skip to ${skipLabel}</a>
   <nav class="human-nav" aria-label="Human giveaway">
-    <a class="nav-primary" href="${onDesk ? "/#workspace" : "#workspace"}">Use on Worker</a>
+    <a class="nav-primary" href="${offHome ? "/#workspace" : "#workspace"}">Use on Worker</a>
     <a class="nav-primary" href="${onDesk ? "#notes" : "/local-desk"}"${onDesk ? ' aria-current="page"' : ""}>Open local-desk notes</a>
-    <a href="${onDesk ? "/#mcp" : "#mcp"}">Connect MCP</a>
-    <a href="${onDesk ? "/#cite" : "#cite"}">Cite / docs</a>
+    <a href="${offHome ? "/#mcp" : "#mcp"}">Connect MCP</a>
+    <a href="${offHome ? "/#cite" : "#cite"}">Cite / docs</a>
+    <a href="/doors"${onDoors ? ' aria-current="page"' : ""}>Ecosystem</a>
     <a class="nav-secondary" href="/download">Optional pack</a>
   </nav>`;
+}
+
+function ecosystemItems(): string {
+  return ECOSYSTEM_DOORS.map((door) => {
+    const glama = door.glama ? ` <a href="${escapeHtml(door.glama)}">Glama</a>` : "";
+    return `<li><a href="${escapeHtml(door.url)}">${escapeHtml(door.name)}</a> <span>${escapeHtml(door.role)}</span>${glama}</li>`;
+  }).join("");
+}
+
+function sisterFooter(): string {
+  return `<footer class="wrap">
+    <p>© ${new Date().getUTCFullYear()} ${escapeHtml(AUTHOR)} · ${escapeHtml(PRODUCT_TITLE)} ${escapeHtml(VERSION)} · ${escapeHtml(LICENSE)} · identity ${escapeHtml(AUTHOR)} only</p>
+    <nav aria-label="Ecosystem">
+      <p><a href="/doors">Ecosystem / Doors</a></p>
+      <ul class="eco">${ecosystemItems()}</ul>
+    </nav>
+  </footer>`;
 }
 
 export function renderLanding(views: number, downloads: number): string {
@@ -268,6 +296,7 @@ npx tsx src/cli.ts health</pre>
           <a href="/humans.txt">/humans.txt</a> ·
           <a href="/robots.txt">/robots.txt</a> ·
           <a href="/sitemap.xml">/sitemap.xml</a> ·
+          <a href="/doors">/doors</a> ·
           <a href="/v1/skill">/v1/skill</a> ·
           <a href="${escapeHtml(REPOSITORY)}">GitHub</a>
         </p>
@@ -309,7 +338,7 @@ npm run demo</pre>
     <p><a class="btn" href="/local-desk">Open local-desk notes</a></p>
     <p class="notice">Install notes only: <a href="/local-desk">/local-desk</a>. Option C pilot is not started. Option D is not started.</p>
   </main>
-  <footer class="wrap">© ${new Date().getUTCFullYear()} ${escapeHtml(AUTHOR)} · ${escapeHtml(PRODUCT_TITLE)} ${escapeHtml(VERSION)} · ${escapeHtml(LICENSE)} · identity ${escapeHtml(AUTHOR)} only</footer>
+  ${sisterFooter()}
   <script>
     fetch("/v1/stats").then((r) => r.json()).then((s) => {
       if (typeof s.views === "number") document.getElementById("views").textContent = String(s.views);
@@ -352,6 +381,36 @@ npx tsx src/cli.ts desk</pre>
     <p class="notice">Writes require operator approval and are off by default. They run only on the shop machine, and only with that shop's local backends. The public demo keeps live_backends false. Option D is not started.</p>
     <p><a class="btn" href="/#workspace">Use on Worker</a></p>
   </main>
+  ${sisterFooter()}
+</body>
+</html>`;
+}
+
+export function renderDoors(): string {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#121410">
+  <title>Ecosystem / Doors · ${escapeHtml(PRODUCT_TITLE)}</title>
+  <meta name="description" content="Live public doors in the Aziel Eliab ecosystem. This Trades-Runtime Worker stays the 1.0.0 demo: pilot_started false, field_claim false, live_backends false, Pages off.">
+  <meta name="author" content="${escapeHtml(AUTHOR)}">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="${escapeHtml(PUBLIC_ORIGIN)}/doors">
+  <style>${GIVEAWAY_CSS}</style>
+</head>
+<body>
+  <main class="wrap">
+    <p class="kicker">Public giveaway · v${escapeHtml(VERSION)} · ${escapeHtml(AUTHOR)} · sister sites</p>
+    ${humanNav("doors")}
+    <h1 id="doors-list">Ecosystem / Doors</h1>
+    <p class="lede">These are the live public sites and runtimes in the Aziel Eliab ecosystem. Each name links to its canonical URL.</p>
+    <p>This public Worker stays the 1.0.0 demo. pilot_started is false. field_claim is false. live_backends is false. Pages stay off.</p>
+    <ul class="eco">${ecosystemItems()}</ul>
+    <p class="notice">MirageGrid is a Cap-7 mesh DNS factory Worker. It is mesh-only. public_icann: false. It is not an ICANN registrar.</p>
+  </main>
+  ${sisterFooter()}
 </body>
 </html>`;
 }
