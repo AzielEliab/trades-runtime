@@ -23,8 +23,16 @@ curl -sS http://127.0.0.1:8787/humans.txt
 curl -sS http://127.0.0.1:8787/robots.txt
 curl -sS http://127.0.0.1:8787/sitemap.xml
 curl -sS http://127.0.0.1:8787/.well-known/mcp.json
+curl -sS http://127.0.0.1:8787/.well-known/mcp/server-card.json
+curl -sS http://127.0.0.1:8787/.well-known/oauth-protected-resource
+curl -sS http://127.0.0.1:8787/connect
+curl -sS http://127.0.0.1:8787/mcp.json
+curl -sS http://127.0.0.1:8787/install/cursor.json
 curl -sS http://127.0.0.1:8787/openapi.json
 curl -sS http://127.0.0.1:8787/v1/skill
+curl -sS -X POST http://127.0.0.1:8787/mcp \
+  -H 'content-type: application/json' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"smoke","version":"1.0.0"}}}'
 curl -sS -X POST http://127.0.0.1:8787/mcp \
   -H 'content-type: application/json' \
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'

@@ -64,9 +64,16 @@ Classification (per counted request): health-check UA is skipped on homepage vie
 | GET | `/sitemap.xml` | no |
 | GET | `/person.jsonld`, `/graph.jsonld` | no |
 | GET | `/.well-known/mcp.json` | no |
+| GET | `/.well-known/mcp/server-card.json` | no |
+| GET | `/.well-known/oauth-protected-resource` | no (`authorization_servers: []`, public, no authorization server) |
+| GET | `/connect` | no (HTML steps for ChatGPT, Claude, Grok, Gemini, Cursor, VS Code, LM Studio) |
+| GET | `/mcp.json` | no |
+| GET | `/install/cursor.json`, `/install/vscode.json`, `/install/claude-desktop.json` | no |
 | GET | `/v1/skill` | no |
 | GET | `/openapi.json` | no |
 | GET / POST | `/mcp` | no (GET is a transport note; POST is read-only health/stats/cite/skill) |
+
+`POST /mcp` `initialize` answers `2025-11-25` when the client requests it, and still answers `2024-11-05`, `2025-03-26`, and `2025-06-18`. The four tools set `readOnlyHint: true`. CORS preflight `Access-Control-Allow-Headers` is `Accept, Content-Type, MCP-Protocol-Version, Mcp-Session-Id, Authorization`, and responses expose `Mcp-Session-Id`. No authentication. The same OAuth document is also at `/.well-known/oauth-protected-resource/mcp`.
 
 No write API. No ST/ProBooks routes.
 

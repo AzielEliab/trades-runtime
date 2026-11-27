@@ -387,10 +387,29 @@ What it is:
 - Human giveaway UI on this VibeLock host (browser / PWA): honesty, cite, MCP, skill, and stats, usable without downloading first
 - Optional counted Apache-2.0 tarball at `GET /download` (increments only after a verified gzip 200)
 - `/local-desk` cites the local `npx tsx src/cli.ts desk` install. It does not host tenant metrics or a live company board
-- Thin read-only `/openapi.json` and `POST /mcp` for AI clients (health / stats / cite / skill only)
+- Thin read-only `/openapi.json` and `POST /mcp` for AI clients (health / stats / cite / skill only). Each tool sets `readOnlyHint: true`
+- Connect page at `/connect` for ChatGPT, Claude, Grok, Gemini, Cursor, VS Code, and LM Studio
 - Growth-ON crawl surfaces: `/robots.txt` (full Allow + Content-Signal), `/sitemap.xml`, `/ai.txt`, `/humans.txt`, `/.well-known/mcp.json`, `/person.jsonld`, `/graph.jsonld`
 - Stdio MCP bridge for Glama / Claude Desktop / Cursor: `npm run mcp` → [`cli/mcp-stdio.mjs`](cli/mcp-stdio.mjs) (forwards to Worker `POST /mcp`)
 - Honest Workers KV counters (`COUNTS`): `views` and `downloads` start at 0; increment only on successful 200 responses; no sampling, no seed, no inflation
+
+### Connect an AI client
+
+Public MCP, no authentication: https://trades-runtime.vibelock.workers.dev/mcp
+
+Connect page: https://trades-runtime.vibelock.workers.dev/connect
+
+This repository does not deploy the Worker. The routes below are in the giveaway Worker source.
+
+- ChatGPT: Plugins → Add custom MCP server → No authentication.
+- Claude: Connectors → Add custom connector. Config: `/install/claude-desktop.json`
+- Grok: https://grok.com/connectors
+- Gemini: AI Studio, Gemini Enterprise, and the Gemini CLI only.
+- Cursor: `cursor://` deep link on `/connect`, plus `/install/cursor.json`
+- VS Code: `vscode:mcp/install` on `/connect`, plus `/install/vscode.json`
+- LM Studio: snippet on `/connect`
+
+`initialize` answers `2025-11-25` when the client requests it, and still answers `2024-11-05`, `2025-03-26`, and `2025-06-18`. Discovery: `/.well-known/mcp.json`, `/.well-known/mcp/server-card.json`, `/mcp.json`, and `/.well-known/oauth-protected-resource` with `authorization_servers: []` (public server, no authorization server).
 
 ### Deploy (operator / box with wrangler auth)
 

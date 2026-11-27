@@ -27,6 +27,7 @@ import {
   X_HANDLE,
   X_URL
 } from "./identity.js";
+import { PROTOCOL_VERSIONS } from "./mcp.js";
 
 export function robotsTxt(): string {
   const agents = CRAWL_USER_AGENTS.map((ua) => `User-agent: ${ua}\nAllow: /\n`).join("\n");
@@ -46,7 +47,7 @@ Sitemap: ${PUBLIC_ORIGIN}/sitemap.xml
 }
 
 export function sitemapXml(): string {
-  const lastmod = "2026-11-20";
+  const lastmod = "2026-11-27";
   const urls = SITEMAP_ENTRIES.map((entry) => {
     const loc = entry.path === "/" ? `${PUBLIC_ORIGIN}/` : `${PUBLIC_ORIGIN}${entry.path}`;
     return `  <url>
@@ -91,7 +92,7 @@ Softwares tab: ${SOFTWARES_TAB}
 ## How to use
 
 1. Humans: open ${PUBLIC_ORIGIN}/ — giveaway Worker UI on this VibeLock host (browser / PWA) without downloading first. Panels: honesty, cite, MCP, skill, stats. Install notes: ${PUBLIC_ORIGIN}/local-desk
-2. Agents: POST ${PUBLIC_ORIGIN}/mcp (read-only health/stats/cite/skill) or OpenAPI at ${PUBLIC_ORIGIN}/openapi.json
+2. Agents: POST ${PUBLIC_ORIGIN}/mcp (read-only health/stats/cite/skill) or OpenAPI at ${PUBLIC_ORIGIN}/openapi.json. Connect page: ${PUBLIC_ORIGIN}/connect
 3. Optional pack: curl -fsSL ${PUBLIC_ORIGIN}/download -o ${RELEASE_FILENAME} && tar -xzf ${RELEASE_FILENAME}
 4. Softwares card: ${SOFTWARES_TAB}
 5. Local human desk, on the operator machine: npx tsx src/cli.ts desk — install notes at ${PUBLIC_ORIGIN}/local-desk. This Worker does not serve that desk or tenant metrics.
@@ -103,6 +104,7 @@ Softwares tab: ${SOFTWARES_TAB}
 - llms.txt / ai.txt / humans.txt
 - cite.json / person.jsonld / graph.jsonld
 - .well-known/mcp.json
+- /connect — ChatGPT, Claude, Grok, Gemini, Cursor, VS Code, and LM Studio
 - .well-known/ai.txt (same lead as /ai.txt)
 - /doors — live public ecosystem
 - /v1/stats and /count (honest KV; human/bot fleet split)
@@ -129,7 +131,7 @@ Purpose: Shadow-first local BYO runtime for HVAC, plumbing, electrical, sewer, a
 Human UI: ${PUBLIC_ORIGIN}/ (browser / PWA on this VibeLock host, without downloading first)
 Optional counted pack: ${PUBLIC_ORIGIN}/download
 Softwares: ${SOFTWARES_TAB}
-Agents: ${PUBLIC_ORIGIN}/mcp · ${PUBLIC_ORIGIN}/openapi.json · ${PUBLIC_ORIGIN}/llms.txt
+Agents: ${PUBLIC_ORIGIN}/mcp · ${PUBLIC_ORIGIN}/openapi.json · ${PUBLIC_ORIGIN}/connect · ${PUBLIC_ORIGIN}/llms.txt
 Ecosystem: ${PUBLIC_ORIGIN}/doors
 `;
 }
@@ -205,9 +207,11 @@ export function wellKnownMcp(): Record<string, unknown> {
     cite: `${PUBLIC_ORIGIN}/cite.json`,
     llms: `${PUBLIC_ORIGIN}/llms.txt`,
     ai: `${PUBLIC_ORIGIN}/ai.txt`,
+    connect: `${PUBLIC_ORIGIN}/connect`,
+    protocolVersions: [...PROTOCOL_VERSIONS],
     author: AUTHOR,
     identity: IDENTITY,
     person_id: PERSON_ID,
-    note: "Read-only product MCP (health, stats, cite, skill). live_backends false."
+    note: "Read-only product MCP (health, stats, cite, skill). Public, no OAuth. live_backends false."
   };
 }

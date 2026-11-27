@@ -248,7 +248,14 @@ export const SITEMAP_ENTRIES = [
   { path: "/count", changefreq: "hourly", priority: "0.7" },
   { path: "/v1/skill", changefreq: "daily", priority: "0.85" },
   { path: "/mcp", changefreq: "daily", priority: "0.9" },
+  { path: "/connect", changefreq: "weekly", priority: "0.9" },
+  { path: "/mcp.json", changefreq: "weekly", priority: "0.8" },
+  { path: "/install/cursor.json", changefreq: "weekly", priority: "0.7" },
+  { path: "/install/vscode.json", changefreq: "weekly", priority: "0.7" },
+  { path: "/install/claude-desktop.json", changefreq: "weekly", priority: "0.7" },
   { path: "/.well-known/mcp.json", changefreq: "daily", priority: "0.85" },
+  { path: "/.well-known/mcp/server-card.json", changefreq: "weekly", priority: "0.8" },
+  { path: "/.well-known/oauth-protected-resource", changefreq: "weekly", priority: "0.6" },
   { path: "/person.jsonld", changefreq: "weekly", priority: "0.8" },
   { path: "/graph.jsonld", changefreq: "weekly", priority: "0.8" }
 ] as const;
