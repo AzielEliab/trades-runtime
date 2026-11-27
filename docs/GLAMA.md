@@ -29,6 +29,28 @@ Checked 2026-10-02: the listing machine payload `latestRelease.version` is 1.0.0
 - `live_backends` false.
 - Humans use the giveaway Worker UI on this VibeLock host (browser / PWA) without downloading first. Agents use MCP / OpenAPI. Optional counted pack: `/download`.
 
+## HTTP clients
+
+ChatGPT, Claude, Grok, Gemini, Cursor, VS Code, and LM Studio use the public HTTP MCP. No authentication.
+
+Connect page: https://trades-runtime.vibelock.workers.dev/connect
+
+`initialize` answers `2025-11-25` when the client requests it, and still answers `2024-11-05`, `2025-03-26`, and `2025-06-18`. The four public tools set `readOnlyHint: true`.
+
+| Client | Path |
+| --- | --- |
+| ChatGPT | Plugins → Add custom MCP server → No authentication |
+| Claude | Connectors → Add custom connector |
+| Grok | https://grok.com/connectors |
+| Gemini | AI Studio, Gemini Enterprise, and the Gemini CLI only |
+| Cursor | `cursor://` deep link and `/install/cursor.json` |
+| VS Code | `vscode:mcp/install` and `/install/vscode.json` |
+| LM Studio | snippet on `/connect` |
+
+Also in the Worker source: `/mcp.json`, `/.well-known/mcp/server-card.json`, and `/.well-known/oauth-protected-resource` (`authorization_servers: []`, public server, no authorization server).
+
+Glama Install Server still needs the stdio pack below. Do **not** treat Install Server as LIVE from this git tree alone. This page does not Make Release.
+
 ## Why stdio
 
 Glama wraps the process and talks MCP on stdin/stdout (newline-delimited JSON-RPC; Content-Length framing is also accepted). HTTP `POST /mcp` stays the Worker API; this CLI forwards `initialize`, `tools/list`, `tools/call`, `ping`, and notifications so the tool list is not duplicated.

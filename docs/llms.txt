@@ -41,7 +41,7 @@ A Full-Day Trajectory · B Call-to-Call Ledger · C Human Override / Recalibrati
 
 ## Public surface
 
-https://trades-runtime.vibelock.workers.dev — giveaway Worker UI on this VibeLock host (browser / PWA) without downloading first. Optional counted tarball at /download. The git source is free to clone. GitHub Pages stays off. Aziel Eliab is the author, not the operator.
+https://trades-runtime.vibelock.workers.dev — giveaway Worker UI on this VibeLock host (browser / PWA) without downloading first. Optional counted tarball at /download. Connect an AI client: https://trades-runtime.vibelock.workers.dev/connect. The git source is free to clone. GitHub Pages stays off. Aziel Eliab is the author, not the operator.
 
 ## Ecosystem / Doors
 

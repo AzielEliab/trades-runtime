@@ -1,3 +1,18 @@
+import {
+  AI_STUDIO_URL,
+  claudeConnectorLink,
+  claudeDesktopInstallDocument,
+  CONNECT_URL,
+  cursorInstallDocument,
+  cursorInstallLink,
+  GEMINI_CLI_URL,
+  GROK_CONNECTORS_URL,
+  lmStudioInstallDocument,
+  MCP_URL,
+  OPENAPI_URL,
+  vscodeInstallDocument,
+  vscodeInstallLink
+} from "./connect.js";
 import { homepageJsonLd } from "./crawl.js";
 import {
   AUTHOR,
@@ -151,23 +166,28 @@ const GIVEAWAY_CSS = `
     .eco span { color: var(--muted); }
     footer nav p { margin: 0.8rem 0 0; }
     input, select, textarea { font-size: 1rem; min-height: 44px; max-width: 100%; }
+    .copy-line { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin: 0.7rem 0; min-width: 0; }
+    .copy-line code { flex: 1 1 16rem; background: var(--bg-inset); border: 1px solid var(--line); border-radius: 10px; padding: 0.55rem 0.75rem; min-height: 44px; display: flex; align-items: center; overflow-wrap: anywhere; }
+    button.btn { border: 0; font: inherit; cursor: pointer; }
     @media (max-width: 40rem) {
       .counts { grid-template-columns: minmax(0, 1fr); }
       .wrap { padding-top: max(1.1rem, env(safe-area-inset-top)); }
     }
 `;
 
-function humanNav(current: "home" | "desk" | "doors"): string {
+function humanNav(current: "home" | "desk" | "doors" | "connect"): string {
   const onDesk = current === "desk";
   const onDoors = current === "doors";
+  const onConnect = current === "connect";
   const offHome = current !== "home";
-  const skipHref = onDesk ? "#notes" : onDoors ? "#doors-list" : "#workspace";
-  const skipLabel = onDesk ? "local-desk notes" : onDoors ? "ecosystem doors" : "the Worker UI";
+  const skipHref = onDesk ? "#notes" : onDoors ? "#doors-list" : onConnect ? "#mcp-url" : "#workspace";
+  const skipLabel = onDesk ? "local-desk notes" : onDoors ? "ecosystem doors" : onConnect ? "the MCP URL" : "the Worker UI";
   return `<a class="skip" href="${skipHref}">Skip to ${skipLabel}</a>
   <nav class="human-nav" aria-label="Human giveaway">
     <a class="nav-primary" href="${offHome ? "/#workspace" : "#workspace"}">Use on Worker</a>
     <a class="nav-primary" href="${onDesk ? "#notes" : "/local-desk"}"${onDesk ? ' aria-current="page"' : ""}>Open local-desk notes</a>
     <a href="${offHome ? "/#mcp" : "#mcp"}">Connect MCP</a>
+    <a href="/connect"${onConnect ? ' aria-current="page"' : ""}>Connect clients</a>
     <a href="${offHome ? "/#cite" : "#cite"}">Cite / docs</a>
     <a href="/doors"${onDoors ? ' aria-current="page"' : ""}>Ecosystem</a>
     <a class="nav-secondary" href="/download">Optional pack</a>
@@ -276,6 +296,7 @@ npx tsx src/cli.ts health</pre>
       <div class="panel" id="mcp">
         <h2>Connect MCP</h2>
         <p>Thin read-only surface for agents: <a href="/openapi.json">/openapi.json</a> and <a href="/mcp"><code>POST /mcp</code></a> (health, stats, cite, skill). Public, no OAuth. Discover at <a href="/.well-known/mcp.json"><code>/.well-known/mcp.json</code></a>.</p>
+        <p><a class="btn" href="/connect">Connect ChatGPT, Claude, Grok, Gemini, Cursor, VS Code, and LM Studio</a></p>
         <ul>${clients}</ul>
       </div>
 
@@ -411,6 +432,146 @@ export function renderDoors(): string {
     <p class="notice">MirageGrid is a Cap-7 mesh DNS factory Worker. It is mesh-only. public_icann: false. It is not an ICANN registrar.</p>
   </main>
   ${sisterFooter()}
+</body>
+</html>`;
+}
+
+export function renderConnect(): string {
+  const cursorSnippet = JSON.stringify(cursorInstallDocument(), null, 2);
+  const vscodeSnippet = JSON.stringify(vscodeInstallDocument(), null, 2);
+  const claudeSnippet = JSON.stringify(claudeDesktopInstallDocument(), null, 2);
+  const lmSnippet = JSON.stringify(lmStudioInstallDocument(), null, 2);
+  const cursorLink = cursorInstallLink();
+  const vscodeLink = vscodeInstallLink();
+  const claudeLink = claudeConnectorLink();
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#121410">
+  <title>Connect · ${escapeHtml(PRODUCT_TITLE)}</title>
+  <meta name="description" content="Connect the public Trades-Runtime MCP to ChatGPT, Claude, Grok, Gemini, Cursor, VS Code, and LM Studio. No authentication. Author: Aziel Eliab.">
+  <meta name="author" content="${escapeHtml(AUTHOR)}">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="${escapeHtml(CONNECT_URL)}">
+  <style>${GIVEAWAY_CSS}</style>
+</head>
+<body>
+  <main class="wrap">
+    <p class="kicker">Public giveaway · v${escapeHtml(VERSION)} · ${escapeHtml(AUTHOR)} · no authentication</p>
+    ${humanNav("connect")}
+    <h1>Connect a client</h1>
+    <p class="lede">Public MCP for ChatGPT, Claude, Grok, Gemini, Cursor, VS Code, and LM Studio. Paste the URL. No authentication.</p>
+    <p class="notice">initialize answers 2025-11-25 when the client requests it, and still answers 2024-11-05, 2025-03-26, and 2025-06-18. Four tools, all read-only: health, stats, cite, skill. This page ships in the Worker source and is not a deploy.</p>
+
+    <div class="panel" id="mcp-url">
+      <h2>MCP URL</h2>
+      <div class="copy-line">
+        <code>${escapeHtml(MCP_URL)}</code>
+        <button type="button" class="btn" data-copy="${escapeHtml(MCP_URL)}">Copy MCP URL</button>
+      </div>
+      <h2>OpenAPI</h2>
+      <div class="copy-line">
+        <code>${escapeHtml(OPENAPI_URL)}</code>
+        <button type="button" class="btn" data-copy="${escapeHtml(OPENAPI_URL)}">Copy OpenAPI URL</button>
+      </div>
+    </div>
+
+    <div class="panel" id="chatgpt">
+      <h2>ChatGPT</h2>
+      <p>Plugins → Add custom MCP server → No authentication. Paste the MCP URL.</p>
+    </div>
+
+    <div class="panel" id="claude">
+      <h2>Claude</h2>
+      <p>Connectors → Add custom connector. Paste the MCP URL. No authentication.</p>
+      <p><a class="btn" href="${escapeHtml(claudeLink)}">Add custom connector</a></p>
+      <p class="notice">The same URL in a desktop <code>mcpServers</code> block: <a href="/install/claude-desktop.json">/install/claude-desktop.json</a>.</p>
+      <pre>${escapeHtml(claudeSnippet)}</pre>
+      <button type="button" class="btn" data-copy="${escapeHtml(claudeSnippet)}">Copy Claude snippet</button>
+    </div>
+
+    <div class="panel" id="grok">
+      <h2>Grok</h2>
+      <p><a href="${escapeHtml(GROK_CONNECTORS_URL)}">grok.com/connectors</a>. Add the MCP URL. No authentication.</p>
+    </div>
+
+    <div class="panel" id="gemini">
+      <h2>Gemini</h2>
+      <p>AI Studio, Enterprise, and CLI only. Paste the MCP URL with no authentication.</p>
+      <p>
+        <a href="${escapeHtml(AI_STUDIO_URL)}">Google AI Studio</a> ·
+        Gemini Enterprise ·
+        <a href="${escapeHtml(GEMINI_CLI_URL)}">Gemini CLI</a>
+      </p>
+    </div>
+
+    <div class="panel" id="cursor">
+      <h2>Cursor</h2>
+      <p><a class="btn" href="${escapeHtml(cursorLink)}">Add to Cursor</a></p>
+      <p class="notice">cursor:// deep link, plus the <code>mcp.json</code> snippet. Config file: <a href="/install/cursor.json">/install/cursor.json</a>.</p>
+      <pre>${escapeHtml(cursorSnippet)}</pre>
+      <button type="button" class="btn" data-copy="${escapeHtml(cursorSnippet)}">Copy Cursor snippet</button>
+    </div>
+
+    <div class="panel" id="vscode">
+      <h2>VS Code</h2>
+      <p><a class="btn" href="${escapeHtml(vscodeLink)}">Add to VS Code</a></p>
+      <p class="notice">vscode:mcp/install link. Workspace or user <code>mcp.json</code> uses <code>servers</code>. File: <a href="/install/vscode.json">/install/vscode.json</a>.</p>
+      <pre>${escapeHtml(vscodeSnippet)}</pre>
+      <button type="button" class="btn" data-copy="${escapeHtml(vscodeSnippet)}">Copy VS Code snippet</button>
+    </div>
+
+    <div class="panel" id="lmstudio">
+      <h2>LM Studio</h2>
+      <p>Paste this into LM Studio's <code>mcp.json</code>. No authentication.</p>
+      <pre>${escapeHtml(lmSnippet)}</pre>
+      <button type="button" class="btn" data-copy="${escapeHtml(lmSnippet)}">Copy LM Studio snippet</button>
+    </div>
+
+    <div class="panel" id="discovery">
+      <h2>Discovery</h2>
+      <p>
+        <a href="/mcp.json">/mcp.json</a> ·
+        <a href="/.well-known/mcp.json">/.well-known/mcp.json</a> ·
+        <a href="/.well-known/mcp/server-card.json">/.well-known/mcp/server-card.json</a> ·
+        <a href="/.well-known/oauth-protected-resource">/.well-known/oauth-protected-resource</a>
+      </p>
+      <p class="notice">The OAuth metadata lists <code>authorization_servers: []</code>. This is a public server with no authorization server.</p>
+    </div>
+  </main>
+  ${sisterFooter()}
+  <script>
+    document.querySelectorAll("[data-copy]").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const value = btn.getAttribute("data-copy") || "";
+        const previous = btn.textContent;
+        let copied = false;
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(value);
+            copied = true;
+          }
+        } catch (err) {
+          copied = false;
+        }
+        if (!copied) {
+          const area = document.createElement("textarea");
+          area.value = value;
+          area.setAttribute("readonly", "");
+          area.style.position = "fixed";
+          area.style.left = "-9999px";
+          document.body.appendChild(area);
+          area.select();
+          copied = document.execCommand("copy");
+          area.remove();
+        }
+        btn.textContent = copied ? "Copied" : "Copy failed";
+        setTimeout(() => { btn.textContent = previous; }, 1600);
+      });
+    });
+  </script>
 </body>
 </html>`;
 }

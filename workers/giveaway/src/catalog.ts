@@ -176,7 +176,7 @@ ${HONESTY.product}
 - Humans: ${PUBLIC_ORIGIN}/ — giveaway Worker UI on this VibeLock host (browser / PWA) without downloading first
 - Plain commands on the installed package: help, softwares, version, health
 - Suite shell card: ${PUBLIC_ORIGIN}/suite-card.json
-- Agents: POST ${PUBLIC_ORIGIN}/mcp · ${PUBLIC_ORIGIN}/openapi.json · ${PUBLIC_ORIGIN}/llms.txt · ${PUBLIC_ORIGIN}/ai.txt
+- Agents: POST ${PUBLIC_ORIGIN}/mcp · ${PUBLIC_ORIGIN}/openapi.json · ${PUBLIC_ORIGIN}/connect · ${PUBLIC_ORIGIN}/llms.txt · ${PUBLIC_ORIGIN}/ai.txt
 - Optional pack: counted GET ${PUBLIC_ORIGIN}/download (${RELEASE_FILENAME}). The operator desk with your own ServiceTitan and ProBooks installs locally from that pack.
 
 ## Discovery (Growth-ON)
@@ -184,6 +184,7 @@ ${HONESTY.product}
 - sitemap.xml
 - cite.json · person.jsonld · graph.jsonld
 - .well-known/mcp.json
+- Connect clients: ${PUBLIC_ORIGIN}/connect
 - .well-known/ai.txt
 - /doors — live public ecosystem
 - Softwares tab: ${SOFTWARES_TAB}
@@ -217,6 +218,7 @@ Person @id: ${PERSON_ID}
 X / Twitter: ${X_HANDLE} ${X_URL}
 License: ${LICENSE}
 Worker: ${PUBLIC_ORIGIN}
+Connect: ${PUBLIC_ORIGIN}/connect
 
 ## What it is
 
@@ -303,13 +305,27 @@ export function openApiSpec(): Record<string, unknown> {
       "/person.jsonld": { get: { summary: "Person JSON-LD. Machine 15:20 disambiguation. No HTML chrome." } },
       "/graph.jsonld": { get: { summary: "SoftwareApplication + WebSite + Person JSON-LD." } },
       "/.well-known/mcp.json": { get: { summary: "MCP discovery for POST /mcp + OpenAPI." } },
+      "/.well-known/mcp/server-card.json": {
+        get: { summary: "MCP server card. Public streamable HTTP remote. No authentication." }
+      },
+      "/.well-known/oauth-protected-resource": {
+        get: {
+          summary: "OAuth protected resource metadata. Public server. authorization_servers is empty."
+        }
+      },
+      "/connect": { get: { summary: "HTML connect page for ChatGPT, Claude, Grok, Gemini, Cursor, VS Code, and LM Studio." } },
+      "/mcp.json": { get: { summary: "Generic mcpServers document for the public HTTP MCP." } },
+      "/install/cursor.json": { get: { summary: "Cursor mcp.json snippet. URL only. No authentication." } },
+      "/install/vscode.json": { get: { summary: "VS Code mcp.json snippet. servers + type http." } },
+      "/install/claude-desktop.json": { get: { summary: "Claude desktop mcpServers snippet. URL only. No authentication." } },
       "/v1/skill": { get: { summary: "Agent skill markdown, including what the local package carries (modules, platform peers, mapping confidence)." } },
       "/openapi.json": { get: { summary: "This OpenAPI document." } },
       "/mcp": {
         get: { summary: "MCP transport note. Use POST for JSON-RPC." },
         post: {
           summary: "Read-only MCP JSON-RPC (initialize, tools/list, tools/call)",
-          description: "Tools: health, stats, cite, skill. Public, no OAuth. Does not increment counters. cite and skill describe the local package's modules and platform peers; none of them runs here."
+          description:
+            "Tools: health, stats, cite, skill. Each tool sets readOnlyHint true. Public, no OAuth. initialize echoes 2025-11-25 when the client requests it, and still echoes 2024-11-05, 2025-03-26, and 2025-06-18. Does not increment counters. cite and skill describe the local package's modules and platform peers; none of them runs here."
         }
       }
     }

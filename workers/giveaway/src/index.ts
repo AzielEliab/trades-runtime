@@ -1,4 +1,12 @@
 import { citeBody, healthBody, json, jsonLd, llmsTxt, openApiSpec, skillMarkdown, statsBody, text } from "./catalog.js";
+import {
+  claudeDesktopInstallDocument,
+  cursorInstallDocument,
+  mcpJsonDocument,
+  oauthProtectedResource,
+  serverCard,
+  vscodeInstallDocument
+} from "./connect.js";
 import { suiteCardBody } from "./suite-card.js";
 import {
   aiTxt,
@@ -19,7 +27,7 @@ import {
   type CountStore
 } from "./counters.js";
 import { CONTENT_SIGNAL, INDEXNOW_KEY, RELEASE_FILENAME, VERSION } from "./identity.js";
-import { renderDoors, renderLanding, renderLocalDesk } from "./landing.js";
+import { renderConnect, renderDoors, renderLanding, renderLocalDesk } from "./landing.js";
 import { handleMcp } from "./mcp.js";
 import { loadReleaseBytes, releaseHeaders } from "./release.js";
 
@@ -40,8 +48,27 @@ export default {
   }
 };
 
+const CORS_ALLOW_HEADERS = "Accept, Content-Type, MCP-Protocol-Version, Mcp-Session-Id, Authorization";
+const CORS_EXPOSE_HEADERS = "Mcp-Session-Id";
+
 export async function handleRequest(request: Request, env: Env, ctx?: WorkerContext): Promise<Response> {
-  return stampContentSignal(await routeRequest(request, env, ctx));
+  return applyCors(stampContentSignal(await routeRequest(request, env, ctx)));
+}
+
+function applyCors(response: Response): Response {
+  const headers = new Headers(response.headers);
+  if (!headers.has("Access-Control-Allow-Origin")) {
+    headers.set("Access-Control-Allow-Origin", "*");
+  }
+  headers.set("Access-Control-Expose-Headers", CORS_EXPOSE_HEADERS);
+  if (response.status === 204 || response.status === 205 || response.status === 304) {
+    return new Response(null, { status: response.status, statusText: response.statusText, headers });
+  }
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers
+  });
 }
 
 function stampContentSignal(response: Response): Response {
@@ -67,7 +94,8 @@ async function routeRequest(request: Request, env: Env, _ctx?: WorkerContext): P
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type"
+        "Access-Control-Allow-Headers": CORS_ALLOW_HEADERS,
+        "Access-Control-Expose-Headers": CORS_EXPOSE_HEADERS
       }
     });
   }
@@ -94,6 +122,26 @@ async function routeRequest(request: Request, env: Env, _ctx?: WorkerContext): P
   if (pathname === "/person.jsonld") return jsonLd(personJsonLd());
   if (pathname === "/graph.jsonld") return jsonLd(graphJsonLd());
   if (pathname === "/.well-known/mcp.json") return json(wellKnownMcp());
+  if (pathname === "/.well-known/mcp/server-card.json") {
+    return new Response(JSON.stringify(serverCard(), null, 2) + "\n", {
+      status: 200,
+      headers: {
+        "Content-Type": "application/mcp-server-card+json; charset=utf-8",
+        "Cache-Control": "no-store",
+        "Access-Control-Allow-Origin": "*"
+      }
+    });
+  }
+  if (
+    pathname === "/.well-known/oauth-protected-resource" ||
+    pathname === "/.well-known/oauth-protected-resource/mcp"
+  ) {
+    return json(oauthProtectedResource());
+  }
+  if (pathname === "/mcp.json") return json(mcpJsonDocument());
+  if (pathname === "/install/cursor.json") return json(cursorInstallDocument());
+  if (pathname === "/install/vscode.json") return json(vscodeInstallDocument());
+  if (pathname === "/install/claude-desktop.json") return json(claudeDesktopInstallDocument());
   if (pathname === "/v1/skill" || pathname === "/skill.md") {
     return text(skillMarkdown(), "text/markdown; charset=utf-8");
   }
@@ -130,6 +178,20 @@ async function routeRequest(request: Request, env: Env, _ctx?: WorkerContext): P
     return new Response(bytes, {
       status: 200,
       headers: releaseHeaders(filename, bytes.byteLength)
+    });
+  }
+
+  if (pathname === "/connect") {
+    if (request.method !== "GET" && request.method !== "HEAD") {
+      return json({ error: "method not allowed" }, 405);
+    }
+    return new Response(request.method === "HEAD" ? null : renderConnect(), {
+      status: 200,
+      headers: {
+        "Content-Type": "text/html; charset=utf-8",
+        "Cache-Control": "no-store",
+        "X-Product-Version": env.PRODUCT_VERSION || VERSION
+      }
     });
   }
 
